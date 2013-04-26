@@ -5,7 +5,7 @@ import datetime
 # the new user with all the details we need
 
 class CoopManager(BaseUserManager):
-    def create_user(self, email, twitter_handle, password=None):
+    def create_user(self, email, password=None):
         if not email:
             raise ValueError('Users must have an email address')
  
@@ -31,13 +31,13 @@ class CoopManager(BaseUserManager):
 class CoopMember(AbstractBaseUser):
 	NEAREST_PICKUP = (
          ('Whangarei', (
-            	('vinyl', 'Hikurangi'),
+            	('hikurangi', 'Hikurangi'),
             	('cd', 'Whangarei Central'),
             	('cd', 'Whangarei Central'),
             )
          ),
          ('Whangarei Heads', (
-	            ('vhs', 'VHS Tape'),
+	            ('parua-bay', 'Parua Bay'),
 	            ('dvd', 'DVD'),
 	        )
 	    ),
@@ -51,41 +51,45 @@ class CoopMember(AbstractBaseUser):
 	            ('dvd', 'DVD'),
 	        )
 	    ),
-	    ('unknown', 'Kaikohe'),
-	    ('unknown', 'Kaitaia'),
-	    ('unknown', 'Dargaville'),
-	    ('unknown', 'Waipu'),
-	    ('unknown', 'Maungawhai'),
-	    ('unknown', 'Maungaturoto'),
-	    ('unknown', 'Kaiwaka'),
+	    ('kaikohe', 'Kaikohe'),
+	    ('kaitaia', 'Kaitaia'),
+	    ('dargaville', 'Dargaville'),
+	    ('waipu', 'Waipu'),
+	    ('maungawhai', 'Maungawhai'),
+	    ('maungaturoto', 'Maungaturoto'),
+	    ('kaiwaka', 'Kaiwaka'),
 	)
     nearest_pickup = models.CharField(max_length=2, choices=NEAREST_PICKUP)
 	
 	whangarei_pickup = models.BooleanField(default=True)
 	
 	username = models.CharField(max_length=40, unique=True, db_index=True)
-	firstname = models.CharField(max_length=40, db_index=True)
-	lastname = models.CharField(max_length=40, db_index=True)
+	first_name = models.CharField(max_length=40, db_index=True)
+	last_name = models.CharField(max_length=40, db_index=True)
 	email = models.EmailField(max_length=254, unique=True)
+	address = models.TextField(max_length=300, db_index=True)
 	member_since = datetime.date()
 	
 	is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
+    
+    producer = models.ForeignKey('Producer', null=True)
 	
 	objects = UserManager
 	
 	USERNAME_FIELD = 'email'
-	REQUIRED_FIELDS = ['twitter_handle']
+	REQUIRED_FIELDS = ['first_name','last_name', 'email', 'nearest_pickup','address',]
 
 	
 	
 	def get_full_name(self):
         # For this case we return email. Could also be User.first_name User.last_name if you have these fields
-        return self.email
+        full_name = self.first_name.append(self.last_name)
+        return self.full_name
  
     def get_short_name(self):
         # For this case we return email. Could also be User.first_name if you have this field
-        return self.email
+        return self.first_name
  
     def __unicode__(self):
         return self.email
@@ -106,3 +110,17 @@ class CoopMember(AbstractBaseUser):
 
 class Post(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL)
+    
+class Producer(models.Model)
+	PRODUCER_Type = (
+		('produce', 'Produce'),
+		('meat', 'Meat'),
+		('dairy', 'Dairy'),
+		('processed', 'Processed Goods')
+	)
+
+	
+	biography = models.Textfield(max_length=3000, db_index=True)
+	photo = models.ImageField(upload_to='producer_photo/%Y/%m/%githud')
+	is_approved = models.BooleanField(default=False)
+	
