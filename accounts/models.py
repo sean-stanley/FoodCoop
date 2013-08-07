@@ -68,7 +68,8 @@ class CoopMember(AbstractBaseUser):
 	last_name = models.CharField(max_length=40, db_index=True)
 	email = models.EmailField(max_length=254, unique=True)
 	address = models.TextField(max_length=300, db_index=True)
-	member_since = datetime.date()
+	bankNumber = models.IntegerField(max_length= 14, unique=True)
+	member_since = datetime.today()
 	
 	is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)

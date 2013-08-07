@@ -17,7 +17,7 @@ class Product(models.Model):
 	
 	
 	producer = models.ForeignKey('accounts.Producer')
-	description = models.CharField(max_length=300, db_index=True)
+	details = models.CharField(max_length=900, db_index=True)
 	price = models.DecimalField(max_digits=6, decimal_places=2)
 	category = models.CharField(max_length=2, choices=CATEGORY)
 	
@@ -34,4 +34,4 @@ class OrderItem(models.Model):
 	quantity = models.PositiveIntegerField()
 	
 	markup = 1.2
-	final_price = markup * Product.price
+	final_price = markup * product.price
