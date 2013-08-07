@@ -1,0 +1,28 @@
+div#grass-containter {
+	overflow: hidden;
+	z-index: -99999;
+	background: url(../img/Grass-Field.jpg) no-repeat;
+	box-shadow: 1px 4px 1px #2d2d2d;
+	opacity: 1;
+
+}
+
+h1.logo {
+	font-size: 60px;
+	color: white;
+	text-align: left;
+	text-shadow: 1px 1px 1px #292828;
+	text-indent: 0.5em;
+	margin: 20px 0 0;
+	padding: 0;
+}
+
+h2.slogan {
+	font-size: 20px;
+	color: yellow;
+	text-align: left;
+	text-shadow: 1px 1px 1px #292828;
+	margin: 0 0 20px;
+	padding: 0;
+	text-indent: 1.5em;
+}

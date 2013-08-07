@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" ng-app>
+<head>
+    <meta charset="utf-8">
+    <title>Blog Mockup</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/banner.css" rel="stylesheet">
+    <link href="css/bootstrap.css" rel="stylesheet">
+    
+    
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+	<!-- universal angular data here -->
+	<script src="js/angular.js"></script>
+	<script src="js/angualr-bootstrap-prettify.js"></script> <!-- not working for some reason -->
+	
+	<!-- project-specific angualr data here -->
+	<script src="js/controllers.js"
+	
+    <!-- Optionally enable responsive features in IE8 -->
+    <script src="js/respond.js"></script>
+    <style type="text/css">
+          /* Sticky footer styles
+      -------------------------------------------------- */
+
+      html,
+      body {
+        height: 100%;
+        /* The html and body elements cannot have any padding or margin. */
+      }
+
+      /* Wrapper for page content to push down footer */
+      #wrap {
+        min-height: 100%;
+        height: auto !important;
+        height: 100%;
+        /* Negative indent footer by it's height */
+        margin: 0 auto -60px;
+      }
+
+      /* Set the fixed height of the footer here */
+      #push,
+      #footer {
+        height: 60px;
+      }
+      #footer {
+        background-color: #f5f5f5;
+      }
+
+      /* Lastly, apply responsive CSS fixes as necessary */
+      @media (max-width: 767px) {
+        #footer {
+          margin-left: -20px;
+          margin-right: -20px;
+          padding-left: 20px;
+          padding-right: 20px;
+        }
+      }
+      
+          /* Custom styles
+      -------------------------------------------------- */
+      #banner .btn-group {
+        top: -85px;
+        right: 35px;
+      }
+      
+    </style>
+</head>
+
+<body><div id="wrap" class="container"><!--Sticky footer hack: wrap all page content-->
+    <div class="row">
+	    <ul class="nav nav-tabs pull-right">
+	        <li><a href="#contact">Store</a></li>
+	        <li class="active"><a href="#join">Join Us</a></li>
+	        <li><a href="#contact">Our Mission</a></li>
+		</ul>
+    </div>
+    
+    <div id="banner">
+        <div id="grass-containter">
+        <h1 class="logo">NNFC</h1>
+		<h2 class="slogan">Local • Sustainable • Affordable</h2>  
+        </div>
+		    
+        
+        <div class="btn-group pull-right">
+            <button id="login" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                Login
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <!-- dropdown menu links -->
+                <form class="form-horizontal">
+				  <div class="form-group">
+				    <!-- <label for="inputEmail" class="col-lg-2 control-label">Email</label> -->
+				    <div class="col-lg-10">
+				      <input type="text" class="form-control" id="inputEmail" placeholder="Email">
+				    </div>
+				  </div>
+				  <div class="form-group">
+				    <!-- <label for="inputPassword" class="col-lg-2 control-label">Password</label> -->
+				    <div class="col-lg-10">
+				      <input type="password" class="form-control" id="inputPassword" placeholder="Password">
+				      <div class="checkbox">
+				        <label>
+				          <input type="checkbox"> Remember me
+				        </label>
+				      </div>
+				      <button type="submit" class="btn btn-default">Sign in</button>
+				    </div>
+				  </div>
+				</form>
+            </ul>
+        </div>
+    </div>
+    
+
+    <div class="container">
+        <div class="row">
+                
+            <div ng-view class="col-lg-9">
+                <div class="content">
+                    <div class="page-header">
+                    	<h1>Heading 1 &lt;h1&gt;
+                    <small>subtitle</small></h1>
+                    </div>
+                    
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur porta, lacus ac fermentum auctor, tortor enim pulvinar purus, at porttitor felis lectus nec ante. Cras tincidunt enim id nibh ullamcorper rutrum. Sed et pellentesque metus. In in convallis tellus. Nulla et leo dolor. Sed feugiat, turpis sit amet iaculis porttitor, leo odio ultricies turpis, vitae rhoncus nibh nisl non nisi. Morbi quis enim aliquet quam tristique egestas. Mauris lobortis magna sit amet mattis consectetur. Sed imperdiet porttitor ultricies. Proin ullamcorper purus lorem, nec tempus ante gravida sit amet. Nunc molestie interdum purus, ut semper ipsum rutrum pretium. Integer mattis varius massa nec pulvinar. Sed a eros eu arcu tincidunt laoreet eget sed arcu.
+
+Aliquam at risus quam. Nunc iaculis mauris euismod sodales sodales. Ut vel porttitor dui. Donec fermentum accumsan orci a volutpat. Vestibulum eu pharetra purus, vel porttitor est. In sodales odio in placerat fringilla. Proin imperdiet, eros quis cursus tempus, massa lectus tempor metus, faucibus consequat sapien odio id lorem.
+
+Nam fringilla, libero a placerat ornare, libero lorem hendrerit odio, eget molestie ipsum odio nec erat. Ut molestie, ipsum eget blandit tincidunt, ante enim suscipit urna, a condimentum lacus mi et leo. Vivamus semper nisl et quam sagittis consequat. Vivamus diam nulla, suscipit vitae turpis sed, congue imperdiet massa. Aenean non turpis tincidunt, egestas sem at, adipiscing nulla. Suspendisse consectetur dolor nibh, eget blandit odio fringilla non. In iaculis ornare lorem ac sagittis. Quisque semper gravida ullamcorper. Nulla dictum quis leo vitae feugiat. Mauris dignissim eu lacus sed commodo. Vestibulum eu viverra leo.
+
+Proin nec nisi rutrum urna placerat varius sit amet ut magna. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Etiam semper lacus eget venenatis rhoncus. Sed non malesuada metus. Vestibulum vel nibh vitae quam sodales tincidunt. Fusce consectetur dui in libero placerat consectetur. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+
+Nam enim dui, varius eu congue sed, ornare ut arcu. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Phasellus ultrices adipiscing nulla nec venenatis. Nullam feugiat, urna eu porta consequat, urna mi sollicitudin magna, eu malesuada neque tortor nec massa. Cras in sapien id lectus tempus ornare bibendum eget elit. Vivamus vitae ultrices sapien, nec vulputate sapien. Maecenas tristique odio vel mi mollis, eu cursus nibh semper. Nullam congue nec ligula non feugiat. Aenean bibendum eu sapien non interdum. In dignissim velit et viverra consectetur. Sed luctus id est sit amet auctor. Aliquam quis libero sed orci rhoncus elementum. Donec vitae sagittis erat, ut mollis turpis. Ut sem magna, posuere sed lectus sed, adipiscing tristique velit. Quisque semper molestie ultrices. Nunc non pharetra felis, eu pharetra sapien. 
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <ul class="nav nav-list">
+                    <li><a href="#1">Meet the Tean</a></li>
+                    <li><a href="#2">Sustainable development</a></li>
+                    <li><a href="#3">Our mission</a></li>
+                    <li><a href="#talk">Contact us</a></li>
+                </ul>
+                <ul class="nav nav-list">
+                    <li><a href="#1">This is all blog related</a></li>
+                    <li><a href="#2">Including above</a></li>
+                    <li><a href="#3">Site related at top and footer</a></li>
+                    <li><a href="#talk">Talk to Us</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div id="push"></div>
+</div><!--End hack-->
+
+    <div id="footer">
+        <div class="container-fluid">
+            <ul class="breadcrumb pull-right">
+                <li><a href="#home">Home</a> <span class="divider">/</span></li>
+                <li><a href="#blog">Blog</a> <span class="divider">/</spam></li>
+                <li class="active">Latest</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
