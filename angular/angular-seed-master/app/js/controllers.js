@@ -8,4 +8,7 @@ angular.module('myApp.controllers', []).
   }])
   .controller('MyCtrl2', [function() {
 
+  }])
+  .controller('Login', ['$scope', function($scope) {
+	  $scope.showLogin = false;
   }]);

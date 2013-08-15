@@ -1,28 +1,164 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" ng-app="myApp">
 <head>
-  <meta charset="utf-8">
-  <title>My AngularJS App</title>
-  <link rel="stylesheet" href="css/app.css"/>
+    <meta charset="utf-8">
+    <title>Blog Mockup</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/banner.css" rel="stylesheet">
+    <link href="css/bootstrap.css" rel="stylesheet">
+    
+    
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+
+		
+    <!-- Optionally enable responsive features in IE8 -->
+    <script src="js/respond.js"></script>
+    <style type="text/css">
+          /* Sticky footer styles
+      -------------------------------------------------- */
+
+      html,
+      body {
+        height: 100%;
+        /* The html and body elements cannot have any padding or margin. */
+      }
+
+      /* Wrapper for page content to push down footer */
+      #wrap {
+        min-height: 100%;
+        height: auto !important;
+        height: 100%;
+        /* Negative indent footer by it's height */
+        margin: 0 auto -60px;
+      }
+
+      /* Set the fixed height of the footer here */
+      #push,
+      #footer {
+        height: 60px;
+      }
+      #footer {
+        background-color: #f5f5f5;
+      }
+
+      /* Lastly, apply responsive CSS fixes as necessary */
+      @media (max-width: 767px) {
+        #footer {
+          margin-left: -20px;
+          margin-right: -20px;
+          padding-left: 20px;
+          padding-right: 20px;
+        }
+      }
+      
+          /* Custom styles
+      -------------------------------------------------- */
+      #banner .btn-group {
+        top: -85px;
+        right: 35px;
+      }
+      
+    </style>
 </head>
-<body>
-  <ul class="menu">
-    <li><a href="#/view1">view1</a></li>
-    <li><a href="#/view2">view2</a></li>
-  </ul>
 
-  <div ng-view></div>
+<body><div id="wrap" class="container"><!--Sticky footer hack: wrap all page content-->
+    <div class="row">
+	    <ul class="nav nav-tabs pull-right">
+	        <li><a href="#contact">Store</a></li>
+	        <li><a href="#/signup">Join Us</a></li>
+	        <li class="active"><a href="#contact">Our Mission</a></li>
+		</ul>
+    </div>
+    
+    <div id="banner">
+        <div id="grass-containter">
+        <h1 class="logo">NNFC</h1>
+		<h2 class="slogan">Local • Sustainable • Affordable</h2>  
+        </div>
+		    
+        
+        <div class="btn-group pull-right" ng-controller="Login" style="z-index:9999">
+            <button id="login" type="button" class="btn btn-default" ng-click="showLogin = true">
+                Login
+                <span class="caret"></span>
+            </button>
+            <ul ng-show="showLogin">
+                <!-- dropdown menu links -->
+                <form class="form-horizontal">
+				  <div class="form-group">
+				    <!-- <label for="inputEmail" class="col-lg-2 control-label">Email</label> -->
+				    <div class="col-lg-10">
+				      <input type="text" class="form-control" id="inputEmail" placeholder="Email">
+				    </div>
+				  </div>
+				  <div class="form-group">
+				    <!-- <label for="inputPassword" class="col-lg-2 control-label">Password</label> -->
+				    <div class="col-lg-10">
+				      <input type="password" class="form-control" id="inputPassword" placeholder="Password">
+				      <div class="checkbox">
+				        <label>
+				          <input type="checkbox"> Remember me
+				        </label>
+				      </div>
+				      <button type="submit" class="btn btn-default" ng-click="showLogin = false">Sign in</button>
+				    </div>
+				  </div>
+				</form>
+            </ul>
+        </div>
+    </div>
+    
 
-  <div>Angular seed app: v<span app-version></span></div>
+    <div class="container">
+        <div class="row">
+                
+            <div class="col-lg-9">
+                <div ng-view></div>
+            </div>
+            
+            <div class="col-lg-3">
+                <ul class="nav nav-list">
+                    <li><a href="#1">Meet the Team</a></li>
+                    <li><a href="#2">Sustainable development</a></li>
+                    <li><a href="#3">Our mission</a></li>
+                    <li><a href="#talk">Contact us</a></li>
+                </ul>
+                <ul class="nav nav-list">
+                    <li><a href="#/product-upload">Upload a product</a></li>
+                    <li><a href="#2">Including above</a></li>
+                    <li><a href="#3">Site related at top and footer</a></li>
+                    <li><a href="#talk">Talk to Us</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div id="push"></div>
+</div><!--End hack-->
 
-  <!-- In production use:
-  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
-  -->
-  <script src="lib/angular/angular.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/services.js"></script>
-  <script src="js/controllers.js"></script>
-  <script src="js/filters.js"></script>
-  <script src="js/directives.js"></script>
+    <div id="footer">
+        <div class="container-fluid">
+            <ul class="breadcrumb pull-right">
+                <li><a href="#home">Home</a> <span class="divider">/</span></li>
+                <li><a href="#blog">Blog</a> <span class="divider">/</spam></li>
+                <li class="active">Latest</li>
+            </ul>
+        </div>
+    </div>
+    
+<!-- universal angular data here -->
+<script src="js/angular.js"></script>
+<script src="js/angualr-bootstrap-prettify.js"></script> <!-- not working for some reason -->
+
+<!-- project-specific angualr data here -->
+<script src="lib/angular/angular.js"></script>
+<script src="js/app.js"></script>
+<script src="js/services.js"></script>
+<script src="js/controllers.js"></script>
+<script src="js/filters.js"></script>
+<script src="js/directives.js"></script>
+
 </body>
 </html>

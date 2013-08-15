@@ -1,0 +1,75 @@
+<div id="product-upload-preview-column" class="col-lg-4">
+	<div id="preview-container" class="preview-box">
+		<img width="220px" height="140px" alt="product name">
+		<h3>{{variety}} {{inputName}}</h3>
+		<p>{{price}} {{units}} </p>
+	</div>
+</div>
+
+<div id="product-upload-form-container" class="col-lg-8">
+	<form autocomplete="on" >
+  <fieldset>
+    <legend>Upload a Product {{username}}</legend>
+    <div class="form-group">
+      <label for="Category">Product Category</label>
+      <select name="category" id="category-menu" required>
+	      <option value="produce">Fresh Produce</option>
+	      <option value="meat">Meat</option>
+	      <option value="dairy">Dairy</option>
+	      <option value="processed-food">Processed Food</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="inputName">Product Name</label>
+      <input type="text" class="form-control" id="inputName" placeholder="e.g. Apples" autofocus required>
+    </div>
+    <div class="form-group">
+      <label for="inputVariety">Variety</label>
+      <input type="text" class="form-control" id="inputVariety" placeholder="e.g. Granny Smith">
+    </div>
+    <div class="form-group">
+      <label for="quantity">Quantity Available</label>
+      <input type="number" max="1000" class="form-control" id="quantity" placeholder="e.g. 27" required>
+    </div>
+    <div class="form-group">
+      <label for="units">Quantity Units</label>
+      <select name="units" id="units" required>
+	      <option value="g">g</option>
+	      <option value="kg" selected="true">kg</option>
+	      <option value="ml">ml</option>
+	      <option value="l">l</option>
+	      <option value="quarter">quarter beast</option>
+	      <option value="half">half beast</option>
+	      <option value="whole">whole beast</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="description">Description</label> 
+      <textarea id="description" maxlength="2000" placeholder="Write a couple paragraphs about how special your product is." required></textarea>  
+    </div>
+    <div class="checkbox">
+      <label for="save-product">Save this product for future order cycles</label>
+      <input name="save-product" type="checkbox">
+
+    </div> 
+    <div class="checkbox">
+      <label for="product-image">Product Image Upload</label>
+      <input name="product-image" type="image" class="form-control" size="2MB">
+    </div>
+    <div class="checkbox">
+      <label>Certification (select those that apply)</label>
+      <input name="bioGro" type="checkbox"> Biogro
+      <input name="assureQuality" type="checkbox"> Assurequality
+      <input name="demeter" type="checkbox"> Demeter BioDynamic
+      <input name="organicFarmsNZ" type="checkbox"> Organic Farms NZ
+    </div>
+    <div class="checkbox">
+      <label for="tags">Tags</label>
+      <input name="tags" type="text" class="form-control" maxlength="200">
+    </div>
+    <button type="reset" class="btn btn-default">Reset</button>    
+    <button type="submit" class="btn btn-default">Submit</button>
+  </fieldset>
+</form>
+
+</div>
