@@ -1,3 +1,11 @@
+<div ng-controller="userCtrl" id="user-info-preview-column" class="col-lg-4">
+	<div id="preview-container" class="preview-box" >
+		<h5>{{userFirstName}} {{userLastName}}</h5>
+		<p>{{userCity}} <span>{{userType.text}}</span>
+		</p>
+	</div>
+</div>
+
 <form autocomplete="on" >
   <fieldset>
     <legend>Join the Northland Natural Food Co-op</legend>
@@ -11,11 +19,11 @@
     </div>
     <div class="form-group">
       <label for="InputFirstName">First Name</label>
-      <input type="text" class="form-control" id="InputFirstName" placeholder="First Name" required>
+      <input ng-model="userFirstName" type="text" class="form-control" id="InputFirstName" placeholder="First Name" required>
     </div>
     <div class="form-group">
       <label for="InputLastName">Last Name</label>
-      <input type="text" class="form-control" id="InputLastName" placeholder="Last Name" required>
+      <input ng-model="userLastName" type="text" class="form-control" id="InputLastName" placeholder="Last Name" required>
     </div>
     <div class="form-group">
       <label for="DateOfBirth">Date of Birth</label>
@@ -23,11 +31,11 @@
     </div>
     <div class="form-group">
       <label for="Address">Address</label> 
-      <textarea id="Address" required></textarea>  
+      <textarea id="Address" style="width:80%;" required></textarea>  
     </div>
     <div class="form-group">
     	<label for="InputLastName">Nearest City</label>
-		<select contenteditable="true">
+		<select ng-model="userCity" contenteditable="true">
 		  <option value="ahipara">Ahipara</option>
 		  <option value="awanui">Awanui</option>
 		  <option value="dargaville">Dargaville</option>
@@ -58,7 +66,7 @@
     </div>
     <div class="checkbox">
       <label>
-        <input type="checkbox"> I want to sell products too!
+        <input ng-model="isProducer" type="checkbox"> I want to sell products too!
       </label>
     </div>
     <button type="submit" class="btn btn-default">Submit</button>

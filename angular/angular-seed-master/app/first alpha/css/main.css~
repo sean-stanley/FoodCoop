@@ -1,0 +1,138 @@
+/* Generic Styles */
+
+.highlight {
+    color: #572138;
+}
+
+/* Layout Specific Style */
+#header {
+	clear: both;
+	float: left;
+	width: 100%;
+	border-bottom: 1px solid #000;
+}
+
+/* column container */
+.colmask {
+	position: relative;	/* This fixes the IE7 overflow hidden bug */
+	clear: both;
+	float: left;
+	width: 100%;			/* width of whole page */
+	overflow: hidden;		/* This chops off any overhanging divs */
+}
+
+.conleft {
+	float: left;
+	width: 100%;
+	position: relative;
+}
+
+.colleft,
+.colmain {
+	float: left;
+	position: relative;
+	padding: 0 0 1em 0;
+	overflow: hidden;
+	background-color: inherit;
+}
+
+.colmask {
+	background: inherit;		/* right background */
+}
+
+.conleft {
+	right: 79%;			/* right width */
+	background: inherit;	/* left background */
+}
+
+.colmain {
+	width: 77%;			/* main content width */
+	left: 101%;			/* 100% plus left padding */
+}
+
+.colleft {
+	width: 19%;			/* left column width */
+	min-width: 200px;
+	left: 3%;			/* (main content padding) plus (left padding) */
+	font-size: 1em;
+}
+
+.colleft h1 {
+    margin-bottom: 0px;
+}
+
+.colleft h2 {
+    margin-top: 0px;
+    font-size: 0.9em;
+    color: #ffcc67;
+}
+
+.colleft .filter select, .colleft .filter input {
+    display: block;
+}
+
+.colmain .navbar li {
+    display: inline;
+    margin: 0px;
+    padding: 0px;
+}
+
+.colmain .navbar li a {
+    background-color: #777;
+    padding: 10px;
+    text-decoration: none;
+    color: #000;
+    margin: 0px;
+    border: 1px solid #000;
+}
+
+.colmain .navbar li a:hover {
+    background-color: #888;
+}
+
+.colmain .product {
+    float: left;
+    width: 200px;
+    height: 245px;
+    background-color: inherit;
+    border: 1px solid #555;
+    margin: 0px 8px 8px 0px;
+    font-size: 0.8em;
+}
+
+.colmain .big {
+    width: 410px;
+    height: 500px;
+}
+
+.colmain .product img {
+    width: 190px;
+    margin: 5px;
+    border-right: 1px solid #666;
+    border-bottom: 1px solid #666;
+}
+
+.colmain .big img {
+    width: 400px;
+}
+
+.colmain .product p {
+    margin: 0px 0px 0px 5px;
+}
+
+.colmain .product .producer {
+    position: relative;
+    float: right;
+    right: 5px;
+}
+
+.colmain .product strong {
+    display: block;
+}
+
+#footer {
+	clear: both;
+	float: left;
+	width: 100%;
+	border-top: 1px solid #000;
+}

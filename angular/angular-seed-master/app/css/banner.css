@@ -26,3 +26,9 @@ h2.slogan {
 	padding: 0;
 	text-indent: 1.5em;
 }
+
+.login {
+	background-color: rgba(255,255,255,0.86);
+	border: 14px solid rgba(28,26,26,0.86);
+	
+}

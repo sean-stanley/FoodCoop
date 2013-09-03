@@ -1,0 +1,31 @@
+
+.animate-show.ng-hide-add, 
+.animate-show.ng-hide-remove {
+  -webkit-transition:all linear 1s;
+  -moz-transition:all linear 1s;
+  -o-transition:all linear 1s;
+  transition:all linear 1s;
+  display:block!important;
+}
+
+.animate-show.ng-hide-add.ng-hide-add-active,
+.animate-show.ng-hide-remove {
+  line-height:0;
+  opacity:0;
+  padding:0 10px;
+}
+ 
+.animate-show.ng-hide-add,
+.animate-show.ng-hide-remove.ng-hide-remove-active {
+  line-height:20px;
+  opacity:1;
+  padding:10px;
+  border:1px solid black;
+  background:white;
+}
+ 
+.check-element {
+  padding:10px;
+  border:1px solid black;
+  background:white;
+}
