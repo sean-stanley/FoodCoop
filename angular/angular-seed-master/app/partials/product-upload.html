@@ -1,15 +1,14 @@
-<div id="product-upload-controller-container" ng-controller="product-upload">
 	
 	<div id="product-upload-preview-column" class="col-lg-4">
 	<div id="preview-container" class="preview-box">
-		<img ng-src={{ctrlBoundImage}} width="220px" height="140px" alt="product name">
+		<img ng-src={{productImage}} alt="product name" width="260px">
 		<h5>{{variety}} {{productName}}</h5>
 		<p>${{unitPrice}} / {{units}} </p>
 	</div>
 </div>
 
 <div id="product-upload-form-container" class="col-lg-8" >
-	<form autocomplete="on" >
+	<form autocomplete="on" ng-submit="submitForm();">
   <fieldset>
     <legend>Upload a Product {{username}}</legend>
     <div class="form-group">
@@ -19,8 +18,9 @@
     </div>
     
     <div class="col-lg-6">
-      <h4 for="product-image">Product Image Upload</h4>
-	  <div file-dropzone="[image/png, image/jpeg, image/gif]" file="ctrlBoundImage" file-name="ctrlBoundFileName" data-max-file-size="3" id="file-dropzone" style="width: 150px; height: 150px; border: 1px solid">
+      <label for="product-image">Product Image Upload</label>
+	  <input type="file" id="product-image" name="product-image"/>
+	  <div file-dropzone="[image/png, image/jpeg, image/gif]" file="productImage" data-max-file-size="3" id="file-dropzone" style="width: 150px; height: 45px; border: 1px solid">
 	<span>Drop Product Image Here</span>
 	  </div>    
 	</div>
@@ -46,14 +46,19 @@
       <select ng-model="units" ng-options="c for c in availableUnits" name="units" id="units" required>
       </select>
     </div>
+     
+     <div ng-show="ingredients" class="slide-container" ng-animate="slide">
+     <div class="form-group col-lg-12">
+      <label for="ingredients">Ingredients</label> 
+      <textarea id="ingredients" maxlength="1000" placeholder="Please list all ingredients of this product." rows="9" style="width: 100%;" required></textarea>  
+    </div>
+     </div>
+    
     <div class="form-group">
       <label for="description">Description</label> 
       <textarea id="description" maxlength="2000" placeholder="Write a couple paragraphs about how special your product is." rows="9" style="width: 100%;" required></textarea>  
     </div>
-    <div ng-show="ingredients" class="form-group animate-show">
-      <label for="ingredients">Ingredients</label> 
-      <textarea id="ingredients" maxlength="1000" placeholder="Please list all ingredients of this product." rows="9" style="width: 100%;" required></textarea>  
-    </div>
+   
     
     
     <div class="checkbox">
@@ -71,14 +76,12 @@
       </select>
     </div>
     <div class="checkbox">
-      <label for="tags">Tags</label>
-      <input name="tags" type="text" class="form-control" maxlength="200">
+      <label for="keyword">keywords</label>
+      <input name="keywords" type="text" class="form-control" maxlength="200" placeholder="seperate keywords with commas e.g. salad, lettuce, organic"> 
     </div>
     <button type="reset" class="btn btn-default">Reset</button>    
-    <button type="submit" class="btn btn-default">Submit</button>
+    <button type="submit" class="btn btn-default" ng-disabled="sign-up.email1.$pristine || sign-up.email1.$dirty && sign-up.email1.$invalid">Submit</button>
   </fieldset>
 </form>
-
-</div>
 
 </div>

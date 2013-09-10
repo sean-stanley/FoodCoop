@@ -6,7 +6,7 @@ angular.module('co-op', [ 'ngRoute', 'co-op.filters', 'co-op.services', 'co-op.d
   config(['$routeProvider', function($routeProvider) {
     $routeProvider.when('/view1', {templateUrl: 'partials/partial1.html', controller: 'MyCtrl1'});
     $routeProvider.when('/view2', {templateUrl: 'partials/partial2.html', controller: 'MyCtrl2'});
-    $routeProvider.when('/signup', {templateUrl: 'partials/signup.html', controller: 'MyCtrl1'});
-    $routeProvider.when('/product-upload', {templateUrl: 'partials/product-upload.html', controller: 'MyCtrl2'});
+    $routeProvider.when('/signup', {templateUrl: 'partials/signup.html', controller: 'userCtrl'});
+    $routeProvider.when('/product-upload', {templateUrl: 'partials/product-upload.html', controller: 'product-upload'});
     $routeProvider.otherwise({redirectTo: '/view1'});
   }]);
