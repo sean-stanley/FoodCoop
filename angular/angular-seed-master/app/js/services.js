@@ -6,4 +6,26 @@
 // Demonstrate how to register services
 // In this case it is a simple value service.
 angular.module('co-op.services', []).
-  value('version', '0.1');
+	factory('UserManager', ['$http', function($http) {
+		return {
+			registerUser : function(userData) {
+				console.log("User data", userData);
+			}			
+		};
+	}])
+	
+	.factory('ProductManager', ['$http', function($http) {
+		return {
+			registerProduct : function(productData) {
+				console.log("Product Data Object", productData);
+			}
+		}	
+	}])
+	
+	.factory('ProducerManager', ['$http', function($http) {
+		return {
+			registerProduct : function(producerData) {
+				console.log("Producer Data Object", producerData);
+			}
+		}	
+	}]);

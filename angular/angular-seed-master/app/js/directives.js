@@ -64,7 +64,7 @@ angular.module('co-op.directives', []).
                 if (scope.pw === '') {
                     iElement.css({ "display": "none"  });
                 } else {
-                    var c = strength.getColor(strength.mesureStrength(scope.pw));
+                    var c = strength.getColor(strength.mesureStrength(scope.userData.pw));
                     iElement.css({ "display": "inline" });
                     iElement.children('li')
                         .css({ "background": "#DDD" })
@@ -141,4 +141,5 @@ angular.module('co-op.directives', []).
         });
       }
     };
-  });
+  })
+  

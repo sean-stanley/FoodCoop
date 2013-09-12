@@ -1,62 +1,24 @@
-.slide-container {
-    height: 100px;
-    position: relative;
+#ingredients.ng-hide-add, 
+#ingredients.ng-hide-remove {
+  -webkit-transition:all linear 0.5s;
+  -moz-transition:all linear 0.5s;
+  -o-transition:all linear 0.5s;
+  transition:all linear 0.5s;
+  display:block!important;
 }
-.slide-container > * {
-    display:block;
-    width:100%;
-    top:0;
-    left:0;
-    right:0;
-    bottom:0;
-    padding:10px;
+ 
+#ingredients.ng-hide-add.ng-hide-add-active,
+#ingredients.ng-hide-remove {
+  line-height:0;
+  opacity:0;
+  padding:0 10px;
 }
-.slide-hide, .slide-show {
-    -webkit-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 1.5s;
-    -moz-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 1.5s;
-    -o-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 1.5s;
-    transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 1.5s;
-}
-.slide-hide {
-    position: relative;
-    top: 0;
-}
-.slide-hide.slide-hide-active {
-    position: absolute;
-    top: -100px;
-}
-.slide-show {
-    position: absolute;
-    top: 100px;
-}
-.slide-show.slide-show-active {
-    position: relative;
-    top: 0px;
-}
-
-input.ng-pristine + ul#strength {
-    display:none;
-}
-ul#strength {
-    display:inline;
-    list-style:none;
-    margin:0;
-    margin-left:15px;
-    padding:0;
-    vertical-align:2px;
-}
-.point:last {
-    margin:0 !important;
-}
-.point {
-    background:#DDD;
-    border-radius:2px;
-    display:inline-block;
-    height:5px;
-    margin-right:1px;
-    width:20px;
-}
-#footer {
-    position:fixed;
-    bottom:5px;
+ 
+#ingredients.ng-hide-add,
+#ingredients.ng-hide-remove.ng-hide-remove-active {
+  line-height:20px;
+  opacity:1;
+  padding:10px;
+  border:1px solid black;
+  background:white;
 }

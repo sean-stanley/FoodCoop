@@ -1,51 +1,52 @@
 <div id="user-info-preview-column" class="col-lg-4">
 	<div id="preview-container" class="preview-box" >
-		<h5>{{userFullName}} <span ng-hide="singUp.userCity.$pristine"> of </span> {{userCity.name}}</h5>
-		<p ng-hide="singUp.userCity.$pristine">Distance to Whangarei: <span>{{userCity.distance}}km</span>
+		<h5>{{userData.fullName}} <span ng-hide="signUp.city.$pristine"> of </span> {{userData.city.name}}</h5>
+		<p ng-hide="signUp.city.$pristine">Distance to Whangarei: <span>{{userData.city.distance}}km</span>
+		<p ng-hide="signUp.city.$pristine">If you volunteer to deliver you will be paid: {{0.67 * userData.city.distance|currency}} for your petrol.
 		</p>
 	</div>
 </div>
 
-<form name="signUp" autocomplete="on" novalidate>
+<form name="signUp" autocomplete="on" ng-submit="submitForm()" novalidate>
   <fieldset>
     <legend>Join the Northland Natural Food Co-op</legend>
     <div class="form-group">
-      <label for="email1">Email address</label>
-      <input ng-model="email1" name="email1" type="email" class="form-control" placeholder="Enter email" autofocus required>
-      <div class="custom-error" ng-show="signUp.email1.$dirty && signUp.email1.$invalid">Sorry:
-		  <span ng-show="signUp.email1.$error.required">email is required.</span>
-		  <span ng-show="signUp.email1.$error.email">Please, write a valid email address.</span>
+      <label for="email">Email address</label>
+      <input ng-model="userData.email" name="email" type="email" class="form-control" placeholder="Enter email" autofocus required>
+      <div class="custom-error" ng-show="signUp.email.$dirty && signUp.email.$invalid">Sorry:
+		  <span ng-show="signUp.email.$error.required">email is required.</span>
+		  <span ng-show="signUp.email.$error.email">Please, write a valid email address.</span>
       </div>
     </div>
     <div class="form-group">
       <label for="pw">Create a Password</label>
-      <input type="password" class="form-control" ng-model="pw" name="pw" placeholder="Enter a Password" required>
-      <ul id="strength" check-strength="pw"></ul>
+      <input type="password" class="form-control" ng-model="userData.pw" name="pw" placeholder="Enter a Password" required>
+      <ul id="strength" check-strength="userData.pw"></ul>
     </div>
     <div class="form-group">
-      <label for="InputFirstName">Full Name</label>
-      <input ng-model="userFullName" name="userFullName" type="text" class="form-control" id="InputFullName" placeholder="Full Name" required>
+      <label for="userFullName">Full Name</label>
+      <input ng-model="userData.fullName" name="userFullName" type="text" class="form-control" placeholder="Full Name" required>
       <div class="custom-error" ng-show="signUp.userFullName.$dirty && signUp.userFullName.$invalid">Sorry:
 		  <span ng-show="signUp.userFullName.$error.required">Full name is required.</span>
       </div>
     </div>
     <div class="form-group">
       <label for="DateOfBirth">Date of Birth</label>
-      <input type="date" class="form-control" id="DateOfBirth" min="2000-01-01" max="1910-01-01">
+      <input type="date" class="form-control" id="DateOfBirth" min="2006-01-01" max="1910-01-01">
     </div>
     <div class="form-group">
-      <label for="Address">Address</label> 
-      <textarea id="Address" style="width:80%;" required></textarea>  
+      <label for="address">Address</label> 
+      <input ng-model="address" name="address" type="text" id="address_field" style="width:80%;" required></textarea>  
     </div>
     <div class="form-group">
     	<label for="city">Nearest City</label>
-		<select ng-model="userCity" ng-options="c.name for c in cities" name="city" id="category-menu" required></select>    
+		<select ng-model="userData.city" ng-options="c.name for c in cities" name="city" id="category-menu" required></select>    
     </div>
     <div class="checkbox">
       <label>
-        <input ng-model="isProducer" type="checkbox"> I want to sell products too!
+        <input type="checkbox" ng-model="wantsToBeProducer"> I want to sell products too!
       </label>
     </div>
-    <button type="submit" class="btn btn-default" ng-disabled="signUp.email1.$pristine || signUp.email1.$dirty && signUp.email1.$invalid">Submit</button>
+    <button type="submit" class="btn btn-default" ng-disabled="signUp.$pristine || (signUp.$dirty && signUp.$invalid)">Submit</button>
   </fieldset>
 </form>

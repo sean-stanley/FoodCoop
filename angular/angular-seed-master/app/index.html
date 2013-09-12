@@ -2,12 +2,14 @@
 <html lang="en" ng-app="co-op">
 <head>
     <meta charset="utf-8">
-    <title>Blog Mockup</title>
+    <title>NNFC -- Northland Natural Food Co-op</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/site.css" title="site" type="text/css" media="screen">
     <link href="css/banner.css" rel="stylesheet" media="screen">
-	<link href="css/bootstrap.css" rel="stylesheet" media="screen">
     <link rel="stylesheet" href="css/products.css" title="products" type="text/css" media="screen"> 
     <link rel="stylesheet" href="css/animations.css" title="animations" type="text/css" media="screen">
+    <link href="css/bootstrap.css" rel="stylesheet" media="screen">
+
     
     <script src="http://code.jquery.com/jquery.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
@@ -61,11 +63,12 @@
 </head>
 
 <body><div id="wrap" class="container"><!--Sticky footer hack: wrap all page content-->
-    <div class="row">
+    <div class="row" ng-controller="navCtrl">
 	    <ul class="nav nav-tabs pull-right">
-	        <li><a href="#contact">Store</a></li>
-	        <li><a href="#/signup">Join Us</a></li>
-	        <li class="active"><a href="#contact">Our Mission</a></li>
+	        <li ng-class="{active:isActive('/')}"><a href="#contact">Home</a></li>
+	        <li ng-class="{active:isActive('/signup')}"><a href="#/signup">Join Us</a></li>
+	        <li ng-class="{active:isActive('/mission')}"><a href="#contact">Contact Us</a></li>
+	        <li><a href="http://foodcoop.org.nz">Blog</a></li>
 		</ul>
     </div>
     
@@ -82,7 +85,8 @@
                 <span class="caret"></span>
             </button>
             <div ng-show="showLogin" id="login-drop-down-menu" class="login">
-            	<ul>
+               <ul>
+                <button type="reset" class="boxclose" ng-click="showLogin = false"></button>
                 <!-- dropdown menu links -->
                 <form class="form-horizontal">
 				  <div class="form-group">
@@ -104,7 +108,7 @@
 				    </div>
 				  </div>
 				</form>
-				</ul>
+               </ul>
             </div>
         </div>
     </div>
@@ -115,20 +119,18 @@
                 
             <div class="col-lg-9">
                 <div ng-view></div>
-            </div>
+            </div> 
             
-            <div class="col-lg-3">
-                <ul class="nav nav-list">
+            <div class="col-lg-3" ng-controller="navCtrl">
+                <ul class="nav nav-pills nav-stacked">
                     <li><a href="#1">Meet the Team</a></li>
-                    <li><a href="#2">Sustainable development</a></li>
-                    <li><a href="#3">Our mission</a></li>
                     <li><a href="#talk">Contact us</a></li>
                 </ul>
-                <ul class="nav nav-list">
-                    <li><a href="#/product-upload">Upload a product</a></li>
-                    <li><a href="#2">Including above</a></li>
-                    <li><a href="#3">Site related at top and footer</a></li>
-                    <li><a href="#talk">Talk to Us</a></li>
+                <br>
+                <ul class="nav nav-list nav-pills nav-stacked">
+                    <li ng-class="{active:isActive('/product-upload')}"><a href="#/product-upload">Upload a Product</a></li>
+                    <li ng-class="{active:isActive('/producer-profile')}"><a href="#/producer-profile">Edit Producer Profile</a></li>
+                    <li><a href="#/faq">User FAQ</a></li>
                 </ul>
             </div>
         </div>

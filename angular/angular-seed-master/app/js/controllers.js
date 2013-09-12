@@ -9,17 +9,18 @@ angular.module('co-op.controllers', []).
   .controller('MyCtrl2', [function() {
 
   }])
-  .controller('userCtrl', ['$scope', function($scope) {
+  .controller('navCtrl', function($scope, $location) {
+	$scope.isActive = function(route) {
+		return route === $location.path();
+	}  
+  })
+  .controller('userCtrl', ['$scope', 'UserManager', function($scope, UserManager) {
+	  
 	  $scope.userTypes = [
 	  {name:'Guest', buy:false, sell:false },
 	  {name:'Customer', buy:true, sell:false},
 	  {name:'Producer', buy:true, sell:true},
 	  ];
-	  
-	  $scope.userType = $scope.userTypes[0]; // a guest by default
-	  
-	  $scope.pw = '';
-	  $scope.email1 = '';
 	  
 	  $scope.cities = [
 	  		{name:'Ahipara', value:'ahipara', fromWhangarei:'north', distance:'166', maps:'https://www.google.co.nz/maps/preview#!data=!4m18!3m17!1m1!1sWhangarei%2C+Northland!1m5!1sAhipara!2s0x6d090e62e90609c9%3A0x500ef6143a2b140!3m2!3d-35.1713389!4d173.1532718!3m8!1m3!1d95823!2d173.1526512!3d-35.155162!3m2!1i1298!2i705!4f13.1&fid=0'},
@@ -46,19 +47,37 @@ angular.module('co-op.controllers', []).
 	  		{name:'Whangarei', value:'whangarei', fromWhangarei:'south', distance:'0', maps:'https://www.google.co.nz/maps/preview#!q=Whangarei%2C+Northland&data=!1m4!1m3!1d99347!2d174.2877818!3d-35.7118146!4m10!1m9!4m8!1m3!1d103667!2d174.2877818!3d-35.7118146!3m2!1i1024!2i768!4f13.1'},	 
 	  ];
 	  
-	  $scope.city = $scope.cities[19]; // Whangarei is default
+	  $scope.userData = {
+		  pw: '',
+		  email: '',
+		  fullName: '',
+		  address: '',
+		  type: $scope.userTypes[0],
+		  city: $scope.cities[21] // Whangarei is default
+	  };
 	  
-	  $scope.mileage = $scope.city.distance * 0.67 * 2 |currency; //find cost in dollars of return trip to whangarei for producers.
+	  $scope.$watch('wantsToBeProducer', function(newValue) {
+		  if ($scope.wantsToBeProducer) {
+			  $scope.userData.type = $scope.userTypes[2]
+		  } else {
+			$scope.userData.type = $scope.userTypes[0];
+		  }
+	  });
+	  	  
+	  $scope.mileage = $scope.userData.city.distance * 0.67 * 2; //find cost in dollars of return trip to whangarei for producers.
 
 	  $scope.submitForm = function () {
-        console.info("Here I should implement the logic to send a request to the server.");
+        UserManager.registerUser($scope.userData);
     }
   }])
   
   .controller('Login', ['$scope', function($scope) {
 	  $scope.showLogin = false;
   }])
-  .controller('product-upload', ['$scope', function($scope) {
+  
+  .controller('product-upload', ['$scope', 'ProductManager', function($scope, ProductManager) {	  
+//	  $scope.theImage = ''; //sets empty variable to be populated if user uses the input[type=file] method to upload an image
+	  
 	  $scope.productCategories = [
 	  		{name:'Produce', value:'produce', placeholderName:'apples', placeholderVariety:'Granny Smith'},
 	  		{name:'Processed Food', value:'processedFood', placeholderName:'Jam', placeholderVariety:'Strawberry'},
@@ -124,12 +143,53 @@ angular.module('co-op.controllers', []).
 			  	$scope.ingredients = true;
 			  	break;
 		  }
-		  $scope.units = $scope.availableUnits[0];
 	  });
 	  
+	  $scope.certifications = [
+	  {name:'Assure Quality', value: 'assure-quality', img: '<img src="../img/certification/assure-quality.png" alt="assure-quality" width="180" height="180" />'},
+	  {name:'BioGro', value: 'biogro', img: '<img src="../img/certification/biogro.png" alt="biogro" width="117" height="126" />'},
+	  {name:'Demeter Biodynamics', value: 'dem-organics', img: '<img src="../img/certification/demgreen.gif" alt="demgreen" width="336" height="435" />'},
+	  {name:'Organic Farm NZ', value: 'organicfarmnz', img: '<img src="../img/certification/organicfarmnz.png" alt="organicfarmnz" width="88" height="81" />'},
+	  {name:'In Transition', value: 'transition', img: ''},
+	  {name:'None', value: 'none', img: ''}
+	  ];
+	  
+	  //$scope.setImage = function(element) {
+      //  $scope.$apply(function($scope) {
+     //       $scope.theImage = element.files[0];
+  //      });
+//    };
+	  
+	  $scope.productData = {
+		  image: '',
+		  productName: '',
+		  variety: '',
+		  price: '',
+		  quantity: '',
+		  units: '',
+		  ingredients: '',
+		  description: '',
+		  certification: $scope.certifications[5],
+	  };
+	  
 	  $scope.submitForm = function () {
-        console.info("Here I should implement the logic to send a request to the server.");
+        ProductManager.registerProduct($scope.productData);
     }
 
 	 
+  }])
+  
+   .controller('producerCtrl', ['$scope', 'ProducerManager', function($scope, ProducerManager) {
+	   
+	   $scope.producerData = {
+		  image: '',
+		  logo: '',
+		  companyName: '',
+		  description: '',
+	  };
+	   
+	   $scope.submitForm = function () {
+        ProducerManager.registerProduct($scope.producerData);
+    }
+	   
   }]);

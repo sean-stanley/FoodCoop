@@ -1,14 +1,14 @@
 	
 	<div id="product-upload-preview-column" class="col-lg-4">
 	<div id="preview-container" class="preview-box">
-		<img ng-src={{productImage}} alt="product name" width="260px">
-		<h5>{{variety}} {{productName}}</h5>
-		<p>${{unitPrice}} / {{units}} </p>
+		<img ng-src={{productData.image}} alt="product name" width="260px">
+		<h5>{{productData.variety}} {{productData.name}}</h5>
+		<p>{{productData.price|currency * 1.2}} / {{productData.units}} </p>
 	</div>
 </div>
 
 <div id="product-upload-form-container" class="col-lg-8" >
-	<form autocomplete="on" ng-submit="submitForm();">
+	<form name="productUpload" autocomplete="on" ng-submit="submitForm();" novalidate>
   <fieldset>
     <legend>Upload a Product {{username}}</legend>
     <div class="form-group">
@@ -19,68 +19,54 @@
     
     <div class="col-lg-6">
       <label for="product-image">Product Image Upload</label>
-	  <input type="file" id="product-image" name="product-image"/>
-	  <div file-dropzone="[image/png, image/jpeg, image/gif]" file="productImage" data-max-file-size="3" id="file-dropzone" style="width: 150px; height: 45px; border: 1px solid">
+	  
+	  <!-- <input type="file" id="product-image" name="product-image" onchange="angular.element(this).scope().setImage(this)"/> -->
+	  
+	  <div file-dropzone="[image/png, image/jpeg, image/gif]" file="productData.image" data-max-file-size="3" id="file-dropzone" style="width: 150px; height: 45px; border: 1px solid">
 	<span>Drop Product Image Here</span>
 	  </div>    
 	</div>
     
     <div class="form-group col-lg-6">
       <label for="inputName" >Product Name</label>
-      <input ng-model="productName" type="text" class="form-control" id="inputName" placeholder="e.g. {{category.placeholderName}}" autofocus required >
+      <input ng-model="productData.name" type="text" class="form-control" id="inputName" placeholder="e.g. {{category.placeholderName}}" autofocus required >
     </div>
     <div class="form-group col-lg-6">
       <label for="inputVariety" ng-model="variety">Variety</label>
-      <input ng-model="variety" type="text" class="form-control" id="inputVariety" placeholder="e.g. {{category.placeholderVariety}}">
+      <input ng-model="productData.variety" type="text" class="form-control" id="inputVariety" placeholder="e.g. {{category.placeholderVariety}}">
     </div>
     <div class="form-group col-lg-6">
       <label for="inputVariety">Price</label>
-      <input ng-model="unitPrice" type="number" class="form-control" id="inputPrice" min="0" placeholder="e.g. $2.50" required>
+      <input ng-model="productData.price" name="price" type="number" class="form-control" id="inputPrice" min="0" placeholder="e.g. $2.50" required>
     </div>
     <div class="form-group col-lg-6">
       <label for="quantity">Quantity Available</label>
-      <input name="quantity" type="number" max="1000" class="form-control" id="quantity" placeholder="e.g. 27" required>
+      <input ng-model="productData.quantity" name="quantity" type="number" max="1000" class="form-control" id="quantity" placeholder="e.g. 27" required>
     </div>
     <div class="form-group col-lg-6">
       <label for="units">Quantity Units</label>
-      <select ng-model="units" ng-options="c for c in availableUnits" name="units" id="units" required>
+      <select ng-model="productData.units" ng-options="c for c in availableUnits" name="units" id="units" required>
       </select>
     </div>
      
-     <div ng-show="ingredients" class="slide-container" ng-animate="slide">
-     <div class="form-group col-lg-12">
+     <div ng-show="ingredients" id="ingredients" class="form-group col-lg-12">
       <label for="ingredients">Ingredients</label> 
-      <textarea id="ingredients" maxlength="1000" placeholder="Please list all ingredients of this product." rows="9" style="width: 100%;" required></textarea>  
+      <textarea ng-model="productData.ingredients" id="ingredients" maxlength="1000" placeholder="Please list all ingredients of this product." rows="9" style="width: 100%;" required></textarea>  
     </div>
-     </div>
     
     <div class="form-group">
       <label for="description">Description</label> 
-      <textarea id="description" maxlength="2000" placeholder="Write a couple paragraphs about how special your product is." rows="9" style="width: 100%;" required></textarea>  
-    </div>
-   
-    
-    
-    <div class="checkbox">
-      <label for="save-product">Save this product for future order cycles</label>
-      <input name="save-product" type="checkbox">
+      <textarea ng-model="productData.description" id="description" maxlength="2000" placeholder="Write a couple paragraphs about how special your product is." rows="9" style="width: 100%;" required></textarea>  
     </div> 
     
     <div class="checkbox">
       <label for="certification">Certification (select those that apply)</label>
-      <select name="certification">
-      	<option value="bioGro"> Biogro</option>
-	  	<option value="assureQuality"> Assurequality</option>
-	  	<option value="demeter"> Demeter BioDynamic</option>
-	  	<option value="organicFarmsNZ"> Organic Farms NZ</option>
+      <select ng-model="productData.certification" ng-options="c.name for c in certifications" name="certification">
       </select>
     </div>
-    <div class="checkbox">
-      <label for="keyword">keywords</label>
-      <input name="keywords" type="text" class="form-control" maxlength="200" placeholder="seperate keywords with commas e.g. salad, lettuce, organic"> 
-    </div>
+    
     <button type="reset" class="btn btn-default">Reset</button>    
-    <button type="submit" class="btn btn-default" ng-disabled="sign-up.email1.$pristine || sign-up.email1.$dirty && sign-up.email1.$invalid">Submit</button>
+    <button type="submit" class="btn btn-default" ng-disabled="productUpload.price.$pristine || productUpload.price.$dirty && productUpload.price.$invalid">Submit</button>
   </fieldset>
 </form>
 
