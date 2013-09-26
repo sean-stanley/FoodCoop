@@ -1,11 +1,13 @@
 	
-	<div id="product-upload-preview-column" class="col-lg-4">
-	<div id="preview-container" class="preview-box">
-		<img ng-src={{productData.image}} alt="product name" width="260px">
-		<h5>{{producerData.companyName}} <small>Matt Stanley</small></h5>
-		<p></p>
+	<div id="producer-preview-column" class="col-lg-4">
+		
+		<div id="preview-container" class="preview-box">
+			<img ng-src={{producerData.logo}} alt="producer image" width="200px">	
+			<img ng-src={{producerData.image}} alt="producer image" width="200px">
+			<h5>{{producerData.companyName}} <small>Matt Stanley</small></h5>
+			<p>{{producerData.description}}</p>
+		</div>
 	</div>
-</div>
 
 <div id="product-upload-form-container" class="col-lg-8" >
 	<form name="producerEdit" autocomplete="on" ng-submit="submitForm();" novalidate>
@@ -15,11 +17,11 @@
     <div class="col-lg-6">	  
 	  <!-- <input type="file" id="product-image" name="product-image" onchange="angular.element(this).scope().setImage(this)"/> -->
 	  
-	  <div file-dropzone="[image/png, image/jpeg, image/gif]" file="productData.logo" data-max-file-size="3" id="file-dropzone" style="width: 150px; height: 45px; border: 1px solid">
+	  <div file-dropzone="[image/png, image/jpeg, image/gif]" file="producerData.logo" data-max-file-size="3" id="file-dropzone" class="image-drop">
 	<span>Drop Producer Logo Here</span>
 	  </div> 
 	  
-	  <div file-dropzone="[image/png, image/jpeg, image/gif]" file="productData.logo" data-max-file-size="3" id="file-dropzone" style="width: 150px; height: 45px; border: 1px solid">
+	  <div file-dropzone="[image/png, image/jpeg, image/gif]" file="producerData.image" data-max-file-size="3" id="file-dropzone" class="image-drop">
 		  <span>Drop Producer Image Here</span>
 	  </div>    
 	</div>
@@ -32,7 +34,7 @@
         
     <div class="form-group">
       <label for="description">Description</label> 
-      <textarea ng-model="producerData.description" id="description" maxlength="2000" placeholder="Write a couple paragraphs about how special your product is." rows="9" style="width: 100%;" required></textarea>  
+      <textarea ng-model="producerData.description" id="description" maxlength="3000" placeholder="Write a couple paragraphs about how special your product is." rows="9" style="width: 100%;" required></textarea>  
     </div> 
     
     <button type="reset" class="btn btn-default">Reset</button>    

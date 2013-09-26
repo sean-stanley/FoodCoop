@@ -24,8 +24,16 @@ angular.module('co-op.services', []).
 	
 	.factory('ProducerManager', ['$http', function($http) {
 		return {
-			registerProduct : function(producerData) {
+			registerProducer : function(producerData) {
 				console.log("Producer Data Object", producerData);
+			}
+		}	
+	}])
+	
+	.factory('MailManager', ['$http', function($http) {
+		return {
+			mail : function(mail) {
+				console.log("email message", mail);
 			}
 		}	
 	}]);

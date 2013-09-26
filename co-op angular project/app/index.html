@@ -124,7 +124,7 @@
             <div class="col-lg-3" ng-controller="navCtrl">
                 <ul class="nav nav-pills nav-stacked">
                     <li><a href="#1">Meet the Team</a></li>
-                    <li><a href="#talk">Contact us</a></li>
+                    <li ng-class="{active:isActive('/contact')}"><a href="#/contact">Contact us</a></li>
                 </ul>
                 <br>
                 <ul class="nav nav-list nav-pills nav-stacked">
@@ -161,6 +161,7 @@
 <script src="js/filters.js"></script>
 <script src="js/directives.js"></script>
 <script src="js/angular-animate.js"></script>
+
 
 </body>
 </html>

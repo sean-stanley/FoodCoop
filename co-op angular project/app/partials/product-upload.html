@@ -22,7 +22,7 @@
 	  
 	  <!-- <input type="file" id="product-image" name="product-image" onchange="angular.element(this).scope().setImage(this)"/> -->
 	  
-	  <div file-dropzone="[image/png, image/jpeg, image/gif]" file="productData.image" data-max-file-size="3" id="file-dropzone" style="width: 150px; height: 45px; border: 1px solid">
+	  <div file-dropzone="[image/png, image/jpeg, image/gif]" file="productData.image" data-max-file-size="3" id="file-dropzone" class="image-drop">
 	<span>Drop Product Image Here</span>
 	  </div>    
 	</div>
@@ -47,6 +47,13 @@
       <label for="units">Quantity Units</label>
       <select ng-model="productData.units" ng-options="c for c in availableUnits" name="units" id="units" required>
       </select>
+    </div>
+     
+     <div class="form-group col-lg-6">
+      <label for="refrigeration">Refrigeration Required</label>
+      <input ng-model="productData.refrigeration" name="refrigeration" type="radio" value="none" class="form-control input-group" checked><span>None</span>
+      <input ng-model="productData.refrigeration" name="refrigeration" type="radio" value="refrigeration" class="form-control input-group"><span>Refrigeration</span>
+      <input ng-model="productData.refrigeration" name="refrigeration" type="radio" value="frozen" class="form-control input-group"><span>Frozen</span>
     </div>
      
      <div ng-show="ingredients" id="ingredients" class="form-group col-lg-12">

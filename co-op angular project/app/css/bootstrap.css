@@ -286,7 +286,7 @@ table {
     border: 1px solid #ddd !important;
   }
 }
-
+#652c4a
 * {
   -webkit-box-sizing: border-box;
      -moz-box-sizing: border-box;
@@ -316,13 +316,13 @@ textarea {
 }
 
 a {
-  color: #428bca;
+  color: #652c4a;
   text-decoration: none;
 }
 
 a:hover,
 a:focus {
-  color: #2a6496;
+  color: #652c4a;
   text-decoration: underline;
 }
 
@@ -387,23 +387,23 @@ cite {
 }
 
 .text-primary {
-  color: #428bca;
+  color: #8b43ca;
 }
 
 .text-warning {
-  color: #c09853;
+  color: #bf9753;
 }
 
 .text-danger {
-  color: #b94a48;
+  color: #ba4a48;
 }
 
 .text-success {
-  color: #468847;
+  color: #448745;
 }
 
 .text-info {
-  color: #3a87ad;
+  color: #3c88ae;
 }
 
 .text-left {
@@ -679,9 +679,9 @@ pre {
 code {
   padding: 2px 4px;
   font-size: 90%;
-  color: #c7254e;
+  color: #c7264f;
   white-space: nowrap;
-  background-color: #f9f2f4;
+  background-color: #faf4f5;
   border-radius: 4px;
 }
 
@@ -1167,7 +1167,7 @@ th {
 
 .table-striped > tbody > tr:nth-child(odd) > td,
 .table-striped > tbody > tr:nth-child(odd) > th {
-  background-color: #f9f9f9;
+  background-color: #fafafa;
 }
 
 .table-hover > tbody > tr:hover > td,
@@ -1883,6 +1883,7 @@ input[type="button"].btn-block {
 .input-group {
   display: table;
   border-collapse: separate;
+ 
 }
 
 .input-group.col {
@@ -2561,7 +2562,7 @@ button.close {
 .nav-pills > li.active > a:hover,
 .nav-pills > li.active > a:focus {
   color: #ffffff;
-  background-color: #428bca;
+  background-color: #652c4a;
 }
 
 .nav-stacked > li {

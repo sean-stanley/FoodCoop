@@ -1,0 +1,42 @@
+<h1>Contact Form <small>Instructions</small></h1>
+<p>Please feel free to contact our administrator, who conveniently is also our webmaster, and also conveniently, very good looking but inconveniently is deeply committed to his relationship. If you are having trouble using the website, use this form. If you are having trouble understanding how the NNFC works, use this form. If you are super keen on the good work the NNFC is doing for Northland and want to volunteer to help, use this form. If you are kinda lonely on a friday night and want to message a young man who shares your interests in organic gardening, permaculture, alternative energy and long walks on the beach, DON'T use this form.</p>
+
+<form name="contactUs" ng-submit="submitForm();">
+	<fieldset>
+		
+		<legend>Contact Us</legend>
+	
+		<div class="form-group">
+	    	<label for="senderName">Full Name</label>
+			<input ng-model="mail.name" name="senderName" type="text" class="form-control" placeholder="your full name here" required>
+			<div class="custom-error" ng-show="contactUs.senderName.$dirty && contactUs.senderName.$invalid">Sorry:
+				<span ng-show="contactUs.senderName.$error.required">Your name is required. We want to know who we are corresponding with.</span>
+			</div>
+		</div>
+		<div class="form-group">
+	    	<label for="senderEmail">Email</label>
+			<input ng-model="mail.email" name="senderEmail" type="email" class="form-control" placeholder="your email here" required>
+			<div class="custom-error" ng-show="contactUs.senderEmail.$dirty && signUp.senderEmail.$invalid">Sorry:
+			  <span ng-show="contactUs.senderEmail.$error.required">email is required.</span>
+			  <span ng-show="contactUs.senderEmail.$error.senderEmail">Please, write a valid email address. So we will know who to reply too.</span>
+	      </div>
+		</div>
+		<div class="form-group">
+	    	<label for="senderSubject">Subject</label>
+			<input ng-model="mail.subject" name="senderSubject" type="text" class="form-control" placeholder="email subject" required>
+			<div class="custom-error" ng-show="contactUs.senderSubject.$dirty && contactUs.senderSubject.$invalid">Sorry:
+				<span ng-show="contactUs.senderSubject.$error.required">A subject is required. For reasons of courtesy.</span>
+			</div>
+		</div>
+		<div class="form-group">
+	    	<label for="senderMessage">Message</label>
+			<textarea ng-model="mail.message" name="senderMessage" type="text" class="form-control" placeholder="Your message here" required>
+			<div class="custom-error" ng-show="contactUs.senderMessage.$dirty && contactUs.senderMessage.$invalid">Sorry:
+				<span ng-show="contactUs.senderMessage.$error.required">A message is required. Or do you not want to talk to us after all?</span>
+			</div>
+		</div>
+		<button type="reset" class="btn btn-default">Reset</button>    
+	    <button type="submit" class="btn btn-default" ng-disabled="contactUs.senderMessage.$pristine || contactUs.senderMessage.$dirty && contactUs.senderMessage.$invalid">Submit</button>
+		
+	</fieldset>	
+</form>

@@ -1,0 +1,12 @@
+{
+    "date-joined": "25/9/13",
+    "name": "Test User",
+    "email" : "sean@maplekiwi.com",
+    "pw" : "testing123",
+    "dob" : "27/10/93",
+    "producer": false,
+    "address": "71 Lauries Drive, Kauri, Kamo RD1",
+    "city": "Whangarei",
+    "mileage": 0,
+    "admin" : false
+}

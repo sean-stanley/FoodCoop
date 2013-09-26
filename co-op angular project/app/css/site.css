@@ -17,3 +17,20 @@ button.boxclose{
 .boxclose:before {
     content: "×";
 }
+
+.image-drop {
+	display: block;
+	width: 150px; 
+	height: 60px;
+	border: 3px dashed #cbcbcb;
+	color: #aa969f;
+	text-align: center;
+	line-height: 1.2em;
+	margin-bottom: 20px;
+}
+
+.image-drop span {
+	display: block;
+	margin-top: 10%;
+}
+

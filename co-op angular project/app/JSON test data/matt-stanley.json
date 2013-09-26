@@ -1,0 +1,17 @@
+{
+    "date-joined": "25/9/13",
+    "name": "Matt Stanley",
+    "email" : "matt@maplekiwi.com",
+    "pw" : "testing123",
+    "dob" : "27/11/93",
+    "producer": true,
+    "address": "71 Lauries Drive, Kauri, Kamo RD1",
+    "city": "Whangarei",
+    "mileage": 0,
+    
+    "company" : "Northland Naturals",
+    "logo" : "pathToLogoPic",
+    "image" : "pathToImagePic",
+    "Description" : "Canadian born Matt Stanley loves organic horticulture. He graduated from NorthTec with a level 3 certificate in Horticulture and landscaping. He is extremely interested in the possibilities of permaculture systems, food forests and occassionally, biodynamics. His production centre is located on rich volcanic soil that has not been sprayed in over 7 years."
+
+}

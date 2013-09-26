@@ -94,6 +94,7 @@ angular.module('co-op.controllers', []).
 			  case 'Meat':
 			  	$scope.availableUnits = [
 			  		'kg',
+			  		'unit',
 			  		'quarter beast',
 			  		'half beast',
 			  		'whole beast',
@@ -167,6 +168,7 @@ angular.module('co-op.controllers', []).
 		  price: '',
 		  quantity: '',
 		  units: '',
+		  refrigeration: '',
 		  ingredients: '',
 		  description: '',
 		  certification: $scope.certifications[5],
@@ -190,6 +192,21 @@ angular.module('co-op.controllers', []).
 	   
 	   $scope.submitForm = function () {
         ProducerManager.registerProduct($scope.producerData);
+    }
+	   
+  }])
+  
+  .controller('contactCtrl', ['$scope', 'MailManager', function($scope, MailManager) {
+	   
+	   $scope.mail = {
+		   name : '',
+		   email : '',
+		   subject : '',
+		   message : '',
+	};
+	   
+	   $scope.submitForm = function () {
+       MailManager.sendMail($scope.mail);
     }
 	   
   }]);
