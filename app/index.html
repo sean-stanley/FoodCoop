@@ -13,61 +13,18 @@
     
     <script src="http://code.jquery.com/jquery.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
+        <script src="http://code.jquery.com/jquery.js"></script>
 
-    <style type="text/css">
-          /* Sticky footer styles
-      -------------------------------------------------- */
 
-      html,
-      body {
-        height: 100%;
-        /* The html and body elements cannot have any padding or margin. */
-      }
-
-      /* Wrapper for page content to push down footer */
-      #wrap {
-        min-height: 100%;
-        height: auto !important;
-        height: 100%;
-        /* Negative indent footer by it's height */
-        margin: 0 auto -60px;
-      }
-
-      /* Set the fixed height of the footer here */
-      #push,
-      #footer {
-        height: 60px;
-      }
-      #footer {
-        background-color: #f5f5f5;
-      }
-
-      /* Lastly, apply responsive CSS fixes as necessary */
-      @media (max-width: 767px) {
-        #footer {
-          margin-left: -20px;
-          margin-right: -20px;
-          padding-left: 20px;
-          padding-right: 20px;
-        }
-      }
-      
-          /* Custom styles
-      -------------------------------------------------- */
-      #banner .btn-group {
-        top: -85px;
-        right: 35px;
-      }
-      
-    </style>
+   
 </head>
 
 <body><div id="wrap" class="container"><!--Sticky footer hack: wrap all page content-->
     <div class="row" ng-controller="navCtrl">
 	    <ul class="nav nav-tabs pull-right">
-	        <li ng-class="{active:isActive('/')}"><a href="#contact">Home</a></li>
-	        <li ng-class="{active:isActive('/signup')}"><a href="#/signup">Join Us</a></li>
-	        <li ng-class="{active:isActive('/mission')}"><a href="#contact">Contact Us</a></li>
+	        <li ng-class="{active:isActive('/home')}"><a href="#home">Home</a></li>
+	        <li ng-class="{active:isActive('/signup')}"><a href="#signup">Join Us</a></li>
+	        <li ng-class="{active:isActive('/contact')}"><a href="#contact">Contact Us</a></li>
 	        <li><a href="http://foodcoop.org.nz">Blog</a></li>
 		</ul>
     </div>
@@ -79,49 +36,40 @@
         </div>
 		    
         
-        <div class="btn-group pull-right" ng-controller="Login" style="z-index:9999">
-            <button id="login" type="button" class="btn btn-default" ng-click="showLogin = true">
-                Login
-                <span class="caret"></span>
+        <div class="" id="login-button" ng-controller="Login" style="z-index:9999">
+            <button id="login" type="button" class="btn btn-default btn-lg" ng-click="showLogin = true">
+                Login <span class="glyphicon .glyphicon-lock"></span>
             </button>
-            <div ng-show="showLogin" id="login-drop-down-menu" class="login">
-               <ul>
-                <button type="reset" class="boxclose" ng-click="showLogin = false"></button>
+            <div ng-show="showLogin" id="login-drop-down-menu" class="login pull-right">
+               <button type="button" class="close pull-right" aria-hidden="true" ng-click="showLogin = false">&times;</button>
                 <!-- dropdown menu links -->
-                <form class="form-horizontal">
+                <form class="form-horizontal" name="signIn" autocomplete="on" ng-submit="submitForm()" ng-controller="loginCtrl" novalidate>
 				  <div class="form-group">
 				    <!-- <label for="inputEmail" class="col-lg-2 control-label">Email</label> -->
-				    <div class="col-lg-10">
-				      <input type="text" class="form-control" id="inputEmail" placeholder="Email">
-				    </div>
+				      <input ng-model="inputEmail" type="email" name="email" class="form-control" id="inputEmail" placeholder="Email">
+						<div class="alert alert-warning" ng-show="signIn.email.$dirty && signIn.email.$invalid">Sorry:
+						  <span ng-show="signIn.email.$error.required">email is required.</span>
+						  <span ng-show="signIn.email.$error.email">Please, write a valid email address.</span>
+						</div>				      
 				  </div>
 				  <div class="form-group">
 				    <!-- <label for="inputPassword" class="col-lg-2 control-label">Password</label> -->
-				    <div class="col-lg-10">
-				      <input type="password" class="form-control" id="inputPassword" placeholder="Password">
+				      <input ng-model="inputPwd" type="password" name="password" class="form-control" id="inputPassword" placeholder="Password">
 				      <div class="checkbox">
-				        <label>
 				          <input type="checkbox"> Remember me
-				        </label>
 				      </div>
 				      <button type="submit" class="btn btn-default" ng-click="showLogin = false">Sign in</button>
-				    </div>
 				  </div>
 				</form>
-               </ul>
             </div>
         </div>
     </div>
     
 
     <div class="container">
-        <div class="row">
-                
-            <div class="col-lg-9">
-                <div ng-view></div>
-            </div> 
-            
-            <div class="col-lg-3" ng-controller="navCtrl">
+    <div class="row">
+        
+        <div class="col-md-3 col-md-push-9" ng-controller="navCtrl">
                 <ul class="nav nav-pills nav-stacked">
                     <li><a href="#1">Meet the Team</a></li>
                     <li ng-class="{active:isActive('/contact')}"><a href="#/contact">Contact us</a></li>
@@ -133,8 +81,15 @@
                     <li><a href="#/faq">User FAQ</a></li>
                 </ul>
             </div>
-        </div>
-    </div>
+            
+            <!--  
+            This is where the partials go for the forms and information pages.
+            /-->    
+            <div class="col-md-9 col-md-pull-3">
+                <div ng-view></div>
+            </div> 
+    </div> <!-- End of "row" /--> 
+    </div> <!-- End of "container" /--> 
     
     <div id="push"></div>
 </div><!--End hack-->

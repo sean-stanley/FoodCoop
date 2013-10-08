@@ -14,6 +14,13 @@ angular.module('co-op.controllers', []).
 		return route === $location.path();
 	}  
   })
+  .controller('loginCtrl', function($scope) {
+	$scope.userEmail = 'sean@maplekiwi.com';
+	$scope.userPwd = 'maplekiwi';
+	
+	$scope.inputEmail = '';
+	$scope.inputPwd = '';
+  })
   .controller('userCtrl', ['$scope', 'UserManager', function($scope, UserManager) {
 	  
 	  $scope.userTypes = [
@@ -75,7 +82,7 @@ angular.module('co-op.controllers', []).
 	  $scope.showLogin = false;
   }])
   
-  .controller('product-upload', ['$scope', 'ProductManager', function($scope, ProductManager) {	  
+  .controller('productUpload', ['$scope', 'ProductManager', function($scope, ProductManager) {	  
 //	  $scope.theImage = ''; //sets empty variable to be populated if user uses the input[type=file] method to upload an image
 	  
 	  $scope.productCategories = [

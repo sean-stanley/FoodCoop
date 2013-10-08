@@ -1,13 +1,16 @@
-	
-	<div id="product-upload-preview-column" class="col-lg-4">
+<div class="row">
+	<div id="product-upload-preview-column" class="col-md-4">
 	<div id="preview-container" class="preview-box">
-		<img ng-src={{productData.image}} alt="product name" width="260px">
+		<a href="#" class="thumbnail">
+			<img data-src="holder.js/100%x180" alt="...">
+			<img ng-src={{productData.image}} alt="product name" width="100%">
+	  	</a>
 		<h5>{{productData.variety}} {{productData.name}}</h5>
-		<p>{{productData.price|currency * 1.2}} / {{productData.units}} </p>
+		<p>{{productData.price|currency}} / {{productData.units}} </p> <!-- multiply the price by 1.2 to include markup -->
 	</div>
 </div>
 
-<div id="product-upload-form-container" class="col-lg-8" >
+<div id="product-upload-form-container" class="col-md-8" >
 	<form name="productUpload" autocomplete="on" ng-submit="submitForm();" novalidate>
   <fieldset>
     <legend>Upload a Product {{username}}</legend>
@@ -16,8 +19,8 @@
       <select ng-model="category" ng-options="c.name for c in productCategories" name="category" id="category-menu" required>
       </select>
     </div>
-    
-    <div class="col-lg-6">
+   <div class="row"> 
+    <div class="col-md-6">
       <label for="product-image">Product Image Upload</label>
 	  
 	  <!-- <input type="file" id="product-image" name="product-image" onchange="angular.element(this).scope().setImage(this)"/> -->
@@ -27,36 +30,59 @@
 	  </div>    
 	</div>
     
-    <div class="form-group col-lg-6">
+   
+    <div class="form-group col-md-6">
       <label for="inputName" >Product Name</label>
       <input ng-model="productData.name" type="text" class="form-control" id="inputName" placeholder="e.g. {{category.placeholderName}}" autofocus required >
     </div>
-    <div class="form-group col-lg-6">
+   </div>
+   <div class="row">
+    <div class="form-group col-md-6">
       <label for="inputVariety" ng-model="variety">Variety</label>
       <input ng-model="productData.variety" type="text" class="form-control" id="inputVariety" placeholder="e.g. {{category.placeholderVariety}}">
     </div>
-    <div class="form-group col-lg-6">
+    <div class="form-group col-md-6">
       <label for="inputVariety">Price</label>
       <input ng-model="productData.price" name="price" type="number" class="form-control" id="inputPrice" min="0" placeholder="e.g. $2.50" required>
     </div>
-    <div class="form-group col-lg-6">
+   </div>
+   <div class="row">
+    <div class="form-group col-md-6">
       <label for="quantity">Quantity Available</label>
       <input ng-model="productData.quantity" name="quantity" type="number" max="1000" class="form-control" id="quantity" placeholder="e.g. 27" required>
     </div>
-    <div class="form-group col-lg-6">
+    <div class="form-group col-md-6">
       <label for="units">Quantity Units</label>
       <select ng-model="productData.units" ng-options="c for c in availableUnits" name="units" id="units" required>
       </select>
     </div>
-     
-     <div class="form-group col-lg-6">
+   </div>  
+   
+    
+    <div class="form-group">
       <label for="refrigeration">Refrigeration Required</label>
-      <input ng-model="productData.refrigeration" name="refrigeration" type="radio" value="none" class="form-control input-group" checked><span>None</span>
-      <input ng-model="productData.refrigeration" name="refrigeration" type="radio" value="refrigeration" class="form-control input-group"><span>Refrigeration</span>
-      <input ng-model="productData.refrigeration" name="refrigeration" type="radio" value="frozen" class="form-control input-group"><span>Frozen</span>
-    </div>
+      <div class="form-group">
+		  <div class="row">
+			<div class="col-md-4">
+			  <label for="refrigeration">
+			    <input ng-model="productData.refrigeration" name="refrigeration" type="radio" value="none" ng-checked="true"> none
+			  </label>
+			</div>
+			<div class="col-md-4">  
+			  <label for="refrigeration">
+			    <input ng-model="productData.refrigeration" name="refrigeration" type="radio" value="refrigeration"> refrigeration
+			  </label>
+			</div>
+			<div class="col-md-4">  
+			  <label for="refrigeration">
+			    <input ng-model="productData.refrigeration" name="refrigeration" type="radio" value="frozen"> frozen
+			  </label>
+			</div>
+	    </div>
+	</div>
+
      
-     <div ng-show="ingredients" id="ingredients" class="form-group col-lg-12">
+     <div ng-show="ingredients" id="ingredients" class="form-group col-md-12">
       <label for="ingredients">Ingredients</label> 
       <textarea ng-model="productData.ingredients" id="ingredients" maxlength="1000" placeholder="Please list all ingredients of this product." rows="9" style="width: 100%;"></textarea>  
     </div>
@@ -77,4 +103,5 @@
   </fieldset>
 </form>
 
+</div>
 </div>

@@ -1,0 +1,10 @@
+<div class="product" ng-repeat="product in products | orderBy:getOrder() | categorise">
+    <a popup="{type:'ajax',ajax: {settings: null,cursor: 'mfp-ajax-cur', tError: '<a href=&quot;%url%&quot;>The content</a> could not be loaded.'}}" href="partials/test.html" ><img src="img/{{product.img}}"></img></a>
+    <p>
+	    <strong>{{product.title}}</strong>
+	    ${{product.price}}/{{product.unit}}
+	    <p><button class="btn btn-primary" ng-click="openDialog(product)">Open Dialog</button></p><!--{{product}} parse to openDialog then filter, yet to implement/test-->
+	    <a class="producer" href="#/producers/{{product.producer}}">{{product.producer}}</a>
+	</p>
+</div>
+<div class="visualClear"></div>

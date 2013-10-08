@@ -1,3 +1,4 @@
+/*
 button.boxclose{
     float:right;
     margin-top:-30px;
@@ -16,7 +17,7 @@ button.boxclose{
 
 .boxclose:before {
     content: "×";
-}
+} */
 
 .image-drop {
 	display: block;
@@ -34,3 +35,15 @@ button.boxclose{
 	margin-top: 10%;
 }
 
+div#login-button {
+	position: absolute;
+	z-index: 9999;
+	right: 60px;
+	top: 42px;
+}
+
+div#banner {
+	position: relative;
+	margin-bottom: 30px;
+	margin-top: 15px;
+}

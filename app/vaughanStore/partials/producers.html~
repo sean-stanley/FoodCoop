@@ -1,0 +1,7 @@
+<p>This is the partial for producers</p>
+<p>
+  Showing of 'interpolate' filter:
+  {{ 'Current version is v%VERSION%.' | interpolate }}
+  <appVersion>{{elm.text}}
+  </appVersion>
+</p>

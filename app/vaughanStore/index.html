@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="fcStore">
+<head>
+    <meta charset="utf-8">
+    <title>FoodCoop Store</title>
+    <link rel="stylesheet" type="text/css" href="lib/css/normalize.css">
+    <link rel="stylesheet" type="text/css" href="lib/css/magnific-popup.css">
+    <link rel="stylesheet" type="text/css" href="css/app.css">
+    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet"><!--Kill this dep ASAP-->
+</head>
+<body>
+    <div id="content" role="main" ng-view></div>
+
+
+<div ng-controller="DialogDemoCtrl">
+    <div class="row-fluid">
+        <div class="span6">
+            <p>Change options at will and press the open dialog button below!</p>
+            <p><button class="btn btn-primary" ng-click="openDialog()">Open Dialog</button></p>
+        </div>
+    </div>
+</div>
+    <div id="fc-navigation">
+        <div id="fc-head">
+            <ul class="calender">
+                <li><div><span>6 SAT</span>1</div></li>
+                <li><div><span>6 SUN</span>2</div></li>
+                <li><div><span>6 MON</span>3</div></li>
+                <li><div><span>6 TUE</span>4</div></li>
+                <li><div><span>6 WED</span>5</div></li>
+                <li><div><span>6 THU</span>6</div></li>
+                <li><div><span>6 FRI</span>7</div></li>
+                <li><div><span>6 SAT</span>8</div></li>
+                <li class="ordering"><div><span>6 SUN</span>9</div></li>
+                <li class="ordering today"><div><span>6 MON</span>10</div></li>
+                <li class="ordering"><div><span>6 TUE</span>11</div></li>
+                <li class="ordering"><div><span>6 WED</span>12</div></li>
+                <li class="ordering"><div><span>6 THU</span>13</div></li>
+                <li class="ordering"><div><span>6 FRI</span>14</div></li>
+                <li class="ordering"><div><span>6 SAT</span>15</div></li>
+                <li><div><span>6 SUN</span>16</div></li>
+                <li><div><span>6 MON</span>17</div></li>
+                <li><div><span>6 TUE</span>18</div></li>
+                <li><div><span>6 WED</span>19</div></li>
+                <li><div><span>6 THU</span>20</div></li>
+                <li><div><span>6 FRI</span>21</div></li>
+            </ul>
+        </div>
+
+        <div id="fc-panel">
+            <div class="stick">
+                <div>
+                   <h1 class="highlight">NNFC</h1>
+                    <h5>Local Sustainable Affordable</h5>
+                </div>
+                <div class="navblock">
+                    <span class="highlight">Welcome, Jane Anderson</span>
+                    <a href="/signout">Sign Out</a>
+                </div>
+                <p>
+                    Ordering closes in <span class="highlight">5</span> days<br>
+                    Delivery Day is in <span class="highlight">14</span> days
+                </p>
+                <hr>
+                <div ng-controller="productRefine">
+                    <input autocomplete="off" placeholder="Search" type="search" ng-model="filterText"><br>
+                    <input type="checkbox" ng-model="category.veg"><a href="#/products/veg" ng-click="setFilter('veg')">Fruit and Veg</a><br>
+                    <input type="checkbox" ng-model="category.meat"><a href="#/products/meat" ng-click="setFilter('meat')">Meat</a><br>
+                    <input type="checkbox" ng-model="category.processed"><a href="#/products/processed" ng-click="setFilter('processed')">Processed Goods</a><br>
+                    <input type="checkbox" ng-model="category.baked"><a href="#/products/baked" ng-click="setFilter('baked')">Baked Goods</a><br>
+                    <input type="checkbox" ng-model="category.dairy"><a href="#/products/dairy" ng-click="setFilter('dairy')">Dairy</a><br>
+                    Order By
+                    <select ng-model="orderField">
+	        		    <option value="title" ng-click="setOrder('title')">Title</option>
+	        		    <option value="producer" ng-click="setOrder('producer')">Producer</option>
+	        		</select>
+	    		</div>
+                <hr>
+                <div class="highlight navblock">
+                    <span><a href="#">Your Cart</a>: 0 Items</span>
+                    <span>Sub Total: $0.00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--<ul class="menu">
+        <li><a href="#/products/all">products</a></li>
+        <li><a href="#/producers/Steve Bob">producers</a></li>
+    </ul>
+
+    <div ng-view></div>
+
+    <div>Angular seed app: v<span app-version></span></div>-->
+
+    <script type="text/javascript" src="lib/jquery/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="lib/jquery/jquery.magnific-popup.min.js"></script>
+    <script type="text/javascript" src="lib/jquery/jquery.sticky.js"></script>
+    <script type="text/javascript" src="lib/angular/angular.js"></script>
+    <script src="lib/angular/ui-bootstrap-0.5.0.js"></script><!--Kill this dep ASAP-->
+    <script type="text/javascript" src="js/app.js"></script>
+	
+    <script>
+        $(window).load(function(){
+            $(".stick").sticky({ topSpacing: 0 });
+        });
+    </script>
+</body>
+</html>
