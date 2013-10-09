@@ -6,7 +6,7 @@
     <link rel="stylesheet" type="text/css" href="lib/css/normalize.css">
     <link rel="stylesheet" type="text/css" href="lib/css/magnific-popup.css">
     <link rel="stylesheet" type="text/css" href="css/app.css">
-    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet"><!--Kill this dep ASAP-->
+    <link rel="stylesheet" href="css/bootstrap.min.css" title="bootstrap" type="text/css">
 </head>
 <body>
     <div id="content" role="main" ng-view></div>
@@ -47,8 +47,8 @@
             </ul>
         </div>
 
-        <div id="fc-panel">
-            <div class="stick">
+        <div id="fc-panel" class="row" >
+            <div class="col-md-4">
                 <div>
                    <h1 class="highlight">NNFC</h1>
                     <h5>Local Sustainable Affordable</h5>
@@ -69,11 +69,12 @@
                     <input type="checkbox" ng-model="category.processed"><a href="#/products/processed" ng-click="setFilter('processed')">Processed Goods</a><br>
                     <input type="checkbox" ng-model="category.baked"><a href="#/products/baked" ng-click="setFilter('baked')">Baked Goods</a><br>
                     <input type="checkbox" ng-model="category.dairy"><a href="#/products/dairy" ng-click="setFilter('dairy')">Dairy</a><br>
+                    
+                    <label for="orderBy">
                     Order By
-                    <select ng-model="orderField">
-	        		    <option value="title" ng-click="setOrder('title')">Title</option>
-	        		    <option value="producer" ng-click="setOrder('producer')">Producer</option>
+                    <select  name="orderBy" ng-model="orderField" ng-options="i.name for i in sortingMethods">
 	        		</select>
+                    </label>
 	    		</div>
                 <hr>
                 <div class="highlight navblock">
@@ -99,10 +100,5 @@
     <script src="lib/angular/ui-bootstrap-0.5.0.js"></script><!--Kill this dep ASAP-->
     <script type="text/javascript" src="js/app.js"></script>
 	
-    <script>
-        $(window).load(function(){
-            $(".stick").sticky({ topSpacing: 0 });
-        });
-    </script>
 </body>
 </html>

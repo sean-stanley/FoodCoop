@@ -4,7 +4,8 @@ angular.module('fcStore', ['ui.bootstrap'])
 		$routeProvider.when('/producers/:id', {templateUrl: 'partials/producers.html', controller: 'producerDisplay'});
 		$routeProvider.otherwise({redirectTo: '/products/all'});
 	}])
-    .controller('productDisplay', ['$scope', '$dialog', 'productService', function($scope, $dialog, productService) {
+    .
+    controller('productDisplay', ['$scope', '$dialog', 'productService', function($scope, $dialog, productService) {
         $scope.products = productService.getProducts();
 
 		$scope.getOrder = function() {
@@ -32,11 +33,31 @@ angular.module('fcStore', ['ui.bootstrap'])
   };
   
     }])
+    
     .controller('productRefine', ['$scope', 'productService', function($scope, productService) {
 		// Initialize values
         $scope.category = productService.getCategories(); //passed objects aren't immutable, we can set value directly in another $scope
 		var categories = ['veg', 'meat', 'processed', 'baked', 'dairy'];
 		$scope.orderField = productService.getOrder();
+		
+		$scope.sortingMethods = [
+		{name:'title'},
+		{name:'producer'}
+		];
+		
+		$scope.sortingMethod = $scope.sortingMethods[0];
+		
+		$scope.$watch('sortingMethod.name', function(newValue) {
+		  switch (newValue) {
+			  case 'title':
+			  $scope.sortingMethod = $scope.sortingMethods[0]; 
+			  break;
+			  
+			  case 'producer':
+			  $scope.sortingMethod = $scope.sortingMethods[1]; 
+			  break;
+		}
+		});
 		
 		$scope.setOrder = function(orderField) {
 			productService.setOrder(orderField);
@@ -53,6 +74,7 @@ angular.module('fcStore', ['ui.bootstrap'])
 			}
 		}
     }])
+   
     .controller('DialogDemoCtrl', ['$scope', '$dialog', function ($scope, $dialog){
 
   // Inlined template for demo
@@ -141,6 +163,7 @@ angular.module('fcStore', ['ui.bootstrap'])
         }
 		this.setOrder = function(newValue) {
 			orderField = newValue;
+			console.log = "orderField";
 		}
 		
 		this.getOrder = function() {

@@ -1,4 +1,4 @@
-<div class="product" ng-repeat="product in products | orderBy:getOrder() | categorise">
+<div class="product" ng-repeat="product in products | filter:filterText | orderBy:getOrder() | categorise">
     <a popup="{type:'ajax',ajax: {settings: null,cursor: 'mfp-ajax-cur', tError: '<a href=&quot;%url%&quot;>The content</a> could not be loaded.'}}" href="partials/test.html" ><img src="img/{{product.img}}"></img></a>
     <p>
 	    <strong>{{product.title}}</strong>
