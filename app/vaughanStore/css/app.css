@@ -64,17 +64,16 @@
     }
     
     /* Left Element */
-    #fc-panel {
-        position:absolute;
+  /*  #fc-panel {
+        position:relative;
         top:2em;
         padding-top:1em;
         width:15em;
         left: 0.2em;
-    }
+    } */
     
     /* Main Element */
     #content {
-        margin: 4em 0 0 15em;
         background: #dfd;
     }
     

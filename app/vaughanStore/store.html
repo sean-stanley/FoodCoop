@@ -9,18 +9,18 @@
     <link rel="stylesheet" href="css/bootstrap.min.css" title="bootstrap" type="text/css">
 </head>
 <body>
-    <div id="content" role="main" ng-view></div>
+    
 
 
 <div ng-controller="DialogDemoCtrl">
-    <div class="row-fluid">
+    <div class="row">
         <div class="span6">
             <p>Change options at will and press the open dialog button below!</p>
             <p><button class="btn btn-primary" ng-click="openDialog()">Open Dialog</button></p>
         </div>
     </div>
 </div>
-    <div id="fc-navigation">
+    <div id="fc-navigation" class="row">
         <div id="fc-head">
             <ul class="calender">
                 <li><div><span>6 SAT</span>1</div></li>
@@ -47,8 +47,8 @@
             </ul>
         </div>
 
-        <div id="fc-panel" class="row" >
-            <div class="col-md-4">
+        <div class="row" >
+            <div class="col-md-3">
                 <div>
                    <h1 class="highlight">NNFC</h1>
                     <h5>Local Sustainable Affordable</h5>
@@ -82,6 +82,7 @@
                     <span>Sub Total: $0.00</span>
                 </div>
             </div>
+            <div id="content" role="main" class="col-md-9" ng-view></div>
         </div>
     </div>
     <!--<ul class="menu">
