@@ -36,8 +36,27 @@
     </div>
     <div class="form-group">
       <label for="address">Address</label> 
-      <input ng-model="address" name="address" type="text" id="address_field" class="form-control" required></input>  
+      <input ng-model="address" name="address" type="text" id="address_field" class="form-control" required>
     </div>
+    
+    <div class="form-group">
+    	<label for="securityQ">Security Question</label>
+    	<select name="securityQ" ng-model="userData.securityQ" required>
+	    	<option value="1">What was your childhood nickname?</option>
+	    	<option value="2">In what city did you meet your spouse/significant other?</option>
+	    	<option value="3">What school did you attend for year six?</option>
+	    	<option value="4">What is your maternal grandmother's maiden name?</option>
+	    	<option value="5">In what city or town was your first job?</option>
+	    	<option value="6">Where were you when you first heard about 9/11?</option>
+	    	<option value="7">What was the name of your first stuffed animal?</option>
+    	</select>
+    </div>
+    
+    <div class="form-group">
+    	<label for="securityA">Security Answer</label>
+    	<input type="text" name="securityA" ng-model="userData.securityA" placeholder="Put your answer here" required>
+    </div>
+    
     <div class="form-group">
     	<label for="city">Nearest City</label>
 		<select ng-model="userData.city" ng-options="c.name for c in cities" name="city" id="category-menu" required></select>    

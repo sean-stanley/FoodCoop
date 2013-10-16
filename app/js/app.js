@@ -9,5 +9,6 @@ angular.module('co-op', [ 'ngRoute', 'co-op.filters', 'co-op.services', 'co-op.d
     $routeProvider.when('/product-upload', {templateUrl: 'partials/product-upload.html', controller: 'productUpload'});
     $routeProvider.when('/producer-profile', {templateUrl: 'partials/edit-producer-profile.html', controller: 'producerCtrl'});
     $routeProvider.when('/contact', {templateUrl: 'partials/contact.html', controller: 'contactCtrl'});
+    $routeProvider.when('/login', {templateUrl: 'partials/login.html'});
     $routeProvider.otherwise({redirectTo: '/home'});
   }]);
