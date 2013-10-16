@@ -1,9 +1,4 @@
-*.log
-*.pot
-*.pyc
+.DS_Store
 
-database.sqlite3
-local_settings.py
-._*
 
 
