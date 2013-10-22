@@ -1,0 +1,42 @@
+<h1>My Carts <small>Updated Live until ordering finishes</small></h1>
+<p>Here is where you will see all your orders. You will get an email of this list at the end of order week and you can also view past month's shopping here.</p>
+
+<div id="table-div" ng-controller="cartTableCtrl">
+[ <a href="" ng-click="predicate=''">unsorted</a> ]
+<table class="table">
+	<caption>October Cart</caption>
+	<thead>
+		<tr>
+			<th>Remove</th>
+			<th>Product</th>
+			<th>Quantity</th>
+			<th>Price</th>
+			<th>Producer</th>
+		</tr>
+	<tbody>
+		<tr ng-repeat="c in cart" >
+	        <td data-title=" 'remove' ">
+	        	<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
+	        <td data-title="'Product'" >
+	            {{c.product}}
+	        </td>
+	        <td data-title="'Quantity'">
+	            {{c.quantity}}
+	        </td>
+	        <td data-title="'Price'">
+	            {{c.price | currency}}
+	        </td>
+	        <td data-title="'Customer'">
+	            {{c.producer}}
+	        </td>
+	    </tr>
+	</tbody>
+</table>
+Total: {{total}}
+</div>
+
+
+
+
+
+

@@ -1,0 +1,62 @@
+<h1>Orders <small>Live Updates until Ordering Closes</small></h1>
+<p>Here is where you will see all the orders for {{producerData.companyName}}. You will get an email of this list at the end of order week and you can also view past month's order's here. To see a quick look at total sales per month, slide the toggle switch below to change views.</p>
+
+<div id="table-div" ng-controller="orderTableCtrl">
+[ <a href="" ng-click="predicate=''">unsorted</a> ]
+<table class="table">
+	<caption>October Orders</caption>
+	<thead>
+		<tr>
+			<th><a href="" ng-click="predicate = 'product'; reverse=!reverse ">Product</a></th>
+			<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Quantity</a></th>
+			<th><a href="" ng-click="predicate = 'price'; reverse=!reverse ">Price</a></th>
+			<th><a href="" ng-click="predicate = 'customer'; reverse=!reverse ">Customer</a></th>
+		</tr>
+	<tbody>
+		<tr ng-repeat="order in orders | orderBy:predicate:reverse " >
+	        <td data-title="'Product'" >
+	            {{order.product}}
+	        </td>
+	        <td data-title="'Quantity'">
+	            {{order.quantity}}
+	        </td>
+	        <td data-title="'Price'">
+	            {{order.price | currency}}
+	        </td>
+	        <td data-title="'Customer'">
+	            {{order.customer}}
+	        </td>
+	    </tr>
+	</tbody>
+</table>
+</div>
+
+<div id="table-div" ng-controller="orderTableCtrl">
+[ <a href="" ng-click="predicate=''">unsorted</a> ]
+<table class="table">
+	<caption>September Orders</caption>
+	<thead>
+		<tr>
+			<th><a href="" ng-click="predicate = 'product'; reverse=!reverse ">Product</a></th>
+			<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Quantity</a></th>
+			<th><a href="" ng-click="predicate = 'price'; reverse=!reverse ">Price</a></th>
+			<th><a href="" ng-click="predicate = 'customer'; reverse=!reverse ">Customer</a></th>
+		</tr>
+	<tbody>
+		<tr ng-repeat="order in orders | orderBy:predicate:reverse " >
+	        <td data-title="'Product'" >
+	            {{order.product}}
+	        </td>
+	        <td data-title="'Quantity'">
+	            {{order.quantity}}
+	        </td>
+	        <td data-title="'Price'">
+	            {{order.price | currency}}
+	        </td>
+	        <td data-title="'Customer'">
+	            {{order.customer}}
+	        </td>
+	    </tr>
+	</tbody>
+</table>
+</div>

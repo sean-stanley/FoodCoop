@@ -1,10 +1,31 @@
+/* @override 
+	http://localhost:8000/app/css/site.css
+	http://localhost:8000/app/css/banner.css
+*/
+
 div#grass-containter {
 	overflow: hidden;
 	z-index: -99999;
-	background: url(../img/Grass-Field.jpg) no-repeat;
+	
 	box-shadow: 1px 4px 1px #2d2d2d;
 	opacity: 1;
+	padding-top: 22px;
+	padding-left: 18px;
+	padding-right: 0;
+	margin-bottom: 40px;
+}
 
+#login-button {
+	position: absolute;
+	z-index: 9999;
+	right: 25%;
+	top: 90px;
+}
+
+#login-drop-down-menu button.close {
+	position: absolute;
+	right: 7px;
+	top: 7px;
 }
 
 h1.logo {
@@ -27,8 +48,15 @@ h2.slogan {
 	text-indent: 1.5em;
 }
 
-.login {
+div.login {
 	background-color: rgba(255,255,255,0.86);
 	border: 14px solid rgba(28,26,26,0.86);
-	
+	width: 300px;
+	padding: 48px;
+	position: absolute;
+	z-index: 999;
+}
+
+div#banner {
+	background: url(../img/Grass-Field.jpg) no-repeat;
 }
