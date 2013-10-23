@@ -9,8 +9,14 @@ angular.module('co-op.controllers', []).
   .controller('MyCtrl2', [function() {
 
   }])
-  .controller('navCtrl', ['$scope', '$location', 'LoginManager', function($scope, $location, LoginManager) {
+  .controller('navCtrl', ['$scope', '$location', 'LoginManager', 'CartRecords', function($scope, $location, LoginManager, CartRecords) {
 	$scope.loginManager = LoginManager; 
+	$scope.isActive = function(route) {
+		return route === $location.path();
+	} 
+	
+	$scope.items = CartRecords.getCart().length;
+	
   }])
   
   .controller('logoutCtrl', ['$scope', '$location', 'LoginManager', function($scope, $location, LoginManager) {
@@ -214,20 +220,19 @@ angular.module('co-op.controllers', []).
 	  
 	  $scope.predicate = 'product';
 	  
-	  $scope.total = 0;
+	  $scope.total = OrderRecords.sumSales();
 	    
   }])
   
   .controller('cartTableCtrl', ['$scope', '$filter', 'ngTableParams', 'CartRecords', function($scope, $filter, ngTableParams, CartRecords) {
 	  $scope.cart = CartRecords.getCart();
 	  
-	  $scope.predicate = 'product';
-	  
 	  $scope.total = CartRecords.sumPrice();
-	  
+		  	  
 	  $scope.delete = function(idx) {
 		  var itemToDelete = $scope.cart[idx];
 		  $scope.cart.splice(idx, 1);
+		  $scope.total = CartRecords.sumPrice();
 	  }
 	  
 	  

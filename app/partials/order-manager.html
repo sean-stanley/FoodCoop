@@ -1,5 +1,5 @@
 <h1>Orders <small>Live Updates until Ordering Closes</small></h1>
-<p>Here is where you will see all the orders for {{producerData.companyName}}. You will get an email of this list at the end of order week and you can also view past month's order's here. To see a quick look at total sales per month, slide the toggle switch below to change views.</p>
+<p>Here is where you will see all the orders for {{producerData.companyName}}. You will get an email of the list for this month at the end of order week. Please be sure to pack all the goods on the month's current order as listed here and bring them to Woods for sorting in Whangarei. For your reference, scroll to see past month's orders.</p>
 
 <div id="table-div" ng-controller="orderTableCtrl">
 [ <a href="" ng-click="predicate=''">unsorted</a> ]
@@ -29,9 +29,14 @@
 	    </tr>
 	</tbody>
 </table>
+<strong>Total: {{total|currency}}</strong>
+<br>
+
 </div>
 
 <div id="table-div" ng-controller="orderTableCtrl">
+<br>
+<br>
 [ <a href="" ng-click="predicate=''">unsorted</a> ]
 <table class="table">
 	<caption>September Orders</caption>
@@ -59,4 +64,5 @@
 	    </tr>
 	</tbody>
 </table>
+<strong>Total: {{total|currency}}</strong>
 </div>

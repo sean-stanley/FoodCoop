@@ -52,7 +52,7 @@
                 </ul>
                 <br>
                 <ul class="nav nav-list nav-pills nav-stacked">
-                    <li ng-class="{active:isActive('/order-manager')}" ng-show="loginManager.IsLoggedIn()"><a href="#/my-cart">My Cart</a></li>
+                    <li ng-class="{active:isActive('/my-cart')}" ng-show="loginManager.IsLoggedIn()"><a href="#/my-cart">My Cart <span class="badge">{{items}}</span></a></li>
                     <li ng-class="{active:isActive('/order-manager')}" ng-show="loginManager.IsLoggedIn()"><a href="#/order-manager">My Orders</a></li>
                     <li ng-class="{active:isActive('/product-upload')}" ng-show="loginManager.IsLoggedIn()"><a href="#/product-upload">Upload a Product</a></li>
                     <li ng-class="{active:isActive('/producer-profile')}" ng-show="loginManager.IsLoggedIn()"><a href="#/producer-profile">Edit Producer Profile</a></li>
@@ -94,6 +94,17 @@
 <script src="js/angular-animate.js"></script>
 <script src="lib/ng-table/ng-table.js"></script>
 
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-45071933-1', 'strategicdevelopment.co.nz');
+  ga('send', 'pageview');
+
+</script>
 
 </body>
 </html>

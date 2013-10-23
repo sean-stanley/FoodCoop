@@ -97,6 +97,16 @@ angular.module('co-op.services', []).
 			orders.push(orderData)
 		}
 		
+		this.sumSales = function() {
+		 var total = 0;
+		 for(var i=0; i < orders.length; i++) {
+		 	console.log(i, ' order items = ', orders[i].price)
+		 	total += orders[i].price; 
+		 }
+		 return total;
+	  }
+
+		
 		var orders = [
 			{product: "Granny Smith Apples", quantity: 30, price: 2*30, customer: 'Sean Stanley'},
             {product: "Spray-Free Oranges", quantity: 12, price: 2.5*12, customer: 'Matt Stanley'},
@@ -122,10 +132,10 @@ angular.module('co-op.services', []).
 		this.sumPrice = function() {
 		 var total = 0;
 		 for(var i=0; i < cartItems.length; i++) {
-		 	console.log(i, ' cart items = ', cartItems.price)
-		 	total += cartItems.price[i];
-		 	return total; 
+		 	console.log(i, ' cart items = ', cartItems[i].price)
+		 	total += cartItems[i].price; 
 		 }
+		 return total;
 	  }
 
 		
@@ -134,7 +144,8 @@ angular.module('co-op.services', []).
             {product: "Spray-Free Oranges", quantity: 2, price: 2.5*2, producer: 'Northland Naturals'},
             {product: "Romaine Lettuce", quantity: 6, price: 4*6, producer: 'EcoBikes'},
             {product: "Rosemary bunches", quantity: 4, price: 1*4, producer: 'Rowan Clements'},
-            {product: "Loafs of Gluten Free Bread", quantity: 3, price: 3.2*4, producer: 'Lisa Taylor'}
+            {product: "Loafs of Gluten Free Bread", quantity: 3, price: 3.2*4, producer: 'Lisa Taylor'},
+            {product: "Organic Garlic and Basil Sausages", quantity: 2, price: 8.50*2, producer: 'Lisa Taylor'}
 		];
 	}])
 	
