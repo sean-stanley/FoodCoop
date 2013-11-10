@@ -10,8 +10,27 @@ angular.module('co-op', [ 'ngRoute', 'co-op.filters', 'co-op.services', 'co-op.d
     $routeProvider.when('/producer-profile', {templateUrl: 'partials/edit-producer-profile.html', controller: 'producerCtrl'});
     $routeProvider.when('/contact', {templateUrl: 'partials/contact.html', controller: 'contactCtrl'});
     $routeProvider.when('/login', {templateUrl: 'partials/login.html'});
+    $routeProvider.when('/must-login', {templateUrl: 'partials/must-login.html'});
     $routeProvider.when('/forgot-password', {templateUrl: 'partials/forgot-password.html', controller: 'resetPwdCtrl'});
     $routeProvider.when('/my-cart', {templateUrl: 'partials/my-cart.html'});
     $routeProvider.when('/order-manager', {templateUrl: 'partials/order-manager.html'});
     $routeProvider.otherwise({redirectTo: '/home'});
-  }]);
+  }])
+  .run(function($rootScope, $location, LoginManager) {
+  
+        $rootScope.$on( '$routeChangeStart', function(event, next, current) {
+        	console.log(next);
+        	switch(next.originalPath) {
+				case '/home':
+				case '/signup':
+				case '/contact':	
+				    break;
+				default:	        	
+					if (! LoginManager.IsLoggedIn() && next.templateUrl !== '/partials/login.html') {
+						$location.path("/must-login");
+					}
+		            break;
+		    }
+        });
+
+  });

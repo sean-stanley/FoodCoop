@@ -6,7 +6,48 @@
 			<img ng-src={{productData.image}} alt="product name" width="100%">
 	  	</a>
 		<h5>{{productData.variety}} {{productData.name}}</h5>
-		<p>{{productData.price|currency}} / {{productData.units}} </p> <!-- multiply the price by 1.2 to include markup -->
+		<p>{{1.2 * productData.price|currency}} / {{productData.units}} {{productData.quantity}} Available</p> <!-- multiply the price by 1.2 to include markup -->
+	</div>
+	
+	<div id="product-history-list" ng-controller="productHistoryCtrl">
+		Click a product to edit it.
+		<table>
+			<caption>Current Month</caption>
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Tools</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="i in data">
+					<td><a ng-click="editProduct()">{{i.'name'}} {{i.'variety'}}</a></td>
+					<td>
+						<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<table>
+			<caption>Product History</caption>
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Tools</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="i in data">
+					<td>{{i.'name'}} {{i.'variety'}}</td>
+					<td>
+						<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
+					</td>
+
+				</tr>
+			</tbody>
+		</table>
+
+		</div>
 	</div>
 </div>
 
@@ -14,92 +55,89 @@
 	<form name="productUpload" autocomplete="on" ng-submit="submitForm();" novalidate>
   <fieldset>
     <legend>Upload a Product {{username}}</legend>
-    <div class="form-group">
-      <label for="Category">Product Category</label>
-      <select ng-model="category" ng-options="c.name for c in productCategories" name="category" id="category-menu" required>
-      </select>
-    </div>
-   <div class="row"> 
-    <div class="col-md-6">
-      <label for="product-image">Product Image Upload</label>
-	  
-	  <!-- <input type="file" id="product-image" name="product-image" onchange="angular.element(this).scope().setImage(this)"/> -->
-	  
-	  <div file-dropzone="[image/png, image/jpeg, image/gif]" file="productData.image" data-max-file-size="3" id="file-dropzone" class="image-drop">
-	<span>Drop Product Image Here</span>
-	  </div>    
+    <div class="row">
+		<div class="form-group col-md-6">
+			<label for="Category">Product Category</label>
+			<select ng-model="category" ng-options="c.name for c in productCategories" name="category" id="category-menu" required>
+			</select>
+		</div>
+		<div class="form-group col-md-6">
+			<label for="product-image">Product Image Upload</label>	  
+			<div file-dropzone="[image/png, image/jpeg, image/gif]" file="productData.image" data-max-file-size="3" id="file-dropzone" class="image-drop">
+			  <span>Drop Product Image Here</span>
+			</div>    
+		</div>
+    
+	<div class="row">
+		<div class="form-group col-md-6">
+			<label for="inputName" >Product Name</label>
+			<input ng-model="productData.name" type="text" class="form-control" id="inputName" placeholder="e.g. {{category.placeholderName}}" autofocus required>
+		</div>
+		<div class="form-group col-md-6">
+			<label for="inputVariety" ng-model="variety">Variety</label>
+			<input ng-model="productData.variety" type="text" class="form-control" id="inputVariety" placeholder="e.g. {{category.placeholderVariety}}">
+		</div>
 	</div>
-    
-   
-    <div class="form-group col-md-6">
-      <label for="inputName" >Product Name</label>
-      <input ng-model="productData.name" type="text" class="form-control" id="inputName" placeholder="e.g. {{category.placeholderName}}" autofocus required >
-    </div>
+	
+	<div class="row">	
+		<div class="form-group col-md-4">
+			<label for="inputVariety">Price</label>
+			<input ng-model="productData.price" name="price" type="number" class="form-control" id="inputPrice" min="0" placeholder="e.g. $2.50" required>
+		</div>
+		
+	    <div class="form-group col-md-4">
+			<label for="units">Quantity Units</label>
+			<select ng-model="productData.units" ng-options="c for c in availableUnits" name="units" id="units" required>
+			</select>
+	    </div>
+	    
+	    <div class="form-group col-md-4">
+			<label for="quantity">Quantity Available</label>
+			<input ng-model="productData.quantity" name="quantity" type="number" max="1000" class="form-control" id="quantity" placeholder="e.g. 27" required>
+	    </div>
    </div>
-   <div class="row">
-    <div class="form-group col-md-6">
-      <label for="inputVariety" ng-model="variety">Variety</label>
-      <input ng-model="productData.variety" type="text" class="form-control" id="inputVariety" placeholder="e.g. {{category.placeholderVariety}}">
-    </div>
-    <div class="form-group col-md-6">
-      <label for="inputVariety">Price</label>
-      <input ng-model="productData.price" name="price" type="number" class="form-control" id="inputPrice" min="0" placeholder="e.g. $2.50" required>
-    </div>
-   </div>
-   <div class="row">
-    <div class="form-group col-md-6">
-      <label for="quantity">Quantity Available</label>
-      <input ng-model="productData.quantity" name="quantity" type="number" max="1000" class="form-control" id="quantity" placeholder="e.g. 27" required>
-    </div>
-    <div class="form-group col-md-6">
-      <label for="units">Quantity Units</label>
-      <select ng-model="productData.units" ng-options="c for c in availableUnits" name="units" id="units" required>
-      </select>
-    </div>
-   </div>  
    
     
     <div class="form-group">
-      <label for="refrigeration">Refrigeration Required</label>
-      <div class="form-group">
-		  <div class="row">
+		<label for="refrigeration">Refrigeration Required</label>
+		<div class="row">
 			<div class="col-md-4">
-			  <label for="refrigeration">
-			    <input ng-model="productData.refrigeration" name="refrigeration" type="radio" value="none" ng-checked="true"> none
-			  </label>
+				<label for="refrigeration">
+				<input ng-model="productData.refrigeration" name="refrigeration" type="radio" value="none" ng-checked="true"> none
+				</label>
 			</div>
 			<div class="col-md-4">  
-			  <label for="refrigeration">
-			    <input ng-model="productData.refrigeration" name="refrigeration" type="radio" value="refrigeration"> refrigeration
-			  </label>
+				<label for="refrigeration">
+				<input ng-model="productData.refrigeration" name="refrigeration" type="radio" value="refrigeration"> refrigeration
+				</label>
 			</div>
 			<div class="col-md-4">  
-			  <label for="refrigeration">
-			    <input ng-model="productData.refrigeration" name="refrigeration" type="radio" value="frozen"> frozen
-			  </label>
+				<label for="refrigeration">
+				<input ng-model="productData.refrigeration" name="refrigeration" type="radio" value="frozen"> frozen
+				</label>
 			</div>
-	    </div>
+		</div>
 	</div>
 
      
      <div ng-show="ingredients" id="ingredients" class="form-group col-md-12">
-      <label for="ingredients">Ingredients</label> 
-      <textarea ng-model="productData.ingredients" id="ingredients" maxlength="1000" placeholder="Please list all ingredients of this product." rows="9" style="width: 100%;"></textarea>  
+		<label for="ingredients">Ingredients</label> 
+		<textarea ng-model="productData.ingredients" id="ingredients" maxlength="1000" placeholder="Please list all ingredients of this product." rows="9" style="width: 100%;"></textarea>  
     </div>
     
     <div class="form-group">
-      <label for="description">Description</label> 
-      <textarea ng-model="productData.description" id="description" maxlength="2000" placeholder="Write a couple paragraphs about how special your product is." rows="9" style="width: 100%;"></textarea>  
+		<label for="description">Description</label> 
+		<textarea ng-model="productData.description" id="description" maxlength="2000" placeholder="Write a couple paragraphs about how special your product is." rows="9" style="width: 100%;"></textarea>  
     </div> 
     
     <div class="checkbox">
-      <label for="certification">Certification (select those that apply)</label>
-      <select ng-model="productData.certification" ng-options="c.name for c in certifications" name="certification">
-      </select>
+		<label for="certification">Certification (select those that apply)</label>
+		<select ng-model="productData.certification" ng-options="c.name for c in certifications" name="certification">
+		</select>
     </div>
     
     <button type="reset" class="btn btn-default">Reset</button>    
-    <button type="submit" class="btn btn-default" ng-disabled="productUpload.$invalid">Submit</button>
+    <button type="submit" class="btn btn-default" ng-disabled="productUpload.$invalid">Save</button>
   </fieldset>
 </form>
 

@@ -13,6 +13,16 @@
 			<th>Price</th>
 			<th>Producer</th>
 		</tr>
+	</thead>
+	<tfoot>
+		<tr>
+			
+			<td></td>
+			<td></td>
+			<td></td>
+			<td><strong>Total: {{total|currency}}</strong></td>
+		</tr>
+	</tfoot>
 	<tbody>
 		<tr ng-repeat="c in cart" >
 	        <td data-title=" 'remove' ">
@@ -32,7 +42,6 @@
 	    </tr>
 	</tbody>
 </table>
-<strong>Total: {{total|currency}}</strong>
 </div>
 
 

@@ -9,7 +9,7 @@ angular.module('co-op.services', []).
 	factory('LoginManager', ['$http', function($http) {
 		var module = {
 			loginAttempt : function(loginData) {
-				console.log("Login Data", loginData);
+				console.log('Login Data', loginData);
 				module.loginChange(true);
 			},			
 			IsLoggedIn : function() {
@@ -46,7 +46,7 @@ angular.module('co-op.services', []).
 	.factory('PwdResetManager', ['$http', function($http) {
 		return {
 			pwdReset : function(resetData) {
-				console.log("Reset Data", resetData);
+				console.log('Reset Data', resetData);
 			}			
 		};
 	}])
@@ -54,7 +54,7 @@ angular.module('co-op.services', []).
 	.factory('UserManager', ['$http', function($http) {
 		return {
 			registerUser : function(userData) {
-				console.log("User data", userData);
+				console.log('User data', userData);
 			},
 			userTypes : [
 	  {name:'Guest', buy:false, sell:false },
@@ -67,15 +67,15 @@ angular.module('co-op.services', []).
 	.factory('ProductManager', ['$http', function($http) {
 		return {
 			registerProduct : function(productData) {
-				console.log("Product Data Object", productData);
+				console.log('Product Data Object', productData);
 			}
 		}	
 	}])
 	
 	.factory('ProducerManager', ['$http', function($http) {
 		return {
-			registerProducer : function(producerData) {
-				console.log("Producer Data Object", producerData);
+			setProducer : function(producerData) {
+				console.log('Producer Data Object', producerData);
 			}
 		}	
 	}])
@@ -83,7 +83,7 @@ angular.module('co-op.services', []).
 	.factory('MailManager', ['$http', function($http) {
 		return {
 			mail : function(mail) {
-				console.log("email message", mail);
+				console.log('email message', mail);
 			}
 		}	
 	}])
@@ -108,11 +108,11 @@ angular.module('co-op.services', []).
 
 		
 		var orders = [
-			{product: "Granny Smith Apples", quantity: 30, price: 2*30, customer: 'Sean Stanley'},
-            {product: "Spray-Free Oranges", quantity: 12, price: 2.5*12, customer: 'Matt Stanley'},
-            {product: "Romaine Lettuce", quantity: 27, price: 4*27, customer: 'Myles Green'},
-            {product: "Organic Basil", quantity: 7, price: 1.5*7, customer: 'Rowan Clements'},
-            {product: "Dozen Eggs", quantity: 4, price: 8*4, customer: 'Lisa Taylor'}
+			{product: 'Granny Smith Apples', quantity: 30, price: 2*30, customer: 'Sean Stanley'},
+            {product: 'Spray-Free Oranges', quantity: 12, price: 2.5*12, customer: 'Matt Stanley'},
+            {product: 'Romaine Lettuce', quantity: 27, price: 4*27, customer: 'Myles Green'},
+            {product: 'Organic Basil', quantity: 7, price: 1.5*7, customer: 'Rowan Clements'},
+            {product: 'Dozen Eggs', quantity: 4, price: 8*4, customer: 'Lisa Taylor'}
 		];
 	}])
 	.service('CartRecords', ['$http', function($http) {
@@ -140,15 +140,94 @@ angular.module('co-op.services', []).
 
 		
 		var cartItems = [
-			{product: "Organic Blue-Veined Cheese", quantity: 1, price: 10, producer: 'Hiki Dairy Farm'},
-            {product: "Spray-Free Oranges", quantity: 2, price: 2.5*2, producer: 'Northland Naturals'},
-            {product: "Romaine Lettuce", quantity: 6, price: 4*6, producer: 'EcoBikes'},
-            {product: "Rosemary bunches", quantity: 4, price: 1*4, producer: 'Rowan Clements'},
-            {product: "Loafs of Gluten Free Bread", quantity: 3, price: 3.2*4, producer: 'Lisa Taylor'},
-            {product: "Organic Garlic and Basil Sausages", quantity: 2, price: 8.50*2, producer: 'Lisa Taylor'}
+			{product: 'Organic Blue-Veined Cheese', quantity: 1, price: 10, producer: 'Hiki Dairy Farm'},
+            {product: 'Spray-Free Oranges', quantity: 2, price: 2.5*2, producer: 'Northland Naturals'},
+            {product: 'Romaine Lettuce', quantity: 6, price: 4*6, producer: 'EcoBikes'},
+            {product: 'Rosemary bunches', quantity: 4, price: 1*4, producer: 'Rowan Clements'},
+            {product: 'Loafs of Gluten Free Bread', quantity: 3, price: 3.2*4, producer: 'Lisa Taylor'},
+            {product: 'Organic Garlic and Basil Sausages', quantity: 2, price: 8.50*2, producer: 'Lisa Taylor'}
 		];
 	}])
 	
+	factory('ProductHistory', ['$http', function($http) {
+		var module = {
+						
+			getData : function() {
+	            return module.data;
+	            console.log(module.data);
+	        },
+			
+			addProduct : function(newData) {
+				module.data.push(newData);
+				return module.data;
+				console.log(module.data);
+
+			},
+			
+			data : [
+				{
+			    'date-uploaded': '24/9/13',
+			    'category': 'Baked Goods',
+			    'name': 'Buns',
+			    'variety': 'Whole Wheat',
+			    'price': 3.5,
+			    'quantityAvailable': 10,
+			    'quantityUnits': 'dozen',
+			    'refrigeration': 'refrigeration',
+			    'ingredients': 'whole wheat, water, poppy seeds, sunflower seeds, sesame seeds, sugar, oil, yeast, salt',
+			    'description': 'Freshly baked buns topped with a delcious variety of seeds. The buns were baked in Kerikeri by loving hands. The hands in question were washed very thouroughly and covered in latex gloves during the entire baking process.',
+			    'certification': null,
+			    'producerName': 'Jane Blank',
+			    'producerCompany': 'Fun Buns'
+				},
+				{
+			    'date-uploaded': '24/10/13',
+			    'category': 'Produce',
+			    'name': 'Grapefruit',
+			    'variety': 'Pink',
+			    'price': 2.5,
+			    'quantityAvailable': 25,
+			    'quantityUnits': 'kg',
+			    'refrigeration': 'none',
+			    'ingredients': null,
+			    'description': 'These delicious pink grapefruit were grown in Whangarei without any artificial fertilier, insecticides or herbicides. In fact, every morning we get up and sing to the tree and ask the fey spirits to bless it and make it boutiful. It worked I think as we have more fruit now than my family can eat.',
+			    'certification': null,
+			    'producerName': 'Matt Stanley',
+			    'producerCompany': 'Northland Naturals'
+				},
+				{
+			    'date-uploaded': '4/11/13',
+			    'category': 'Meat',
+			    'name': 'Sausages',
+			    'variety': 'Gluten-Free',
+			    'price': 12.5,
+			    'quantityAvailable': 10,
+			    'quantityUnits': 'kg',
+			    'ingredients': 'Organic pork, gluten-free breadcrumbs, salt, spices, smoke, tender-loving care',
+			    'description': 'These delicious pink grapefruit were grown in Whangarei without any artificial fertilier, insecticides or herbicides. In fact, every morning we get up and sing to the tree and ask the fey spirits to bless it and make it boutiful. It worked I think as we have more fruit now than my family can eat.',
+			    'certification': null,
+			    'producerName': 'Butch Jock',
+			    'producerCompany': 'Butch Butcher'
+				},
+				{
+			    'date-uploaded': '4/11/13',
+			    'category': 'Dairy',
+			    'name': 'Milk',
+			    'variety': 'Raw',
+			    'price': 2,
+			    'quantityAvailable': 100,
+			    'quantityUnits': 'L',
+			    'ingredients': 'milk',
+			    'description': 'Raw Milk certified Demeter',
+			    'certification': 'Demeter',
+			    'producerName': 'Stan',
+			    'producerCompany': 'Salmon Road Dairy Farm'
+				}
+			]
+		};
+		
+		return module;
+	}])
 	
 	.service('LocationService', function() {
 		

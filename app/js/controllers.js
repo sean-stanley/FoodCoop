@@ -24,15 +24,17 @@ angular.module('co-op.controllers', []).
 	
 	$scope.logOut = function () {
 		$scope.loginManager.loginChange(false);
+		$location.path('/home');
 	}
 	
 	$scope.logIn = function () {
 		$scope.loginManager.loginChange(true);
+		$location.path('/home');
 	}
 	
   }])
   
-  .controller('loginCtrl', ['$scope', 'LoginManager', function($scope, LoginManager) {
+  .controller('loginCtrl', ['$scope', '$location', 'LoginManager', function($scope, $location, LoginManager) {
 	  $scope.showLogin = false;
 	
 	$scope.loginManager = LoginManager;
@@ -46,6 +48,7 @@ angular.module('co-op.controllers', []).
         $scope.loginManager.loginAttempt($scope.loginData);
         $scope.loginManager.logIn();
         console.log($scope.loginManager.loggedIn);
+        $location.path('/home');
     } 
   }])
   .controller('resetPwdCtrl', ['$scope', 'PwdResetManager', function($scope, PwdResetManager) {
@@ -63,7 +66,7 @@ angular.module('co-op.controllers', []).
 	
   }])  
   
-  .controller('userCtrl', ['$scope', 'UserManager', 'LocationService', function($scope, UserManager, LocationService) {
+  .controller('userCtrl', ['$scope', 'UserManager', 'LocationService', 'LoginManager', '$location', function($scope, UserManager, LocationService, LoginManager, $location) {
 	  $scope.cities = LocationService.getLocations();
 	  
 	  $scope.userData = {
@@ -87,10 +90,17 @@ angular.module('co-op.controllers', []).
 		  }
 	  });
 	  	  
-	  $scope.mileage = $scope.userData.city.distance * 0.67 * 2; //find cost in dollars of return trip to whangarei for producers.
+	  $scope.mileage = $scope.userData.city.distance * 0.67; //find cost in dollars of return trip to whangarei for producers.
 
 	  $scope.submitForm = function () {
         UserManager.registerUser($scope.userData);
+        LoginManager.loginChange(true);
+        if ($scope.userData.type.name === 'Producer') {
+	        $location.path('/producer-profile');
+        }
+        else {
+	        $location.path('/home');;
+        }
     }
   }])
   
@@ -210,10 +220,27 @@ angular.module('co-op.controllers', []).
 	  };
 	   
 	   $scope.submitForm = function () {
-        ProducerManager.registerProduct($scope.producerData);
+        ProducerManager.setProducer($scope.producerData);
+        $location.path('/product-upload');
     }
 	   
   }])
+   
+   .controller('productHistoryCtrl', ['$scope', 'ProductHistory', function($scope, ProductHistory) {
+		$scope.data = ProductHistory.getData();
+	   
+		$scope.predicate = 'date-uploaded';
+	   
+		$scope.delete = function(idx) {
+			var itemToDelete = $scope.data[idx];
+			$scope.data.splice(idx, 1);
+		}
+		
+		$scope.editProduct = function(product) {
+			console.log(product);
+		};
+	  }
+   }])
   
   .controller('orderTableCtrl', ['$scope', '$filter', 'ngTableParams', 'OrderRecords', function($scope, $filter, ngTableParams, OrderRecords) {
 	  $scope.orders = OrderRecords.getOrders();

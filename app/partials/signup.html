@@ -32,11 +32,11 @@
     </div>
     <div class="form-group">
       <label for="DateOfBirth">Date of Birth</label>
-      <input type="date" class="form-control" id="DateOfBirth" min="2006-01-01" max="1910-01-01">
+      <input ng-model="userData.dob" type="date" class="form-control" id="DateOfBirth" min="2006-01-01" max="1910-01-01">
     </div>
     <div class="form-group">
       <label for="address">Address</label> 
-      <input ng-model="address" name="address" type="text" id="address_field" class="form-control" required>
+      <input ng-model="userData.address" name="address" type="text" id="address_field" class="form-control" required>
     </div>
     
     <div class="form-group">
