@@ -175,14 +175,7 @@ angular.module('co-op.controllers', []).
 		  }
 	  });
 	  
-	  $scope.certifications = [
-	  {name:'Assure Quality', value: 'assure-quality', img: '<img src="../img/certification/assure-quality.png" alt="assure-quality" width="180" height="180" />'},
-	  {name:'BioGro', value: 'biogro', img: '<img src="../img/certification/biogro.png" alt="biogro" width="117" height="126" />'},
-	  {name:'Demeter Biodynamics', value: 'dem-organics', img: '<img src="../img/certification/demgreen.gif" alt="demgreen" width="336" height="435" />'},
-	  {name:'Organic Farm NZ', value: 'organicfarmnz', img: '<img src="../img/certification/organicfarmnz.png" alt="organicfarmnz" width="88" height="81" />'},
-	  {name:'In Transition', value: 'transition', img: ''},
-	  {name:'None', value: 'none', img: ''}
-	  ];
+	  $scope.certifications = ProductManager.certificationTypes;
 	  
 	  //$scope.setImage = function(element) {
       //  $scope.$apply(function($scope) {
@@ -191,6 +184,8 @@ angular.module('co-op.controllers', []).
 //    };
 	  
 	  $scope.productData = {
+		  dateUploaded: Date(),
+		  category: '',
 		  image: '',
 		  productName: '',
 		  variety: '',
@@ -201,6 +196,8 @@ angular.module('co-op.controllers', []).
 		  ingredients: '',
 		  description: '',
 		  certification: $scope.certifications[5],
+		  producerName: '',
+		  producerCompany: '',
 	  };
 	  
 	  $scope.submitForm = function () {
@@ -229,7 +226,7 @@ angular.module('co-op.controllers', []).
    .controller('productHistoryCtrl', ['$scope', 'ProductHistory', function($scope, ProductHistory) {
 		$scope.data = ProductHistory.getData();
 	   
-		$scope.predicate = 'date-uploaded';
+		$scope.predicate = 'dateUploaded';
 	   
 		$scope.delete = function(idx) {
 			var itemToDelete = $scope.data[idx];
@@ -237,10 +234,12 @@ angular.module('co-op.controllers', []).
 		}
 		
 		$scope.editProduct = function(product) {
-			console.log(product);
+			$scope.productData = product;
+			console.log($scope.productData)
+			// pass product to productUpload controller $scope.productData
 		};
-	  }
-   }])
+	  }])
+   
   
   .controller('orderTableCtrl', ['$scope', '$filter', 'ngTableParams', 'OrderRecords', function($scope, $filter, ngTableParams, OrderRecords) {
 	  $scope.orders = OrderRecords.getOrders();

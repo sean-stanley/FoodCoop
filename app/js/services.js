@@ -68,7 +68,40 @@ angular.module('co-op.services', []).
 		return {
 			registerProduct : function(productData) {
 				console.log('Product Data Object', productData);
-			}
+			},
+			
+			certificationTypes : [
+				{
+				  name:'Assure Quality', 
+				  value: 'assure-quality', 
+				  img: '<img src="../img/certification/assure-quality.png" alt="assure-quality" width="180" height="180" />'
+				},
+				{
+				  name:'BioGro', 
+				  value: 'biogro', 
+				  img: '<img src="../img/certification/biogro.png" alt="biogro" width="117" height="126" />'
+				},
+				{
+				  name:'Demeter Biodynamics', 
+				  value: 'dem-organics', 
+				  img: '<img src="../img/certification/demgreen.gif" alt="demgreen" width="336" height="435" />'
+				},
+				{
+				  name:'Organic Farm NZ', 
+				  value: 'organicfarmnz', 
+				  img: '<img src="../img/certification/organicfarmnz.png" alt="organicfarmnz" width="88" height="81" />'
+				},
+				{
+				  name:'In Transition', 
+				  value: 'transition', img: ''
+				},
+				{
+				  name:'None', 
+				  value: 'none', 
+				  img: ''
+				}
+		  	]
+
 		}	
 	}])
 	
@@ -76,7 +109,7 @@ angular.module('co-op.services', []).
 		return {
 			setProducer : function(producerData) {
 				console.log('Producer Data Object', producerData);
-			}
+			},
 		}	
 	}])
 	
@@ -149,7 +182,7 @@ angular.module('co-op.services', []).
 		];
 	}])
 	
-	factory('ProductHistory', ['$http', function($http) {
+	.factory('ProductHistory', ['$http', function($http) {
 		var module = {
 						
 			getData : function() {
@@ -166,62 +199,62 @@ angular.module('co-op.services', []).
 			
 			data : [
 				{
-			    'date-uploaded': '24/9/13',
-			    'category': 'Baked Goods',
-			    'name': 'Buns',
-			    'variety': 'Whole Wheat',
-			    'price': 3.5,
-			    'quantityAvailable': 10,
-			    'quantityUnits': 'dozen',
-			    'refrigeration': 'refrigeration',
-			    'ingredients': 'whole wheat, water, poppy seeds, sunflower seeds, sesame seeds, sugar, oil, yeast, salt',
-			    'description': 'Freshly baked buns topped with a delcious variety of seeds. The buns were baked in Kerikeri by loving hands. The hands in question were washed very thouroughly and covered in latex gloves during the entire baking process.',
-			    'certification': null,
-			    'producerName': 'Jane Blank',
-			    'producerCompany': 'Fun Buns'
+				    dateUploaded: '24/9/13',
+				    category: 'Baked Goods',
+				    productName: 'Buns',
+				    variety: 'Whole Wheat',
+				    price: 3.5,
+				    quantity: 10,
+				    units: 'dozen',
+				    refrigeration: 'refrigeration',
+				    ingredients: 'whole wheat, water, poppy seeds, sunflower seeds, sesame seeds, sugar, oil, yeast, salt',
+				    description: 'Freshly baked buns topped with a delcious variety of seeds. The buns were baked in Kerikeri by loving hands. The hands in question were washed very thouroughly and covered in latex gloves during the entire baking process.',
+				    certification: null,
+				    producerName: 'Jane Blank',
+				    producerCompany: 'Fun Buns'
 				},
 				{
-			    'date-uploaded': '24/10/13',
-			    'category': 'Produce',
-			    'name': 'Grapefruit',
-			    'variety': 'Pink',
-			    'price': 2.5,
-			    'quantityAvailable': 25,
-			    'quantityUnits': 'kg',
-			    'refrigeration': 'none',
-			    'ingredients': null,
-			    'description': 'These delicious pink grapefruit were grown in Whangarei without any artificial fertilier, insecticides or herbicides. In fact, every morning we get up and sing to the tree and ask the fey spirits to bless it and make it boutiful. It worked I think as we have more fruit now than my family can eat.',
-			    'certification': null,
-			    'producerName': 'Matt Stanley',
-			    'producerCompany': 'Northland Naturals'
+				    dateUploaded: '24/10/13',
+				    category: 'Produce',
+				    productName: 'Grapefruit',
+				    variety: 'Pink',
+				    price: 2.5,
+				    quantity: 25,
+				    units: 'kg',
+				    refrigeration: 'none',
+				    ingredients: null,
+				    description: 'These delicious pink grapefruit were grown in Whangarei without any artificial fertilier, insecticides or herbicides. In fact, every morning we get up and sing to the tree and ask the fey spirits to bless it and make it boutiful. It worked I think as we have more fruit now than my family can eat.',
+				    certification: null,
+				    producerName: 'Matt Stanley',
+				    producerCompany: 'Northland Naturals'
 				},
 				{
-			    'date-uploaded': '4/11/13',
-			    'category': 'Meat',
-			    'name': 'Sausages',
-			    'variety': 'Gluten-Free',
-			    'price': 12.5,
-			    'quantityAvailable': 10,
-			    'quantityUnits': 'kg',
-			    'ingredients': 'Organic pork, gluten-free breadcrumbs, salt, spices, smoke, tender-loving care',
-			    'description': 'These delicious pink grapefruit were grown in Whangarei without any artificial fertilier, insecticides or herbicides. In fact, every morning we get up and sing to the tree and ask the fey spirits to bless it and make it boutiful. It worked I think as we have more fruit now than my family can eat.',
-			    'certification': null,
-			    'producerName': 'Butch Jock',
-			    'producerCompany': 'Butch Butcher'
+				    dateUploaded: '4/11/13',
+				    category: 'Meat',
+				    productName: 'Sausages',
+				    variety: 'Gluten-Free',
+				    price: 12.5,
+				    quantity: 10,
+				    units: 'kg',
+				    ingredients: 'Organic pork, gluten-free breadcrumbs, salt, spices, smoke, tender-loving care',
+				    description: 'These delicious pink grapefruit were grown in Whangarei without any artificial fertilier, insecticides or herbicides. In fact, every morning we get up and sing to the tree and ask the fey spirits to bless it and make it boutiful. It worked I think as we have more fruit now than my family can eat.',
+				    certification: null,
+				    producerName: 'Butch Jock',
+				    producerCompany: 'Butch Butcher'
 				},
 				{
-			    'date-uploaded': '4/11/13',
-			    'category': 'Dairy',
-			    'name': 'Milk',
-			    'variety': 'Raw',
-			    'price': 2,
-			    'quantityAvailable': 100,
-			    'quantityUnits': 'L',
-			    'ingredients': 'milk',
-			    'description': 'Raw Milk certified Demeter',
-			    'certification': 'Demeter',
-			    'producerName': 'Stan',
-			    'producerCompany': 'Salmon Road Dairy Farm'
+				    dateUploaded: '4/11/13',
+				    category: 'Dairy',
+				    productName: 'Milk',
+				    variety: 'Raw',
+				    price: 2,
+				    quantity: 100,
+				    units: 'L',
+				    ingredients: 'milk',
+				    description: 'Raw Milk certified Demeter',
+				    certification: 'Demeter',
+				    producerName: 'Stan',
+				    producerCompany: 'Salmon Road Dairy Farm'
 				}
 			]
 		};

@@ -1,145 +1,145 @@
 <div class="row">
 	<div id="product-upload-preview-column" class="col-md-4">
-	<div id="preview-container" class="preview-box">
-		<a href="#" class="thumbnail">
-			<img data-src="holder.js/100%x180" alt="...">
-			<img ng-src={{productData.image}} alt="product name" width="100%">
-	  	</a>
-		<h5>{{productData.variety}} {{productData.name}}</h5>
-		<p>{{1.2 * productData.price|currency}} / {{productData.units}} {{productData.quantity}} Available</p> <!-- multiply the price by 1.2 to include markup -->
-	</div>
+		<div id="preview-container" class="preview-box">
+			<a href="#" class="thumbnail">
+				<img data-src="holder.js/100%x180" alt="...">
+				<img ng-src={{productData.image}} alt="product name" width="100%">
+				<img ng-src={{productData.certification.image}}>
+		  	</a>
+			<h5>{{productData.variety}} {{productData.name}}</h5>
+			<p>{{1.2 * productData.price|currency}} / {{productData.units}} {{productData.quantity}} Available</p> <!-- multiply the price by 1.2 to include markup -->
+		</div>
 	
-	<div id="product-history-list" ng-controller="productHistoryCtrl">
-		Click a product to edit it.
-		<table>
-			<caption>Current Month</caption>
-			<thead>
-				<tr>
-					<th>Name</th>
-					<th>Tools</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr ng-repeat="i in data">
-					<td><a ng-click="editProduct()">{{i.'name'}} {{i.'variety'}}</a></td>
-					<td>
-						<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-		<table>
-			<caption>Product History</caption>
-			<thead>
-				<tr>
-					<th>Name</th>
-					<th>Tools</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr ng-repeat="i in data">
-					<td>{{i.'name'}} {{i.'variety'}}</td>
-					<td>
-						<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
-					</td>
-
-				</tr>
-			</tbody>
-		</table>
-
-		</div>
-	</div>
-</div>
-
-<div id="product-upload-form-container" class="col-md-8" >
-	<form name="productUpload" autocomplete="on" ng-submit="submitForm();" novalidate>
-  <fieldset>
-    <legend>Upload a Product {{username}}</legend>
-    <div class="row">
-		<div class="form-group col-md-6">
-			<label for="Category">Product Category</label>
-			<select ng-model="category" ng-options="c.name for c in productCategories" name="category" id="category-menu" required>
-			</select>
-		</div>
-		<div class="form-group col-md-6">
-			<label for="product-image">Product Image Upload</label>	  
-			<div file-dropzone="[image/png, image/jpeg, image/gif]" file="productData.image" data-max-file-size="3" id="file-dropzone" class="image-drop">
-			  <span>Drop Product Image Here</span>
-			</div>    
-		</div>
-    
-	<div class="row">
-		<div class="form-group col-md-6">
-			<label for="inputName" >Product Name</label>
-			<input ng-model="productData.name" type="text" class="form-control" id="inputName" placeholder="e.g. {{category.placeholderName}}" autofocus required>
-		</div>
-		<div class="form-group col-md-6">
-			<label for="inputVariety" ng-model="variety">Variety</label>
-			<input ng-model="productData.variety" type="text" class="form-control" id="inputVariety" placeholder="e.g. {{category.placeholderVariety}}">
-		</div>
-	</div>
+		<div id="product-history-list" ng-controller="productHistoryCtrl">
+			<h5>Click a product to edit it.</h5>
+			<table class="table table-hover">
+				<caption>Current Month</caption>
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Remove</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="i in data">
+						<td><a ng-click="editProduct(i)">{{i.productName}} {{i.variety}}</a></td>
+						<td>
+							<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<h5>Product History</h5>
+			
+			<table class="table table-hover">
+				<caption>Product History</caption>
+				<thead>
+					<tr>
+						<th><a href="" ng-click="predicate = 'name'; reverse=!reverse ">Name</th>
+						<th><a href="" ng-click="predicate = 'dateUploaded'; reverse=!reverse ">Date Added</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="i in data | orderBy:predicate:reverse ">
+						<td><a ng-click="editProduct(i)">{{i.productName}} {{i.variety}}</a></td>
+						<td>{{i.dateUploaded}}</td>
+						
 	
-	<div class="row">	
-		<div class="form-group col-md-4">
-			<label for="inputVariety">Price</label>
-			<input ng-model="productData.price" name="price" type="number" class="form-control" id="inputPrice" min="0" placeholder="e.g. $2.50" required>
-		</div>
-		
-	    <div class="form-group col-md-4">
-			<label for="units">Quantity Units</label>
-			<select ng-model="productData.units" ng-options="c for c in availableUnits" name="units" id="units" required>
-			</select>
-	    </div>
-	    
-	    <div class="form-group col-md-4">
-			<label for="quantity">Quantity Available</label>
-			<input ng-model="productData.quantity" name="quantity" type="number" max="1000" class="form-control" id="quantity" placeholder="e.g. 27" required>
-	    </div>
-   </div>
-   
-    
-    <div class="form-group">
-		<label for="refrigeration">Refrigeration Required</label>
-		<div class="row">
-			<div class="col-md-4">
-				<label for="refrigeration">
-				<input ng-model="productData.refrigeration" name="refrigeration" type="radio" value="none" ng-checked="true"> none
-				</label>
-			</div>
-			<div class="col-md-4">  
-				<label for="refrigeration">
-				<input ng-model="productData.refrigeration" name="refrigeration" type="radio" value="refrigeration"> refrigeration
-				</label>
-			</div>
-			<div class="col-md-4">  
-				<label for="refrigeration">
-				<input ng-model="productData.refrigeration" name="refrigeration" type="radio" value="frozen"> frozen
-				</label>
-			</div>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	</div>
 
-     
-     <div ng-show="ingredients" id="ingredients" class="form-group col-md-12">
-		<label for="ingredients">Ingredients</label> 
-		<textarea ng-model="productData.ingredients" id="ingredients" maxlength="1000" placeholder="Please list all ingredients of this product." rows="9" style="width: 100%;"></textarea>  
-    </div>
-    
-    <div class="form-group">
-		<label for="description">Description</label> 
-		<textarea ng-model="productData.description" id="description" maxlength="2000" placeholder="Write a couple paragraphs about how special your product is." rows="9" style="width: 100%;"></textarea>  
-    </div> 
-    
-    <div class="checkbox">
-		<label for="certification">Certification (select those that apply)</label>
-		<select ng-model="productData.certification" ng-options="c.name for c in certifications" name="certification">
-		</select>
-    </div>
-    
-    <button type="reset" class="btn btn-default">Reset</button>    
-    <button type="submit" class="btn btn-default" ng-disabled="productUpload.$invalid">Save</button>
-  </fieldset>
-</form>
-
-</div>
+	<div id="product-upload-form-container" class="col-md-8" >
+		<form name="productUpload" autocomplete="on" ng-submit="submitForm();" novalidate>
+			<fieldset>
+				<legend>Upload a Product {{username}}</legend>
+					<div class="row">
+						<div class="form-group col-md-6">
+							<label for="Category">Product Category</label>
+							<select ng-model="category" ng-options="c.name for c in productCategories" name="category" id="category-menu" required>
+							</select>
+						</div>
+						<div class="form-group col-md-6">
+							<label for="product-image">Product Image Upload</label>	  
+							<div file-dropzone="[image/png, image/jpeg, image/gif]" file="productData.image" data-max-file-size="3" id="file-dropzone" class="image-drop">
+							  <span>Drop Product Image Here</span>
+							</div>    
+						</div>
+			    
+					<div class="row">
+						<div class="form-group col-md-6">
+							<label for="inputName" >Product Name</label>
+							<input ng-model="productData.name" type="text" class="form-control" id="inputName" maxlength="12" placeholder="e.g. {{category.placeholderName}}" autofocus required>
+						</div>
+						<div class="form-group col-md-6">
+							<label for="inputVariety" ng-model="variety">Variety</label>
+							<input ng-model="productData.variety" type="text" class="form-control" id="inputVariety" maxlength="18" placeholder="e.g. {{category.placeholderVariety}}">
+						</div>
+					</div>
+				
+					<div class="row">	
+						<div class="form-group col-md-4">
+							<label for="inputVariety">Price</label>
+							<input ng-model="productData.price" name="price" type="number" class="form-control" id="inputPrice" min="0" placeholder="e.g. $2.50" required>
+						</div>
+						
+					    <div class="form-group col-md-4">
+							<label for="units">Quantity Units</label>
+							<select ng-model="productData.units" ng-options="c for c in availableUnits" name="units" id="units" required>
+							</select>
+					    </div>
+					    
+					    <div class="form-group col-md-4">
+							<label for="quantity">Quantity Available</label>
+							<input ng-model="productData.quantity" name="quantity" type="number" max="1000" class="form-control" id="quantity" placeholder="e.g. 27" required>
+					    </div>
+				   </div>
+			   
+			    
+			    <div class="form-group">
+					<label for="refrigeration">Refrigeration Required</label>
+					<div class="row">
+						<div class="form-group col-md-4">
+							<label for="refrigeration">
+							<input ng-model="productData.refrigeration" name="refrigeration" type="radio" value="none" ng-checked="true"> none
+							</label>
+						</div>
+						<div class="form-group col-md-4">  
+							<label for="refrigeration">
+							<input ng-model="productData.refrigeration" name="refrigeration" type="radio" value="refrigeration"> refrigeration
+							</label>
+						</div>
+						<div class="form-group col-md-4">  
+							<label for="refrigeration">
+							<input ng-model="productData.refrigeration" name="refrigeration" type="radio" value="frozen"> frozen
+							</label>
+						</div>
+					</div>
+				</div>
+			
+			     
+			     <div ng-show="ingredients" id="ingredients" class="form-group col-md-12">
+					<label for="ingredients">Ingredients</label> 
+					<textarea ng-model="productData.ingredients" id="ingredients" maxlength="1000" placeholder="Please list all ingredients of this product." rows="9" style="width: 100%;"></textarea>  
+			    </div>
+			    
+			    <div class="form-group">
+					<label for="description">Description</label> 
+					<textarea ng-model="productData.description" id="description" maxlength="2000" placeholder="Write a couple paragraphs about how special your product is." rows="9" style="width: 100%;"></textarea>  
+			    </div> 
+			    
+			    <div class="checkbox">
+					<label for="certification">Certification (select those that apply)</label>
+					<select ng-model="productData.certification" ng-options="c.name for c in certifications" name="certification">
+					</select>
+			    </div>
+			    
+			    <button type="reset" class="btn btn-default">Reset</button>    
+			    <button type="submit" class="btn btn-default" ng-disabled="productUpload.$invalid">Save</button>
+			  </fieldset>
+		  </form>
+	
+	</div>
 </div>

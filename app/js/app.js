@@ -19,7 +19,6 @@ angular.module('co-op', [ 'ngRoute', 'co-op.filters', 'co-op.services', 'co-op.d
   .run(function($rootScope, $location, LoginManager) {
   
         $rootScope.$on( '$routeChangeStart', function(event, next, current) {
-        	console.log(next);
         	switch(next.originalPath) {
 				case '/home':
 				case '/signup':
