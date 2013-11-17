@@ -70,36 +70,76 @@ angular.module('co-op.services', []).
 				console.log('Product Data Object', productData);
 			},
 			
+			productCategories : [
+		  		{	
+		  			name:'Produce', 
+		  			value:'produce', 
+		  			placeholderName:'apples', 
+		  			placeholderVariety:'Granny Smith'
+		  		},
+		  		{
+		  			name:'Processed Food', 
+		  			value:'processedFood', 
+		  			placeholderName:'Jam', 
+		  			placeholderVariety:'Strawberry'
+		  		},
+		  		{
+		  			name:'Baked Goods', 
+		  			value:'bakedGoods', 
+		  			placeholderName:'Bread', 
+		  			placeholderVariety:'Sourdough Rye'
+		  		},
+		  		{
+		  			name:'Meat', 
+		  			value:'meat', 
+		  			placeholderName:'Lamb', 
+		  			placeholderVariety:'Half a small'
+		  		},
+		  		{
+		  			name:'Dairy', 
+		  			value:'dairy', 
+		  			placeholderName:'Cheese', 
+		  			placeholderVariety:'Cottage'
+		  		},	
+		  		{
+		  			name:'Raw Milk', 
+		  			value:'rawMilk', 
+		  			placeholderName:'Milk', 
+		  			placeholderVariety:'Raw'
+		  		}  
+	  		],
+			
 			certificationTypes : [
+				{
+				  name:'none', 
+				  value: null, 
+				  img: ''
+				},
 				{
 				  name:'Assure Quality', 
 				  value: 'assure-quality', 
-				  img: '<img src="../img/certification/assure-quality.png" alt="assure-quality" width="180" height="180" />'
+				  img: '<img src="/img/certification/assure-quality.png" alt="assure-quality" width="180" height="180" />'
 				},
 				{
 				  name:'BioGro', 
 				  value: 'biogro', 
-				  img: '<img src="../img/certification/biogro.png" alt="biogro" width="117" height="126" />'
+				  img: '<img src="/img/certification/biogro.png" alt="biogro" width="117" height="126" />'
 				},
 				{
 				  name:'Demeter Biodynamics', 
 				  value: 'dem-organics', 
-				  img: '<img src="../img/certification/demgreen.gif" alt="demgreen" width="336" height="435" />'
+				  img: '<img src="/img/certification/demgreen.gif" alt="demgreen" width="336" height="435" />'
 				},
 				{
 				  name:'Organic Farm NZ', 
 				  value: 'organicfarmnz', 
-				  img: '<img src="../img/certification/organicfarmnz.png" alt="organicfarmnz" width="88" height="81" />'
+				  img: '<img src="/img/certification/organicfarmnz.png" alt="organicfarmnz" width="88" height="81" />'
 				},
 				{
 				  name:'In Transition', 
 				  value: 'transition', img: ''
-				},
-				{
-				  name:'None', 
-				  value: 'none', 
-				  img: ''
 				}
+				
 		  	]
 
 		}	
@@ -209,7 +249,7 @@ angular.module('co-op.services', []).
 				    refrigeration: 'refrigeration',
 				    ingredients: 'whole wheat, water, poppy seeds, sunflower seeds, sesame seeds, sugar, oil, yeast, salt',
 				    description: 'Freshly baked buns topped with a delcious variety of seeds. The buns were baked in Kerikeri by loving hands. The hands in question were washed very thouroughly and covered in latex gloves during the entire baking process.',
-				    certification: null,
+				    certification: 'BioGro',
 				    producerName: 'Jane Blank',
 				    producerCompany: 'Fun Buns'
 				},
@@ -223,44 +263,143 @@ angular.module('co-op.services', []).
 				    units: 'kg',
 				    refrigeration: 'none',
 				    ingredients: null,
-				    description: 'These delicious pink grapefruit were grown in Whangarei without any artificial fertilier, insecticides or herbicides. In fact, every morning we get up and sing to the tree and ask the fey spirits to bless it and make it boutiful. It worked I think as we have more fruit now than my family can eat.',
-				    certification: null,
+				    description: 'These delicious pink grapefruit were grown in Whangarei without any artificial fertilier, insecticides or herbicides. In fact, every morning we get up and sing to the tree and ask the fey spirits to bless it and make it bountiful. It worked I think as we have more fruit now than my family can eat.',
+				    certification: 'Assure Quality',
 				    producerName: 'Matt Stanley',
 				    producerCompany: 'Northland Naturals'
 				},
 				{
-				    dateUploaded: '4/11/13',
+				    dateUploaded: '12/11/13',
 				    category: 'Meat',
 				    productName: 'Sausages',
 				    variety: 'Gluten-Free',
 				    price: 12.5,
 				    quantity: 10,
 				    units: 'kg',
+				    refrigeration: 'frozen',
 				    ingredients: 'Organic pork, gluten-free breadcrumbs, salt, spices, smoke, tender-loving care',
 				    description: 'These delicious pink grapefruit were grown in Whangarei without any artificial fertilier, insecticides or herbicides. In fact, every morning we get up and sing to the tree and ask the fey spirits to bless it and make it boutiful. It worked I think as we have more fruit now than my family can eat.',
-				    certification: null,
+				    certification: 'none',
 				    producerName: 'Butch Jock',
 				    producerCompany: 'Butch Butcher'
 				},
 				{
-				    dateUploaded: '4/11/13',
+				    dateUploaded: '2/11/13',
 				    category: 'Dairy',
-				    productName: 'Milk',
+				    productName: 'Yoghurt',
+				    variety: 'Raw',
+				    price: 4,
+				    quantity: 20,
+				    units: 'L',
+				    refrigeration: 'refrigeration',
+				    ingredients: 'raw milk, culture',
+				    description: 'Raw Milk certified Demeter, made in Waipu',
+				    certification: 'Demeter Biodynamics',
+				    producerName: 'Stan',
+				    producerCompany: 'Salmon Road Dairy Farm'
+				},
+				{
+				    dateUploaded: '7/11/13',
+				    category: 'Raw Milk',
+				    productName: 'Goat Milk',
 				    variety: 'Raw',
 				    price: 2,
 				    quantity: 100,
-				    units: 'L',
+				    units: 'L/week for 4 weeks',
 				    ingredients: 'milk',
-				    description: 'Raw Milk certified Demeter',
-				    certification: 'Demeter',
-				    producerName: 'Stan',
-				    producerCompany: 'Salmon Road Dairy Farm'
+				    refrigeration: 'refrigeration',
+				    description: 'Raw Goats Milk certified Organic Farm NZ. Goats raised naturally in Tutukaka.',
+				    certification: 'Organic Farm NZ',
+				    producerName: 'Klaus Lotz',
+				    producerCompany: 'Tutukaka Organics'
 				}
 			]
 		};
 		
 		return module;
 	}])
+	
+	.factory('ProducerList', ['$http', function($http) {
+		var module = {
+						
+			getData : function() {
+	            return module.data;
+	            console.log(module.data);
+	        },
+			
+			addProducer : function(newData) {
+				module.data.push(newData);
+				return module.data;
+
+			},
+			
+			data : [
+				{
+				    dateJoined : '11/11/13',
+				    producerName : 'Amber Atkins',
+				    companyName : 'Atkins Greenhouses',
+				    companyImg : '/img/producers/amber-atkins.JPG',
+				    companyLogo : '',
+				    description : 'We sell Kombucha fermented tea health tonics as well as all sorts of greenhouse grown veges. We use natural practices whenever possible and our kombucha is delicious!',
+				    email : 'atkins.stephen@ymail.com',
+				    phone : '0272233279',
+				    address : 'Somewhere in Kaitaia',
+				    certification : 'In Transition'
+				},
+				{
+				   dateJoined : '10/10/13',
+				    producerName : 'Lisa Taylor',
+				    companyName : 'Northland Naturals 2',
+				    companyImg : '/img/producers/lisa-taylor.JPG" alt="lisa-taylor',
+				    companyLogo : '/img/producer-logos/northland%20naturals%20logo.png',
+				    description : 'I sell fruits and veges grown organically in deep, rich volcanic soil in Whangarei. They are so fresh and tasty',
+				    email : 'lisa@maplekiwi.com',
+				    phone : '0212534669',
+				    address : '104/148 Corks Rd, Tikipunga Whangarei, 0221',
+				    certification : 'Assure Quality' 
+				},
+				{
+				    dateJoined : '9/9/13',
+				    producerName : 'Rosie Boom',
+				    companyName : 'Boom Jams',
+				    companyImg : '/img/producers/rosie-boom.JPG',
+				    companyLogo : '',
+				    description : 'Hi, I\'m Rosie Boom. I write children\'s books about homesteading and homeschooling in New Zealand. I sell home made jams and preserves made from our fruit trees. They are fantastic. Try some!',
+				    email : 'boomfamily@xtra.co.nz',
+				    phone : '0274376677',
+				    address : 'Kara Road, Maungatepere Whangarei',
+				    certification : 'none'
+				},
+				{
+				    dateJoined : '8/8/13',
+				    producerName : 'Michael Taylor',
+				    companyName : 'Assistant Fig Keeper',
+				    companyImg : '/img/producers/michael-taylor.JPG',
+				    companyLogo : '',
+				    description : 'I keep figs! I\'ve got figs to sell! Isn\'t that great? Sean is really good at webdesign don\'t you think?',
+				    email : 'michael@maplekiwi.com',
+				    phone : '0210699472',
+				    address : '104/148 Corks Rd, Tikipunga Whangarei, 0221',
+				    certification : 'Demeter Biodynamics'
+				},
+				{
+				    dateJoined : '7/7/13',
+				    producerName : 'Matt Stanley',
+				    companyName : 'Northland Naturals',
+				    companyImg : '/img/producer-logos/northland%20naturals%20logo.png',
+				    companyLogo : '/img/producers/matt-stanley.JPG" alt="matt-stanley',
+				    description : 'Northland Naturals is an organic permacultural centre in Whangarei. We grow on our 11 acre block all varieties of fruit and vegetables and have been feeding families since 2012.',
+				    email : 'matt@maplekiwi.com',
+				    phone : '02040094128',
+				    address : '71 Lauries Drive, Kamo Whangarei',
+				    certification : 'Organic Farm NZ'
+				}
+			]
+		};
+		
+		return module;
+	}])
+
 	
 	.service('LocationService', function() {
 		

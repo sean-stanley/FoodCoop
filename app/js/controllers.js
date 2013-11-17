@@ -104,21 +104,37 @@ angular.module('co-op.controllers', []).
     }
   }])
   
-  .controller('productUpload', ['$scope', 'ProductManager', function($scope, ProductManager) {	  
+  .controller('producerListCtrl', ['$scope', 'ProducerList', function($scope, ProducerList) {
+	  $scope.data = ProducerList.getData();
+	  
+	  $scope.predicate = 'dateJoined';
+	  
+  }])  
+
+  
+  .controller('productUpload', ['$scope', 'ProductManager', 'ProductHistory', function($scope, ProductManager, ProductHistory) {	  
 //	  $scope.theImage = ''; //sets empty variable to be populated if user uses the input[type=file] method to upload an image
 	  
-	  $scope.productCategories = [
-	  		{name:'Produce', value:'produce', placeholderName:'apples', placeholderVariety:'Granny Smith'},
-	  		{name:'Processed Food', value:'processedFood', placeholderName:'Jam', placeholderVariety:'Strawberry'},
-	  		{name:'Baked Goods', value:'bakedGoods', placeholderName:'Bread', placeholderVariety:'Sourdough Rye'},
-	  		{name:'Meat', value:'meat', placeholderName:'Lamb', placeholderVariety:'Half a small'},
-	  		{name:'Dairy', value:'dairy', placeholderName:'Cheese', placeholderVariety:'Cottage'},	  
-	  ];
+	  $scope.data = ProductHistory.getData();
+	   
+	  $scope.predicate = 'dateUploaded';
+	   
+		$scope.delete = function(idx) {
+			var itemToDelete = $scope.data[idx];
+			$scope.data.splice(idx, 1);
+		}
+		
+		$scope.editProduct = function(product) {
+			$scope.productData = product;
+			console.log($scope.productData)
+			// pass product to productUpload controller $scope.productData
+		};
 	  
-	  $scope.category = $scope.productCategories[0]; // produce
+	  $scope.categories = ProductManager.productCategories;
+	  $scope.category = ProductManager.productCategories[0]; // set produce to default
 	  $scope.ingredients = false; //show or hide ingredients field
 	  
-	  $scope.$watch('category.name', function(newValue, oldValue) {
+	  $scope.$watch('productData.category', function(newValue, oldValue) {
 		  switch (newValue) {
 			  case 'Meat':
 			  	$scope.availableUnits = [
@@ -155,6 +171,7 @@ angular.module('co-op.controllers', []).
 			  		'loaf',
 			  		'bun',
 			  		'unit',
+			  		'dozen',
 			  		'bakers dozen',
 			  		'kg'
 		
@@ -172,6 +189,12 @@ angular.module('co-op.controllers', []).
 			  	];
 			  	$scope.ingredients = true;
 			  	break;
+			  case 'Raw Milk':
+			  	$scope.availableUnits = [
+			  		'L/week for 4 weeks',	
+			  	];
+			  	$scope.ingredients = false;
+			  	break;
 		  }
 	  });
 	  
@@ -185,7 +208,7 @@ angular.module('co-op.controllers', []).
 	  
 	  $scope.productData = {
 		  dateUploaded: Date(),
-		  category: '',
+		  category: $scope.category.name,
 		  image: '',
 		  productName: '',
 		  variety: '',
@@ -203,7 +226,6 @@ angular.module('co-op.controllers', []).
 	  $scope.submitForm = function () {
         ProductManager.registerProduct($scope.productData);
     }
-
 	 
   }])
   
@@ -223,24 +245,6 @@ angular.module('co-op.controllers', []).
 	   
   }])
    
-   .controller('productHistoryCtrl', ['$scope', 'ProductHistory', function($scope, ProductHistory) {
-		$scope.data = ProductHistory.getData();
-	   
-		$scope.predicate = 'dateUploaded';
-	   
-		$scope.delete = function(idx) {
-			var itemToDelete = $scope.data[idx];
-			$scope.data.splice(idx, 1);
-		}
-		
-		$scope.editProduct = function(product) {
-			$scope.productData = product;
-			console.log($scope.productData)
-			// pass product to productUpload controller $scope.productData
-		};
-	  }])
-   
-  
   .controller('orderTableCtrl', ['$scope', '$filter', 'ngTableParams', 'OrderRecords', function($scope, $filter, ngTableParams, OrderRecords) {
 	  $scope.orders = OrderRecords.getOrders();
 	  

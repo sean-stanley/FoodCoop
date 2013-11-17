@@ -1,17 +1,17 @@
 <div class="row">
 	<div id="product-upload-preview-column" class="col-md-4">
+		<h2>Preview <small>Live</small></h2>
 		<div id="preview-container" class="preview-box">
 			<a href="#" class="thumbnail">
-				<img data-src="holder.js/100%x180" alt="...">
 				<img ng-src={{productData.image}} alt="product name" width="100%">
 				<img ng-src={{productData.certification.image}}>
 		  	</a>
-			<h5>{{productData.variety}} {{productData.name}}</h5>
-			<p>{{1.2 * productData.price|currency}} / {{productData.units}} {{productData.quantity}} Available</p> <!-- multiply the price by 1.2 to include markup -->
+			<h5>{{productData.variety}} {{productData.productName}}</h5>
+			<p>{{1.2 * productData.price|currency}} / {{productData.units}}  <small>{{productData.quantity}} Available</small></p> <!-- multiply the price by 1.2 to include markup -->
 		</div>
 	
-		<div id="product-history-list" ng-controller="productHistoryCtrl">
-			<h5>Click a product to edit it.</h5>
+		<div id="product-history-list">
+			<h3>Product History</h3>
 			<table class="table table-hover">
 				<caption>Current Month</caption>
 				<thead>
@@ -58,7 +58,8 @@
 					<div class="row">
 						<div class="form-group col-md-6">
 							<label for="Category">Product Category</label>
-							<select ng-model="category" ng-options="c.name for c in productCategories" name="category" id="category-menu" required>
+							<select ng-model="productData.category" ng-selected="productData.category" name="category" id="category-menu" required>
+								<option ng-repeat="item in categories">{{item.name}}</option>
 							</select>
 						</div>
 						<div class="form-group col-md-6">
@@ -71,7 +72,7 @@
 					<div class="row">
 						<div class="form-group col-md-6">
 							<label for="inputName" >Product Name</label>
-							<input ng-model="productData.name" type="text" class="form-control" id="inputName" maxlength="12" placeholder="e.g. {{category.placeholderName}}" autofocus required>
+							<input ng-model="productData.productName" type="text" class="form-control" id="inputName" maxlength="12" placeholder="e.g. {{category.placeholderName}}" autofocus required>
 						</div>
 						<div class="form-group col-md-6">
 							<label for="inputVariety" ng-model="variety">Variety</label>
@@ -87,7 +88,8 @@
 						
 					    <div class="form-group col-md-4">
 							<label for="units">Quantity Units</label>
-							<select ng-model="productData.units" ng-options="c for c in availableUnits" name="units" id="units" required>
+							<select ng-model="productData.units" ng-selected="productData.units" name="units" id="units" required>
+								<option ng-repeat="item in availableUnits">{{item}}</option>
 							</select>
 					    </div>
 					    
@@ -103,17 +105,17 @@
 					<div class="row">
 						<div class="form-group col-md-4">
 							<label for="refrigeration">
-							<input ng-model="productData.refrigeration" name="refrigeration" type="radio" value="none" ng-checked="true"> none
+							<input ng-model="productData.refrigeration" ng-checked="productData.refrigeration === 'none' " name="refrigeration" type="radio" value="none" ng-checked="true"> none
 							</label>
 						</div>
 						<div class="form-group col-md-4">  
 							<label for="refrigeration">
-							<input ng-model="productData.refrigeration" name="refrigeration" type="radio" value="refrigeration"> refrigeration
+							<input ng-model="productData.refrigeration" ng-checked="productData.refrigeration === 'refrigeration'  "name="refrigeration" type="radio" value="refrigeration"> refrigeration
 							</label>
 						</div>
 						<div class="form-group col-md-4">  
 							<label for="refrigeration">
-							<input ng-model="productData.refrigeration" name="refrigeration" type="radio" value="frozen"> frozen
+							<input ng-model="productData.refrigeration" ng-checked="productData.refrigeration === 'frozen' " name="refrigeration" type="radio" value="frozen"> frozen
 							</label>
 						</div>
 					</div>
@@ -132,7 +134,8 @@
 			    
 			    <div class="checkbox">
 					<label for="certification">Certification (select those that apply)</label>
-					<select ng-model="productData.certification" ng-options="c.name for c in certifications" name="certification">
+					<select ng-model="productData.certification" ng-selected="productData.certification" name="certification">
+						<option ng-repeat="c in certifications">{{c.name}}</option>
 					</select>
 			    </div>
 			    

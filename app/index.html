@@ -46,12 +46,12 @@
         
         <div class="col-md-2 col-md-push-10" ng-controller="navCtrl">
                 <ul class="nav nav-pills nav-stacked">
-                    <li><a href="#1">Meet the Team</a></li>
+                    <li ng-class="{active:isActive('/producer-list')}"><a href="#/producer-list">Producer List</a></li>
                     <li><a href="#/faq">User FAQ</a></li>
                     <li ng-class="{active:isActive('/contact')}"><a href="#/contact">Contact us</a></li>
                 </ul>
                 <br>
-                <ul class="nav nav-list nav-pills nav-stacked">
+                <ul class="nav nav-pills nav-stacked">
                     <li ng-class="{active:isActive('/my-cart')}" ng-show="loginManager.IsLoggedIn()"><a href="#/my-cart">My Cart <span class="badge">{{items}}</span></a></li>
                     <li ng-class="{active:isActive('/order-manager')}" ng-show="loginManager.IsLoggedIn()"><a href="#/order-manager">My Orders</a></li>
                     <li ng-class="{active:isActive('/product-upload')}" ng-show="loginManager.IsLoggedIn()"><a href="#/product-upload">Upload a Product</a></li>
