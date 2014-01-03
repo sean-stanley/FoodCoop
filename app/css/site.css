@@ -1,5 +1,9 @@
 /* @override http://localhost:8000/app/css/site.css */
 
+a:hover {
+	cursor: pointer;
+}
+
 div#wrap.container {
 	margin-top: 10px;
 }

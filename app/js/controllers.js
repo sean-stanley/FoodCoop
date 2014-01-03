@@ -104,13 +104,45 @@ angular.module('co-op.controllers', []).
     }
   }])
   
-  .controller('producerListCtrl', ['$scope', 'ProducerList', function($scope, ProducerList) {
+  .controller('producerListCtrl', ['$scope', '$modal', 'ProducerList', function($scope, $modal, ProducerList) {
 	  $scope.data = ProducerList.getData();
+	  console.log($scope.data);
 	  
 	  $scope.predicate = 'dateJoined';
 	  
-  }])  
+	  $scope.max = 5;
+	  $scope.isReadonly = true;
+	  
+	  $scope.open = function (producer) {
 
+	    var modalInstance = $modal.open({
+	      templateUrl: 'partials/producer-modal.html',
+	      controller: 'modalInstanceCtrl',
+	      resolve: {
+			  data: function () {
+				  return producer;
+        }
+      }
+	      }
+	    );
+	
+	    modalInstance.result.then(function (selectedItem) {
+	      $scope.selected = selectedItem;
+	    }, function () {
+	      $log.info('Modal dismissed at: ' + new Date());
+	    });
+	  }
+  
+  }])
+    
+  .controller ('modalInstanceCtrl', ['$scope', '$modalInstance', 'data', function($scope, $modalInstance, data) {
+	
+	  $scope.data = data;
+	  
+	  $scope.cancel = function () {
+	    $modalInstance.dismiss('cancel');
+	  };
+  }])
   
   .controller('productUpload', ['$scope', 'ProductManager', 'ProductHistory', function($scope, ProductManager, ProductHistory) {	  
 //	  $scope.theImage = ''; //sets empty variable to be populated if user uses the input[type=file] method to upload an image
@@ -218,7 +250,7 @@ angular.module('co-op.controllers', []).
 		  refrigeration: '',
 		  ingredients: '',
 		  description: '',
-		  certification: $scope.certifications[5],
+		  certification: $scope.certifications[0],
 		  producerName: '',
 		  producerCompany: '',
 	  };
@@ -229,7 +261,7 @@ angular.module('co-op.controllers', []).
 	 
   }])
   
-   .controller('producerCtrl', ['$scope', 'ProducerManager', function($scope, ProducerManager) {
+  .controller('producerCtrl', ['$scope', 'ProducerManager', function($scope, ProducerManager) {
 	   
 	   $scope.producerData = {
 		  image: '',

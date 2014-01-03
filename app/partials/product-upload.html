@@ -3,8 +3,8 @@
 		<h2>Preview <small>Live</small></h2>
 		<div id="preview-container" class="preview-box">
 			<a href="#" class="thumbnail">
-				<img ng-src={{productData.image}} alt="product name" width="100%">
-				<img ng-src={{productData.certification.image}}>
+				<img ng-src="{{productData.image}}" alt="product name" width="100%">
+				{{productData.certification.img}}
 		  	</a>
 			<h5>{{productData.variety}} {{productData.productName}}</h5>
 			<p>{{1.2 * productData.price|currency}} / {{productData.units}}  <small>{{productData.quantity}} Available</small></p> <!-- multiply the price by 1.2 to include markup -->
@@ -102,22 +102,10 @@
 			    
 			    <div class="form-group">
 					<label for="refrigeration">Refrigeration Required</label>
-					<div class="row">
-						<div class="form-group col-md-4">
-							<label for="refrigeration">
-							<input ng-model="productData.refrigeration" ng-checked="productData.refrigeration === 'none' " name="refrigeration" type="radio" value="none" ng-checked="true"> none
-							</label>
-						</div>
-						<div class="form-group col-md-4">  
-							<label for="refrigeration">
-							<input ng-model="productData.refrigeration" ng-checked="productData.refrigeration === 'refrigeration'  "name="refrigeration" type="radio" value="refrigeration"> refrigeration
-							</label>
-						</div>
-						<div class="form-group col-md-4">  
-							<label for="refrigeration">
-							<input ng-model="productData.refrigeration" ng-checked="productData.refrigeration === 'frozen' " name="refrigeration" type="radio" value="frozen"> frozen
-							</label>
-						</div>
+					<div class="btn-group">
+						<button type="button" class="btn btn-primary" ng-model="productData.refrigeration" btn-radio="'none'">None</button>
+						<button type="button" class="btn btn-primary" ng-model="productData.refrigeration" btn-radio="'refrigeration'">Refrigeration</button>
+						<button type="button" class="btn btn-primary" ng-model="productData.refrigeration" btn-radio="'frozen'">Frozen</button>
 					</div>
 				</div>
 			

@@ -335,64 +335,56 @@ angular.module('co-op.services', []).
 			
 			data : [
 				{
-				    dateJoined : '11/11/13',
-				    producerName : 'Amber Atkins',
-				    companyName : 'Atkins Greenhouses',
-				    companyImg : '/img/producers/amber-atkins.JPG',
-				    companyLogo : '',
-				    description : 'We sell Kombucha fermented tea health tonics as well as all sorts of greenhouse grown veges. We use natural practices whenever possible and our kombucha is delicious!',
-				    email : 'atkins.stephen@ymail.com',
-				    phone : '0272233279',
-				    address : 'Somewhere in Kaitaia',
-				    certification : 'In Transition'
-				},
-				{
 				   dateJoined : '10/10/13',
 				    producerName : 'Lisa Taylor',
 				    companyName : 'Northland Naturals 2',
-				    companyImg : '/img/producers/lisa-taylor.JPG" alt="lisa-taylor',
-				    companyLogo : '/img/producer-logos/northland%20naturals%20logo.png',
+				    companyImg : 'img/producers/lisa-taylor.JPG',
+				    companyLogo : 'img/producer-logos/northland%20naturals%20logo.png',
 				    description : 'I sell fruits and veges grown organically in deep, rich volcanic soil in Whangarei. They are so fresh and tasty',
 				    email : 'lisa@maplekiwi.com',
 				    phone : '0212534669',
 				    address : '104/148 Corks Rd, Tikipunga Whangarei, 0221',
-				    certification : 'Assure Quality' 
+				    certification : 'Assure Quality',
+				    feedbackScore : 4
 				},
 				{
 				    dateJoined : '9/9/13',
 				    producerName : 'Rosie Boom',
 				    companyName : 'Boom Jams',
-				    companyImg : '/img/producers/rosie-boom.JPG',
+				    companyImg : 'img/producers/rosie-boom.JPG',
 				    companyLogo : '',
 				    description : 'Hi, I\'m Rosie Boom. I write children\'s books about homesteading and homeschooling in New Zealand. I sell home made jams and preserves made from our fruit trees. They are fantastic. Try some!',
 				    email : 'boomfamily@xtra.co.nz',
 				    phone : '0274376677',
 				    address : 'Kara Road, Maungatepere Whangarei',
-				    certification : 'none'
+				    certification : 'none',
+				    feedbackScore : 3
 				},
 				{
 				    dateJoined : '8/8/13',
 				    producerName : 'Michael Taylor',
 				    companyName : 'Assistant Fig Keeper',
-				    companyImg : '/img/producers/michael-taylor.JPG',
+				    companyImg : 'img/producers/michael-taylor.JPG',
 				    companyLogo : '',
 				    description : 'I keep figs! I\'ve got figs to sell! Isn\'t that great? Sean is really good at webdesign don\'t you think?',
 				    email : 'michael@maplekiwi.com',
 				    phone : '0210699472',
 				    address : '104/148 Corks Rd, Tikipunga Whangarei, 0221',
-				    certification : 'Demeter Biodynamics'
+				    certification : 'Demeter Biodynamics',
+				    feedbackScore : 1
 				},
 				{
 				    dateJoined : '7/7/13',
 				    producerName : 'Matt Stanley',
 				    companyName : 'Northland Naturals',
-				    companyImg : '/img/producer-logos/northland%20naturals%20logo.png',
-				    companyLogo : '/img/producers/matt-stanley.JPG" alt="matt-stanley',
+				    companyImg : 'img/producers/matt-stanley.JPG',
+				    companyLogo : 'img/producer-logos/northland%20naturals%20logo.png',
 				    description : 'Northland Naturals is an organic permacultural centre in Whangarei. We grow on our 11 acre block all varieties of fruit and vegetables and have been feeding families since 2012.',
 				    email : 'matt@maplekiwi.com',
 				    phone : '02040094128',
 				    address : '71 Lauries Drive, Kamo Whangarei',
-				    certification : 'Organic Farm NZ'
+				    certification : 'Organic Farm NZ',
+				    feedbackScore : 5
 				}
 			]
 		};
