@@ -12,12 +12,16 @@
 	<caption>Users List</caption>
 	<thead>
 		<tr>
+			<th><a href="" ng-click="predicate = 'active'; reverse=!reverse ">Active</a></th>
 			<th><a href="" ng-click="predicate = 'name'; reverse=!reverse ">Name</a></th>
 			<th><a href="" ng-click="predicate = 'town/city'; reverse=!reverse ">Town/City</a></th>
 			<th><a href="" ng-click="predicate = 'date joined'; reverse=!reverse ">Date Joined</a></th>
 		</tr>
 	<tbody>
 		<tr ng-repeat="user in userLibrary | orderBy:predicate:reverse | filter:search " ng-controller="userEditingCtrl">
+	        <td data-title="'Active Users'">
+	            <input type="checkbox" ng-model="user.isActive">
+	        </td>
 	        <td data-title="'Full Name'" >
 	            {{user.fullName}}
 	        </td>
