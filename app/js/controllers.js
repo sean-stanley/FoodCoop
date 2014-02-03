@@ -294,7 +294,7 @@ angular.module('co-op.controllers', []).
 	   
   }])
    
-  .controller('orderTableCtrl', ['$scope', '$filter', 'ngTableParams', 'OrderRecords', function($scope, $filter, ngTableParams, OrderRecords) {
+  .controller('orderTableCtrl', ['$scope', '$filter', 'OrderRecords', function($scope, $filter, OrderRecords) {
 	  $scope.orders = OrderRecords.getOrders();
 	  
 	  $scope.predicate = 'product';
@@ -303,7 +303,7 @@ angular.module('co-op.controllers', []).
 	    
   }])
   
-  .controller('cartTableCtrl', ['$scope', '$filter', 'ngTableParams', 'CartRecords', function($scope, $filter, ngTableParams, CartRecords) {
+  .controller('cartTableCtrl', ['$scope', '$filter', 'CartRecords', function($scope, $filter, CartRecords) {
 	  $scope.cart = CartRecords.getCart();
 	  
 	  $scope.total = CartRecords.sumPrice();
