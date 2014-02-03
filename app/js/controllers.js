@@ -64,7 +64,23 @@ angular.module('co-op.controllers', []).
         PwdResetManager.pwdReset($scope.resetData);
     }
 	
-  }])  
+  }])
+  
+  .controller('userAdminCtrl', ['$scope', 'UserManager', function($scope, UserManager) {
+	
+	$scope.userLibrary = UserManager.getUserLibrary();
+	$scope.predicate = 'dateJoined';
+	
+  }])
+  
+  .controller('userEditingCtrl', ['$scope', 'UserManager', function($scope, UserManager) {
+		
+	$scope.$watch('user', function(newValue, oldValue) {
+		UserManager.updateUser(newValue);
+		console.log('user changer: ', newValue); //calls the server to make the change for this user
+	}, true);
+		
+  }])    
   
   .controller('userCtrl', ['$scope', 'UserManager', 'LocationService', 'LoginManager', '$location', function($scope, UserManager, LocationService, LoginManager, $location) {
 	  $scope.cities = LocationService.getLocations();
@@ -79,7 +95,7 @@ angular.module('co-op.controllers', []).
 		  securityA: '',
 		  
 		  type: UserManager.userTypes[0],
-		  city: $scope.cities[21] // Whangarei is default
+		  city: $scope.cities[21],  // Whangarei is default		  
 	  };
 	  
 	  $scope.$watch('wantsToBeProducer', function(newValue) {
@@ -101,6 +117,7 @@ angular.module('co-op.controllers', []).
         else {
 	        $location.path('/home');;
         }
+        
     }
   }])
   
@@ -129,7 +146,7 @@ angular.module('co-op.controllers', []).
 	    modalInstance.result.then(function (selectedItem) {
 	      $scope.selected = selectedItem;
 	    }, function () {
-	      $log.info('Modal dismissed at: ' + new Date());
+	      console.log('Modal dismissed at: ' + new Date());
 	    });
 	  }
   

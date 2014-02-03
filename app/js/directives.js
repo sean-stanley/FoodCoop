@@ -8,9 +8,66 @@ angular.module('co-op.directives', []).
     return function(scope, elm, attrs) {
       elm.text(version);
     };
-  }]).
+  }])
+	
   
-  directive('checkStrength', function () {
+  .directive('addressFinder', function () {
+	  return {
+		  restrict: "EACM",
+		  link : function (scope, elem, attrs) {
+			  var widget = new AddressFinder.Widget(document.getElementById("search_field"), "67UE3RD9GTV4HLJKAFMQ");
+		  },
+		  
+		  scope : {
+			  model: '=ngModel'
+		  },
+		  
+		  template : '<input ng-model="model" name="address" type="text" id="search_field" class="form-control"/>​'
+
+	  }
+  })
+  
+  .directive('fundooRating', function () { //www.\befundoo.com/university/tutorials/angularjs-directives-tutorial
+    return {
+      restrict: 'A',
+      template: '<ul class="rating">' +
+                  '<li ng-repeat="star in stars" ng-class="star" ng-click="toggle($index)">' +
+                    '\u2605' +
+                  '</li>' +
+                '</ul>',
+      scope: {
+        ratingValue: '=',
+        max: '=',
+        readonly: '@',
+        onRatingSelected: '&'
+      },
+      link: function (scope, elem, attrs) {
+
+        var updateStars = function() {
+          scope.stars = [];
+          for (var  i = 0; i < scope.max; i++) {
+            scope.stars.push({filled: i < scope.ratingValue});
+          }
+        };
+
+        scope.toggle = function(index) {
+          if (scope.readonly && scope.readonly === 'true') {
+            return;
+          }
+          scope.ratingValue = index + 1;
+          scope.onRatingSelected({rating: index + 1});
+        };
+
+        scope.$watch('ratingValue', function(oldVal, newVal) {
+          if (newVal) {
+            updateStars();
+          }
+        });
+       }
+      }
+     })
+  
+  .directive('checkStrength', function () {
 
     return {
         replace: false,
@@ -77,10 +134,10 @@ angular.module('co-op.directives', []).
         template: '<li class="point"></li><li class="point"></li><li class="point"></li><li class="point"></li><li class="point"></li>'
     };
 
-}).
+})
   
   
-  directive('fileDropzone', function() {
+  .directive('fileDropzone', function() {
     return {
       restrict: 'A',
       scope: {

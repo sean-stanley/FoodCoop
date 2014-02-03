@@ -6,6 +6,7 @@ angular.module('co-op', [ 'ngRoute', 'co-op.filters', 'co-op.services', 'co-op.d
   config(['$routeProvider', function($routeProvider) {
     $routeProvider.when('/home', {templateUrl: 'partials/index-content.html', controller: 'MyCtrl1'});
     $routeProvider.when('/signup', {templateUrl: 'partials/signup.html', controller: 'userCtrl'});
+    $routeProvider.when('/users-rights', {templateUrl: 'partials/user-rights.html', controller: 'userAdminCtrl'});
     $routeProvider.when('/producer-list', {templateUrl: 'partials/producer-list.html', controller: 'producerListCtrl'});
     $routeProvider.when('/product-upload', {templateUrl: 'partials/product-upload.html', controller: 'productUpload'});
     $routeProvider.when('/producer-profile', {templateUrl: 'partials/edit-producer-profile.html', controller: 'producerCtrl'});
