@@ -162,73 +162,36 @@ angular.module('co-op.controllers', []).
 			// pass product to productUpload controller $scope.productData
 		};
 	  
-	  $scope.categories = ProductManager.productCategories;
-	  $scope.category = ProductManager.productCategories[0]; // set produce to default
 	  $scope.ingredients = false; //show or hide ingredients field
 	  
 	  $scope.$watch('productData.category', function(newValue, oldValue) {
-		  switch (newValue) {
-			  case 'Meat':
-			  	$scope.availableUnits = [
-			  		'kg',
-			  		'unit',
-			  		'quarter beast',
-			  		'half beast',
-			  		'whole beast',
-			  		'live animal'
-			  	];
-			  	$scope.ingredients = true; 
-			  	break;
-			  case 'Produce':
-			  	$scope.availableUnits = [
-			  		'kg',
-			  		'5 kg',
-			  		'10 kg' 
-			  	];
-			  	$scope.ingredients = false;
-			  	break;
-			  case 'Processed Food':
-			  	$scope.availableUnits = [
-			  		'g',
-			  		'kg',
-			  		'ml',
-			  		'L',
-			  		'unit',
-			  		'case'
-			  	];
-			  	$scope.ingredients = true;
-			  	break;
-			  case 'Baked Goods':
-			  	$scope.availableUnits = [
-			  		'loaf',
-			  		'bun',
-			  		'unit',
-			  		'dozen',
-			  		'bakers dozen',
-			  		'kg'
-		
-			  	];
-			  	$scope.ingredients = true;
-			  	break;
-			  case 'Dairy':
-			  	$scope.availableUnits = [
-			  		'100 g',
-			  		'kg',
-			  		'unit',
-			  		'100 ml',
-			  		'L'
-		
-			  	];
-			  	$scope.ingredients = true;
-			  	break;
-			  case 'Raw Milk':
-			  	$scope.availableUnits = [
-			  		'L/week for 4 weeks',	
-			  	];
-			  	$scope.ingredients = false;
-			  	break;
-		  }
+		$scope.availableUnits = newValue.availableUnits;
+		$scope.ingredients = newValue.ingredients;
 	  });
+	  ProductManager.productCategories(function(results){
+		$scope.categories = results;
+		$scope.category = results[0];	// set produce to default
+		$scope.productData = {
+			  dateUploaded: Date(),
+			  category: $scope.category.name,
+			  image: '',
+			  productName: '',
+			  variety: '',
+			  price: '',
+			  quantity: '',
+			  units: '',
+			  refrigeration: '',
+			  ingredients: '',
+			  description: '',
+			  certification: '',
+			  producerName: '',
+			  producerCompany: '',
+		  };
+	  
+		  $scope.submitForm = function(){
+			ProductManager.registerProduct($scope.productData);
+		}
+	  })
 	  
 	  $scope.certifications = ProductManager.certificationTypes;
 	  
@@ -238,28 +201,10 @@ angular.module('co-op.controllers', []).
   //      });
 //    };
 	  
-	  $scope.productData = {
-		  dateUploaded: Date(),
-		  category: $scope.category.name,
-		  image: '',
-		  productName: '',
-		  variety: '',
-		  price: '',
-		  quantity: '',
-		  units: '',
-		  refrigeration: '',
-		  ingredients: '',
-		  description: '',
-		  certification: '',
-		  producerName: '',
-		  producerCompany: '',
-	  };
-	  
-	  $scope.submitForm = function () {
-        ProductManager.registerProduct($scope.productData);
+
     }
 	 
-  }])
+  ])
   
   .controller('producerCtrl', ['$scope', 'ProducerManager', function($scope, ProducerManager) {
 	   
