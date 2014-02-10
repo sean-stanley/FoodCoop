@@ -6,6 +6,7 @@ angular.module('co-op', [ 'ngRoute', 'co-op.filters', 'co-op.services', 'co-op.d
   config(['$routeProvider', function($routeProvider) {
     $routeProvider.when('/home', {templateUrl: 'partials/index-content.html', controller: 'MyCtrl1'});
     $routeProvider.when('/signup', {templateUrl: 'partials/signup.html', controller: 'userCtrl'});
+    $routeProvider.when('/users-rights', {templateUrl: 'partials/user-rights.html', controller: 'userAdminCtrl'});
     $routeProvider.when('/producer-list', {templateUrl: 'partials/producer-list.html', controller: 'producerListCtrl'});
     $routeProvider.when('/product-upload', {templateUrl: 'partials/product-upload.html', controller: 'productUpload'});
     $routeProvider.when('/producer-profile', {templateUrl: 'partials/edit-producer-profile.html', controller: 'producerCtrl'});
@@ -15,6 +16,7 @@ angular.module('co-op', [ 'ngRoute', 'co-op.filters', 'co-op.services', 'co-op.d
     $routeProvider.when('/forgot-password', {templateUrl: 'partials/forgot-password.html', controller: 'resetPwdCtrl'});
     $routeProvider.when('/my-cart', {templateUrl: 'partials/my-cart.html'});
     $routeProvider.when('/order-manager', {templateUrl: 'partials/order-manager.html'});
+    $routeProvider.when('/store', {templateUrl: 'store.html'});
     $routeProvider.otherwise({redirectTo: '/home'});
   }])
   .run(function($rootScope, $location, LoginManager) {

@@ -53,14 +53,23 @@ angular.module('co-op.services', [])
 
 	.factory('UserManager', ['$http', function($http) {
 		return {
+			getUserLibrary : function() {
+	            return module.userLibrary;
+	            console.log(module.userLibrary);
+	        },
+			
 			registerUser : function(userData) {
 				console.log('User data', userData);
 			},
-			userTypes : [
-	  {name:'Guest', buy:false, sell:false },
-	  {name:'Customer', buy:true, sell:false},
-	  {name:'Producer', buy:true, sell:true},
-	  ]		
+			userTypes : {
+				Guest: { canBuy:false, canSell:false },
+				Customer: { canBuy:true, canSell:false },
+				Producer: { canBuy:true, canSell:true },
+			},
+	  
+	  		userLibrary : [
+	  		
+	  		]		
 		};
 	}])
 	
