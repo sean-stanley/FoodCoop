@@ -182,35 +182,26 @@ angular.module('co-op.controllers', []).
 	  $scope.ingredients = false; //show or hide ingredients field
 	  
 	  $scope.$watch('productData.category', function(newValue, oldValue) {
-		$scope.availableUnits = newValue.availableUnits;
-		$scope.ingredients = newValue.ingredients;
+		if (newValue){
+			$scope.availableUnits = newValue.availableUnits;
+			$scope.ingredients = newValue.ingredients;
+		}
 	  });
+	  $scope.productData = {};
 	  ProductManager.productCategories(function(results){
 		$scope.categories = results;
 		$scope.category = results[0];	// set produce to default
-		$scope.productData = {
-			  dateUploaded: Date(),
-			  category: $scope.category.name,
-			  image: '',
-			  productName: '',
-			  variety: '',
-			  price: '',
-			  quantity: '',
-			  units: '',
-			  refrigeration: '',
-			  ingredients: '',
-			  description: '',
-			  certification: '',
-			  producerName: '',
-			  producerCompany: '',
-		  };
+		$scope.productData.dateUploaded = Date();
+		$scope.productData.category = $scope.category.name;
 	  
-		  $scope.submitForm = function(){
+		$scope.submitForm = function(){
 			ProductManager.registerProduct($scope.productData);
-		}
-	  })
+		}})
 	  
-	  $scope.certifications = ProductManager.certificationTypes;
+	  ProductManager.certificationTypes(function(results){
+		$scope.certifications = results;
+		$scope.productData.certification = results[0].name;
+	  });
 	  
 	  //$scope.setImage = function(element) {
       //  $scope.$apply(function($scope) {

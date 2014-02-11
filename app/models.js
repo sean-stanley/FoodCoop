@@ -16,11 +16,14 @@ var ProductSchema = new Schema({
 			producerCompany: {type: String, required: true}
 });
 var OrderSchema = new Schema({
-////
-////
+		datePlaced: {type: Date, default: Date.now},
+		product: {type: Schema.ObjectId, required: true},
+		producer: {type: Schema.ObjectId, required: true},
+		customer: {type: Schema.ObjectId, required: true},
+		quantity: {type: Number, required: true},
 });
 var UserSchema = new Schema({
-			dateJoined : {type: Date, default: Date.now, required: true},
+			dateJoined : {type: Date, default: Date.now},
 			producerName : {type: String, required: true},
 			companyName : {type: String, required: true},
 			companyImg : {type: String, required: true},
@@ -51,7 +54,7 @@ var LocationSchema = new Schema({
 var CertificationSchema = new Schema({
 			name:{type: String, required: true},
 			value:{type: String, required: true},
-			img:{type: String, required: true},
+			img:{type: String},
 });
 exports.Product = mongoose.model('Product', ProductSchema);
 exports.Order = mongoose.model('Order', OrderSchema);

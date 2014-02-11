@@ -80,10 +80,10 @@ angular.module('co-op.services', [])
 			},
 			
 			productCategories : function(callback){
-				$http.get("/collections/:categories").success(callback);
+				$http.get("api/category").success(callback);
 			},
 			certificationTypes: function(callback){
-				$http.get("/collections/:certifications").success(callback);
+				$http.get("api/certification").success(callback);
 			}
 
 		}	
@@ -170,9 +170,12 @@ angular.module('co-op.services', [])
 		var module = {
 						
 			getData : function(callback) {
-	            $http.get("/collections/:products").success(callback);
+	            if (!this.products){
+					this.products = $http.get("/api/product").success(callback);
+				}
+				return this.products
 	        },
-			
+			products : {},
 			addProduct : function(newData) {
 				module.data.push(newData);
 				return module.data;
@@ -186,7 +189,7 @@ angular.module('co-op.services', [])
 		var module = {
 						
 			getData : function(callback) {
-	            $http.get("/collections/:users?user_type='Producer'").success(callback);
+	            $http.get("/api/user?user_type='Producer'").success(callback);
 	        },
 			
 			addProducer : function(newData) {
@@ -194,7 +197,6 @@ angular.module('co-op.services', [])
 				return module.data;
 
 			},
-			
 			
 		};
 		
@@ -205,9 +207,12 @@ angular.module('co-op.services', [])
 	.service('LocationService', function() {
 		
         this.getLocations = function(callback) {
-            $http.get("/collections/:locations").success(callback);
-        }
-            
+			if (!this.locations){
+				this.locations = $http.get("/api/location").success(callback);
+			}
+			return this.locations
+	    },
+		this.locations = {},
         this.addLocation = function(locationData) {
             data.push(locationData);
         }

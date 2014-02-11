@@ -1,7 +1,8 @@
-// app.js
-var databaseUrl = "mydb"; // "username:password@example.com/mydb"
-var collections = ["users","orders","products","categories","locations","certifications"];
-var db = require("mongojs").connect(databaseUrl, collections);
+#!/usr/bin/env node
+var mongoose = require('mongoose');
+var models = require('../app/models.js');
+mongoose.connect('mongodb://localhost/mydb');
+var db = mongoose.connection;
 var sample_users = [
 	{
 		dateJoined : '10/10/13',
@@ -137,20 +138,8 @@ var sample_products =
 		producerCompany: 'Tutukaka Organics'
 	}];
 for (i=0; i<sample_users.length; i++){
-	db.users.save(sample_users[i], function(err, saved) {
-		if( err || !saved ) console.log("User not saved");
-		else console.log("User saved");
-	});
+	new models.User(sample_users[i]).save(function(err){console.dir("User saved")});
 };
 for (i=0; i<sample_products.length; i++){
-	db.products.save(sample_products[i], function(err, saved) {
-		if( err || !saved ) console.log("Product not saved");
-		else console.log("Product saved");
-	});
+	new models.Product(sample_products[i]).save(function(err){console.dir("Product saved")});
 };
-db.users.find(function(err, results){
-	console.dir(results);
-})
-db.products.find(function(err, results){
-	console.dir(results);
-})
