@@ -143,3 +143,4 @@ for (i=0; i<sample_users.length; i++){
 for (i=0; i<sample_products.length; i++){
 	new models.Product(sample_products[i]).save(function(err){console.dir("Product saved")});
 };
+

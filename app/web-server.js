@@ -63,7 +63,6 @@ app.get("/api/order", function(req, res, next) {
 app.post("/api/order", function(req, res, next) {
 	new models.Order({datePlaced: Date.now,
 		product: req.product._id,
-		producer: req.producer._id,
 		customer: req.customer._id,
 		quantity: req.quantity
 	}).save()

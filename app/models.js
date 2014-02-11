@@ -11,14 +11,13 @@ var ProductSchema = new Schema({
 			refrigeration: {type: String, required: true},
 			ingredients: {type: String, required: false},
 			description: {type: String, required: true},
-			certification: {type: String, required: true},
+			certification: {type: String},
 			producerName: {type: String, required: true},
 			producerCompany: {type: String, required: true}
 });
 var OrderSchema = new Schema({
 		datePlaced: {type: Date, default: Date.now},
 		product: {type: Schema.ObjectId, required: true},
-		producer: {type: Schema.ObjectId, required: true},
 		customer: {type: Schema.ObjectId, required: true},
 		quantity: {type: Number, required: true},
 });
@@ -27,12 +26,12 @@ var UserSchema = new Schema({
 			producerName : {type: String, required: true},
 			companyName : {type: String, required: true},
 			companyImg : {type: String, required: true},
-			companyLogo : {type: String, required: true},
+			companyLogo : {type: String},
 			description : {type: String, required: false},
 			email : {type: String, required: true},
 			phone : {type: String, required: false},
 			address : {type: String, required: true},
-			certification : {type: String, required: true},
+			certification : {type: String},
 			feedbackScore : {type: Number, required: false},
 			user_type : {type: String, required: true}
 });

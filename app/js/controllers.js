@@ -122,8 +122,8 @@ angular.module('co-op.controllers', []).
   }])
   
   .controller('producerListCtrl', ['$scope', '$modal', 'ProducerList', function($scope, $modal, ProducerList) {
-	  $scope.data = ProducerList.getData();
-	  console.log($scope.data);
+	  ProducerList.getData(function(result){$scope.data = result;});
+
 	  
 	  $scope.predicate = 'dateJoined';
 	  
@@ -164,7 +164,7 @@ angular.module('co-op.controllers', []).
   .controller('productUpload', ['$scope', 'ProductManager', 'ProductHistory', function($scope, ProductManager, ProductHistory) {	  
 //	  $scope.theImage = ''; //sets empty variable to be populated if user uses the input[type=file] method to upload an image
 	  
-	  $scope.data = ProductHistory.getData();
+	  ProductHistory.getData(function(result){$scope.data = result});
 	   
 	  $scope.predicate = 'dateUploaded';
 	   

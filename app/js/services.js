@@ -170,12 +170,8 @@ angular.module('co-op.services', [])
 		var module = {
 						
 			getData : function(callback) {
-	            if (!this.products){
-					this.products = $http.get("/api/product").success(callback);
-				}
-				return this.products
+				this.products = $http.get("/api/product").success(callback);
 	        },
-			products : {},
 			addProduct : function(newData) {
 				module.data.push(newData);
 				return module.data;
@@ -189,7 +185,7 @@ angular.module('co-op.services', [])
 		var module = {
 						
 			getData : function(callback) {
-	            $http.get("/api/user?user_type='Producer'").success(callback);
+	            $http.get("/api/user?user_type=Producer").success(callback);
 	        },
 			
 			addProducer : function(newData) {
