@@ -42,13 +42,24 @@
 			<label for="DateOfBirth">Date of Birth</label>
 			<input ng-model="userData.dob" type="date" class="form-control" id="DateOfBirth" min="2006-01-01" max="1910-01-01">
 		</div>
+		
+		<!--> This is where the current Address Finder issue is. </-->
 		<div class="form-group">
 			<label for="address">Address</label>
-			<address-finder ng-model="userData.address"></address-finder>
+			<script type="text/javascript">
+	        window.onload = function(){
+	          var widget = new AddressFinder.Widget(document.getElementById("search_field"), "67UE3RD9GTV4HLJKAFMQ");
+	        };
+			</script>
+			local version: <input ng-model="model" name="address" type="text" id="search_field" class="form-control"/>​ 
+			directive version: <address-finder ng-model="userData.address"></address-finder>
+			
 			<div class="custom-error" ng-show="signUp.address.$dirty && signUp.address.$invalid">		Sorry:
 				<span ng-show="signUp.userFullName.$error.required">Your NZ address is required.</span>
 			</div>
 		</div>
+		
+		<!--> End of Issue zone</-->
     
 		<div class="form-group">
     		<label for="securityQ">Security Question</label>
