@@ -44,15 +44,16 @@
 		</div>
 		
 		<!--> This is where the current Address Finder issue is. </-->
-		<div class="form-group">
+		<div class="form-group" ng-controller="geoCtrl">
 			<label for="address">Address</label>
 			<script type="text/javascript">
 	        window.onload = function(){
 	          var widget = new AddressFinder.Widget(document.getElementById("search_field"), "67UE3RD9GTV4HLJKAFMQ");
 	        };
 			</script>
-			local version: <input ng-model="model" name="address" type="text" id="search_field" class="form-control"/>​ 
+			local version: <input ng-model="userData.address" name="address" type="text" id="search_field" class="form-control"/>​ 
 			directive version: <address-finder ng-model="userData.address"></address-finder>
+			google version: <input type="text" id="Autocomplete" class="form-control" ng-autocomplete="result1" details="addressDetails" options="addressOptions"/>
 			
 			<div class="custom-error" ng-show="signUp.address.$dirty && signUp.address.$invalid">		Sorry:
 				<span ng-show="signUp.userFullName.$error.required">Your NZ address is required.</span>

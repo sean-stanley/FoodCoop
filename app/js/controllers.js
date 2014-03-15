@@ -89,7 +89,7 @@ angular.module('co-op.controllers', []).
 		  pw: '',
 		  email: '',
 		  fullName: '',
-		  address: '',
+		  address: $scope.details.formatted_address,
 		  
 		  securityQ: '',
 		  securityA: '',
@@ -119,6 +119,15 @@ angular.module('co-op.controllers', []).
         }
         
     }
+  }])
+  
+  .controller('geoCtrl', ['$scope', function ($scope) {
+
+      $scope.addressOptions = {
+		  country: 'nz',
+      };
+      $scope.details = '';
+	  
   }])
   
   .controller('producerListCtrl', ['$scope', '$modal', 'ProducerList', function($scope, $modal, ProducerList) {
@@ -269,5 +278,24 @@ angular.module('co-op.controllers', []).
 	   $scope.submitForm = function () {
        MailManager.sendMail($scope.mail);
     }
+
 	   
+  }])
+  
+  .controller('calendarCtrl', ['$scope', function($scope) {
+      /* config object */
+      $scope.uiConfig = {
+        calendar:{
+          height: 450,
+          editable: false,
+          header:{
+            left: 'month basicWeek basicDay agendaWeek agendaDay',
+            center: 'title',
+            right: 'today prev,next'
+          },
+          dayClick: $scope.alertEventOnClick,
+          eventDrop: $scope.alertOnDrop,
+          eventResize: $scope.alertOnResize
+        }
+      };
   }]);
