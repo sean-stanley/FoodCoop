@@ -13,6 +13,10 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "momentjs": "~2.4.0"
+    "momentjs": "~2.4.0",
+    "angular-ui-calendar": "latest"
+  },
+  "resolutions": {
+    "jquery": ">=1.6"
   }
 }
