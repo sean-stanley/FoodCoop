@@ -59,13 +59,13 @@ angular.module('co-op.services', [])
 	        },
 			
 			registerUser : function(userData) {
-				console.log('User data', userData);
+				$http.post("api/user", userData);
 			},
-			userTypes : {
-				Guest: { canBuy:false, canSell:false },
-				Customer: { canBuy:true, canSell:false },
-				Producer: { canBuy:true, canSell:true },
-			},
+			userTypes : [
+				{name : "Guest", canBuy:false, canSell:false },
+				{name : "Customer", canBuy:true, canSell:false },
+				{name : "Producer", canBuy:true, canSell:true },
+			],
 	  
 	  		userLibrary : [
 	  		
@@ -76,7 +76,7 @@ angular.module('co-op.services', [])
 	.factory('ProductManager', ['$http', function($http) {
 		return {
 			registerProduct : function(productData) {
-				console.log('Product Data Object', productData);
+				$http.post("api/product", productData);
 			},
 			
 			productCategories : function(callback){
@@ -200,18 +200,16 @@ angular.module('co-op.services', [])
 	}])
 
 	
-	.service('LocationService', function() {
+	.service('LocationService',  ['$http', function($http) {
 		
         this.getLocations = function(callback) {
-			if (!this.locations){
-				this.locations = $http.get("/api/location").success(callback);
-			}
-			return this.locations
+			$http.get("/api/location").success(callback);
 	    },
-		this.locations = {},
+
         this.addLocation = function(locationData) {
             data.push(locationData);
+			$http.post("/api/location", locationData);
         }
 		
 
-    });
+    }]);

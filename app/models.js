@@ -16,16 +16,17 @@ var ProductSchema = new Schema({
 			producerCompany: {type: String, required: true}
 });
 var OrderSchema = new Schema({
-		datePlaced: {type: Date, default: Date.now},
+		datePlaced: {type: Date, default: Date.now()},
 		product: {type: Schema.ObjectId, required: true},
 		customer: {type: Schema.ObjectId, required: true},
 		quantity: {type: Number, required: true},
+		confirmed: {type: Boolean, default : false}
 });
 var UserSchema = new Schema({
-			dateJoined : {type: Date, default: Date.now},
-			producerName : {type: String, required: true},
-			companyName : {type: String, required: true},
-			companyImg : {type: String, required: true},
+			dateJoined : {type: Date, default: Date.now()},
+			producerName : {type: String},
+			companyName : {type: String},
+			companyImg : {type: String},
 			companyLogo : {type: String},
 			description : {type: String, required: false},
 			email : {type: String, required: true},
@@ -33,7 +34,10 @@ var UserSchema = new Schema({
 			address : {type: String, required: true},
 			certification : {type: String},
 			feedbackScore : {type: Number, required: false},
-			user_type : {type: String, required: true}
+			user_type : [new Schema({name: {type : String, required : true},
+									 canBuy: {type : Boolean, required : true},
+									 canSell:{type : Boolean, required : true}}
+						)]
 });
 var CategorySchema = new Schema({
 			name:{type: String, required: true},

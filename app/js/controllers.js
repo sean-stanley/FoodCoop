@@ -83,35 +83,36 @@ angular.module('co-op.controllers', []).
   }])    
   
   .controller('userCtrl', ['$scope', 'UserManager', 'LocationService', 'LoginManager', '$location', function($scope, UserManager, LocationService, LoginManager, $location) {
-	  $scope.cities = LocationService.getLocations();
-	  
-	  $scope.userData = {
+	  LocationService.getLocations(function(result){$scope.cities = result;
+		$scope.userData.city = $scope.cities[21]; // Whangarei is default	
+		$scope.mileage = $scope.userData.city.distance * 0.67; //find cost in dollars of return trip to whangarei for producers.
+	  });
+		$scope.userData = {
 		  pw: '',
 		  email: '',
-		  fullName: '',
+		  producerName: '',
 		  address: '',
 		  
 		  securityQ: '',
 		  securityA: '',
 		  
-		  type: UserManager.userTypes[0],
-		  city: $scope.cities[21],  // Whangarei is default		  
-	  };
-	  
+		  user_type: UserManager.userTypes[0],  
+		};
+
 	  $scope.$watch('wantsToBeProducer', function(newValue) {
 		  if ($scope.wantsToBeProducer) {
-			  $scope.userData.type = UserManager.userTypes[2]
+			  $scope.userData.user_type = UserManager.userTypes[2];
 		  } else {
-			$scope.userData.type = UserManager.userTypes[0];
+			$scope.userData.user_type = UserManager.userTypes[0];
 		  }
 	  });
 	  	  
-	  $scope.mileage = $scope.userData.city.distance * 0.67; //find cost in dollars of return trip to whangarei for producers.
+	  
 
 	  $scope.submitForm = function () {
         UserManager.registerUser($scope.userData);
         LoginManager.loginChange(true);
-        if ($scope.userData.type.name === 'Producer') {
+        if ($scope.userData.user_type === UserManager.userTypes[2]) {
 	        $location.path('/producer-profile');
         }
         else {
