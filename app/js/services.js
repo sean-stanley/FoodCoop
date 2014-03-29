@@ -9,29 +9,26 @@ angular.module('co-op.services', [])
 	.factory('LoginManager', ['$http', function($http) {
 		var module = {
 			loginAttempt : function(loginData) {
-				console.log('Login Data', loginData);
+				$http.post('/login', loginData)
 				module.loginChange(true);
 			},			
 			IsLoggedIn : function() {
 	            return module.loggedIn;
-	            console.log(module.loggedIn);
 	        },
 			
 			loginChange : function(newValue) {
 				module.loggedIn = newValue;
 				return module.loggedIn;
-				console.log(module.loggedIn);
 
 			},
 			
 			logIn : function() {
 				module.loginChange(true);
 				return module.loggedIn;
-				console.log(module.loggedIn);
-				
 			},
 			
 			logOut : function() {
+				$http.post('/logout', loginData)
 				module.loginChange(false);
 				return module.loggedIn;
 				console.log(module.loggedIn);
@@ -92,7 +89,7 @@ angular.module('co-op.services', [])
 	.factory('ProducerManager', ['$http', function($http) {
 		return {
 			setProducer : function(producerData) {
-				console.log('Producer Data Object', producerData);
+				$http.post("api/producerData/edit", producerData);
 			},
 		}	
 	}])
@@ -185,7 +182,7 @@ angular.module('co-op.services', [])
 		var module = {
 						
 			getData : function(callback) {
-	            $http.get("/api/user?user_type=Producer").success(callback);
+	            $http.get("/api/user?user_type.name='Producer'").success(callback);
 	        },
 			
 			addProducer : function(newData) {

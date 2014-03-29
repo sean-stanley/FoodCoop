@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+var passportLocalMongoose = require('passport-local-mongoose');
 var ProductSchema = new Schema({
 			dateUploaded: {type: Date, required: true},
 			category: {type: String, required: true},
@@ -24,20 +25,24 @@ var OrderSchema = new Schema({
 });
 var UserSchema = new Schema({
 			dateJoined : {type: Date, default: Date.now()},
-			producerName : {type: String},
-			companyName : {type: String},
-			companyImg : {type: String},
-			companyLogo : {type: String},
-			description : {type: String, required: false},
 			email : {type: String, required: true},
 			phone : {type: String, required: false},
 			address : {type: String, required: true},
-			certification : {type: String},
-			feedbackScore : {type: Number, required: false},
-			user_type : [new Schema({name: {type : String, required : true},
-									 canBuy: {type : Boolean, required : true},
-									 canSell:{type : Boolean, required : true}}
-						)]
+			name : {type: String, required: true},
+			user_type : [new Schema({
+							name: {type : String, required : true},
+							canBuy: {type : Boolean, required : true},
+							canSell:{type : Boolean, required : true}
+						})],
+			producerData : [new Schema({
+							companyName : {type: String},
+							image : {},
+							logo : {},
+							description : {type: String},
+							certification : {type: String},
+							feedbackScore : {type: Number},
+							approved : {type: Boolean, default: false}
+						})]
 });
 var CategorySchema = new Schema({
 			name:{type: String, required: true},
@@ -59,6 +64,8 @@ var CertificationSchema = new Schema({
 			value:{type: String, required: true},
 			img:{type: String},
 });
+UserSchema.plugin(passportLocalMongoose);
+
 exports.Product = mongoose.model('Product', ProductSchema);
 exports.Order = mongoose.model('Order', OrderSchema);
 exports.User = mongoose.model('User', UserSchema);

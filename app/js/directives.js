@@ -103,7 +103,7 @@ angular.module('co-op.directives', []).
           }, true);
         }
       };
-    });
+    })
   
   .directive('addressFinder', function () {
 	  return {

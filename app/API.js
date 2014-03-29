@@ -6,11 +6,17 @@ var util = require('util'),
 	express = require('express');
 	mongoose = require('mongoose'),
 	models = require('./models.js'),
+	passport = require('passport'),
+	LocalStrategy = require('passport-local').Strategy;
 
 exports.configAPI = function configAPI(app){
 	app.configure(function(){
 		app.use(express.bodyParser());
 		app.use(express.methodOverride());
+		app.use(express.cookieParser());
+		app.use(express.session({ secret: 'Intrinsic Definability' }));
+		app.use(passport.initialize());
+		app.use(passport.session());
 		app.use(app.router);
 		app.use(express.static(__dirname));
 		app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
@@ -83,42 +89,45 @@ exports.configAPI = function configAPI(app){
 			res.send(results)
 		})
 	});
-	app.post("/api/user", function(req, res, next) {
-		new models.User({dateJoined : Date.now(),
-				producerName : req.body.producerName,
-				companyName : req.body.companyName,
-				companyImg : req.body.companyImg,
-				companyLogo : req.body.companyLogo,
-				description : req.body.description,
-				email : req.body.email,
-				phone : req.body.phone,
-				address : req.body.address,
-				certification : req.body.certification,
-				feedbackScore : req.body.feedbackScore,
-				user_type : req.body.user_type}).save();
+	app.post("/api/user", function(req, res, next) {    
+	models.User.register(new models.User({
+			dateJoined : Date.now(),
+			email : req.body.email,
+			phone : req.body.phone,
+			address : req.body.address,
+			user_type : req.body.user_type}), 
+			req.body.password, 
+			function(err, account) {
+				passport.authenticate('local')(req, res, function () {
+				res.redirect('/');
+        });
+    });
+		new models.User().save();
 	});
 	app.post("/api/user/edit", function(req, res, next) {
-		var user = models.User.findOne({_id : req._id}, function(e, results){
-			user.producerName = req.body.producerName;
-			user.companyName = req.body.companyName;
-			user.companyImg = req.body.companyImg;
-			user.companyLogo = req.body.companyLogo;
-			user.description = req.body.description;
+		var user = req.user;
 			user.email = req.body.email;
 			user.phone = req.body.phone;
+			user.name = req.body.name;
 			user.address = req.body.address;
-			user.certification = req.body.certification;
-			user.feedbackScore = req.body.feedbackScore;
 			user.user_type = req.body.user_type;
 			user.save();
 			res.send(user);
-		})
 	});
-	app.post("/api/user/delete", function(req, res, next) {
+	app.post("api/user/producer/edit", function (req, res, next) {
+		var user = req.user;
+			user.producerData.companyName = req.body.companyName;
+			user.producerData.companyImg = req.body.companyImg;
+			user.producerData.companyLogo = req.body.companyLogo;
+			user.producerData.description = req.body.description;
+			user.save();
+	})
+	app.post("/api/user/delete", function(req, res, next) { //disabled
 		models.User.findOne({_id : req._id}, function(e, results){
 			res.send(results)
 		})
 	});
+
 
 	//Static stuff, won't be changed by users.
 	app.get("/api/category", function(req, res, next) {

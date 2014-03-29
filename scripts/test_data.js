@@ -102,7 +102,7 @@ var sample_products =
 		units: 'kg',
 		refrigeration: 'frozen',
 		ingredients: 'Organic pork, gluten-free breadcrumbs, salt, spices, smoke, tender-loving care',
-		description: 'These delicious pink grapefruit were grown in Whangarei without any artificial fertilier, insecticides or herbicides. In fact, every morning we get up and sing to the tree and ask the fey spirits to bless it and make it boutiful. It worked I think as we have more fruit now than my family can eat.',
+		description: 'These delicious pink grapefruit were grown in Whangarei without any artificial fertilier, insecticides or herbicides. In fact, every morning we get up and sing to the tree and ask the fey spirits to bless it and make it bountiful. It worked I think as we have more fruit now than my family can eat.',
 		certification: 'none',
 		producerName: 'Butch Jock',
 		producerCompany: 'Butch Butcher'

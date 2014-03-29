@@ -41,7 +41,7 @@ angular.module('co-op.controllers', []).
 	
 	$scope.loginData = {
 		email: '',
-		pwd: ''
+		password: ''
 	};
 	
 	$scope.submitForm = function () {
@@ -88,9 +88,9 @@ angular.module('co-op.controllers', []).
 		$scope.mileage = $scope.userData.city.distance * 0.67; //find cost in dollars of return trip to whangarei for producers.
 	  });
 		$scope.userData = {
-		  pw: '',
+		  password: '',
 		  email: '',
-		  producerName: '',
+		  name: '',
 		  address: $scope.details.formatted_address,
 		  
 		  securityQ: '',
