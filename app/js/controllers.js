@@ -87,6 +87,7 @@ angular.module('co-op.controllers', []).
 		$scope.userData.city = $scope.cities[21]; // Whangarei is default	
 		$scope.mileage = $scope.userData.city.distance * 0.67; //find cost in dollars of return trip to whangarei for producers.
 	  });
+		
 		$scope.userData = {
 		  password: '',
 		  email: '',
