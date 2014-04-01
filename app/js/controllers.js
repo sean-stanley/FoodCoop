@@ -91,7 +91,7 @@ angular.module('co-op.controllers', []).
 		  password: '',
 		  email: '',
 		  name: '',
-		  address: $scope.details.formatted_address,
+		  address: '',
 		  
 		  securityQ: '',
 		  securityA: '',
@@ -101,7 +101,7 @@ angular.module('co-op.controllers', []).
 
 	  $scope.$watch('wantsToBeProducer', function(newValue) {
 		  if ($scope.wantsToBeProducer) {
-			  $scope.userData.user_type = UserManager.userTypes[2];
+			$scope.userData.user_type = UserManager.userTypes[2];
 		  } else {
 			$scope.userData.user_type = UserManager.userTypes[0];
 		  }

@@ -90,8 +90,10 @@ exports.configAPI = function configAPI(app){
 		})
 	});
 	app.post("/api/user", function(req, res, next) {    
-	models.User.register(new models.User({
+		console.log(req.body.name);
+		models.User.register(new models.User({
 			dateJoined : Date.now(),
+			name : req.body.name,
 			email : req.body.email,
 			phone : req.body.phone,
 			address : req.body.address,
@@ -100,9 +102,8 @@ exports.configAPI = function configAPI(app){
 			function(err, account) {
 				passport.authenticate('local')(req, res, function () {
 				res.redirect('/');
-        });
-    });
-		new models.User().save();
+			});
+		});
 	});
 	app.post("/api/user/edit", function(req, res, next) {
 		var user = req.user;

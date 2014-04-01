@@ -56,6 +56,7 @@ angular.module('co-op.services', [])
 	        },
 			
 			registerUser : function(userData) {
+				console.log(userData);
 				$http.post("api/user", userData);
 			},
 			userTypes : [
