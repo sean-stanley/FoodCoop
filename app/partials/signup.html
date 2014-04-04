@@ -1,16 +1,3 @@
-<script type="text/javascript">
-        var widget = new AddressFinder.Widget(document.getElementById("search_field"), "67UE3RD9GTV4HLJKAFMQ");
-</script>
-
-<div id="user-info-preview-column" class="col-md-4">
-	<div id="preview-container" class="preview-box" >
-		<h5>{{userData.fullName}} <span ng-hide="signUp.city.$pristine"> of </span> {{userData.city.name}}</h5>
-		<p ng-hide="signUp.city.$pristine">Distance to Whangarei: <span>{{userData.city.distance}}km</span>
-		<p ng-hide="signUp.city.$pristine">If you volunteer to deliver you will be paid: {{0.67 * userData.city.distance|currency}} for your petrol.
-		</p>
-	</div>
-</div>
-
 <form name="signUp" autocomplete="on" ng-submit="submitForm()" novalidate>
 	<fieldset>
     	<legend>Join the Northland Natural Food Co-op</legend>
@@ -38,10 +25,6 @@
 			</div>
 		</div>
 		
-		<div class="form-group">
-			<label for="DateOfBirth">Date of Birth</label>
-			<input ng-model="userData.dob" type="date" class="form-control" id="DateOfBirth" min="2006-01-01" max="1910-01-01">
-		</div>
 		
 		<div class="form-group" ng-controller="geoCtrl">
 			<label for="address">Address</label>
@@ -51,28 +34,13 @@
 				<span ng-show="signUp.userFullName.$error.required">Your NZ address is required.</span>
 			</div>
 		</div>
-		    
+		
 		<div class="form-group">
-    		<label for="securityQ">Security Question</label>
-			<select name="securityQ" ng-model="userData.securityQ" class="form-control" required>
-	    		<option value="1">What was your childhood nickname?</option>
-				<option value="2">In what city did you meet your spouse/significant other?</option>
-				<option value="3">What school did you attend for year six?</option>
-				<option value="4">What is your maternal grandmother's maiden name?</option>
-				<option value="5">In what city or town was your first job?</option>
-				<option value="6">Where were you when you first heard about 9/11?</option>
-				<option value="7">What was the name of your first stuffed animal?</option>
-			</select>
-		</div>
-    
-		<div class="form-group">
-    		<label for="securityA">Security Answer</label>
-			<input type="text" name="securityA" ng-model="userData.securityA" class="form-control" placeholder="Put your answer here" required>
-		</div>
-    
-		<div class="form-group">
-    		<label for="city">Nearest City</label>
-			<select ng-model="userData.city" ng-options="c.name for c in cities" name="city" class="form-control" id="category-menu" required></select>    
+			<label for="phone">Phone</label>
+			<input type="tel" class="form-control" ng-model="userData.phone" name="phone" placeholder="Enter your preferred phone number" required>
+			<div class="custom-error" ng-show="signUp.phone.$dirty && signUp.phone.$invalid">		Sorry:
+				<span ng-show="signUp.userFullName.$error.required">Please give us a valid phone number to use to quickly sort out issues.</span>
+			</div>
 		</div>
 		
 		<div class="checkbox">

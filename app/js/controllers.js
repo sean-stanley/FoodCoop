@@ -35,9 +35,7 @@ angular.module('co-op.controllers', []).
   }])
   
   .controller('loginCtrl', ['$scope', '$location', 'LoginManager', function($scope, $location, LoginManager) {
-	  $scope.showLogin = false;
-	
-	$scope.loginManager = LoginManager;
+	$scope.showLogin = false;
 	
 	$scope.loginData = {
 		email: '',
@@ -45,8 +43,8 @@ angular.module('co-op.controllers', []).
 	};
 	
 	$scope.submitForm = function () {
-        $scope.loginManager.loginAttempt($scope.loginData);
-        $scope.loginManager.logIn();
+        LoginManager.loginAttempt($scope.loginData);
+        LoginManager.logIn();
         console.log($scope.loginManager.loggedIn);
         $location.path('/home');
     } 
@@ -82,20 +80,13 @@ angular.module('co-op.controllers', []).
 		
   }])    
   
-  .controller('userCtrl', ['$scope', 'UserManager', 'LocationService', 'LoginManager', '$location', function($scope, UserManager, LocationService, LoginManager, $location) {
-	  LocationService.getLocations(function(result){$scope.cities = result;
-		$scope.userData.city = $scope.cities[21]; // Whangarei is default	
-		$scope.mileage = $scope.userData.city.distance * 0.67; //find cost in dollars of return trip to whangarei for producers.
-	  });
+  .controller('userCtrl', ['$scope', 'UserManager', 'LoginManager', '$location', function($scope, UserManager, LoginManager, $location) {
 		
 		$scope.userData = {
 		  password: '',
 		  email: '',
 		  name: '',
 		  address: '',
-		  
-		  securityQ: '',
-		  securityA: '',
 		  
 		  user_type: UserManager.userTypes[0],  
 		};
@@ -114,7 +105,7 @@ angular.module('co-op.controllers', []).
         UserManager.registerUser($scope.userData);
         LoginManager.loginChange(true);
         if ($scope.userData.user_type === UserManager.userTypes[2]) {
-	        $location.path('/producer-profile');
+	        $location.path('/producer-profile'); //Needs to redirect to a producer application page
         }
         else {
 	        $location.path('/home');;

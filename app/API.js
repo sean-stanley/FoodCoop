@@ -71,6 +71,7 @@ exports.configAPI = function configAPI(app){
 			product: req.product._id,
 			customer: req.customer._id,
 			quantity: req.quantity,
+			month: req.month-ordered,
 		}).save()
 	});
 	app.post("/api/order/delete", function(req, res, next) {
@@ -97,7 +98,8 @@ exports.configAPI = function configAPI(app){
 			email : req.body.email,
 			phone : req.body.phone,
 			address : req.body.address,
-			user_type : req.body.user_type}), 
+			user_type : req.body.user_type}),
+			customer: req.customer._id, //is there a way for the server to generate this?
 			req.body.password, 
 			function(err, account) {
 				passport.authenticate('local')(req, res, function () {

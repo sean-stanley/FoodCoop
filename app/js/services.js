@@ -10,7 +10,7 @@ angular.module('co-op.services', [])
 		var module = {
 			loginAttempt : function(loginData) {
 				$http.post('/login', loginData)
-				module.loginChange(true);
+				if module.loginChange(true);
 			},			
 			IsLoggedIn : function() {
 	            return module.loggedIn;
