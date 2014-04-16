@@ -1,6 +1,6 @@
 {
   "name": "lib",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "homepage": "https://github.com/StrategicDevelopment/FoodCoop",
   "authors": [
     "Sean Stanley <sean@foodcoop.org.nz>"
@@ -14,7 +14,12 @@
   "license": "MIT",
   "dependencies": {
     "momentjs": "~2.4.0",
-    "angular-ui-calendar": "latest"
+    "angular-ui-calendar": "latest",
+	"angular": "latest",
+	"angular-bootstrap": "latest",
+	"angular-ui-calendar" : "latest",
+	"jquery" : "latest",
+	"jquery-ui" : "latest"
   },
   "resolutions": {
     "jquery": ">=1.6"

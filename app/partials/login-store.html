@@ -1,0 +1,30 @@
+<div id="login-button-store" style="z-index:9999" ng-controller="loginCtrl" ng-hide="loginManager.IsLoggedIn()">
+            <button id="login" type="button" class="btn btn-default btn-lg" ng-click="showLogin = true">
+                Login <span class="glyphicon glyphicon-star"></span>
+            </button>
+
+<!-- dropdown menu links -->
+<div ng-show="showLogin" id="login-drop-down-menu" class="login">
+<button type="button" class="close" aria-hidden="true" ng-click="showLogin = false">&times;</button>
+<form class="form-horizontal" name="signIn" autocomplete="on" ng-submit="submitForm()" novalidate>
+  <div class="form-group">
+    <!-- <label for="inputEmail" class="col-lg-2 control-label">Email</label> -->
+      <input ng-model="loginData.email" type="email" name="email" class="form-control" id="inputEmail" placeholder="Email">
+		<div class="alert alert-warning" ng-show="signIn.email.$dirty && signIn.email.$invalid">Sorry:
+		  <span ng-show="signIn.email.$error.required">email is required.</span>
+		  <span ng-show="signIn.email.$error.email">Please, write a valid email address.</span>
+		</div>				      
+  </div>
+  <div class="form-group">
+    <!-- <label for="inputPassword" class="col-lg-2 control-label">Password</label> -->
+      <input ng-model="loginData.pwd" type="password" name="password" class="form-control" id="inputPassword" placeholder="Password">
+      <div class="checkbox">
+          <input type="checkbox"> Remember me
+      </div>
+      <button type="submit" class="btn btn-default" ng-click="showLogin = false; loginManager.logIn()">Sign in</button>
+  </div>
+</form>
+<a href="#forgot-password" ng-click="showLogin = false">Forgot my password?</a>
+</div>
+
+</div>

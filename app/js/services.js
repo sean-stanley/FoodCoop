@@ -9,9 +9,8 @@ angular.module('co-op.services', [])
 	.factory('LoginManager', ['$http', function($http) {
 		var module = {
 			loginAttempt : function(loginData) {
-				$http.post('/login', loginData)
-				if module.loginChange(true);
-			},			
+				$http.post('/login', loginData);
+						},			
 			IsLoggedIn : function() {
 	            return module.loggedIn;
 	        },
