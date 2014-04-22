@@ -32,7 +32,7 @@ var UserSchema = new Schema({
 			user_type : [new Schema({
 							name: {type : String, required : true},
 							canBuy: {type : Boolean, required : true},
-							canSell:{type : Boolean, required : true}
+							canSell: {type : Boolean, required : true}
 						})],
 			producerData : [new Schema({
 							companyName : {type: String},

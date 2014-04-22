@@ -27,7 +27,8 @@ exports.configAPI = function configAPI(app){
 		})
 	});
 	app.post("/api/product", function(req, res, next) {
-		new models.Product({dateUploaded: Date.now(),
+		new models.Product({
+				dateUploaded: Date.now(),
 				category: req.category,
 				productName: req.productName,
 				variety: req.variety,
@@ -99,7 +100,7 @@ exports.configAPI = function configAPI(app){
 			phone : req.body.phone,
 			address : req.body.address,
 			user_type : req.body.user_type,
-			customer : req.customer._id, //is there a way for the server to generate this?
+			customer : req.body._id, 
 			password : req.body.password }),
 			function(err, account) {
 				passport.authenticate('local')(req, res, function () {
@@ -123,6 +124,7 @@ exports.configAPI = function configAPI(app){
 			user.producerData.companyImg = req.body.companyImg;
 			user.producerData.companyLogo = req.body.companyLogo;
 			user.producerData.description = req.body.description;
+			user.producerData.feedbackScore = req.body.feedbackScore;
 			user.save();
 	})
 	app.post("/api/user/delete", function(req, res, next) { //disabled

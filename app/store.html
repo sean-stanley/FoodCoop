@@ -4,7 +4,8 @@
     <meta charset="utf-8">
     <title>NNFC -- Northland Natural Food Co-op</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="css/bootstrap.css" rel="stylesheet" media="screen">
+    
+	<link href="css/bootstrap.css" rel="stylesheet" media="screen">
     
 	<link rel="stylesheet" href="css/site.css" title="site" type="text/css" media="screen">
     <link href="css/banner.css" rel="stylesheet" media="screen">
@@ -30,100 +31,107 @@
 </head>
 
 <body>
-	<div id="wrap" class="container"><!--Sticky footer hack: wrap all page content-->    		    
-		<div id="sidebar" class="col-md-4 col-lg-3">
-            <ng-include src=" 'partials/login-store.html' "></ng-include>
-			<div>
-               <h1 class="highlight">NNFC</h1>
-                <h5>Local Sustainable Affordable</h5>
-            </div>
-			<div id="calendar-container" ng-controller="calendarCtrl">
-				<div ui-calendar="calendarOptions" ng-model="eventSources" calendar="myCalendar">			
-				</div>
-			</div>
-            <p>
-                Ordering closes in <span class="highlight">5</span> days<br>
-                Delivery Day is in <span class="highlight">14</span> days
-            </p>
-			<accordion close-others="oneAtATime">
-			    <accordion-group is-open="isopen">
-			        <accordion-heading>
-			            Cart <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isopen, 'glyphicon-chevron-right': !isopen}"></i>
-			        </accordion-heading>
-					<div id="table-div" ng-controller="cartTableCtrl">
-					[ <a href="" ng-click="predicate=''">unsorted</a> ]
-					<table class="table">
-						<caption>Cart</caption>
-						<thead>
-							<tr>
-								<th>Remove</th>
-								<th>Product</th>
-								<th>Quantity</th>
-								<th>Price</th>
-								<th>Producer</th>
-							</tr>
-						</thead>
-						<tfoot>
-							<tr>
+	<div id="wrap"><!--Sticky footer hack: wrap all page content-->    		    			
 			
-								<td></td>
-								<td></td>
-								<td></td>
-								<td><strong>Total: {{total|currency}}</strong></td>
-							</tr>
-						</tfoot>
-						<tbody>
-							<tr ng-repeat="c in cart" >
-						        <td data-title=" 'remove' ">
-						        	<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
-						        <td data-title="'Product'" >
-						            {{c.product}}
-						        </td>
-						        <td data-title="'Quantity'">
-						            {{c.quantity}}
-						        </td>
-						        <td data-title="'Price'">
-						            {{c.price | currency}}
-						        </td>
-						        <td data-title="'Customer'">
-						            {{c.producer}}
-						        </td>
-						    </tr>
-						</tbody>
-					</table>
-					</div>
-			    </accordion-group>
-			  </accordion>
-		</div>
-		
-		
-		<div id="main-page" class="col-lg-12">
-			<div id="login-info">
+			<div id="sidebar" ng-show="panelDisplay">
+	            <button class="btn btn-default" ng-click="panelDisplay = false" ng-model="panelDisplay">X</button>
+	            
+				<ng-include src=" 'partials/login-store.html' "></ng-include>
+	            <p>
+	                Ordering closes in <span class="highlight">5</span> days<br>
+	                Delivery Day is in <span class="highlight">14</span> days
+	            </p>
+				<!-- -->
+				<accordion>
+				    <accordion-group is-open="isopen">
+				        <accordion-heading>
+				            Cart <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isopen, 'glyphicon-chevron-right': !isopen}"></i>
+				        </accordion-heading>
+						<div id="table-div" ng-controller="cartTableCtrl">
+						[ <a href="" ng-click="predicate=''">unsorted</a> ]
+						<table class="table" style="width=100%">
+							<caption>Cart</caption>
+							<thead>
+								<tr>
+									<th></th>
+									<th>Product</th>
+									<th>Price</th>
+									<th>Quantity</th>
+								</tr>
+							</thead>
+							<tfoot>
+								<tr>
+			
+								
+									<td colspan="4"><strong>Total: {{total|currency}}</strong></td>
+								</tr>
+							</tfoot>
+							<tbody>
+								<tr ng-repeat="c in cart" >
+							        <td data-title=" 'remove' ">
+							        	<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
+							        <td data-title="'Product'" >
+							            {{c.product}}
+							        </td>
+							        <td data-title="'Price'">
+							            {{c.price | currency}}
+							        </td>
+							        <td data-title="'Quantity'">
+							            <input type="number" ng-model="c.quantity" name="{{c.product}}-quantity"/>
+							        </td>
+						        
+							    </tr>
+							</tbody>
+						</table>
+						</div>
+					</accordion-group>
+					<accordion-group is-open="isopen2">
+						<accordion-heading>
+			            	Calendar <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isopen2, 'glyphicon-chevron-right': !isopen}"></i>
+						</accordion-heading>
+						<div id="calendar">
+							<div id="calendar-container" ng-controller="calendarCtrl">
+								<div ui-calendar="calendarOptions" ng-model="eventSources" calendar="coopCalendar"></div>
+							</div>
+							<iframe src="https://www.google.com/calendar/embed?title=NNFC%20Ordering%20Scheduling&amp;showCalendars=0&amp;showTz=0&amp;height=450&amp;wkst=1&amp;bgcolor=%23ffffff&amp;src=sean%40maplekiwi.com&amp;color=%232F6309&amp;src=en-gb.christian%23holiday%40group.v.calendar.google.com&amp;color=%23B1440E&amp;ctz=Pacific%2FAuckland" style=" border-width:0 " width="100%" height="450" frameborder="0" scrolling="no"></iframe>
+						</div>
+				    </accordion-group>
+				  </accordion>
 				
 			</div>
-			<div id="main-nav-and-sorting" class="row">
-	            <label> Sort: </label>
+			
+			
+			<div class="container-fluid" id="store">
+				<div id="main-nav-and-sorting">
+	            <button class="btn btn-default" ng-click="panelDisplay = true" ng-model="panelDisplay">|||</button>
+				<div>
+	               <h1 class="highlight">Store of the NNFC</h1>
+	                <h5>Local Sustainable Affordable</h5>
+	            </div>
+				
+				<label> Sort: </label>
 				<div class="btn-group">
-					<button class="btn btn-default" btn-radio="'random'">Random</button>
-					<button class="btn btn-default" btn-radio="'alphabetical'">Alphabetical</button>
-					<button class="btn btn-default" btn-radio="'price'">Price</button>
+					<button class="btn btn-default" ng-model="sort" btn-radio="'random'">Random</button>
+					<button class="btn btn-default" ng-model="sort" btn-radio="'alphabetical'">Alphabetical</button>
+					<button class="btn btn-default" ng-model="sort" btn-radio="'price'">Price</button>
 				</div>
 	            <label> Filter: </label>
 				<div class="btn-group">
-					<button class="btn btn-default" btn-radio="'produce'">Produce</button>
-					<button class="btn btn-default" btn-radio="'meat'">Meat</button>
-					<button class="btn btn-default" btn-radio="'processed-goods'">Processed Goods</button>
-					<button class="btn btn-default" btn-radio="'baked-goods'">Baked Goods</button>
-					<button class="btn btn-default" btn-radio="'dariy'">Dairy</button>
-					<button class="btn btn-default" btn-radio="'milk'">Milk</button>
-					<button class="btn btn-default" btn-radio="'none'">None</button>
+					<button class="btn btn-default" ng-model="filter" btn-radio="'produce'">Produce</button>
+					<button class="btn btn-default" ng-model="filter" btn-radio="'meat'">Meat</button>
+					<button class="btn btn-default" ng-model="filter" btn-radio="'processed-goods'">Processed Goods</button>
+					<button class="btn btn-default" ng-model="filter" btn-radio="'baked-goods'">Baked Goods</button>
+					<button class="btn btn-default" ng-model="filter" btn-radio="'dariy'">Dairy</button>
+					<button class="btn btn-default" ng-model="filter" btn-radio="'milk'">Milk</button>
+					<button class="btn btn-default" ng-model="filter" btn-radio="'none'">None</button>
 				</div>
-				<button class="btn btn-default">$</button> 
+			
 			</div>
-			<div id="products-section" class="">
-				<div id="container"></div>
+				<div id="products-section" class="">
+					<div id="store-products"></div>
+				</div>
 			</div>
-		</div>
+			
 		
 	</div>   
        

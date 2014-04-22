@@ -49,7 +49,8 @@
     <div class="row" ng-controller="navCtrl">
 	    <ul class="nav nav-pills pull-right" ng-controller="logoutCtrl">
 	        <li ng-class="{active:isActive('/home')}"><a href="#home">Home</a></li>
-	        <li ng-class="{active:isActive('/signup')}" ng-hide="loginManager.IsLoggedIn()"><a href="#signup">Join Us</a></li>
+	        <li><a href="/store.html">Store</a></li>
+			<li ng-class="{active:isActive('/signup')}" ng-hide="loginManager.IsLoggedIn()"><a href="#signup">Join Us</a></li>
 	        <li ng-class="{active:isActive('/contact')}"><a href="#contact">Contact Us</a></li>
 	        <li><a href="http://foodcoop.org.nz">Blog</a></li>
 	        <li ng-show="loginManager.IsLoggedIn()"><a ng-click="logOut()">Log Out</a>

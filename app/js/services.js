@@ -81,6 +81,9 @@ angular.module('co-op.services', [])
 			},
 			certificationTypes: function(callback){
 				$http.get("api/certification").success(callback);
+			},
+			products: function(callback){
+				$http.get("api/product").success(callback);
 			}
 
 		}	
@@ -122,11 +125,11 @@ angular.module('co-op.services', [])
 
 		
 		var orders = [
-			{product: 'Granny Smith Apples', quantity: 30, price: 2*30, customer: 'Sean Stanley'},
-            {product: 'Spray-Free Oranges', quantity: 12, price: 2.5*12, customer: 'Matt Stanley'},
-            {product: 'Romaine Lettuce', quantity: 27, price: 4*27, customer: 'Myles Green'},
-            {product: 'Organic Basil', quantity: 7, price: 1.5*7, customer: 'Rowan Clements'},
-            {product: 'Dozen Eggs', quantity: 4, price: 8*4, customer: 'Lisa Taylor'}
+			{product: 'Granny Smith Apples', quantity: 30, price: 2, customer: 'Sean Stanley'},
+            {product: 'Spray-Free Oranges', quantity: 12, price: 2.5, customer: 'Matt Stanley'},
+            {product: 'Romaine Lettuce', quantity: 27, price: 4, customer: 'Myles Green'},
+            {product: 'Organic Basil', quantity: 7, price: 1.5, customer: 'Rowan Clements'},
+            {product: 'Dozen Eggs', quantity: 4, price: 8, customer: 'Lisa Taylor'}
 		];
 	}])
 	.service('CartRecords', ['$http', function($http) {
@@ -143,11 +146,11 @@ angular.module('co-op.services', [])
 			cartItems.splice(i, 1);
 		}
 		
-		this.sumPrice = function() {
+		this.sumPrice = function(cart) {
 		 var total = 0;
-		 for(var i=0; i < cartItems.length; i++) {
-		 	console.log(i, ' cart items = ', cartItems[i].price)
-		 	total += cartItems[i].price; 
+		 for(var i=0; i < cart.length; i++) {
+		 	console.log(i, ' cart items = ', cart[i].price, cart[i].price*cart[i].quantity)
+		 	total += cart[i].price*cart[i].quantity; 
 		 }
 		 return total;
 	  }
@@ -155,11 +158,11 @@ angular.module('co-op.services', [])
 		
 		var cartItems = [
 			{product: 'Organic Blue-Veined Cheese', quantity: 1, price: 10, producer: 'Hiki Dairy Farm'},
-            {product: 'Spray-Free Oranges', quantity: 2, price: 2.5*2, producer: 'Northland Naturals'},
-            {product: 'Romaine Lettuce', quantity: 6, price: 4*6, producer: 'EcoBikes'},
-            {product: 'Rosemary bunches', quantity: 4, price: 1*4, producer: 'Rowan Clements'},
-            {product: 'Loafs of Gluten Free Bread', quantity: 3, price: 3.2*4, producer: 'Lisa Taylor'},
-            {product: 'Organic Garlic and Basil Sausages', quantity: 2, price: 8.50*2, producer: 'Lisa Taylor'}
+            {product: 'Spray-Free Oranges', quantity: 2, price: 2.5, producer: 'Northland Naturals'},
+            {product: 'Romaine Lettuce', quantity: 6, price: 4, producer: 'EcoBikes'},
+            {product: 'Rosemary bunches', quantity: 4, price: 1, producer: 'Rowan Clements'},
+            {product: 'Loafs of Gluten Free Bread', quantity: 3, price: 3.2, producer: 'Lisa Taylor'},
+            {product: 'Organic Garlic and Basil Sausages', quantity: 2, price: 8.50, producer: 'Lisa Taylor'}
 		];
 	}])
 	
