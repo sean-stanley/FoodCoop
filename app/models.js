@@ -29,6 +29,7 @@ var UserSchema = new Schema({
 			phone : {type: String, required: false},
 			address : {type: String, required: true},
 			name : {type: String, required: true},
+			password: {type: String, required: true},
 			user_type : [new Schema({
 							name: {type : String, required : true},
 							canBuy: {type : Boolean, required : true},

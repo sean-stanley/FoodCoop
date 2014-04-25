@@ -16,7 +16,7 @@ angular.module('co-op', [ 'ngRoute', 'co-op.filters', 'co-op.services', 'co-op.d
     $routeProvider.when('/forgot-password', {templateUrl: 'partials/forgot-password.html', controller: 'resetPwdCtrl'});
     $routeProvider.when('/my-cart', {templateUrl: 'partials/my-cart.html'});
     $routeProvider.when('/order-manager', {templateUrl: 'partials/order-manager.html'});
-    $routeProvider.when('/store', {templateUrl: 'store.html', controller: 'storeCtrl'});
+    $routeProvider.when('/store', {controller: 'storeCtrl'});
     $routeProvider.otherwise({redirectTo: '/home'});
   }])
   .run(function($rootScope, $location, LoginManager) {

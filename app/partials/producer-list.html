@@ -15,7 +15,7 @@ Sort by:
 
 </ul>
 
-<div class="media" ng-repeat="i in data | orderBy:predicate:reverse | filter:search" ng-click="open(i)">
+<div class="media" ng-repeat="i in producerList | orderBy:predicate:reverse | filter:search" ng-click="open(i)">
 	<a href="" class="pull-right">
 		<img ng-src="{{i.companyLogo}}" height="100px"/>
 		<img ng-src="{{i.companyImg}}" height="100px"/>

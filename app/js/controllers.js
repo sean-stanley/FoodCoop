@@ -145,7 +145,7 @@ controller('MyCtrl1', [
 .controller('producerListCtrl', ['$scope', '$filter', '$modal', 'ProducerList',
 	function($scope, $filter, $modal, ProducerList) {
 		ProducerList.getData(function(result) {
-			$scope.data = result;
+			$scope.producerList = result;
 		});
 
 
@@ -310,7 +310,7 @@ controller('MyCtrl1', [
 
 		$scope.submitForm = function() {
 			MailManager.sendMail($scope.mail);
-		}
+		};
 
 
 	}
@@ -318,7 +318,28 @@ controller('MyCtrl1', [
 
 .controller('storeCtrl', ['$scope', '$filter', '$modal', 'ProductManager',
 	function($scope, $filter, $modal, ProductManager) {
-		$scope.products = ProductManager.products()
+		$scope.products = ProductManager.products();
+		
+		$scope.open = function(product) {
+			console.log('$scope.open got called for' + product)
+			var modalInstance = $modal.open({
+				templateUrl: 'partials/store-modal.html',
+				controller: 'modalInstanceCtrl',
+				resolve: {
+					data: function() {
+						return product;
+					}
+				}
+			});
+
+			
+
+			modalInstance.result.then(function(selectedItem) {
+				$scope.selected = selectedItem;
+			}, function() {
+				console.log('Modal dismissed at: ' + new Date());
+			});
+		}
 
 	}
 

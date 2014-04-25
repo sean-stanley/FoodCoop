@@ -185,7 +185,7 @@ angular.module('co-op.services', [])
 		var module = {
 						
 			getData : function(callback) {
-	            $http.get("/api/user?user_type.name='Producer'").success(callback);
+	            $http.get("/api/user?user_type='Producer'").success(callback); //need to change query once data model is updated
 	        },
 			
 			addProducer : function(newData) {

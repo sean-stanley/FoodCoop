@@ -31,7 +31,7 @@
 </head>
 
 <body>
-	<div id="wrap"><!--Sticky footer hack: wrap all page content-->    		    			
+	<div id="wrap" ng-controller="storeCtrl"><!--Sticky footer hack: wrap all page content-->    		    			
 			
 			<div id="sidebar" ng-show="panelDisplay">
 	            <button class="btn btn-default" ng-click="panelDisplay = false" ng-model="panelDisplay">X</button>
@@ -67,11 +67,11 @@
 								</tr>
 							</tfoot>
 							<tbody>
-								<tr ng-repeat="c in cart" >
+								<tr ng-repeat="c in cart">
 							        <td data-title=" 'remove' ">
 							        	<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
 							        <td data-title="'Product'" >
-							            {{c.product}}
+							            <a href="#" ng-click="open(c)">{{c.product}}</a>
 							        </td>
 							        <td data-title="'Price'">
 							            {{c.price | currency}}
