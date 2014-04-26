@@ -4,11 +4,12 @@
     <meta charset="utf-8">
     <title>NNFC -- Northland Natural Food Co-op</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/site.css" title="site" type="text/css" media="screen">
+    <link href="css/bootstrap.css" rel="stylesheet" media="screen">
+    
+	<link rel="stylesheet" href="css/site.css" title="site" type="text/css" media="screen">
     <link href="css/banner.css" rel="stylesheet" media="screen">
     <link rel="stylesheet" href="css/products.css" title="products" type="text/css" media="screen"> 
     <link rel="stylesheet" href="css/animations.css" title="animations" type="text/css" media="screen">
-    <link href="css/bootstrap.css" rel="stylesheet" media="screen">
 
     
     <script src="http://code.jquery.com/jquery.js"></script>
@@ -37,14 +38,7 @@
 
 	
 	
-	<!-- Other plugins here -->
-	<script type='text/javascript' src='http://www.addressfinder.co.nz/assets/v2/widget.js'></script>
-	<script type="text/javascript">
-      window.onload = function(){
-        var widget = new AddressFinder.Widget(document.getElementById("search_field"), "67UE3RD9GTV4HLJKAFMQ");
-      };
-    </script>
-	
+	<!-- Other plugins here -->	
 	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=true"></script>
 	
         
@@ -57,7 +51,8 @@
     <div class="row" ng-controller="navCtrl">
 	    <ul class="nav nav-pills pull-right" ng-controller="logoutCtrl">
 	        <li ng-class="{active:isActive('/home')}"><a href="#home">Home</a></li>
-	        <li ng-class="{active:isActive('/signup')}" ng-hide="loginManager.IsLoggedIn()"><a href="#signup">Join Us</a></li>
+	        <li><a href="/store.html">Store</a></li>
+			<li ng-class="{active:isActive('/signup')}" ng-hide="loginManager.IsLoggedIn()"><a href="#signup">Join Us</a></li>
 	        <li ng-class="{active:isActive('/contact')}"><a href="#contact">Contact Us</a></li>
 	        <li><a href="http://foodcoop.org.nz">Blog</a></li>
 	        <li ng-show="loginManager.IsLoggedIn()"><a ng-click="logOut()">Log Out</a>
@@ -97,7 +92,6 @@
             This is where the partials go for the forms and information pages.
             /-->    
             <div class="col-md-10 col-md-pull-2">
-                <input ng-model="userData.address" name="address" type="text" id="search_field"/>​
                 <div ng-view></div>
 
             </div> 

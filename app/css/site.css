@@ -4,6 +4,11 @@ a:hover {
 	cursor: pointer;
 }
 
+#wrap {
+	margin: auto;
+	max-width: 1600px;
+}
+
 div#wrap.container {
 	margin-top: 10px;
 }
@@ -27,6 +32,23 @@ div#wrap.container {
 	display: block;
 	margin-top: 10%;
 }
+
+/* Store */ 
+
+#sidebar {
+	margin: 0 20px;
+	width: 35%;
+	float: left;
+}
+
+#products-section {
+	margin: 0 20px;
+}
+
+#store {
+	margin-top: 20px;
+}
+
 
 
 /* www.\befundoo.com/university/tutorials/angularjs-directives-tutorial/ */

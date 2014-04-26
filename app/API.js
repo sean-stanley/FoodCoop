@@ -28,7 +28,8 @@ exports.configAPI = function configAPI(app){
 		})
 	});
 	app.post("/api/product", function(req, res, next) {
-		new models.Product({dateUploaded: Date.now(),
+		new models.Product({
+				dateUploaded: Date.now(),
 				category: req.category,
 				productName: req.productName,
 				variety: req.variety,
@@ -72,6 +73,7 @@ exports.configAPI = function configAPI(app){
 			product: req.product._id,
 			customer: req.customer._id,
 			quantity: req.quantity,
+			month: req.month-ordered,
 		}).save()
 	});
 	app.post("/api/order/delete", function(req, res, next) {
@@ -97,8 +99,9 @@ exports.configAPI = function configAPI(app){
 			email : req.body.email,
 			phone : req.body.phone,
 			address : req.body.address,
-			user_type : req.body.user_type}), 
-			req.body.password, 
+			user_type : req.body.user_type,
+			customer : req.body._id, 
+			password : req.body.password }),
 			function(err, account) {
 				passport.authenticate('local')(req, res, function () {
 				res.redirect('/');
@@ -121,6 +124,7 @@ exports.configAPI = function configAPI(app){
 			user.producerData.companyImg = req.body.companyImg;
 			user.producerData.companyLogo = req.body.companyLogo;
 			user.producerData.description = req.body.description;
+			user.producerData.feedbackScore = req.body.feedbackScore;
 			user.save();
 	})
 	app.post("/api/user/delete", function(req, res, next) { //disabled
