@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var passportLocalMongoose = require('passport-local-mongoose');
+
 var ProductSchema = new Schema({
 			dateUploaded: {type: Date, required: true},
 			category: {type: String, required: true},
@@ -64,7 +65,7 @@ var CertificationSchema = new Schema({
 			value:{type: String, required: true},
 			img:{type: String},
 });
-UserSchema.plugin(passportLocalMongoose);
+UserSchema.plugin(passportLocalMongoose, {usernameField: 'email'});
 
 exports.Product = mongoose.model('Product', ProductSchema);
 exports.Order = mongoose.model('Order', OrderSchema);

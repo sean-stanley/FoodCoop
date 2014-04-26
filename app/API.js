@@ -3,17 +3,18 @@ var util = require('util'),
     fs = require('fs'),
     url = require('url'),
     events = require('events'),
+	flash = require('connect-flash'),
 	express = require('express');
 	mongoose = require('mongoose'),
 	models = require('./models.js'),
 	passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy;
-
 exports.configAPI = function configAPI(app){
 	app.configure(function(){
 		app.use(express.bodyParser());
 		app.use(express.methodOverride());
 		app.use(express.cookieParser());
+		app.use(flash());
 		app.use(express.session({ secret: 'Intrinsic Definability' }));
 		app.use(passport.initialize());
 		app.use(passport.session());
@@ -90,7 +91,6 @@ exports.configAPI = function configAPI(app){
 		})
 	});
 	app.post("/api/user", function(req, res, next) {    
-		console.log(req.body.name);
 		models.User.register(new models.User({
 			dateJoined : Date.now(),
 			name : req.body.name,
@@ -128,8 +128,32 @@ exports.configAPI = function configAPI(app){
 			res.send(results)
 		})
 	});
-
-
+	app.get('/auth/session', 
+	function ensureAuthenticated(req, res, next) {
+		if (req.isAuthenticated()) { return next(); }
+		res.send(401);},
+	function (req, res) {
+		res.json(req.user.user_info);
+	});
+	app.post('/auth/session', function (req, res, next) {
+		passport.authenticate('local', function(err, user, info) {
+			var error = err || info;
+			if (error) { return res.json(400, error); }
+			req.logIn(user, function(err) {
+				if (err) { return res.send(err); }
+			res.json(req.user.user_info);
+			});
+		})(req, res, next);
+	});
+	app.del('/auth/session', function (req, res) {
+	  if(req.user) {
+		req.logout();
+		res.send(200);
+	  } else {
+		res.send(400, "Not logged in");
+	  }
+	});
+ 
 	//Static stuff, won't be changed by users.
 	app.get("/api/category", function(req, res, next) {
 		models.Category.find(req.query, null, { sort:{ _id : 1 }}, function(e, results){
