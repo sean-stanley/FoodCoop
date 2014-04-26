@@ -227,7 +227,7 @@ angular.module('co-op.services', [])
 		var module = {
 						
 			getData : function(callback) {
-	            $http.get("/api/user?user_type.name='Producer'").success(callback);
+	            $http.get("/api/user?user_type.name=Producer").success(callback);
 	        },
 			
 			addProducer : function(newData) {

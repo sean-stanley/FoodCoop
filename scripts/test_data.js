@@ -3,9 +3,12 @@ var mongoose = require('mongoose');
 var models = require('../app/models.js');
 mongoose.connect('mongodb://localhost/mydb');
 var db = mongoose.connection;
+passport = require('passport'),
+LocalStrategy = require('passport-local').Strategy;
 var sample_users = [
+
 	{
-		dateJoined : '10/10/13',
+		dateJoined : Date.now(),
 		name : 'Lisa Taylor',
 		producerData : {
 			companyName : 'Northland Naturals 2',
@@ -18,10 +21,9 @@ var sample_users = [
 		phone : '0212534669',
 		address : '104/148 Corks Rd, Tikipunga Whangarei, 0221',
 		user_type : {name : "Producer", canBuy:true, canSell:true }
-		password: 'abcde'
 	},
 	{
-		dateJoined : '9/9/13',
+		dateJoined : Date.now(),
 		name : 'Rosie Boom',
 		producerData : {
 			companyName : 'Boom Jams',
@@ -34,22 +36,20 @@ var sample_users = [
 		email : 'boomfamily@xtra.co.nz',
 		phone : '0274376677',
 		address : 'Kara Road, Maungatepere Whangarei',
-		password: '12345',
 		
 		user_type : {name : "Producer", canBuy:true, canSell:true }
 	},
 	{
-		dateJoined : '8/8/13',
+		dateJoined : Date.now(),
 		name : 'Michael Taylor',
 		email : 'michael@maplekiwi.com',
 		phone : '0210699472',
 		address : '71 Lauries Drive, RD1 Kamo, 0185',
 		user_type : {name : "Customer", canBuy:true, canSell:false }
-		password: 'test',
 		
 	},
 	{
-		dateJoined : '7/7/13',
+		dateJoined : Date.now(),
 		name : 'Matt Stanley',
 		producerData : {
 			companyName : 'Northland Naturals',
@@ -62,7 +62,6 @@ var sample_users = [
 		phone : '02040094128',
 		address : '71 Lauries Drive, Kamo Whangarei',
 		user_type : {name : "Producer", canBuy:true, canSell:true}
-		password: 'xyz',
 		
 	}
 ]
@@ -143,7 +142,10 @@ var sample_products =
 		producerCompany: 'Tutukaka Organics'
 	}];
 for (i=0; i<sample_users.length; i++){
-	new models.User(sample_users[i]).save(function(err){console.dir("User saved")});
+	models.User.register(new models.User(sample_users[i]), "asdf", function(err, account) {
+				passport.authenticate('local')
+				console.log(err)
+			})
 };
 for (i=0; i<sample_products.length; i++){
 	new models.Product(sample_products[i]).save(function(err){console.dir("Product saved")});

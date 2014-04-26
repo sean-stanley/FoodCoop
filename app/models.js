@@ -30,13 +30,12 @@ var UserSchema = new Schema({
 			phone : {type: String, required: false},
 			address : {type: String, required: true},
 			name : {type: String, required: true},
-			password: {type: String, required: true},
-			user_type : [new Schema({
+			user_type : {
 							name: {type : String, required : true},
 							canBuy: {type : Boolean, required : true},
 							canSell: {type : Boolean, required : true}
-						})],
-			producerData : [new Schema({
+						},
+			producerData : {
 							companyName : {type: String},
 							image : {},
 							logo : {},
@@ -44,7 +43,7 @@ var UserSchema = new Schema({
 							certification : {type: String},
 							feedbackScore : {type: Number},
 							approved : {type: Boolean, default: false}
-						})]
+						}
 });
 var CategorySchema = new Schema({
 			name:{type: String, required: true},
