@@ -93,7 +93,17 @@ angular.module('co-op.services', [])
 					return cb(err.data);
 				});
 			  },
-
+			
+			  getUserLibrary: function(callback) {
+			  	$http.get("api/users")
+					.success(function(data, status, headers, config) {
+						return data;
+					}).
+					error(function(data, status, headers, config) {
+						console.log('failed to get users from database' + status)
+					});
+				},
+			
 			removeUser: function(email, password, callback) {
 				var cb = callback || angular.noop;
 				User.delete({

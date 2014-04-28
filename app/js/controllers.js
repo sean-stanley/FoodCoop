@@ -119,7 +119,7 @@ controller('MyCtrl1', [
 
 
 		$scope.submitForm = function() {
-			UserManager.registerUser($scope.userData);
+			UserManager.createUser($scope.userData);
 			LoginManager.loginChange(true);
 			if ($scope.userData.user_type === UserManager.userTypes[2]) {
 				$location.path('/producer-profile'); //Needs to redirect to a producer application page
