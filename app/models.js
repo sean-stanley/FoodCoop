@@ -31,7 +31,7 @@ var UserSchema = new Schema({
 			address : {type: String, required: true},
 			name : {type: String, required: true},
 
-			user_type : [new Schema({
+			user_type : {
 							name: {type : String, required : true},
 							canBuy: {type : Boolean, required : true},
 							canSell: {type : Boolean, required : true}
