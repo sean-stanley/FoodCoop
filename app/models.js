@@ -48,7 +48,6 @@ var UserSchema = new Schema({
 });
 var CategorySchema = new Schema({
 			name:{type: String, required: true},
-			value:{type: String, required: true},
 			placeholderName:{type: String, required: true},
 			placeholderVariety:{type: String, required: true},
 			availableUnits:{type: Array, required: true},
@@ -59,12 +58,11 @@ var LocationSchema = new Schema({
 			value:{type: String, required: true},
 			fromWhangarei:{type: String, required: true},
 			distance:{type: String, required: true},
-			maps:{type: String, required: true},
+			maps:{type: String, required: true}
 });
 var CertificationSchema = new Schema({
 			name:{type: String, required: true},
-			value:{type: String, required: true},
-			img:{type: String},
+			img:{type: String}
 });
 UserSchema.plugin(passportLocalMongoose, {usernameField: 'email'});
 
