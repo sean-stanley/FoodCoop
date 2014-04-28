@@ -6,38 +6,51 @@
 // Demonstrate how to register services
 // In this case it is a simple value service.
 angular.module('co-op.services', [])
-	.factory('LoginManager', ['$http', function($http) {
-		var module = {
-			loginAttempt : function(loginData) {
-				$http.post('/login', loginData);
-						},			
-			IsLoggedIn : function() {
-	            return module.loggedIn;
-	        },
-			
-			loginChange : function(newValue) {
-				module.loggedIn = newValue;
-				return module.loggedIn;
+	
+	.factory('Session', function ($resource) {
+		return $resource('/auth/session/');
+	})
+	.factory('User', function ($resource) {
+		return $resource('/auth/users/:id/', {},
+		  {
+			'update': {
+			  method:'PUT'
+			}
+		});
+	})
+	.factory('LoginManager', function Auth($location, $rootScope, Session, User, $cookieStore) {
+		$rootScope.currentUser = $cookieStore.get('user') || null;
+		$cookieStore.remove('user');
 
-			},
-			
-			logIn : function() {
-				module.loginChange(true);
-				return module.loggedIn;
-			},
-			
-			logOut : function() {
-				$http.post('/logout', loginData)
-				module.loginChange(false);
-				return module.loggedIn;
-				console.log(module.loggedIn);
-			},
-			
-			loggedIn : false
-		};
-		
-		return module;
-	}])
+		return {
+
+		  login: function(provider, user, callback) {
+			var cb = callback || angular.noop;
+			Session.save({
+			  provider: provider,
+			  email: user.email,
+			  password: user.password,
+			  rememberMe: user.rememberMe
+			}, function(user) {
+			  $rootScope.currentUser = user;
+			  return cb();
+			}, function(err) {
+			  return cb(err.data);
+			});
+		  },
+
+		  logout: function(callback) {
+			var cb = callback || angular.noop;
+			Session.delete(function(res) {
+				$rootScope.currentUser = null;
+				return cb();
+			  },
+			  function(err) {
+				return cb(err.data);
+			  });
+		  },
+		}
+	})
 	
 	.factory('PwdResetManager', ['$http', function($http) {
 		return {
@@ -49,25 +62,57 @@ angular.module('co-op.services', [])
 
 	.factory('UserManager', ['$http', function($http) {
 		return {
-			getUserLibrary : function() {
-	            return module.userLibrary;
-	            console.log(module.userLibrary);
-	        },
-			
-			registerUser : function(userData) {
-				console.log(userData);
-				$http.post("api/user", userData);
-			},
+			createUser: function(userinfo, callback) {
+				var cb = callback || angular.noop;
+				User.save(userinfo,
+				  function(user) {
+					$rootScope.currentUser = user;
+					return cb();
+				  },
+				  function(err) {
+					return cb(err.data);
+				  });
+			  },
+
+			currentUser: function() {
+				Session.get(function(user) {
+				  $rootScope.currentUser = user;
+				});
+			  },
+
+			changePassword: function(email, oldPassword, newPassword, callback) {
+				var cb = callback || angular.noop;
+				User.update({
+				  email: email,
+				  oldPassword: oldPassword,
+				  newPassword: newPassword
+				}, function(user) {
+					console.log('password changed');
+					return cb();
+				}, function(err) {
+					return cb(err.data);
+				});
+			  },
+
+			removeUser: function(email, password, callback) {
+				var cb = callback || angular.noop;
+				User.delete({
+				  email: email,
+				  password: password
+				}, function(user) {
+					console.log(user + 'removed');
+					return cb();
+				}, function(err) {
+					return cb(err.data);
+				});
+			  },
 			userTypes : [
 				{name : "Guest", canBuy:false, canSell:false },
 				{name : "Customer", canBuy:true, canSell:false },
 				{name : "Producer", canBuy:true, canSell:true },
-			],
-	  
-	  		userLibrary : [
-	  		
-	  		]		
-		};
+			]
+			
+		}
 	}])
 	
 	.factory('ProductManager', ['$http', function($http) {
@@ -81,9 +126,6 @@ angular.module('co-op.services', [])
 			},
 			certificationTypes: function(callback){
 				$http.get("api/certification").success(callback);
-			},
-			products: function(callback){
-				$http.get("api/product").success(callback);
 			}
 
 		}	
@@ -125,11 +167,11 @@ angular.module('co-op.services', [])
 
 		
 		var orders = [
-			{product: 'Granny Smith Apples', quantity: 30, price: 2, customer: 'Sean Stanley'},
-            {product: 'Spray-Free Oranges', quantity: 12, price: 2.5, customer: 'Matt Stanley'},
-            {product: 'Romaine Lettuce', quantity: 27, price: 4, customer: 'Myles Green'},
-            {product: 'Organic Basil', quantity: 7, price: 1.5, customer: 'Rowan Clements'},
-            {product: 'Dozen Eggs', quantity: 4, price: 8, customer: 'Lisa Taylor'}
+			{product: 'Granny Smith Apples', quantity: 30, price: 2*30, customer: 'Sean Stanley'},
+            {product: 'Spray-Free Oranges', quantity: 12, price: 2.5*12, customer: 'Matt Stanley'},
+            {product: 'Romaine Lettuce', quantity: 27, price: 4*27, customer: 'Myles Green'},
+            {product: 'Organic Basil', quantity: 7, price: 1.5*7, customer: 'Rowan Clements'},
+            {product: 'Dozen Eggs', quantity: 4, price: 8*4, customer: 'Lisa Taylor'}
 		];
 	}])
 	.service('CartRecords', ['$http', function($http) {
@@ -146,11 +188,11 @@ angular.module('co-op.services', [])
 			cartItems.splice(i, 1);
 		}
 		
-		this.sumPrice = function(cart) {
+		this.sumPrice = function() {
 		 var total = 0;
-		 for(var i=0; i < cart.length; i++) {
-		 	console.log(i, ' cart items = ', cart[i].price, cart[i].price*cart[i].quantity)
-		 	total += cart[i].price*cart[i].quantity; 
+		 for(var i=0; i < cartItems.length; i++) {
+		 	console.log(i, ' cart items = ', cartItems[i].price)
+		 	total += cartItems[i].price; 
 		 }
 		 return total;
 	  }
@@ -158,11 +200,11 @@ angular.module('co-op.services', [])
 		
 		var cartItems = [
 			{product: 'Organic Blue-Veined Cheese', quantity: 1, price: 10, producer: 'Hiki Dairy Farm'},
-            {product: 'Spray-Free Oranges', quantity: 2, price: 2.5, producer: 'Northland Naturals'},
-            {product: 'Romaine Lettuce', quantity: 6, price: 4, producer: 'EcoBikes'},
-            {product: 'Rosemary bunches', quantity: 4, price: 1, producer: 'Rowan Clements'},
-            {product: 'Loafs of Gluten Free Bread', quantity: 3, price: 3.2, producer: 'Lisa Taylor'},
-            {product: 'Organic Garlic and Basil Sausages', quantity: 2, price: 8.50, producer: 'Lisa Taylor'}
+            {product: 'Spray-Free Oranges', quantity: 2, price: 2.5*2, producer: 'Northland Naturals'},
+            {product: 'Romaine Lettuce', quantity: 6, price: 4*6, producer: 'EcoBikes'},
+            {product: 'Rosemary bunches', quantity: 4, price: 1*4, producer: 'Rowan Clements'},
+            {product: 'Loafs of Gluten Free Bread', quantity: 3, price: 3.2*4, producer: 'Lisa Taylor'},
+            {product: 'Organic Garlic and Basil Sausages', quantity: 2, price: 8.50*2, producer: 'Lisa Taylor'}
 		];
 	}])
 	
@@ -185,7 +227,7 @@ angular.module('co-op.services', [])
 		var module = {
 						
 			getData : function(callback) {
-	            $http.get("/api/user?user_type='Producer'").success(callback); //need to change query once data model is updated
+	            $http.get("/api/user?user_type.name=Producer").success(callback);
 	        },
 			
 			addProducer : function(newData) {

@@ -223,10 +223,8 @@ controller('MyCtrl1', [
 			$scope.category = results[0]; // set produce to default
 			$scope.productData.dateUploaded = Date();
 			$scope.productData.category = $scope.category.name;
+			$scope.availableUnits = $scope.category.availableUnits;
 
-			$scope.submitForm = function() {
-				ProductManager.registerProduct($scope.productData);
-			}
 		})
 
 		ProductManager.certificationTypes(function(results) {
@@ -234,6 +232,11 @@ controller('MyCtrl1', [
 			$scope.productData.certification = results[0].name;
 		});
 
+
+		$scope.submitForm = function() {
+			ProductManager.registerProduct($scope.productData);
+		}
+		
 		//$scope.setImage = function(element) {
 		//  $scope.$apply(function($scope) {
 		//       $scope.theImage = element.files[0];

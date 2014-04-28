@@ -5,7 +5,7 @@ var util = require('util'),
     fs = require('fs'),
     url = require('url'),
     events = require('events'),
-	express = require('express');
+	express = require('express'),
 	mongoose = require('mongoose'),
 	models = require('./models.js'),
 	API = require('./API.js'),
@@ -22,20 +22,10 @@ mongoose.connect('mongodb://localhost/mydb');
 var db = mongoose.connection;
 
 var app = API.configAPI(express());
-app.post('/login',
-  passport.authenticate('local', { successRedirect: '/',
-                                   failureRedirect: '/login',
-                                   failureFlash: true })
-);
 
-app.get('/logout', function(req, res) {
-    req.logout();
-    res.redirect('/');
-});
+app.use(express.static(__dirname));
 app.use(forgot.middleware);
-
-
-passport.use(new LocalStrategy({usernameField: 'email'},models.User.createStrategy()));
+passport.use(models.User.createStrategy());
 passport.serializeUser(models.User.serializeUser());
 passport.deserializeUser(models.User.deserializeUser());
 

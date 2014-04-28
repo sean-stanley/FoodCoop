@@ -2,7 +2,7 @@
 
 
 // Declare app level module which depends on filters, and services
-angular.module('co-op', [ 'ngRoute', 'co-op.filters', 'co-op.services', 'co-op.directives', 'co-op.controllers', 'ngAnimate', 'ui.bootstrap', 'ui.calendar']).
+angular.module('co-op', [ 'ngRoute', 'ngResource', "ngCookies", "ui.bootstrap", 'co-op.filters', 'co-op.services', 'co-op.directives', 'co-op.controllers', 'ngAnimate', 'ui.calendar']).
   config(['$routeProvider', function($routeProvider) {
     $routeProvider.when('/home', {templateUrl: 'partials/index-content.html', controller: 'MyCtrl1'});
     $routeProvider.when('/signup', {templateUrl: 'partials/signup.html', controller: 'userCtrl'});
@@ -16,7 +16,7 @@ angular.module('co-op', [ 'ngRoute', 'co-op.filters', 'co-op.services', 'co-op.d
     $routeProvider.when('/forgot-password', {templateUrl: 'partials/forgot-password.html', controller: 'resetPwdCtrl'});
     $routeProvider.when('/my-cart', {templateUrl: 'partials/my-cart.html'});
     $routeProvider.when('/order-manager', {templateUrl: 'partials/order-manager.html'});
-    $routeProvider.when('/store', {controller: 'storeCtrl'});
+    $routeProvider.when('/store', {templateUrl: 'store.html'});
     $routeProvider.otherwise({redirectTo: '/home'});
   }])
   .run(function($rootScope, $location, LoginManager) {
@@ -29,7 +29,7 @@ angular.module('co-op', [ 'ngRoute', 'co-op.filters', 'co-op.services', 'co-op.d
 				case '/producer-list':	
 				    break;
 				default:	        	
-					if (! LoginManager.IsLoggedIn() && next.templateUrl !== '/partials/login.html') {
+					if ($rootScope.currentUser !== null && next.templateUrl !== '/partials/login.html') {
 						$location.path("/must-login");
 					}
 		            break;

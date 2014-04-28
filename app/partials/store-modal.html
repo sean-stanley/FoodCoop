@@ -1,20 +1,17 @@
 <div class="modal-header">
             <img ng-src="{{data.companyLogo}}" width="200px"/>
-	<h1>{{data.variety}} <small>{{data.name}}</small></h1>
+	<h1>{{data.product}}</h1>
         </div>
         <div class="modal-body media">
-            <img class="pull-left" ng-src="{{data.companyImg}}" height="200px"/>
 
             <div class="media-body">
-	            {{data.description}}
-	            <div fundoo-rating rating-value="data.feedbackScore" max="5" readonly="true"></div>
+	            {{data.producer}}<br>
+				
+				{{data.price|currency}}
+				
+				{{data.description}}
 
 	            
-	            <ul>
-	            	<li><span class="glyphicon glyphicon-earphone"></span>{{data.phone}}</li>
-					<li><a ng-href="mailto:data.email">{{data.email}}</a></li>
-					<li>{{data.address}}</li>
-	            </ul>
             </div>
 
         </div>

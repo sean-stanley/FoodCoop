@@ -34,7 +34,7 @@
 	<div id="wrap" ng-controller="storeCtrl"><!--Sticky footer hack: wrap all page content-->    		    			
 			
 			<div id="sidebar" ng-show="panelDisplay">
-	            <button class="btn btn-default" ng-click="panelDisplay = false" ng-model="panelDisplay">X</button>
+	            <button class="btn btn-default panel-btn" ng-click="panelDisplay = false" ng-model="panelDisplay">&times;</button>
 	            
 				<ng-include src=" 'partials/login-store.html' "></ng-include>
 	            <p>
@@ -45,7 +45,7 @@
 				<accordion>
 				    <accordion-group is-open="isopen">
 				        <accordion-heading>
-				            Cart <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isopen, 'glyphicon-chevron-right': !isopen}"></i>
+				            {{user.name}} Cart <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isopen, 'glyphicon-chevron-right': !isopen}"></i>
 				        </accordion-heading>
 						<div id="table-div" ng-controller="cartTableCtrl">
 						[ <a href="" ng-click="predicate=''">unsorted</a> ]
@@ -61,8 +61,6 @@
 							</thead>
 							<tfoot>
 								<tr>
-			
-								
 									<td colspan="4"><strong>Total: {{total|currency}}</strong></td>
 								</tr>
 							</tfoot>
@@ -103,7 +101,7 @@
 			
 			<div class="container-fluid" id="store">
 				<div id="main-nav-and-sorting">
-	            <button class="btn btn-default" ng-click="panelDisplay = true" ng-model="panelDisplay">|||</button>
+	            <button class="btn btn-default panel-btn" ng-click="panelDisplay = !panelDisplay" ng-model="panelDisplay"><i class="glyphicon" ng-class="{'glyphicon-chevron-left': !panelDisplay, 'glyphicon-chevron-right': panelDisplay}"></i></button>
 				<div>
 	               <h1 class="highlight">Store of the NNFC</h1>
 	                <h5>Local Sustainable Affordable</h5>
@@ -111,7 +109,7 @@
 				
 				<label> Sort: </label>
 				<div class="btn-group">
-					<button class="btn btn-default" ng-model="sort" btn-radio="'random'">Random</button>
+					<button class="btn btn-default" ng-model="sort" btn-radio="'producer'">Producer</button>
 					<button class="btn btn-default" ng-model="sort" btn-radio="'alphabetical'">Alphabetical</button>
 					<button class="btn btn-default" ng-model="sort" btn-radio="'price'">Price</button>
 				</div>
