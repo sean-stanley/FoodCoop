@@ -1,0 +1,41 @@
+{
+  "name": "FoodCoop",
+  "version": "0.0.1",
+  "description": "Food Coop",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/StrategicDevelopment/FoodCoop.git"
+  },
+  "keywords": [
+    "Food",
+    "Coop"
+  ],
+  "author": "Sean Stanley",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/StrategicDevelopment/FoodCoop/issues"
+  },
+  "devDependencies": {
+    "karma": "~0.12.12",
+    "grunt": "~0.4.4",
+    "grunt-shell": "~0.7.0",
+    "grunt-nodemon": "~0.2.1"
+  },
+  "dependencies": {
+    "express": "~3.4.1",
+    "passport-local-mongoose": "~0.3.0",
+    "passport-local": "~1.0.0",
+    "passport": "~0.2.0",
+    "mongodb": "~1.4.2",
+    "mongojs": "~0.12.1",
+    "mongoose": "~3.8.8",
+    "password-reset": "~0.1.4"
+  }
+}
