@@ -1,4 +1,5 @@
 'use strict';
+/*global angular, google, $, AddressFinder*/
 
 /* Directives */
 
@@ -54,27 +55,27 @@ angular.module('co-op.directives', []).
         link: function(scope, element, attrs, model) {
 
           //options for autocomplete
-          var opts
+          var opts;
 
           //convert options provided to opts
           var initOpts = function() {
-            opts = {}
+            opts = {};
             if (scope.options) {
               if (scope.options.types) {
-                opts.types = []
-                opts.types.push(scope.options.types)
+                opts.types = [];
+                opts.types.push(scope.options.types);
               }
               if (scope.options.bounds) {
-                opts.bounds = scope.options.bounds
+                opts.bounds = scope.options.bounds;
               }
               if (scope.options.country) {
                 opts.componentRestrictions = {
                   country: scope.options.country
-                }
+                };
               }
             }
-          }
-          initOpts()
+          };
+          initOpts();
 
           //create new autocomplete
           //reinitializes on every change of the options provided
@@ -87,17 +88,17 @@ angular.module('co-op.directives', []).
   //              }
                 scope.ngAutocomplete = element.val();
               });
-            })
-          }
-          newAutocomplete()
+            });
+          };
+          newAutocomplete();
 
           //watch options provided to directive
           scope.watchOptions = function () {
-            return scope.options
+            return scope.options;
           };
           scope.$watch(scope.watchOptions, function () {
-            initOpts()
-            newAutocomplete()
+            initOpts();
+            newAutocomplete();
             element[0].value = '';
             scope.ngAutocomplete = element.val();
           }, true);
@@ -118,7 +119,7 @@ angular.module('co-op.directives', []).
 		  
 		  template : '<input ng-model="model" name="address" type="text" id="search_field" class="form-control"/>​'
 
-	  }
+	  };
   })
   
   .directive('fundooRating', function () { //www.\befundoo.com/university/tutorials/angularjs-directives-tutorial
@@ -158,7 +159,7 @@ angular.module('co-op.directives', []).
           }
         });
        }
-      }
+      };
      })
   
   .directive('checkStrength', function () {
@@ -241,7 +242,7 @@ angular.module('co-op.directives', []).
       link: function(scope, element, attrs) {
         var checkSize, isTypeValid, processDragOverOrEnter, validMimeTypes;
         processDragOverOrEnter = function(event) {
-          if (event != null) {
+          if (event !== null) {
             event.preventDefault();
           }
           event.originalEvent.dataTransfer.effectAllowed = 'copy';
@@ -269,7 +270,7 @@ angular.module('co-op.directives', []).
         element.bind('dragenter', processDragOverOrEnter);
         return element.bind('drop', function(event) {
           var file, name, reader, size, type;
-          if (event != null) {
+          if (event !== null) {
             event.preventDefault();
           }
           reader = new FileReader();
@@ -278,7 +279,8 @@ angular.module('co-op.directives', []).
               return scope.$apply(function() {
                 scope.file = evt.target.result;
                 if (angular.isString(scope.fileName)) {
-                  return scope.fileName = name;
+                  scope.fileName = name;
+                  return name;
                 }
               });
             }
@@ -292,5 +294,5 @@ angular.module('co-op.directives', []).
         });
       }
     };
-  })
+  });
   

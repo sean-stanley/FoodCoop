@@ -26,7 +26,13 @@
     "karma": "~0.12.12",
     "grunt": "~0.4.4",
     "grunt-shell": "~0.7.0",
-    "grunt-nodemon": "~0.2.1"
+    "grunt-nodemon": "~0.2.1",
+    "grunt-contrib-copy": "~0.5.0",
+    "grunt-karma": "~0.8.3",
+    "grunt-concurrent": "~0.5.0",
+    "grunt-contrib-jshint": "~0.10.0",
+    "grunt-node-inspector": "~0.1.5",
+    "grunt-contrib-watch": "~0.6.1"
   },
   "dependencies": {
     "express": "~3.4.1",
@@ -36,6 +42,8 @@
     "mongodb": "~1.4.2",
     "mongojs": "~0.12.1",
     "mongoose": "~3.8.8",
-    "password-reset": "~0.1.4"
+    "password-reset": "~0.1.4",
+    "connect-flash": "~0.1.1",
+    "ejs": "~1.0.0"
   }
 }

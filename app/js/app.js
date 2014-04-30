@@ -1,5 +1,5 @@
 'use strict';
-
+/*global angular*/
 
 // Declare app level module which depends on filters, and services
 angular.module('co-op', [ 'ngRoute', 'ngResource', "ngCookies", "ui.bootstrap", 'co-op.filters', 'co-op.services', 'co-op.directives', 'co-op.controllers', 'ngAnimate', 'ui.calendar']).

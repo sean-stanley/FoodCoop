@@ -1,4 +1,5 @@
 'use strict';
+/*global angular*/
 
 /* Controllers */
 
@@ -18,7 +19,7 @@ controller('MyCtrl1', [
 			$scope.loginManager = LoginManager;
 			$scope.isActive = function(route) {
 				return route === $location.path();
-			}
+			};
 
 			$scope.items = CartRecords.getCart().length;
 
@@ -32,12 +33,12 @@ controller('MyCtrl1', [
 		$scope.logOut = function() {
 			$scope.loginManager.loginChange(false);
 			$location.path('/home');
-		}
+		};
 
 		$scope.logIn = function() {
 			$scope.loginManager.loginChange(true);
 			$location.path('/home');
-		}
+		};
 
 	}
 ])
@@ -56,7 +57,7 @@ controller('MyCtrl1', [
 			LoginManager.logIn();
 			console.log($scope.loginManager.loggedIn);
 			$location.path('/home');
-		}
+		};
 	}
 ])
 	.controller('resetPwdCtrl', ['$scope', 'PwdResetManager',
@@ -71,7 +72,7 @@ controller('MyCtrl1', [
 			};
 			$scope.submitForm = function() {
 				PwdResetManager.pwdReset($scope.resetData);
-			}
+			};
 
 		}
 	])
@@ -124,10 +125,10 @@ controller('MyCtrl1', [
 			if ($scope.userData.user_type === UserManager.userTypes[2]) {
 				$location.path('/producer-profile'); //Needs to redirect to a producer application page
 			} else {
-				$location.path('/home');;
+				$location.path('/home');
 			}
 
-		}
+		};
 	}
 ])
 
@@ -171,7 +172,7 @@ controller('MyCtrl1', [
 			}, function() {
 				console.log('Modal dismissed at: ' + new Date());
 			});
-		}
+		};
 
 	}
 ])
@@ -192,7 +193,7 @@ controller('MyCtrl1', [
 		//	  $scope.theImage = ''; //sets empty variable to be populated if user uses the input[type=file] method to upload an image
 
 		ProductHistory.getData(function(result) {
-			$scope.data = result
+			$scope.data = result;
 		});
 
 		$scope.predicate = 'dateUploaded';
@@ -200,11 +201,11 @@ controller('MyCtrl1', [
 		$scope.delete = function(idx) {
 			var itemToDelete = $scope.data[idx];
 			$scope.data.splice(idx, 1);
-		}
+		};
 
 		$scope.editProduct = function(product) {
 			$scope.productData = product;
-			console.log($scope.productData)
+			console.log($scope.productData);
 			// pass product to productUpload controller $scope.productData
 		};
 
@@ -225,7 +226,7 @@ controller('MyCtrl1', [
 			$scope.productData.category = $scope.category.name;
 			$scope.availableUnits = $scope.category.availableUnits;
 
-		})
+		});
 
 		ProductManager.certificationTypes(function(results) {
 			$scope.certifications = results;
@@ -235,7 +236,7 @@ controller('MyCtrl1', [
 
 		$scope.submitForm = function() {
 			ProductManager.registerProduct($scope.productData);
-		}
+		};
 		
 		//$scope.setImage = function(element) {
 		//  $scope.$apply(function($scope) {
@@ -248,8 +249,8 @@ controller('MyCtrl1', [
 
 ])
 
-.controller('producerCtrl', ['$scope', 'ProducerManager',
-	function($scope, ProducerManager) {
+.controller('producerCtrl', ['$scope', 'ProducerManager', '$location',
+	function($scope, ProducerManager, $location) {
 
 		$scope.producerData = {
 			image: '',
@@ -261,7 +262,7 @@ controller('MyCtrl1', [
 		$scope.submitForm = function() {
 			ProducerManager.setProducer($scope.producerData);
 			$location.path('/product-upload');
-		}
+		};
 
 	}
 ])
@@ -291,7 +292,7 @@ controller('MyCtrl1', [
 			var itemToDelete = $scope.cart[idx];
 			$scope.cart.splice(idx, 1);
 			$scope.total = CartRecords.sumPrice($scope.cart);
-		}
+		};
 
 
 		//  API.DeleteItem({ id: itemToDelete.id}, function (success) {
@@ -324,7 +325,7 @@ controller('MyCtrl1', [
 		$scope.products = ProductManager.products();
 		
 		$scope.open = function(product) {
-			console.log('$scope.open got called for' + product)
+			console.log('$scope.open got called for' + product);
 			var modalInstance = $modal.open({
 				templateUrl: 'partials/store-modal.html',
 				controller: 'modalInstanceCtrl',
@@ -342,7 +343,7 @@ controller('MyCtrl1', [
 			}, function() {
 				console.log('Modal dismissed at: ' + new Date());
 			});
-		}
+		};
 
 	}
 
@@ -361,7 +362,7 @@ controller('MyCtrl1', [
 			className: 'gcal-event', // an option!
 			currentTimezone: 'Pacific/Auckland' // an option!
 		},
-		]
+		];
 
 		/* config object */
 		$scope.uiConfig = {

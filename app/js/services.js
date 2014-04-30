@@ -1,4 +1,5 @@
 'use strict';
+/*global angular, User, Session*/
 
 /* Services */
 
@@ -49,7 +50,7 @@ angular.module('co-op.services', [])
 				return cb(err.data);
 			  });
 		  },
-		}
+		};
 	})
 	
 	.factory('PwdResetManager', ['$http', function($http) {
@@ -60,7 +61,7 @@ angular.module('co-op.services', [])
 		};
 	}])
 
-	.factory('UserManager', ['$http', function($http) {
+	.factory('UserManager', ['$http', '$rootScope', function($http, $rootScope) {
 		return {
 			createUser: function(userinfo, callback) {
 				var cb = callback || angular.noop;
@@ -100,7 +101,7 @@ angular.module('co-op.services', [])
 						return data;
 					}).
 					error(function(data, status, headers, config) {
-						console.log('failed to get users from database' + status)
+						console.log('failed to get users from database' + status);
 					});
 				},
 			
@@ -122,7 +123,7 @@ angular.module('co-op.services', [])
 				{name : "Producer", canBuy:true, canSell:true },
 			]
 			
-		}
+		};
 	}])
 	
 	.factory('ProductManager', ['$http', function($http) {
@@ -138,7 +139,7 @@ angular.module('co-op.services', [])
 				$http.get("api/certification").success(callback);
 			}
 
-		}	
+		};
 	}])
 	
 	.factory('ProducerManager', ['$http', function($http) {
@@ -146,7 +147,7 @@ angular.module('co-op.services', [])
 			setProducer : function(producerData) {
 				$http.post("api/producerData/edit", producerData);
 			},
-		}	
+		};
 	}])
 	
 	.factory('MailManager', ['$http', function($http) {
@@ -154,26 +155,26 @@ angular.module('co-op.services', [])
 			mail : function(mail) {
 				console.log('email message', mail);
 			}
-		}	
+		};
 	}])
 	.service('OrderRecords', ['$http', function($http) {
 		
 		this.getOrders = function() {
 			return orders;
-		}
+		};
 		
 		this.addOrder = function(orderData) {
-			orders.push(orderData)
-		}
+			orders.push(orderData);
+		};
 		
 		this.sumSales = function() {
 		 var total = 0;
 		 for(var i=0; i < orders.length; i++) {
-		 	console.log(i, ' order items = ', orders[i].price)
+		 	console.log(i, ' order items = ', orders[i].price);
 		 	total += orders[i].price; 
 		 }
 		 return total;
-	  }
+	  };
 
 		
 		var orders = [
@@ -188,24 +189,24 @@ angular.module('co-op.services', [])
 		
 		this.getCart = function() {
 			return cartItems;
-		}
+		};
 		
 		this.addItem = function(productData) {
 			cartItems.push(productData);
-		}
+		};
 		
 		this.removeItem = function(i) {
 			cartItems.splice(i, 1);
-		}
+		};
 		
 		this.sumPrice = function() {
 		 var total = 0;
 		 for(var i=0; i < cartItems.length; i++) {
-		 	console.log(i, ' cart items = ', cartItems[i].price)
+		 	console.log(i, ' cart items = ', cartItems[i].price);
 		 	total += cartItems[i].price; 
 		 }
 		 return total;
-	  }
+	  };
 
 		
 		var cartItems = [
@@ -226,10 +227,10 @@ angular.module('co-op.services', [])
 	        },
 			addProduct : function(newData) {
 				module.data.push(newData);
-				return module.data;
 				console.log(module.data);
+				return module.data;
 			}
-		}
+		};
 		return module;
 	}])
 	
@@ -253,15 +254,16 @@ angular.module('co-op.services', [])
 
 	
 	.service('LocationService',  ['$http', function($http) {
+        var data;
 		
         this.getLocations = function(callback) {
 			$http.get("/api/location").success(callback);
-	    },
+	    };
 
         this.addLocation = function(locationData) {
             data.push(locationData);
 			$http.post("/api/location", locationData);
-        }
+        };
 		
 
     }]);
