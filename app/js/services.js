@@ -96,9 +96,10 @@ angular.module('co-op.services', [])
 			  },
 			
 			  getUserLibrary: function(callback) {
-			  	$http.get("api/users")
+			  	$http.get("api/user")
 					.success(function(data, status, headers, config) {
-						return data;
+						var users = data;
+						return users;
 					}).
 					error(function(data, status, headers, config) {
 						console.log('failed to get users from database' + status);
