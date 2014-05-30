@@ -61,7 +61,7 @@ angular.module('co-op.services', [])
 		};
 	}])
 
-	.factory('UserManager', ['$http', '$rootScope', function($http, $rootScope) {
+	.factory('UserManager', function Auth($http, $rootScope, Session, User) {
 		return {
 			createUser: function(userinfo, callback) {
 				var cb = callback || angular.noop;
@@ -69,6 +69,7 @@ angular.module('co-op.services', [])
 				  function(user) {
 					$rootScope.currentUser = user;
 					return cb();
+					console.log(user + user.name + 'is now a part of the NNFC')
 				  },
 				  function(err) {
 					return cb(err.data);
@@ -125,7 +126,7 @@ angular.module('co-op.services', [])
 			]
 			
 		};
-	}])
+	})
 	
 	.factory('ProductManager', ['$http', function($http) {
 		return {

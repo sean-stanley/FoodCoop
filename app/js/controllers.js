@@ -9,11 +9,7 @@ controller('MyCtrl1', [
 
 	}
 ])
-	.controller('MyCtrl2', [
-		function() {
-
-		}
-	])
+	
 	.controller('navCtrl', ['$scope', '$location', 'LoginManager', 'CartRecords',
 		function($scope, $location, LoginManager, CartRecords) {
 			$scope.loginManager = LoginManager;
@@ -37,32 +33,28 @@ controller('MyCtrl1', [
 
 		$scope.logIn = function() {
 			$scope.loginManager.loginChange(true);
-			$location.path('/home');
 		};
 
 	}
 ])
 
-.controller('loginCtrl', ['$scope', '$location', 'LoginManager',
+.controller('loginCtrl', ['$scope', 'LoginManager',
 	function($scope, $location, LoginManager) {
 		$scope.showLogin = false;
 
 		$scope.loginData = {
 			email: '',
-			password: ''
+			password: '',
+			rememberMe: false
 		};
 
 		$scope.submitForm = function() {
-			LoginManager.loginAttempt($scope.loginData);
-			LoginManager.logIn();
-			console.log($scope.loginManager.loggedIn);
-			$location.path('/home');
+			LoginManager.login(provider, $scope.loginData);
 		};
 	}
 ])
 	.controller('resetPwdCtrl', ['$scope', 'PwdResetManager',
 		function($scope, PwdResetManager) {
-
 			$scope.resetData = {
 				email: '',
 				dob: '',
@@ -73,7 +65,6 @@ controller('MyCtrl1', [
 			$scope.submitForm = function() {
 				PwdResetManager.pwdReset($scope.resetData);
 			};
-
 		}
 	])
 
@@ -91,7 +82,7 @@ controller('MyCtrl1', [
 
 		$scope.$watch('user', function(newValue, oldValue) {
 			UserManager.updateUser(newValue);
-			console.log('user changer: ', newValue); //calls the server to make the change for this user
+			console.log('user changer: ' + newValue); //calls the server to make the change for this user
 		}, true);
 
 	}
@@ -105,8 +96,7 @@ controller('MyCtrl1', [
 			email: '',
 			name: '',
 			address: '',
-
-			user_type: UserManager.userTypes[1],
+			user_type: UserManager.userTypes[1]
 		};
 
 		$scope.$watch('wantsToBeProducer', function(newValue) {
@@ -121,14 +111,15 @@ controller('MyCtrl1', [
 
 		$scope.submitForm = function() {
 			UserManager.createUser($scope.userData);
-			LoginManager.loginChange(true);
-			if ($scope.userData.user_type === UserManager.userTypes[2]) {
-				$location.path('/producer-profile'); //Needs to redirect to a producer application page
-			} else {
-				$location.path('/home');
-			}
-
+			$location.path('/thankyou');
 		};
+	}
+])
+
+.controller('signupInvoiceCtrl', ['$scope',
+	function ($scope) {
+		$scope.cost = '$60';
+		$scope.membership = 'ONE CUSTOMER MEMBERSHIP SHARE';
 	}
 ])
 

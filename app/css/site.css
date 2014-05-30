@@ -9,12 +9,9 @@ a:hover {
 	max-width: 1600px;
 }
 
-div#wrap.container {
-	margin-top: 10px;
-}
-
-#wrap div.row.ng-scope ul.nav.nav-pills.pull-right {
-	margin-bottom: 10px;
+.nav-pills > li > a {
+	-webkit-border-radius: 0 0 2px 2px;
+	border-radius: 0 0 2px 2px;
 }
 
 .image-drop {

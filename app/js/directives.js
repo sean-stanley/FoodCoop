@@ -106,22 +106,6 @@ angular.module('co-op.directives', []).
       };
     })
   
-  .directive('addressFinder', function () {
-	  return {
-		  restrict: "EACM",
-		  link : function (scope, elem, attrs) {
-			  var widget = new AddressFinder.Widget(document.getElementById("search_field"), "67UE3RD9GTV4HLJKAFMQ");
-		  },
-		  
-		  scope : {
-			  model: '=ngModel'
-		  },
-		  
-		  template : '<input ng-model="model" name="address" type="text" id="search_field" class="form-control"/>​'
-
-	  };
-  })
-  
   .directive('fundooRating', function () { //www.\befundoo.com/university/tutorials/angularjs-directives-tutorial
     return {
       restrict: 'A',

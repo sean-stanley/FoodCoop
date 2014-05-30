@@ -18,10 +18,11 @@
   <div class="form-group">
     <!-- <label for="inputPassword" class="col-lg-2 control-label">Password</label> -->
       <input ng-model="loginData.pwd" type="password" name="password" class="form-control" id="inputPassword" placeholder="Password">
-      <div class="checkbox">
-          <input type="checkbox"> Remember me
+      <div class="checkbox" style="margin-bottom: 35px;">
+		  <br>
+          <input type="checkbox" ng-model="loginData.rememberMe" value="true"> <p>Remember me</p>
       </div>
-      <button type="submit" class="btn btn-default" ng-click="showLogin = false; loginManager.logIn()">Sign in</button>
+      <button type="submit" class="btn btn-default" ng-click="showLogin = false;">Sign in</button>
   </div>
 </form>
 <a href="#forgot-password" ng-click="showLogin = false">Forgot my password?</a>

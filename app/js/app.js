@@ -6,6 +6,11 @@ angular.module('co-op', [ 'ngRoute', 'ngResource', "ngCookies", "ui.bootstrap", 
   config(['$routeProvider', function($routeProvider) {
     $routeProvider.when('/home', {templateUrl: 'partials/index-content.html', controller: 'MyCtrl1'});
     $routeProvider.when('/signup', {templateUrl: 'partials/signup.html', controller: 'userCtrl'});
+    $routeProvider.when('/thankyou', {templateUrl: 'partials/thankyou.html', controller: 'signupInvoiceCtrl'});
+	
+    $routeProvider.when('/terms-cons', {templateUrl: 'partials/legal/terms-cons.html'});
+    $routeProvider.when('/priv-pol', {templateUrl: 'partials/legal/priv-pol.html'});
+
     $routeProvider.when('/users-rights', {templateUrl: 'partials/users-rights.html', controller: 'userAdminCtrl'});
     $routeProvider.when('/producer-list', {templateUrl: 'partials/producer-list.html', controller: 'producerListCtrl'});
     $routeProvider.when('/product-upload', {templateUrl: 'partials/product-upload.html', controller: 'productUpload'});

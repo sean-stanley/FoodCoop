@@ -4,7 +4,8 @@
     <meta charset="utf-8">
     <title>NNFC -- Northland Natural Food Co-op</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="css/bootstrap.css" rel="stylesheet" media="screen">
+    
+	<link href="css/bootstrap.css" rel="stylesheet" media="screen">
     
 	<link rel="stylesheet" href="css/site.css" title="site" type="text/css" media="screen">
     <link href="css/banner.css" rel="stylesheet" media="screen">
@@ -32,10 +33,15 @@
 	<script type="text/javascript" src="lib/bower_components/jquery/dist/jquery.min.js"></script>
 	<script type="text/javascript" src="lib/bower_components/jquery-ui/ui/jquery-ui.js"></script>
 	<script type="text/javascript" src="lib/bower_components/angular/angular.js"></script>
+	
 	<script type="text/javascript" src="lib/bower_components/angular-ui-calendar/src/calendar.js"></script>
-	<script type="text/javascript" src="lib/bower_components/fullcalendar/fullcalendar.js"></script>
-	<script type="text/javascript" src="lib/bower_components/fullcalendar/gcal.js"></script>
-
+	<!--
+	
+		
+		<script type="text/javascript" src="lib/bower_components/fullcalendar/fullcalendar.js"></script>
+		<script type="text/javascript" src="lib/bower_components/fullcalendar/gcal.js"></script>
+	
+		-->
 	
 	
 	<!-- Other plugins here -->	
@@ -47,26 +53,37 @@
    
 </head>
 
-<body><div id="wrap" class="container"><!--Sticky footer hack: wrap all page content-->
-    <div class="row" ng-controller="navCtrl">
-	    <ul class="nav nav-pills pull-right" ng-controller="logoutCtrl">
-	        <li ng-class="{active:isActive('/home')}"><a href="#home">Home</a></li>
-	        <li><a href="/store.html">Store</a></li>
-			<li ng-class="{active:isActive('/signup')}" ng-hide="loginManager.IsLoggedIn()"><a href="#signup">Join Us</a></li>
-	        <li ng-class="{active:isActive('/contact')}"><a href="#contact">Contact Us</a></li>
-	        <li><a href="http://foodcoop.org.nz">Blog</a></li>
-	        <li ng-show="loginManager.IsLoggedIn()"><a ng-click="logOut()">Log Out</a>
-		</ul>
-    </div>
-    
+<body>
+	
+  
     <div id="banner">
         <div id="grass-containter">
-	        <ng-include src=" 'partials/login.html' "></ng-include>
-	        <h1 class="logo">NNFC</h1>
-			<h2 class="slogan">Local • Sustainable • Affordable</h2>  
+			<div class="container">
+				<section class="feature-box">
+					<h1 class="logo">NNFC</h1>
+					<h2 class="slogan">Local • Sustainable • Affordable</h2>
+				</section>
+			</div>
         </div>
-        
     </div>
+	
+ 	<div id="wrap" class="container"><!--Sticky footer hack: wrap all page content-->
+     <div class="row" ng-controller="navCtrl">
+ 	    <ul class="nav nav-pills pull-left">
+ 			 <ng-include src=" 'partials/login.html' "></ng-include>
+			 <li><a href="/store.html">Store</a></li>
+ 		</ul>
+ 		<ul class="nav nav-pills pull-right" ng-controller="logoutCtrl">
+ 	        <li ng-class="{active:isActive('/home')}"><a href="#home">Home</a></li>
+	       
+ 			<li ng-class="{active:isActive('/signup')}" ng-hide="loginManager.IsLoggedIn()"><a href="#signup">Join Us</a></li>
+ 	        <li ng-class="{active:isActive('/contact')}"><a href="#contact">Contact Us</a></li>
+ 	        <li><a href="http://foodcoop.org.nz">Blog</a></li>
+ 	        <li ng-show="loginManager.IsLoggedIn()"><a ng-click="logOut()">Log Out</a>
+ 		</ul>
+     </div>
+    </div>
+	<hr>
     
 
     <div class="container">
