@@ -56,7 +56,7 @@ angular.module('co-op.services', [])
 	.factory('PwdResetManager', ['$http', function($http) {
 		return {
 			pwdReset : function(resetData) {
-				console.log('Reset Data', resetData);
+				console.log('Reset Data' + resetData);
 			}			
 		};
 	}])
