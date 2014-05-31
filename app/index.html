@@ -45,18 +45,25 @@
 	
 	
 	<!-- Other plugins here -->	
-	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=true"></script>
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=true"></script>
 	
-        
+<script src="lib/bower_components/headroomjs/headroom.min.js"></script>
+<script src="lib/bower_components/headroomjs/jQuery.headroom.min.js"></script>
 
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#banner").headroom({
+			offset: 300
+		});
+	});
+</script>
 
-   
 </head>
 
 <body>
 	
   
-    <div id="banner">
+    <header id="banner" class="headroom">
         <div id="grass-containter">
 			<div class="container">
 				<section class="feature-box">
@@ -65,7 +72,7 @@
 				</section>
 			</div>
         </div>
-    </div>
+    </header>
 	
  	<div id="wrap" class="container"><!--Sticky footer hack: wrap all page content-->
      <div class="row" ng-controller="navCtrl">

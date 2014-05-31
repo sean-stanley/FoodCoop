@@ -24,17 +24,11 @@ controller('MyCtrl1', [
 
 .controller('logoutCtrl', ['$scope', '$location', 'LoginManager',
 	function($scope, $location, LoginManager) {
-		$scope.loginManager = LoginManager;
 
 		$scope.logOut = function() {
-			$scope.loginManager.loginChange(false);
+			LoginManager.logout();
 			$location.path('/home');
 		};
-
-		$scope.logIn = function() {
-			$scope.loginManager.loginChange(true);
-		};
-
 	}
 ])
 
@@ -49,7 +43,9 @@ controller('MyCtrl1', [
 		};
 
 		$scope.submitForm = function() {
-			LoginManager.login(provider, $scope.loginData);
+			LoginManager.login('local', $scope.loginData, function() {
+				$location.path('/my-cart')
+			});
 		};
 	}
 ])
@@ -108,18 +104,28 @@ controller('MyCtrl1', [
 		});
 
 
-
 		$scope.submitForm = function() {
-			UserManager.createUser($scope.userData);
-			$location.path('/thankyou');
+			UserManager.createUser($scope.userData, function() {
+				$location.path('/thankyou');
+			});
 		};
 	}
 ])
 
 .controller('signupInvoiceCtrl', ['$scope',
 	function ($scope) {
-		$scope.cost = '$60';
-		$scope.membership = 'ONE CUSTOMER MEMBERSHIP SHARE';
+		if ($scope.currentUser != null && $scope.currentUser.user_type.name === 'Customer') {
+			$scope.cost = '$60';
+			$scope.membership = 'ONE CUSTOMER MEMBERSHIP SHARE';
+		}
+		else if ($scope.currentUser != null && $scope.currentUser.user_type.name === 'Producer') {
+			$scope.cost = '$120';
+			$scope.membership = 'ONE PRODUCER MEMBERSHIP SHARE';
+		}
+		else {
+			$scope.cost = '';
+			$scope.membership = 'Oops Sorry! Something went wrong and you are not signed in.';
+		}
 	}
 ])
 

@@ -32,6 +32,7 @@ div#grass-containter {
 	width: 50%;
 	min-width: 250px;
 	position: relative;
+	opacity: 0.9;
 }
 
 h1.logo {
@@ -58,9 +59,32 @@ div.login {
 	z-index: 999;
 }
 
-div#banner {
-	background: url(/img/Banner.jpg) center no-repeat;
+#banner {
+	background: url(/img/Grass-Field.jpg) center no-repeat;
 	padding: 50px 0;
 	margin-bottom: 0px;
 	border-bottom: 5px solid #652c4a;
+}
+
+.headroom {
+	-webkit-transition: all 600ms linear;
+	-moz-transition: all 600ms linear;
+	-ms-transition: all 600ms linear;
+	-o-transition: all 600ms linear;
+	transition: all 600ms linear;
+}
+.headroom--pinned {
+	-moz-transform: translateY(0%) ;
+	-webkit-transform: translateY(0%);
+	-o-transform: translateY(0%);
+	-ms-transform: translateY(0%);
+	transform: translateY(0%);
+}
+
+.headroom--unpinned {
+	-moz-transform: translateY(-100%) ;
+	-webkit-transform: translateY(-100%);
+	-o-transform: translateY(-100%);
+	-ms-transform: translateY(-100%);
+	transform: translateY(-100%);
 }
