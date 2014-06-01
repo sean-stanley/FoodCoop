@@ -33,6 +33,7 @@ angular.module('co-op', [ 'ngRoute', 'ngResource', "ngCookies", "ui.bootstrap", 
 				case '/contact':
 				case '/producer-list':
 				case '/users-rights': //remove this before going live	
+				case '/thankyou':
 				    break;
 				default:	        	
 					if ($rootScope.currentUser !== null && next.templateUrl !== '/partials/login.html') {
