@@ -2,8 +2,10 @@
 /*global angular*/
 
 // Declare app level module which depends on filters, and services
-angular.module('co-op', [ 'ngRoute', 'ngResource', "ngCookies", "ui.bootstrap", 'co-op.filters', 'co-op.services', 'co-op.directives', 'co-op.controllers', 'ngAnimate', 'ui.calendar']).
-  config(['$routeProvider', function($routeProvider) {
+angular.module('co-op', [ 'ngRoute', 'ngResource', "ngCookies", "ui.bootstrap", 'co-op.filters', 
+'co-op.services', 'co-op.directives', 'co-op.controllers', 'ngAnimate', 'ui.calendar', 'restangular']).
+
+  config(['$routeProvider', 'RestangularProvider', function($routeProvider, RestangularProvider) {
     $routeProvider.when('/home', {templateUrl: 'partials/index-content.html', controller: 'MyCtrl1'});
     $routeProvider.when('/signup', {templateUrl: 'partials/signup.html', controller: 'userCtrl'});
     $routeProvider.when('/thankyou', {templateUrl: 'partials/thankyou.html', controller: 'signupInvoiceCtrl'});
@@ -23,6 +25,19 @@ angular.module('co-op', [ 'ngRoute', 'ngResource', "ngCookies", "ui.bootstrap", 
     $routeProvider.when('/order-manager', {templateUrl: 'partials/order-manager.html'});
     $routeProvider.when('/store', {templateUrl: 'store.html'});
     $routeProvider.otherwise({redirectTo: '/home'});
+    
+	RestangularProvider.setBaseUrl('/api');
+	RestangularProvider.setRequestInterceptor(function(elem, operation, what) {        
+		if (operation === 'put') {
+			elem._id = undefined;
+			return elem;
+		}
+		return elem;
+	});
+	RestangularProvider.setRestangularFields({
+	  id: "_id"
+	});
+	
   }])
   .run(function($rootScope, $location, LoginManager) {
   

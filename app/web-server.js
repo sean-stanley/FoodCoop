@@ -9,6 +9,7 @@ var util = require('util'),
 	mongoose = require('mongoose'),
 	models = require('./models.js'),
 	API = require('./API.js'),
+	mailer = require('./mailer.js'),
 	passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy;
 
@@ -28,7 +29,6 @@ app.use(forgot.middleware);
 passport.use(models.User.createStrategy());
 passport.serializeUser(models.User.serializeUser());
 passport.deserializeUser(models.User.deserializeUser());
-
 
 
 

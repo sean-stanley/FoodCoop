@@ -9,10 +9,10 @@
 angular.module('co-op.services', [])
 	
 	.factory('Session', function ($resource) {
-		return $resource('/api/session/');
+		return $resource('/auth/session/');
 	})
 	.factory('User', function ($resource) {
-		return $resource('/api/user/:id/', {},
+		return $resource('/api/user/:id/', null,
 		  {
 			'update': {
 			  method:'PUT'

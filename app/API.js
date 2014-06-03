@@ -75,7 +75,7 @@ exports.configAPI = function configAPI(app){
 			product: req.product._id,
 			customer: req.customer._id,
 			quantity: req.quantity,
-			month: req.month-ordered,
+			month: req.monthOrdered,
 		}).save()
 	});
 	app.post("/api/order/delete", function(req, res, next) {

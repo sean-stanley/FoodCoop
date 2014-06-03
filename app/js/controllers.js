@@ -64,23 +64,40 @@ controller('MyCtrl1', [
 		}
 	])
 
-.controller('userAdminCtrl', ['$scope', 'UserManager',
-	function($scope, UserManager) {
+.controller('userAdminCtrl', ['$scope', 'Restangular', '$location',
+	function($scope, Restangular, $location) {
 
-		$scope.userLibrary = UserManager.getUserLibrary();
-		$scope.predicate = 'dateJoined';
+		// First way of creating a Restangular object. Just saying the base URL
+		var allUsers = Restangular.all('user');
 
+		// This will query /accounts and return a promise.
+		allUsers.getList().then(function(users) {
+		  $scope.userLibrary = users;
+		});
+		
+	  $scope.destroy = function() {
+	    original.remove().then(function() {
+	      $location.path('/user-rights');
+	    });
+	  };
 	}
 ])
 
-.controller('userEditingCtrl', ['$scope', 'UserManager',
-	function($scope, UserManager) {
+.controller('userEditingCtrl', ['$scope', 'Restangular', '$location',
+	function($scope, Restangular, $location) {
+		
+		  $scope.destroy = function(idx) {
+		    $scope.userLibrary[idx].remove().then(function() {
+				$scope.userLibrary.splice(idx, 1);
+		    });
+		  };
+		  
 
-		$scope.$watch('user', function(newValue, oldValue) {
-			UserManager.updateUser(newValue);
-			console.log('user changer: ' + newValue); //calls the server to make the change for this user
-		}, true);
-
+		  $scope.save = function(idx) {
+		    $scope.userLibrary[idx].put().then(function() {
+		      $location.path('/user-rights');
+		    });
+		  };
 	}
 ])
 
