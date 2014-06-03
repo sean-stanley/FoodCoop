@@ -13,7 +13,17 @@ angular.module('co-op', [ 'ngRoute', 'ngResource', "ngCookies", "ui.bootstrap", 
     $routeProvider.when('/terms-cons', {templateUrl: 'partials/legal/terms-cons.html'});
     $routeProvider.when('/priv-pol', {templateUrl: 'partials/legal/priv-pol.html'});
 
-    $routeProvider.when('/users-rights', {templateUrl: 'partials/users-rights.html', controller: 'userAdminCtrl'});
+    $routeProvider.when('/users-rights', {templateUrl: 'partials/admin/users-rights.html', controller: 'userAdminCtrl'});
+	$routeProvider.when('/edit/:projectId', {
+	        controller: 'userEditCtrl', 
+	        templateUrl:'detail.html',
+	        resolve: {
+	          user: function(Restangular, $route){
+	            return Restangular.one('user', $route.current.params.userId).get();
+	          }
+	        }
+	      });
+	
     $routeProvider.when('/producer-list', {templateUrl: 'partials/producer-list.html', controller: 'producerListCtrl'});
     $routeProvider.when('/product-upload', {templateUrl: 'partials/product-upload.html', controller: 'productUpload'});
     $routeProvider.when('/producer-profile', {templateUrl: 'partials/edit-producer-profile.html', controller: 'producerCtrl'});

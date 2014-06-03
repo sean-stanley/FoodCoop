@@ -75,27 +75,29 @@ controller('MyCtrl1', [
 		  $scope.userLibrary = users;
 		});
 		
-	  $scope.destroy = function() {
-	    original.remove().then(function() {
-	      $location.path('/user-rights');
-	    });
-	  };
 	}
 ])
 
-.controller('userEditingCtrl', ['$scope', 'Restangular', '$location',
-	function($scope, Restangular, $location) {
+.controller('userEditCtrl', ['$scope', 'Restangular', '$location', 'user',
+	function($scope, Restangular, $location, user) {
 		
-		  $scope.destroy = function(idx) {
-		    $scope.userLibrary[idx].remove().then(function() {
-				$scope.userLibrary.splice(idx, 1);
+		var original = user;
+		  $scope.user = Restangular.copy(original);
+  
+
+		  $scope.isClean = function() {
+		    return angular.equals(original, $scope.user);
+		  }
+
+		  $scope.destroy = function() {
+		    original.remove().then(function() {
+		      $location.path('/');
 		    });
 		  };
-		  
 
-		  $scope.save = function(idx) {
-		    $scope.userLibrary[idx].put().then(function() {
-		      $location.path('/user-rights');
+		  $scope.save = function() {
+		    $scope.project.put().then(function() {
+		      $location.path('/');
 		    });
 		  };
 	}
@@ -109,14 +111,18 @@ controller('MyCtrl1', [
 			email: '',
 			name: '',
 			address: '',
-			user_type: UserManager.userTypes[1]
+			user_type: {
+				name 	: "Customer", 
+				canBuy	: true, 
+				canSell	: false
+			}
 		};
 
-		$scope.$watch('wantsToBeProducer', function(newValue) {
-			if ($scope.wantsToBeProducer) {
-				$scope.userData.user_type = UserManager.userTypes[2];
+		$scope.$watch('userData.user_type.canSell', function(newValue) {
+			if ($scope.userData.user_type.canSell) {
+				$scope.userData.user_type.name = "Producer";
 			} else {
-				$scope.userData.user_type = UserManager.userTypes[1];
+				$scope.userData.user_type.name = "Customer";
 			}
 		});
 

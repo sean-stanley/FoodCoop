@@ -1,0 +1,55 @@
+<form name="userEdit">
+	<div class="form-group">
+		<label for="email">Email address</label>
+		<input ng-model="user.email" name="email" type="email" class="form-control" placeholder="Enter email" autofocus required>
+		<div class="custom-error" ng-show="userEdit.email.$dirty && userEdit.email.$invalid">Sorry:
+			<span ng-show="userEdit.email.$error.required">email is required.</span>
+			<span ng-show="userEdit.email.$error.email">Please, write a valid email address.</span>
+		</div>
+	</div>
+	
+	<div class="form-group">
+		<a href="/password_reset">Reset Password</a>
+	</div>
+	
+	<div class="form-group">
+		<label for="userFullName">Full Name</label>
+		<input ng-model="user.name" name="userFullName" type="text" class="form-control" placeholder="Full Name" required>
+		<div class="custom-error" ng-show="userEdit.userFullName.$dirty && userEdit.userFullName.$invalid">		Sorry:
+			<span ng-show="userEdit.userFullName.$error.required">Full name is required.</span>
+		</div>
+	</div>
+	
+	
+	<div class="form-group" ng-controller="geoCtrl">
+		<label for="address">Address</label>
+		<input type="text" id="Autocomplete" class="form-control" ng-autocomplete="userData.address" details="addressDetails" options="addressOptions" ng-model="user.address"/>
+		
+		<div class="custom-error" ng-show="userEdit.address.$dirty && userEdit.address.$invalid">		Sorry:
+			<span ng-show="userEdit.userFullName.$error.required">A NZ address is required.</span>
+		</div>
+	</div>
+	
+	<div class="form-group">
+		<label for="phone">Phone</label>
+		<input type="tel" class="form-control" ng-model="user.phone" name="phone" placeholder="Enter your preferred phone number" required>
+		<div class="custom-error" ng-show="userEdit.phone.$dirty && userEdit.phone.$invalid">		Sorry:
+			<span ng-show="userEdit.userFullName.$error.required">A valid phone number is needed to quickly sort out issues.</span>
+		</div>
+	</div>
+	
+	<div class="checkbox">
+		<label>Can Sell Products</label>
+		<input type="checkbox" ng-model="user.user_type.canSell">
+	</div>
+	<div class="checkbox">
+		<label>Can Buy Products</label>
+		<input type="checkbox" ng-model="user.user_type.canBuy">
+	</div>
+        <br>
+        <a href="#/" class="btn">Cancel</a>
+        <button ng-click="save()" ng-disabled="isClean() || userEdit.$invalid"
+                class="btn btn-primary">Save</button>
+        <button ng-click="destroy()"
+                ng-show="project._id" class="btn btn-danger">Delete</button>
+      </form>
