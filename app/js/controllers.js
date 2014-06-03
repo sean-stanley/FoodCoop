@@ -32,7 +32,7 @@ controller('MyCtrl1', [
 	}
 ])
 
-.controller('loginCtrl', ['$scope', 'LoginManager',
+.controller('loginCtrl', ['$scope', '$location', 'LoginManager',
 	function($scope, $location, LoginManager) {
 		$scope.showLogin = false;
 
