@@ -31,7 +31,8 @@ angular.module('co-op.services', [])
 			  provider: provider,
 			  email: user.email,
 			  password: user.password,
-			  rememberMe: user.rememberMe
+			  rememberMe: user.rememberMe,
+			  user_type: user.user_type
 			}, function(user) {
 			  $rootScope.currentUser = user;
 			  return cb();
@@ -69,7 +70,6 @@ angular.module('co-op.services', [])
 				  function(user) {
 					$rootScope.currentUser = user;
 					return cb();
-					console.log(user + user.name + 'is now a part of the NNFC')
 				  },
 				  function(err) {
 					return cb(err.data);

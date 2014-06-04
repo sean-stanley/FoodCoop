@@ -14,9 +14,9 @@ angular.module('co-op', [ 'ngRoute', 'ngResource', "ngCookies", "ui.bootstrap", 
     $routeProvider.when('/priv-pol', {templateUrl: 'partials/legal/priv-pol.html'});
 
     $routeProvider.when('/users-rights', {templateUrl: 'partials/admin/users-rights.html', controller: 'userAdminCtrl'});
-	$routeProvider.when('/edit/:projectId', {
+	$routeProvider.when('/user/:userId', {
 	        controller: 'userEditCtrl', 
-	        templateUrl:'detail.html',
+	        templateUrl:'partials/admin/details.html',
 	        resolve: {
 	          user: function(Restangular, $route){
 	            return Restangular.one('user', $route.current.params.userId).get();
@@ -45,7 +45,7 @@ angular.module('co-op', [ 'ngRoute', 'ngResource', "ngCookies", "ui.bootstrap", 
 		return elem;
 	});
 	RestangularProvider.setRestangularFields({
-	  id: "_id"
+		id: '_id.$oid'
 	});
 	
   }])
@@ -59,9 +59,11 @@ angular.module('co-op', [ 'ngRoute', 'ngResource', "ngCookies", "ui.bootstrap", 
 				case '/producer-list':
 				case '/users-rights': //remove this before going live	
 				case '/thankyou':
+				case '/login':
+					
 				    break;
 				default:	        	
-					if ($rootScope.currentUser !== null && next.templateUrl !== '/partials/login.html') {
+					if ($rootScope.currentUser === null && next.templateUrl !== '/partials/login.html') {
 						$location.path("/must-login");
 					}
 		            break;

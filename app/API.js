@@ -94,6 +94,8 @@ exports.configAPI = function configAPI(app){
 			res.send(results)
 		})
 	});
+	
+	
 	app.post("/api/user", function(req, res, next) {    
 		models.User.register(new models.User({
 			dateJoined : Date.now(),
@@ -119,6 +121,7 @@ exports.configAPI = function configAPI(app){
 			user.save();
 			res.send(user);
 	});
+	
 	app.post("api/user/producer/edit", function (req, res, next) {
 		var user = req.user;
 			user.producerData.companyName = req.body.companyName;

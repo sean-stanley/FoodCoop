@@ -5,7 +5,7 @@
 
 <div class="form-group">
 	<label for="search">Search:</label>
-	<input name="search" class="form-control" type="search"/>
+	<input name="search" class="form-control" type="search" ng-model="search"/>
 </div>
 
 <table class="table">
@@ -30,7 +30,7 @@
 	        	        </td>-->
 	        
 	        <td data-title=" 'edit' ">
-	        	<a href="#/edit/{{project._id}}"><span class="glyphicon glyphicon-pencil"></span></a>
+	        	<a href="#/user/{{user._id}}"><span class="glyphicon glyphicon-pencil"></span></a>
 			</td>
 	        <td data-title="'Full Name'" >
 	            {{user.name}}

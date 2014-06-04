@@ -9,7 +9,7 @@ var util = require('util'),
 	mongoose = require('mongoose'),
 	models = require('./models.js'),
 	API = require('./API.js'),
-	mailer = require('./mailer.js'),
+/*	mailer = require('./mailer.js'),*/
 	passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy;
 

@@ -12,7 +12,6 @@ controller('MyCtrl1', [
 	
 	.controller('navCtrl', ['$scope', '$location', 'LoginManager', 'CartRecords',
 		function($scope, $location, LoginManager, CartRecords) {
-			$scope.loginManager = LoginManager;
 			$scope.isActive = function(route) {
 				return route === $location.path();
 			};
@@ -44,7 +43,7 @@ controller('MyCtrl1', [
 
 		$scope.submitForm = function() {
 			LoginManager.login('local', $scope.loginData, function() {
-				$location.path('/my-cart')
+				$location.path('/my-cart');
 			});
 		};
 	}
@@ -87,7 +86,7 @@ controller('MyCtrl1', [
 
 		  $scope.isClean = function() {
 		    return angular.equals(original, $scope.user);
-		  }
+		  };
 
 		  $scope.destroy = function() {
 		    original.remove().then(function() {
@@ -103,8 +102,8 @@ controller('MyCtrl1', [
 	}
 ])
 
-.controller('userCtrl', ['$scope', 'UserManager', 'LoginManager', '$location',
-	function($scope, UserManager, LoginManager, $location) {
+.controller('userCtrl', ['$scope', 'Restangular', 'LoginManager', '$location',
+	function($scope, Restangular, LoginManager, $location) {
 
 		$scope.userData = {
 			password: '',
@@ -128,20 +127,22 @@ controller('MyCtrl1', [
 
 
 		$scope.submitForm = function() {
-			UserManager.createUser($scope.userData, function() {
-				$location.path('/thankyou');
-			});
+			Restangular.all('user').post($scope.userData).then(function(user) {
+			      LoginManager.login('local', user);
+				  $location.path('/thankyou');
+				  
+			    });
 		};
 	}
 ])
 
 .controller('signupInvoiceCtrl', ['$scope',
 	function ($scope) {
-		if ($scope.currentUser != null && $scope.currentUser.user_type.name === 'Customer') {
+		if ($scope.currentUser !== null && $scope.currentUser.user_type.name === 'Customer') {
 			$scope.cost = '$60';
 			$scope.membership = 'ONE CUSTOMER MEMBERSHIP SHARE';
 		}
-		else if ($scope.currentUser != null && $scope.currentUser.user_type.name === 'Producer') {
+		else if ($scope.currentUser !== null && $scope.currentUser.user_type.name === 'Producer') {
 			$scope.cost = '$120';
 			$scope.membership = 'ONE PRODUCER MEMBERSHIP SHARE';
 		}

@@ -1,3 +1,5 @@
+'use strict';
+
 var nodemailer = require('nodemailer');
 
 // Create a SMTP transport object
@@ -66,8 +68,9 @@ var newMemberMessage = {
     ]
 };
 
-console.log('Sending Mail');
-transport.sendMail(message, function(error){
+/*console.log('Sending Mail');*/
+/*
+transport.sendMail(newMemberMessage, function(error){
     if(error){
         console.log('Error occured');
         console.log(error.message);
@@ -76,5 +79,6 @@ transport.sendMail(message, function(error){
     console.log('Message sent successfully!');
 
     // if you don't want to use this transport object anymore, uncomment following line
-    //transport.close(); // close the connection pool
-});
+    transport.close(); // close the connection pool
+});*/
+
