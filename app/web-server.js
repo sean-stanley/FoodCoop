@@ -9,7 +9,7 @@ var util = require('util'),
 	mongoose = require('mongoose'),
 	models = require('./models.js'),
 	API = require('./API.js'),
-/*	mailer = require('./mailer.js'),*/
+	mailer = require('nodemailer'),
 	passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy;
 
@@ -26,6 +26,11 @@ var app = API.configAPI(express());
 
 app.use(express.static(__dirname));
 app.use(forgot.middleware);
+app.set('mailOptions', {
+	host: 'localhost',
+	port: '25',
+	from: 'info@foodcoop.org.nz'
+});
 passport.use(models.User.createStrategy());
 passport.serializeUser(models.User.serializeUser());
 passport.deserializeUser(models.User.deserializeUser());

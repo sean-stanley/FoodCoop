@@ -55,7 +55,7 @@
 <body>
 	
   
-    <header id="banner" class="headroom">
+    <header id="banner">
         <div id="grass-containter">
 			<div class="container">
 				<section class="feature-box">
@@ -73,8 +73,8 @@
 			 <li><a href="/store.html">Store</a></li>
  		</ul>
  		<ul class="nav nav-pills pull-right" ng-controller="logoutCtrl">
- 	        <li ng-class="{active:isActive('/home')}"><a href="#home">Home</a></li>
-	       
+			<li ng-class="{active:isActive('/home')}"><a href="#home">Home</a></li>
+			<li ng-class="{active:isActive('/about')}"><a href="#/about">About Us</a></li>
  			<li ng-class="{active:isActive('/signup')}" ng-hide="currentUser != null"><a href="#signup">Join Us</a></li>
  	        <li ng-class="{active:isActive('/contact')}"><a href="#contact">Contact Us</a></li>
  	        <li><a href="http://foodcoop.org.nz">Blog</a></li>
@@ -92,7 +92,7 @@
                 <ul class="nav nav-pills nav-stacked">
                     <li ng-class="{active:isActive('/producer-list')}"><a href="#/producer-list">Producer List</a></li>
                     <li><a href="#/faq">User FAQ</a></li>
-                    <li ng-class="{active:isActive('/contact')}"><a href="#/contact">Contact us</a></li>
+                    <li ng-class="{active:isActive('/contact')}"><a href="#/contact">Contact Us</a></li>
                 </ul>
                 <br>
                 <ul class="nav nav-pills nav-stacked">
@@ -118,9 +118,23 @@
 </div><!--End hack-->
 
     <div id="footer">
-        <div class="container-fluid">
-            <h3>NNFC</h3>
-			<h4>Local • Sustainable • Affordable</h4>
+        <div class="container">
+            <div class="row">
+				<section class="col-md-6">
+					<h3>NNFC</h3>
+					<h4>Local • Sustainable • Affordable</h4>
+				</section>
+				<section class="col-md-3 col-md-push-4">
+					<nav id="footer-nav">
+						<ul class="nav">
+							<li><a href="#/about">About Us</a></li>
+							<li><a href="#/contact">Contact Us</a></li>
+							<li><a href="#/terms-cons">Terms and Conditions</a></li>
+							<li><a href="#/priv-pol">Privacy Policy</a></li>
+						</ul>
+					</nav>
+				</section>
+			</div>
         </div>
     </div>
     

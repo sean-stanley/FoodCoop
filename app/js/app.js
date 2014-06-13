@@ -23,16 +23,21 @@ angular.module('co-op', [ 'ngRoute', 'ngResource', "ngCookies", "ui.bootstrap", 
 	          }
 	        }
 	      });
-	
+	$routeProvider.when('/about', {templateUrl: 'partials/about.html'});
     $routeProvider.when('/producer-list', {templateUrl: 'partials/producer-list.html', controller: 'producerListCtrl'});
-    $routeProvider.when('/product-upload', {templateUrl: 'partials/product-upload.html', controller: 'productUpload'});
-    $routeProvider.when('/producer-profile', {templateUrl: 'partials/edit-producer-profile.html', controller: 'producerCtrl'});
-    $routeProvider.when('/contact', {templateUrl: 'partials/contact.html', controller: 'contactCtrl'});
+    
+	$routeProvider.when('/product-upload', {templateUrl: 'partials/loggedIn/product-upload.html', controller: 'productUpload'});
+    $routeProvider.when('/producer-profile', {templateUrl: 'partials/loggedIn/edit-producer-profile.html', controller: 'producerCtrl'});
+	$routeProvider.when('/my-cart', {templateUrl: 'partials/loggedIn/my-cart.html'});
+    $routeProvider.when('/order-manager', {templateUrl: 'partials/loggedIn/order-manager.html'});
+
+	$routeProvider.when('/contact', {templateUrl: 'partials/contact.html', controller: 'contactCtrl'});
+	
     $routeProvider.when('/login', {templateUrl: 'partials/login.html'});
     $routeProvider.when('/must-login', {templateUrl: 'partials/must-login.html'});
-    $routeProvider.when('/forgot-password', {templateUrl: 'partials/forgot-password.html', controller: 'resetPwdCtrl'});
-    $routeProvider.when('/my-cart', {templateUrl: 'partials/my-cart.html'});
-    $routeProvider.when('/order-manager', {templateUrl: 'partials/order-manager.html'});
+    $routeProvider.when('/forgot-password', {templateUrl: 'partials/forgot-password.html', controller: 'resetPwdCtrl'}); //needs to be sorted and replaced with the node server script for password resetting. Mailer has to be setup first though.
+    
+
     $routeProvider.when('/store', {templateUrl: 'store.html'});
     $routeProvider.otherwise({redirectTo: '/home'});
     
@@ -54,6 +59,7 @@ angular.module('co-op', [ 'ngRoute', 'ngResource', "ngCookies", "ui.bootstrap", 
         $rootScope.$on( '$routeChangeStart', function(event, next, current) {
         	switch(next.originalPath) {
 				case '/home':
+				case '/about':
 				case '/signup':
 				case '/contact':
 				case '/producer-list':

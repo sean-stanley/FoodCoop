@@ -59,6 +59,7 @@ a:hover {
 
 /* www.\befundoo.com/university/tutorials/angularjs-directives-tutorial/ */
 
+/*
 .rating{
   color: #a9a9a9;
   margin: 0;
@@ -80,4 +81,18 @@ ul.rating {
 
 .rating .filled {
   color: #21568b;
+}*/
+
+#footer {
+	background-color: #652c4a;
+	color: white;
+}
+
+#footer-nav ul.nav > li > a {
+	color: white;
+	font-size: 0.7em;
+}
+
+#footer-nav ul.nav > li > a:hover {
+	color: #652c4a;
 }

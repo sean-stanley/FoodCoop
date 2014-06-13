@@ -1,20 +1,27 @@
 <div class="modal-header">
             <img ng-src="{{data.companyLogo}}" width="200px"/>
-	<h1>{{data.companyName}} <small>{{data.producerName}}</small></h1>
+	<h1>{{data.name}} <small>{{data.ProducerData.companyName}}</small></h1>
         </div>
         <div class="modal-body media">
-            <img class="pull-left" ng-src="{{data.companyImg}}" height="200px"/>
+            <img class="pull-left" ng-src="{{data.ProducerData.companyImg}}" height="200px"/>
 
             <div class="media-body">
-	            {{data.description}}
+				<article>
+					<h2>Company Description</h2>
+					{{data.ProducerData.description}}
+				</article>
+				
 	            <div fundoo-rating rating-value="data.feedbackScore" max="5" readonly="true"></div>
+				<p>Feedback Rating: {{data.producerData.feedbackScore}} This features is just a placeholder and is completely arbitrary</p>
 
 	            
 	            <ul>
-	            	<li><span class="glyphicon glyphicon-earphone"></span>{{data.phone}}</li>
-					<li><a ng-href="mailto:data.email">{{data.email}}</a></li>
-					<li>{{data.address}}</li>
+	            	<li><span class="glyphicon glyphicon-earphone"></span> {{data.phone}}</li>
+					<li><span class="glyphicon glyphicon-envelope"></span> <a ng-href="mailto:data.email">{{data.email}}</a></li>
+					<li><span class="glyphicon glyphicon-map-marker"></span> {{data.address}}</li>
 	            </ul>
+				<br>
+				
             </div>
 
         </div>

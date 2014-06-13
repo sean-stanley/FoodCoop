@@ -128,17 +128,22 @@ angular.module('co-op.services', [])
 		};
 	})
 	
-	.factory('ProductManager', ['$http', function($http) {
+	.factory('ProductManager', ['$http', 'Restangular', function($http, Restangular) {
 		return {
 			registerProduct : function(productData) {
-				$http.post("api/product", productData);
+				//$http.post("api/product", productData);
+				Restangular.all('product').post(productData);
 			},
 			
 			productCategories : function(callback){
-				$http.get("api/category").success(callback);
+				Restangular.all("category").success(callback);
 			},
 			certificationTypes: function(callback){
-				$http.get("api/certification").success(callback);
+				Restangular.all("certification").success(callback);
+			},
+			
+			getUserProducts: function(callback){
+				$http.get("api/product?producerCompany=:user.producerData.companyName");
 			}
 
 		};

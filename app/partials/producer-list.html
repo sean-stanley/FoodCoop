@@ -8,7 +8,7 @@
 Sort by: 
 <ul class="nav nav-pills">
 	<li><a ng-click="predicate= 'feedbackScore'; reverse=!reverse">Feedback Rating</a></li>
-	<li><a ng-click="predicate= 'dateJoined'; reverse=!reverse">Company Name</a></li>
+	<li><a ng-click="predicate= 'dateJoined'; reverse=!reverse">Date Joined</a></li>
 	<li><a ng-click="predicate= 'companyName'; reverse=!reverse">Company Name</a></li>
 	<li><a ng-click="predicate= 'producerName'; reverse=!reverse">Producer Name</a></li>
 	<li><a ng-click="predicate= 'rating'; reverse=!reverse">Producer Name</a></li>
@@ -17,15 +17,14 @@ Sort by:
 
 <div class="media" ng-repeat="i in producerList | orderBy:predicate:reverse | filter:search" ng-click="open(i)">
 	<a href="" class="pull-right">
-		<img ng-src="{{i.companyLogo}}" height="100px"/>
-		<img ng-src="{{i.companyImg}}" height="100px"/>
+		<img ng-src="{{i.producerData.companyLogo}}" height="100px"/>
+		<img ng-src="{{i.producerData.companyImg}}" height="100px"/>
 	</a>
 
 	<div class="media-body">
-		<h4>{{i.companyName}} <small>{{i.producerName}}</small></h4>
+		<h4>{{i.producerData.companyName}} <small>{{i.name}}</small></h4>
 		<a ng-href="mailto:{{i.email}}">{{i.email}}</a>
 		<div fundoo-rating rating-value="i.feedbackScore" max="5" readonly="true"></div>
 	</div>
 	
-
 </div>

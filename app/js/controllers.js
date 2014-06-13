@@ -136,13 +136,13 @@ controller('MyCtrl1', [
 	}
 ])
 
-.controller('signupInvoiceCtrl', ['$scope',
-	function ($scope) {
-		if ($scope.currentUser !== null && $scope.currentUser.user_type.name === 'Customer') {
+.controller('signupInvoiceCtrl', ['$scope', '$rootScope',
+	function ($scope, $rootScope) {
+		if ($rootScope.currentUser !== null && $rootScope.currentUser.user_type.name === 'Customer') {
 			$scope.cost = '$60';
 			$scope.membership = 'ONE CUSTOMER MEMBERSHIP SHARE';
 		}
-		else if ($scope.currentUser !== null && $scope.currentUser.user_type.name === 'Producer') {
+		else if ($rootScope.currentUser !== null && $rootScope.currentUser.user_type.name === 'Producer') {
 			$scope.cost = '$120';
 			$scope.membership = 'ONE PRODUCER MEMBERSHIP SHARE';
 		}
@@ -159,7 +159,7 @@ controller('MyCtrl1', [
 		$scope.addressOptions = {
 			country: 'nz',
 		};
-		$scope.details = '';
+		$scope.details = {};
 
 	}
 ])
@@ -209,8 +209,8 @@ controller('MyCtrl1', [
 	}
 ])
 
-.controller('productUpload', ['$scope', 'ProductManager', 'ProductHistory',
-	function($scope, ProductManager, ProductHistory) {
+.controller('productUpload', ['$scope', '$rootScope', 'ProductManager', 'ProductHistory',
+	function($scope, $rootScope, ProductManager, ProductHistory) {
 		//	  $scope.theImage = ''; //sets empty variable to be populated if user uses the input[type=file] method to upload an image
 
 		ProductHistory.getData(function(result) {
@@ -238,7 +238,10 @@ controller('MyCtrl1', [
 				$scope.ingredients = newValue.ingredients;
 			}
 		});
-		$scope.productData = {};
+		$scope.productData = {
+			producerName: $rootScope.currentUser.name,
+			producerCompany: $rootScope.currentUser.producerData.companyName
+		};
 
 		ProductManager.productCategories(function(results) {
 			$scope.categories = results;
@@ -246,7 +249,6 @@ controller('MyCtrl1', [
 			$scope.productData.dateUploaded = Date();
 			$scope.productData.category = $scope.category.name;
 			$scope.availableUnits = $scope.category.availableUnits;
-
 		});
 
 		ProductManager.certificationTypes(function(results) {
