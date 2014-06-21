@@ -11,11 +11,14 @@ var ProductSchema = new Schema({
 			quantity: {type: Number, required: true},
 			units: {type: String, required: true},
 			refrigeration: {type: String, required: true},
+			
 			ingredients: {type: String, required: false},
-			description: {type: String, required: true},
-			certification: {type: String},
+			description: {type: String, required: false},
+			certification: {type: String, required: false},
+			
 			producerName: {type: String, required: true},
-			producerCompany: {type: String, required: true}
+			producerCompany: {type: String, required: true},
+			producer_ID: {type:Schema.ObjectId, required: true}
 });
 var OrderSchema = new Schema({
 		datePlaced: {type: Date, default: Date.now()},
@@ -42,15 +45,14 @@ var UserSchema = new Schema({
 							logo : {},
 							description : {type: String},
 							certification : {type: String},
-							feedbackScore : {type: Number},
-							approved : {type: Boolean, default: false}
+							feedbackScore : {type: Number}
 						}
 });
 var CategorySchema = new Schema({
 			name:{type: String, required: true},
 			placeholderName:{type: String, required: true},
 			placeholderVariety:{type: String, required: true},
-			availableUnits:{type: Array, required: true},
+			availableUnits:{type: Array, required: true}, //Is this right? this should mean that categories have a list of strings that are the available units. 
 			ingredients:{type: Boolean}
 });
 var LocationSchema = new Schema({

@@ -20,7 +20,7 @@ angular.module('co-op.services', [])
 		});
 	})
 	.factory('LoginManager', function Auth($location, $rootScope, Session, User, $cookieStore) {
-		$rootScope.currentUser = $cookieStore.get('user') || null;
+		$rootScope.currentUser = $cookieStore.get('User') || null;
 		$cookieStore.remove('user');
 
 		return {
@@ -32,7 +32,7 @@ angular.module('co-op.services', [])
 			  email: user.email,
 			  password: user.password,
 			  rememberMe: user.rememberMe,
-			  user_type: user.user_type
+			  user_type: User.user_type
 			}, function(user) {
 			  $rootScope.currentUser = user;
 			  return cb();
@@ -110,8 +110,8 @@ angular.module('co-op.services', [])
 			removeUser: function(email, password, callback) {
 				var cb = callback || angular.noop;
 				User.delete({
-				  email: email,
-				  password: password
+				 	email: email,
+				 	password: password
 				}, function(user) {
 					console.log(user + 'removed');
 					return cb();
@@ -135,12 +135,9 @@ angular.module('co-op.services', [])
 				Restangular.all('product').post(productData);
 			},
 			
-			productCategories : function(callback){
-				Restangular.all("category").success(callback);
-			},
-			certificationTypes: function(callback){
-				Restangular.all("certification").success(callback);
-			},
+			productCategories : Restangular.all("category").getList().$object,
+			
+			certificationTypes: Restangular.all("certification").getList().$object,
 			
 			getUserProducts: function(callback){
 				$http.get("api/product?producerCompany=:user.producerData.companyName");
@@ -257,20 +254,22 @@ angular.module('co-op.services', [])
 		};
 		
 		return module;
-	}])
+	}]);
 
 	
+	/*
 	.service('LocationService',  ['$http', function($http) {
-        var data;
-		
-        this.getLocations = function(callback) {
-			$http.get("/api/location").success(callback);
-	    };
-
-        this.addLocation = function(locationData) {
-            data.push(locationData);
-			$http.post("/api/location", locationData);
-        };
-		
-
-    }]);
+	        var data;
+			
+	        this.getLocations = function(callback) {
+				$http.get("/api/location").success(callback);
+		    };
+	
+	        this.addLocation = function(locationData) {
+	            data.push(locationData);
+				$http.post("/api/location", locationData);
+	        };
+			
+	
+	    }]);   ------- Waiting to be deleted as no longer needed ---------*/ 
+	

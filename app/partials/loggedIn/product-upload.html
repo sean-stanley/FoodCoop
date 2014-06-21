@@ -52,12 +52,12 @@
 	<div id="product-upload-form-container" class="col-md-8" >
 		<form name="productUpload" autocomplete="on" ng-submit="submitForm();" novalidate>
 			<fieldset>
-				<legend>Upload a Product {{username}}</legend>
+				<legend>Upload a Product {{currentUser.name}}</legend>
 					<div class="row">
 						<div class="form-group col-md-6">
 							<label for="Category">Product Category</label>
-							<select ng-model="productData.category" ng-selected="productData.category" name="category" class="form-control" id="category-menu" required>
-								<option ng-repeat="item in categories">{{item.name}}</option>
+							<select ng-model="productData.category" ng-options="category.name for category in categories" name="category" class="form-control" id="category-menu" required>
+								<option value="">--- Select a Category ---</option>
 							</select>
 						</div>
 						<div class="form-group col-md-6">
@@ -70,11 +70,11 @@
 					<div class="row">
 						<div class="form-group col-md-6">
 							<label for="inputName">Product Name</label>
-							<input ng-model="productData.productName" type="text" class="form-control" id="inputName" maxlength="12" placeholder="e.g. {{category.placeholderName}}" autofocus required>
+							<input ng-model="productData.productName" type="text" class="form-control" id="inputName" maxlength="12" placeholder="e.g. {{productData.category.placeholderName}}" autofocus required>
 						</div>
 						<div class="form-group col-md-6">
 							<label for="inputVariety" ng-model="variety">Variety</label>
-							<input ng-model="productData.variety" type="text" class="form-control" id="inputVariety" maxlength="18" placeholder="e.g. {{category.placeholderVariety}}">
+							<input ng-model="productData.variety" type="text" class="form-control" id="inputVariety" maxlength="18" placeholder="e.g. {{productData.category.placeholderVariety}}">
 						</div>
 					</div>
 				
@@ -86,8 +86,8 @@
 						
 					    <div class="form-group col-md-4">
 							<label for="units">Quantity Units</label>
-							<select ng-model="productData.units" ng-selected="productData.units" name="units" id="units" class="form-control" required>
-								<option ng-repeat="item in availableUnits">{{item}}</option>
+							<select ng-model="productData.units" ng-options="unit for unit in productData.category.availableUnits" name="units" id="units" class="form-control" required>
+								<option value="">--- Select a Unit of Measurement ---</option>
 							</select>
 					    </div>
 					    

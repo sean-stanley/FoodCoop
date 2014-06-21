@@ -69,7 +69,7 @@ controller('MyCtrl1', [
 		// First way of creating a Restangular object. Just saying the base URL
 		var allUsers = Restangular.all('user');
 
-		// This will query /accounts and return a promise.
+		// This will query /user and return a promise.
 		allUsers.getList().then(function(users) {
 		  $scope.userLibrary = users;
 		});
@@ -209,8 +209,8 @@ controller('MyCtrl1', [
 	}
 ])
 
-.controller('productUpload', ['$scope', '$rootScope', 'ProductManager', 'ProductHistory',
-	function($scope, $rootScope, ProductManager, ProductHistory) {
+.controller('productUpload', ['$scope', '$rootScope', 'ProductManager', 'ProductHistory', 'Restangular',
+	function($scope, $rootScope, ProductManager, ProductHistory, Restangular) {
 		//	  $scope.theImage = ''; //sets empty variable to be populated if user uses the input[type=file] method to upload an image
 
 		ProductHistory.getData(function(result) {
@@ -229,33 +229,66 @@ controller('MyCtrl1', [
 			console.log($scope.productData);
 			// pass product to productUpload controller $scope.productData
 		};
-
+		
+		
 		$scope.ingredients = false; //show or hide ingredients field
 
+		/*
 		$scope.$watch('productData.category', function(newValue, oldValue) {
-			if (newValue) {
-				$scope.availableUnits = newValue.availableUnits;
-				$scope.ingredients = newValue.ingredients;
+					if (newValue) {
+						$scope.availableUnits = newValue.availableUnits;
+						$scope.ingredients = newValue.ingredients;
+					}
+				});*/
+		
+		
+		
+		// The following two functions should be removed at some stage and .productData modified to just use producer_ID to find out info about the producer
+		$scope.producerName = function() {
+			var el = "";
+			if ($rootScope.currentUser.name) {
+				el = $rootScope.currentUser.name;
 			}
-		});
-		$scope.productData = {
-			producerName: $rootScope.currentUser.name,
-			producerCompany: $rootScope.currentUser.producerData.companyName
+			else {
+				el = "No Producer details saved";
+			}
+			return el;
 		};
+		
+		$scope.producerCompany = function() {
+			var el = "";
+			if ($rootScope.currentUser.producerData) {
+				el = $rootScope.currentUser.producerData.companyName;
+			}
+			else {
+				el = "No Producer Company saved";
+			}
+			return el;
+		};
+		
+		$scope.productData = {
+			dateUploaded : Date(),
+			producerName: $scope.producerName,
+			producerCompany: $scope.producerCompany,
+			producer_ID: null //Need to set this to the object ID of the user once the currentUser object gets those properties from the database 
+		};
+		
+		// First way of creating a Restangular object. Just saying the base URL
+		var categories = Restangular.all('category');
 
-		ProductManager.productCategories(function(results) {
-			$scope.categories = results;
-			$scope.category = results[0]; // set produce to default
-			$scope.productData.dateUploaded = Date();
-			$scope.productData.category = $scope.category.name;
-			$scope.availableUnits = $scope.category.availableUnits;
+		// This will query /category and return a promise.
+		categories.getList().then(function(categories) {
+		  $scope.categories = categories;
+		  $scope.category = $scope.categories[0]; // sets the category produce to be the default
+		  $scope.productData.category = $scope.category.name;
 		});
-
-		ProductManager.certificationTypes(function(results) {
-			$scope.certifications = results;
-			$scope.productData.certification = results[0].name;
+		
+		var certifications = Restangular.all('certification');
+		
+		certifications.getList().then(function(certification) {
+			$scope.certifications = certification;
+			$scope.productData.certification = $scope.certifications[0].name;
 		});
-
 
 		$scope.submitForm = function() {
 			ProductManager.registerProduct($scope.productData);
