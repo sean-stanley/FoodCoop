@@ -13,6 +13,10 @@ Install the necessary modules:
 
 Run Mongodb
 
+Then install test data
+
+    node scripts/test_data.js
+
 Developing
 ==========
 
