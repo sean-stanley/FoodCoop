@@ -2,8 +2,18 @@
 /*global angular*/
 
 // Declare app level module which depends on filters, and services
-angular.module('co-op', [ 'ngRoute', 'ngResource', "ngCookies", "ui.bootstrap", 'co-op.filters', 
-'co-op.services', 'co-op.directives', 'co-op.controllers', 'ngAnimate', 'ui.calendar', 'restangular']).
+angular.module('co-op', [ 
+	'ngRoute', 
+	'ngResource', 
+	'ngCookies', 
+	'co-op.filters', 
+	'co-op.services', 
+	'co-op.directives', 
+	'co-op.controllers', 
+	'ngAnimate', 
+	'ui.calendar',
+	'ui.bootstrap',
+	'restangular']).
 
   config(['$routeProvider', 'RestangularProvider', function($routeProvider, RestangularProvider) {
     $routeProvider.when('/home', {templateUrl: 'partials/index-content.html', controller: 'MyCtrl1'});

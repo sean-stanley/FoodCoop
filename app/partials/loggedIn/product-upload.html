@@ -56,7 +56,7 @@
 					<div class="row">
 						<div class="form-group col-md-6">
 							<label for="Category">Product Category</label>
-							<select ng-model="productData.category" ng-options="category.name for category in categories" name="category" class="form-control" id="category-menu" required>
+							<select ng-model="productData.category" ng-options="category._id as category.name for category in categories" name="category" class="form-control" id="category-menu" required>
 								<option value="">--- Select a Category ---</option>
 							</select>
 						</div>
@@ -119,8 +119,7 @@
 			    
 			    <div class="checkbox">
 					<label for="certification">Certification (select those that apply)</label>
-					<select ng-model="productData.certification" ng-selected="productData.certification" name="certification" class="form-control">
-						<option ng-repeat="c in certifications">{{c.name}}</option>
+					<select ng-model="productData.certification" ng-selected="productData.certification" ng-options="c.name for c in certifications" name="certification" class="form-control">
 					</select>
 			    </div>
 			    

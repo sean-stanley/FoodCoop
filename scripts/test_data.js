@@ -59,6 +59,7 @@ var sample_users = [
 		}
 
 	}, {
+		_id: 0,
 		dateJoined: Date.now(),
 		name: 'Matt Stanley',
 		producerData: {
@@ -125,7 +126,7 @@ var sample_categories = [
 		ingredients: true
 	},
 	{
-		name:'Produce',
+		name:'Baked Goods',
 		placeholderName: 'Bread',
 		placeholderVariety: 'Gluten-Free',
 		availableUnits: ['kg', 'loaf', 'dozen', 'baker\'s dozen', 'package', 'unit'],
@@ -142,23 +143,15 @@ var sample_categories = [
 		name:'Dairy',
 		placeholderName: 'Cheese',
 		placeholderVariety: 'Cottage',
-		availableUnits: ['kg', '100g', 'container', 'L', '500ml', 'unit'],
-		ingredients: true
-	},
-	{
-		name:'Dairy',
-		placeholderName: 'Cheese',
-		placeholderVariety: 'Cottage',
 		availableUnits: ['L', '500ml', 'litres per week', 'litres biweekly'],
 		ingredients: true
 	}
 ]
 
 
-var sample_products =
-	[{
-	dateUploaded: '24/9/13',
-	category: 'Baked Goods',
+var sample_products = [
+{
+	dateUploaded: Date('24/9/14'),
 	productName: 'Buns',
 	variety: 'Whole Wheat',
 	price: 3.5,
@@ -167,13 +160,22 @@ var sample_products =
 	refrigeration: 'refrigeration',
 	ingredients: 'whole wheat, water, poppy seeds, sunflower seeds, sesame seeds, sugar, oil, yeast, salt',
 	description: 'Freshly baked buns topped with a delcious variety of seeds. The buns were baked in Kerikeri by loving hands. The hands in question were washed very thouroughly and covered in latex gloves during the entire baking process.',
-	certification: 'BioGro',
-	producerName: 'Matt Stanley',
-	producerCompany: 'Northland Naturals',
 	img: 'buns.jpg'
-}, {
-	dateUploaded: '24/10/13',
-	category: 'Produce',
+}, 
+{
+	dateUploaded: Date('24/9/14'),
+	productName: 'Jam',
+	variety: 'Strawberry',
+	price: 4.5,
+	quantity: 4,
+	units: 'dozen',
+	refrigeration: 'refrigeration',
+	ingredients: 'strawberries, raw sugar, pectin',
+	description: 'Freshly baked buns topped with a delcious variety of seeds. The buns were baked in Kerikeri by loving hands. The hands in question were washed very thouroughly and covered in latex gloves during the entire baking process.',
+	img: 'buns.jpg'
+},
+{
+	dateUploaded: Date('24/10/14'),
 	productName: 'Grapefruit',
 	variety: 'Pink',
 	price: 2.5,
@@ -182,13 +184,9 @@ var sample_products =
 	refrigeration: 'none',
 	ingredients: null,
 	description: 'These delicious pink grapefruit were grown in Whangarei without any artificial fertilier, insecticides or herbicides. In fact, every morning we get up and sing to the tree and ask the fey spirits to bless it and make it bountiful. It worked I think as we have more fruit now than my family can eat.',
-	certification: 'Assure Quality',
-	producerName: 'Matt Stanley',
-	producerCompany: 'Northland Naturals',
 	img : 'grapefruit.jpg'
 }, {
-	dateUploaded: '12/11/13',
-	category: 'Meat',
+	dateUploaded: Date('12/11/14'),
 	productName: 'Sausages',
 	variety: 'Gluten-Free',
 	price: 12.5,
@@ -197,13 +195,9 @@ var sample_products =
 	refrigeration: 'frozen',
 	ingredients: 'Organic pork, gluten-free breadcrumbs, salt, spices, smoke, tender-loving care',
 	description: 'These delicious pink grapefruit were grown in Whangarei without any artificial fertilier, insecticides or herbicides. In fact, every morning we get up and sing to the tree and ask the fey spirits to bless it and make it bountiful. It worked I think as we have more fruit now than my family can eat.',
-	certification: 'none',
-	producerName: 'Matt Stanley',
-	producerCompany: 'Northland Naturals',
 	img : 'sausages.jpg'
 }, {
-	dateUploaded: '2/11/13',
-	category: 'Dairy',
+	dateUploaded: Date('2/11/13'),
 	productName: 'Yoghurt',
 	variety: 'Raw',
 	price: 4,
@@ -212,13 +206,9 @@ var sample_products =
 	refrigeration: 'refrigeration',
 	ingredients: 'raw milk, culture',
 	description: 'Raw Milk certified Demeter, made in Waipu',
-	certification: 'Demeter Biodynamics',
-	producerName: 'Lisa Taylor',
-	producerCompany: 'Northland Naturals 2',
 	img : 'yogurt-tawar.jpg'
 }, {
-	dateUploaded: '7/11/13',
-	category: 'Raw Milk',
+	dateUploaded: Date('7/11/13'),
 	productName: 'Goat Milk',
 	variety: 'Raw',
 	price: 2,
@@ -227,9 +217,6 @@ var sample_products =
 	ingredients: 'milk',
 	refrigeration: 'refrigeration',
 	description: 'Raw Goats Milk certified Organic Farm NZ. Goats raised naturally in Tutukaka.',
-	certification: 'Organic Farm NZ',
-	producerName: 'Lisa Taylor',
-	producerCompany: 'Northland Naturals 2',
 	img : 'milk.jpg'
 }];
 
@@ -241,18 +228,21 @@ for (i = 0; i < sample_users.length; i++) {
 };
 for (i = 0; i < sample_products.length; i++) {
 	new models.Product(sample_products[i]).save(function(err) {
+		if (err) console.log(err);
 		console.dir("Product saved")
 	});
 };
 
 for (i = 0; i < sample_certifications.length; i++) {
 	new models.Certification(sample_certifications[i]).save(function(err) {
+		if (err) console.log(err);
 		console.dir("Certification saved")
 	});
 };
 
 for (i = 0; i < sample_categories.length; i++) {
 	new models.Category(sample_categories[i]).save(function(err) {
+		if (err) console.log(err);
 		console.dir("Category saved")
 	});
 };

@@ -267,7 +267,6 @@ controller('MyCtrl1', [
 		};
 		
 		$scope.productData = {
-			dateUploaded : Date(),
 			producerName: $scope.producerName,
 			producerCompany: $scope.producerCompany,
 			producer_ID: null //Need to set this to the object ID of the user once the currentUser object gets those properties from the database 
@@ -376,9 +375,16 @@ controller('MyCtrl1', [
 	}
 ])
 
-.controller('storeCtrl', ['$scope', '$filter', '$modal', 'ProductManager',
-	function($scope, $filter, $modal, ProductManager) {
-		$scope.products = ProductManager.products();
+.controller('storeCtrl', ['$scope', '$filter', '$modal', 'Restangular',
+	function($scope, $filter, $modal, Restangular) {
+		
+		$scope.products = Restangular.all('product').getList().$object;
+		
+		$scope.blurb = function(string, length, link) {
+			if (string.length < length) {
+				return string.splice(0, length) + "<a href="+ link +">more...</a>";
+			}
+		};
 		
 		$scope.open = function(product) {
 			console.log('$scope.open got called for' + product);
@@ -407,23 +413,18 @@ controller('MyCtrl1', [
 
 .controller('calendarCtrl', ['$scope',
 	function($scope) {
-		var date = new Date();
-		var d = date.getDate();
-		var m = date.getMonth();
-		var y = date.getFullYear();
+		
 
-		$scope.eventSources = [
-		{
+		$scope.eventSources = {
 			url: "http://www.google.com/calendar/embed?src=sean%40maplekiwi.com&ctz=Pacific/Auckland",
 			className: 'gcal-event', // an option!
 			currentTimezone: 'Pacific/Auckland' // an option!
-		},
-		];
+		};
 
 		/* config object */
 		$scope.uiConfig = {
 			calendar: {
-				height: 450,
+				height: 200,
 				editable: false,
 				header: {
 					left: 'title',

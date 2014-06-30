@@ -4,7 +4,7 @@ var passportLocalMongoose = require('passport-local-mongoose');
 
 var ProductSchema = new Schema({
 			dateUploaded: {type: Date, required: true},
-			category: {type: String, required: true},
+			category: {type: Schema.ObjectId, required: false},
 			productName: {type: String, required: true},
 			variety: {type: String, required: true},
 			price: {type: Number, required: true},
@@ -14,11 +14,8 @@ var ProductSchema = new Schema({
 			
 			ingredients: {type: String, required: false},
 			description: {type: String, required: false},
-			certification: {type: String, required: false},
-			
-			producerName: {type: String, required: true},
-			producerCompany: {type: String, required: true},
-			producer_ID: {type:Schema.ObjectId, required: true}
+			certification: {type: Schema.ObjectId, required: false},
+			producer_ID: {type:Schema.ObjectId, required: false}
 });
 var OrderSchema = new Schema({
 		datePlaced: {type: Date, default: Date.now()},
@@ -52,16 +49,10 @@ var CategorySchema = new Schema({
 			name:{type: String, required: true},
 			placeholderName:{type: String, required: true},
 			placeholderVariety:{type: String, required: true},
-			availableUnits:{type: Array, required: true}, //Is this right? this should mean that categories have a list of strings that are the available units. 
+			availableUnits:{type: Array, required: true},
 			ingredients:{type: Boolean}
 });
-var LocationSchema = new Schema({
-			name:{type: String, required: true},
-			value:{type: String, required: true},
-			fromWhangarei:{type: String, required: true},
-			distance:{type: String, required: true},
-			maps:{type: String, required: true}
-});
+
 var CertificationSchema = new Schema({
 			name:{type: String, required: true},
 			img:{type: String}
@@ -72,6 +63,5 @@ exports.Product = mongoose.model('Product', ProductSchema);
 exports.Order = mongoose.model('Order', OrderSchema);
 exports.User = mongoose.model('User', UserSchema);
 exports.Category = mongoose.model('Category', CategorySchema);
-exports.Location = mongoose.model('Location', LocationSchema);
 exports.Certification = mongoose.model('Certification', CertificationSchema);
 

@@ -9,6 +9,7 @@ var util = require('util'),
 	models = require('./models.js'),
 	passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy;
+
 exports.configAPI = function configAPI(app){
 	app.configure(function(){
 		app.use(express.bodyParser());

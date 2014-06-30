@@ -19,8 +19,7 @@
 	"angular-bootstrap": "latest",
 	"angular-ui-calendar" : "latest",
 	"jquery" : "latest",
-	"jquery-ui" : "latest",
-	"headroom.js" : "latest"
+	"jquery-ui" : "latest"
   },
   "resolutions": {
     "jquery": ">=1.6"
