@@ -381,9 +381,15 @@ controller('MyCtrl1', [
 		$scope.products = Restangular.all('product').getList().$object;
 		
 		$scope.blurb = function(string, length, link) {
+		if (string) {
 			if (string.length < length) {
 				return string.splice(0, length) + "<a href="+ link +">more...</a>";
 			}
+		}
+		else {
+			console.log(string + 'is not defined or being passed properly.');
+		}
+			
 		};
 		
 		$scope.open = function(product) {
@@ -398,7 +404,9 @@ controller('MyCtrl1', [
 				}
 			});
 
-			
+			$scope.addToCart = function() {
+				console.log("user added an item to the cart");
+			};
 
 			modalInstance.result.then(function(selectedItem) {
 				$scope.selected = selectedItem;
@@ -414,27 +422,6 @@ controller('MyCtrl1', [
 .controller('calendarCtrl', ['$scope',
 	function($scope) {
 		
-
-		$scope.eventSources = {
-			url: "http://www.google.com/calendar/embed?src=sean%40maplekiwi.com&ctz=Pacific/Auckland",
-			className: 'gcal-event', // an option!
-			currentTimezone: 'Pacific/Auckland' // an option!
-		};
-
-		/* config object */
-		$scope.uiConfig = {
-			calendar: {
-				height: 200,
-				editable: false,
-				header: {
-					left: 'title',
-					center: '',
-					right: 'today prev,next'
-				},
-				dayClick: $scope.alertEventOnClick,
-				eventDrop: $scope.alertOnDrop,
-				eventResize: $scope.alertOnResize
-			}
-		};
+		//make a service for calling the ordering dates here to use in the scope.
 	}
 ]);

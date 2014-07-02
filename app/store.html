@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="css/animations.css" title="animations" type="text/css" media="screen">
 	<link rel="stylesheet" href="lib/bower_components/fullcalendar/fullcalendar.css" type="text/css" media="screen">
 
-	 <script src="http://code.jquery.com/jquery-latest.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
 	<!-- project-specific angular data here -->
 	<script src="lib/angular/angular.min.js" type="text/javascript" charset="utf-8"></script>
@@ -48,8 +47,9 @@
 			
 			<div id="sidebar" ng-show="panelDisplay">
 	            <button class="btn btn-default panel-btn" ng-click="panelDisplay = false" ng-model="panelDisplay">&times;</button>
-	            
-				<ng-include src=" 'partials/login-store.html' "></ng-include>
+	            <section ng-if="!currentUser">
+					<ng-include src=" 'partials/login-store.html' "></ng-include>
+				</section>
 	            <p>
 	                Ordering closes in <span class="highlight">5</span> days<br>
 	                Delivery Day is in <span class="highlight">14</span> days
@@ -58,7 +58,17 @@
 				<accordion>
 				    <accordion-group is-open="isopen">
 				        <accordion-heading>
-				            {{user.name}} Cart <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isopen, 'glyphicon-chevron-right': !isopen}"></i>
+				            Calendar <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isopen, 'glyphicon-chevron-right': !isopen}"></i>
+				        </accordion-heading>
+						<div id="calendar">
+							<div id="calendar-container" ng-controller="calendarCtrl">
+							<p>Three days left to upload products. Ordering is currently not enabled. Try again next week.<p>
+							</div>
+						</div>
+					</accordion-group>
+					 <accordion-group is-open="isopen2">
+				        <accordion-heading>
+				            {{currentUser.name}} Cart <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isopen2, 'glyphicon-chevron-right': !isopen2}"></i>
 				        </accordion-heading>
 						<div id="table-div" ng-controller="cartTableCtrl">
 						[ <a href="" ng-click="predicate=''">unsorted</a> ]
@@ -98,14 +108,10 @@
 					</accordion-group>
 				  </accordion>
 				  
-				<div id="calendar">
-					<div id="calendar-container" ng-controller="calendarCtrl">
-						<div ui-calendar="uiConfig.calendar" ng-model="eventSources" calendar="coopCalendar" class="calendar"></div>
-					</div>
+				
 					
 				</div>
 				
-			</div>
 			
 			
 			<div class="container-fluid" id="store">
@@ -140,13 +146,13 @@
 							<figure class="first-layer">
 								<img ng-src="upload-imgs/products/{{product.img}}">
 								<figcaption>
-									<h5>{{product.variety}} {{product.name}}</h5>
+									<h5>{{product.variety}} {{product.productName}}</h5>
 									<p>{{1.2 * product.price|currency}} / {{product.units}}</p>
 									
 							</figure>
 							<section class="details-layer" ng-click="open(product)">
 								<article class="details">
-									<h3>{{product.variety}} {{product.name}}</h3>
+									<h3>{{product.variety}} {{product.productName}}</h3>
 									<p ng-bind="blurb(product.description, 200)"></p>
 									<button class"btn btn-primary" ng-click="addToCart()">Add to Cart</button>
 								</article>

@@ -39,10 +39,12 @@ a:hover {
 
 #sidebar {
 	margin: 0 20px;
-	width: 35%;
+	width: 30%;
 	float: left;
     -webkit-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
     transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+	background: #1d1d1d;
+	color: #fff;
 }
 
 #products-section {
@@ -54,6 +56,8 @@ a:hover {
     -webkit-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
     transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
 }
+
+.details {background: #c5c5c5;}
 
 
 
