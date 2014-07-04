@@ -30,8 +30,8 @@ exports.configAPI = function configAPI(app){
 			for (var i = results.length - 1; i >= 0; i--) {
 				var shortDescription = results[i].description;
 					if (shortDescription.length < lengthToCutTo) {
-						shortDescription = shortDescription.splice(0, lengthToCutTo) 
-						+ '<button class="btn btn-link" ng-click="open('+link+')"> more...</button>';
+						shortDescription = shortDescription.slice(0, lengthToCutTo) 
+						+ '<button class="btn btn-link" ng-click="open('+ '#' +')"> more...</button>';
 					}
 					
 					results[i].shortDescription = shortDescription;
