@@ -134,7 +134,7 @@
 			<div id="products-section">
 				<ul id="store-products">
 					<li ng-repeat="product in products | orderBy:sort " class="product-container" ng-controller="productUICtrl" ng-mouseleave="detailsVisible = false">
-						<figure class="first-layer" ng-mouseover="callDelayed()">
+						<figure class="first-layer" ng-mouseover="callDelayed()" ng-mouseleave="callCancelled()">
 							<img ng-src="upload-imgs/products/{{product.img}}">
 							<figcaption>
 								<h5>{{product.variety}} {{product.productName}}</h5>

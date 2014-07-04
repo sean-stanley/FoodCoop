@@ -435,41 +435,24 @@ controller('MyCtrl1', [
 
 .controller('productUICtrl', ['$scope', '$timeout',
 	function($scope, $timeout) {
+		var timer;
+
+		$scope.callDelayed= function () {
+			if(timer){
+				$timeout.cancel(timer);
+			}
+			timer = $timeout(function(){
+				$scope.detailsVisible = true;// run code
+                timer = undefined;
+			}, 1000);
+		};
+		
+		$scope.callCancelled = function() {
+			$timeout.cancel(timer);
+		};
 				
-		$scope.detailsVisible = false;
-		
-		(function (timer, delay) {
-			$scope.callDelayed= function () {
-				if(timer){
-					$timeout.cancel(timer);
-				}
-				timer = $timeout(function(){
-					$scope.detailsVisible = true;// run code
-				}, delay);
-			};
-		})(false, 1000);
-		
-		/*
-		$scope.callCanceled = function(timer) {
-					$timeout.cancel(timer);
-					$scope.detailsVisible = false;
-				};
-				
-				
-				$scope.$on("$destroy", function(event) {
-					$timeout.cancel(timer);
-				} );		*/
-		
-		/*
-		$scope.$watch('detailsVisible', function() {
-					if (timer){
-						$timeout.cancel(timer);
-					}
-					timer = $timeout(function(){
-						console.log('timer is up for');
-					}, 3000);
-				});*/
-		
-		
+		$scope.$on("$destroy", function(event) {
+			$timeout.cancel(timer);
+		});
 	}
 ]);
