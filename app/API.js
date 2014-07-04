@@ -25,22 +25,20 @@ exports.configAPI = function configAPI(app){
 	});
 	app.get("/api/product", function(req, res, next) {
 		models.Product.find(req.query, null, { sort:{ _id : 1 }}, function(e, results) {
-			var lengthToCutTo = 200
-			
+			var lengthToCutTo = 200;
 			for (var i = results.length - 1; i >= 0; i--) {
 				var shortDescription = results[i].description;
-					if (shortDescription.length < lengthToCutTo) {
-						shortDescription = shortDescription.slice(0, lengthToCutTo) 
-						+ '<button class="btn btn-link" ng-click="open('+ '#' +')"> more...</button>';
-					}
+				if (shortDescription.length < lengthToCutTo) {
+					shortDescription = shortDescription.slice(0, lengthToCutTo);
+				};
 					
-					results[i].shortDescription = shortDescription;
-					console.log('the '+ i + ' short Description is: ' + results[i].shortDescription)
+				results[i].shortDescription = shortDescription;
+				console.log('the '+ i + ' short Description is: ' + results[i].shortDescription);
 			}
 			
-			if (e) {console.log(e)}
+			if (e) {console.log(e)};
 			
-			res.send(results)
+			res.send(results);
 		})
 	});
 	app.post("/api/product", function(req, res, next) {
