@@ -377,7 +377,6 @@ controller('MyCtrl1', [
 
 .controller('storeCtrl', ['$scope', '$filter', '$modal', 'Restangular',
 	function($scope, $filter, $modal, Restangular) {
-		
 		$scope.products = Restangular.all('product').getList().$object;
 		
 		$scope.sort="alphabetical";
@@ -446,11 +445,11 @@ controller('MyCtrl1', [
                 timer = undefined;
 			}, 1000);
 		};
-		
+
 		$scope.callCancelled = function() {
 			$timeout.cancel(timer);
 		};
-				
+
 		$scope.$on("$destroy", function(event) {
 			$timeout.cancel(timer);
 		});

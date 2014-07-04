@@ -34,6 +34,7 @@ a:hover {
 
 /* Store */ 
 
+
 .panel-btn {
 	margin-right: 1em;
 	float: left;
@@ -47,12 +48,26 @@ a:hover {
 	position: fixed;
 	z-index: 999;
 	height: 100%;
+	padding: 10px;
+	background: #fff;
+	border-right: 1px solid #dddddd;
+	overflow: scroll;
 }
 
 #sidebar button{padding: 10px;}
 
+#main-nav-and-sorting label{margin: 0 0.5em;}
+
+.menu-icon {
+	font-size: 2em;
+	line-height: 0.6em;
+	cursor: pointer;
+	top: -0.06em;
+	position: relative;
+}
+
 #products-section {
-	margin: 0 20px;
+	margin: 20px;
 }
 
 #store-products {/*div that contains the product containers. Flex container.*/
@@ -76,10 +91,9 @@ a:hover {
 	width: 23%;
 	margin: 10px;
 	flex-grow: 1;
-	padding: 5px;
-	background: #fff;
+	padding: 15px;
 	overflow:hidden;
-
+	background:#ddd;
 }
 
 .product-container figure.first-layer img {
@@ -88,6 +102,11 @@ a:hover {
 	display: block;
 	margin: auto;
 }
+
+.product-container figcaption{margin-top:25px;}
+/*
+.product-container figure {background:#ddd;}
+*/
 
 .details-layer {
 	position: absolute;
@@ -108,8 +127,6 @@ a:hover {
 
 .details-layer-visible {bottom:0; opacity:1; visibility: visible; -moz-transform: scale(1.1) rotate(-2deg);}
 	
-
-
 .details {padding: 5px 2%;}
 
 .details button {position: absolute; bottom: 5px; left: 5px;}

@@ -58,7 +58,9 @@
  	<div id="wrap" class="container"><!--Sticky footer hack: wrap all page content-->
      <div class="row" ng-controller="navCtrl">
  	    <ul class="nav nav-pills pull-left">
- 			 <ng-include src=" 'partials/login.html' "></ng-include>
+			<div ng-if="currentUser === null">
+				<ng-include src=" 'partials/login.html' "></ng-include>
+			</div>
 			 <li><a href="/store.html">Store</a></li>
  		</ul>
  		<ul class="nav nav-pills pull-right" ng-controller="logoutCtrl">
