@@ -380,16 +380,24 @@ controller('MyCtrl1', [
 		
 		$scope.products = Restangular.all('product').getList().$object;
 		
+		$scope.sort="alphabetical";
+		
 		$scope.blurb = function(string, length, link) {
-		if (string) {
 			if (string.length < length) {
-				return string.splice(0, length) + "<a href="+ link +">more...</a>";
+				return string.splice(0, length) + '<button class="btn btn-link" ng-click="open('+link+')"> more...</button>';
 			}
+			else {
+				return string;
+			}
+		};
+		
+		for (var i = $scope.products.length - 1; i >= 0; i--) {
+			var product = $scope.products[i];
+			$scope.products[i].shortDescription = $scope.blurb($scope.products[i].description, 200, product);
 		}
-		else {
-			console.log(string + 'is not defined or being passed properly.');
-		}
-			
+		
+		$scope.addToCart = function(product) {
+			console.log("user added an item to the cart");
 		};
 		
 		$scope.open = function(product) {
@@ -397,6 +405,7 @@ controller('MyCtrl1', [
 			var modalInstance = $modal.open({
 				templateUrl: 'partials/store-modal.html',
 				controller: 'modalInstanceCtrl',
+				size: 'lg',
 				resolve: {
 					data: function() {
 						return product;
@@ -404,24 +413,63 @@ controller('MyCtrl1', [
 				}
 			});
 
-			$scope.addToCart = function() {
-				console.log("user added an item to the cart");
-			};
-
 			modalInstance.result.then(function(selectedItem) {
 				$scope.selected = selectedItem;
 			}, function() {
 				console.log('Modal dismissed at: ' + new Date());
 			});
+			
+			$scope.addToCart = function(product) {
+				console.log("user added an item to the cart from the modal");
+			};
 		};
 
 	}
 
 ])
-
 .controller('calendarCtrl', ['$scope',
 	function($scope) {
 		
-		//make a service for calling the ordering dates here to use in the scope.
+	}
+])
+
+.controller('productUICtrl', ['$scope', '$timeout',
+	function($scope, $timeout) {
+				
+		$scope.detailsVisible = false;
+		
+		(function (timer, delay) {
+			$scope.callDelayed= function () {
+				if(timer){
+					$timeout.cancel(timer);
+				}
+				timer = $timeout(function(){
+					$scope.detailsVisible = true;// run code
+				}, delay);
+			};
+		})(false, 1000);
+		
+		/*
+		$scope.callCanceled = function(timer) {
+					$timeout.cancel(timer);
+					$scope.detailsVisible = false;
+				};
+				
+				
+				$scope.$on("$destroy", function(event) {
+					$timeout.cancel(timer);
+				} );		*/
+		
+		/*
+		$scope.$watch('detailsVisible', function() {
+					if (timer){
+						$timeout.cancel(timer);
+					}
+					timer = $timeout(function(){
+						console.log('timer is up for');
+					}, 3000);
+				});*/
+		
+		
 	}
 ]);

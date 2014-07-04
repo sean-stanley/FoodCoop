@@ -140,7 +140,7 @@ angular.module('co-op.services', [])
 			certificationTypes: Restangular.all("certification").getList().$object,
 			
 			getUserProducts: function(callback){
-				$http.get("api/product?producerCompany=:user.producerData.companyName");
+				$http.get("api/product?producerCompany=:currentUser.producerData.companyName");
 			}
 
 		};
@@ -206,7 +206,6 @@ angular.module('co-op.services', [])
 		this.sumPrice = function() {
 		 var total = 0;
 		 for(var i=0; i < cartItems.length; i++) {
-		 	console.log(i, ' cart items = ', cartItems[i].price);
 		 	total += cartItems[i].price; 
 		 }
 		 return total;

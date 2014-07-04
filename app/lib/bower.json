@@ -14,14 +14,22 @@
   "license": "MIT",
   "dependencies": {
     "momentjs": "~2.4.0",
-    "angular-ui-calendar": "latest",
-	"angular": "latest",
-	"angular-bootstrap": "latest",
-	"angular-ui-calendar" : "latest",
-	"jquery" : "latest",
-	"jquery-ui" : "latest"
+    "angular": "latest",
+    "angular-bootstrap": "latest",
+    "jquery": "latest",
+    "restangular": "~1.4.0"
   },
-  "resolutions": {
-    "jquery": ">=1.6"
-  }
+  "moduleType": [
+    "globals",
+    "node",
+    "yui"
+  ],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
 }

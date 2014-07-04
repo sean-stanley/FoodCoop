@@ -1,20 +1,25 @@
 <div class="modal-header">
-            <img ng-src="{{data.companyLogo}}" width="200px"/>
-	<h1>{{data.product}}</h1>
+            <h1>{{data.variety}} {{data.productName}}<small ng-if="data.certification !== 'none'">{{data.certification}}</small></h1>
+			<img class="product-image-modal" ng-src="upload-imgs/products/{{data.img}}"/>
+	
         </div>
         <div class="modal-body media">
 
-            <div class="media-body">
-	            {{data.producer}}<br>
+            <div class="media-body col-lg-6">
+	            {{data.producerName}}<br>
 				
-				{{data.price|currency}}
+				<div class="well"><h2>Price: {{data.price|currency}} / {{data.units}}</h2></div>
+			</div>
+			<div class="media-body col-lg-6">
 				
-				{{data.description}}
-
-	            
+				<strong>Quantity left:</strong>{{data.quantity}}<br>
+				
+				<strong>Description:</strong> {{data.description}}<br>
+				<span ng-if="data.ingredients"><strong>Ingredients: </strong>{{data.ingredients}}</span>
             </div>
 
         </div>
         <div class="modal-footer">
+			<button class="btn btn-primary" ng-click="addToCart(data)">Add to Cart</button>
             <button class="btn btn-warning" ng-click="cancel()">Close</button>
         </div>

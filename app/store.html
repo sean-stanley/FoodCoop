@@ -11,7 +11,6 @@
     <link href="css/banner.css" rel="stylesheet" media="screen">
     <link rel="stylesheet" href="css/products.css" title="products" type="text/css" media="screen"> 
     <link rel="stylesheet" href="css/animations.css" title="animations" type="text/css" media="screen">
-	<link rel="stylesheet" href="lib/bower_components/fullcalendar/fullcalendar.css" type="text/css" media="screen">
 
     <!-- Include all compiled plugins (below), or include individual files as needed -->
 	<!-- project-specific angular data here -->
@@ -27,50 +26,47 @@
 	<script src="js/directives.js"></script>
 	
 	
-	<script type="text/javascript" src="lib/bower_components/jquery/dist/jquery.min.js"></script>
-	<script type="text/javascript" src="lib/bower_components/jquery-ui/ui/jquery-ui.js"></script>		
-	<script type="text/javascript" src="lib/bower_components/angular-ui-calendar/src/calendar.js"></script>
-	<script type="text/javascript" src="lib/bower_components/fullcalendar/fullcalendar.js"></script>
-	<script type="text/javascript" src="lib/bower_components/fullcalendar/gcal.js"></script>
-
-	<script src="lib/bower_components/angular-bootstrap/ui-bootstrap-tpls-0.10.0.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript" src="lib/bower_components/jquery/jquery.min.js"></script>
 	
-	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.compat.min.js"></script> 
+
+	<script src="lib/bower_components/angular-bootstrap/ui-bootstrap-tpls.js" type="text/javascript" charset="utf-8"></script>
+	
+	<script src="lib/bower_components/lodash/dist/lodash.compat.min.js" type="text/javascript" charset="utf-8"></script>
 	<!--lodash: Restangular Dependency-->
 	
-	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/restangular/1.3.1/restangular.min.js"></script>	
+	<script src="lib/bower_components/restangular/dist/restangular.min.js"></script>
    
 </head>
 
 <body>
 	<div id="wrap" ng-controller="storeCtrl"><!--Sticky footer hack: wrap all page content-->    		    			
 			
-			<div id="sidebar" ng-show="panelDisplay">
-	            <button class="btn btn-default panel-btn" ng-click="panelDisplay = false" ng-model="panelDisplay">&times;</button>
-	            <section ng-if="!currentUser">
-					<ng-include src=" 'partials/login-store.html' "></ng-include>
-				</section>
-	            <p>
-	                Ordering closes in <span class="highlight">5</span> days<br>
-	                Delivery Day is in <span class="highlight">14</span> days
-	            </p>
-				<!-- -->
-				<accordion>
-				    <accordion-group is-open="isopen">
-				        <accordion-heading>
-				            Calendar <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isopen, 'glyphicon-chevron-right': !isopen}"></i>
-				        </accordion-heading>
-						<div id="calendar">
-							<div id="calendar-container" ng-controller="calendarCtrl">
-							<p>Three days left to upload products. Ordering is currently not enabled. Try again next week.<p>
-							</div>
+		<div id="sidebar" ng-show="panelDisplay">
+			<button class="btn btn-link panel-btn" ng-click="panelDisplay = false">&times;</button>
+			
+			<section ng-if="!currentUser">
+				<ng-include src=" 'partials/login-store.html' "></ng-include>
+			</section>
+	            
+			<accordion>
+				<accordion-group is-open="isopen">
+					<accordion-heading>
+					Calendar <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isopen, 'glyphicon-chevron-right': !isopen}"></i>
+					</accordion-heading>
+					<div id="calendar">
+						<div id="calendar-container" ng-controller="calendarCtrl">
+							<p>
+								Ordering closes in <span class="highlight">5</span> days<br>
+								Delivery Day is in <span class="highlight">14</span> days
+							</p>
 						</div>
-					</accordion-group>
-					 <accordion-group is-open="isopen2">
-				        <accordion-heading>
-				            {{currentUser.name}} Cart <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isopen2, 'glyphicon-chevron-right': !isopen2}"></i>
-				        </accordion-heading>
-						<div id="table-div" ng-controller="cartTableCtrl">
+					</div>
+				</accordion-group>
+				<accordion-group is-open="isopen2">
+					<accordion-heading>
+					{{currentUser.name}} Cart <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isopen2, 'glyphicon-chevron-right': !isopen2}"></i>
+					</accordion-heading>
+					<div id="table-div" ng-controller="cartTableCtrl">
 						[ <a href="" ng-click="predicate=''">unsorted</a> ]
 						<table class="table" style="width=100%">
 							<caption>Cart</caption>
@@ -89,79 +85,77 @@
 							</tfoot>
 							<tbody>
 								<tr ng-repeat="c in cart">
-							        <td data-title=" 'remove' ">
-							        	<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
-							        <td data-title="'Product'" >
-							            <a href="#" ng-click="open(c)">{{c.product}}</a>
-							        </td>
-							        <td data-title="'Price'">
-							            {{c.price | currency}}
-							        </td>
-							        <td data-title="'Quantity'">
-							            <input type="number" ng-model="c.quantity" name="{{c.product}}-quantity"/>
-							        </td>
-						        
-							    </tr>
-							</tbody>
-						</table>
+									<td data-title=" 'remove' ">
+										<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
+										<td data-title="'Product'" >
+											<a href="#" ng-click="open(c)">{{c.product}}</a>
+										</td>
+										<td data-title="'Price'">
+											{{c.price | currency}}
+										</td>
+										<td data-title="'Quantity'">
+											<input type="number" ng-model="c.quantity" name="{{c.product}}-quantity"/>
+										</td>
+									</tr>
+								</tbody>
+							</table>
 						</div>
-					</accordion-group>
-				  </accordion>
-				  
-				
-					
-				</div>
+				</accordion-group>
+			</accordion>
+		</div>
 				
 			
 			
-			<div class="container-fluid" id="store">
-				<div id="main-nav-and-sorting">
-	            <button class="btn btn-default panel-btn" ng-click="panelDisplay = !panelDisplay" ng-model="panelDisplay"><i class="glyphicon" ng-class="{'glyphicon-chevron-left': !panelDisplay, 'glyphicon-chevron-right': panelDisplay}"></i></button>
-				<div>
-	               <h1 class="highlight">Store of the NNFC</h1>
-	                <h5>Local Sustainable Affordable</h5>
-	            </div>
-				
-				<label> Sort: </label>
-				<div class="btn-group">
-					<button class="btn btn-primary" ng-model="sort" btn-radio="'producer'">Producer</button>
-					<button class="btn btn-primary" ng-model="sort" btn-radio="'alphabetical'">Alphabetical</button>
-					<button class="btn btn-primary" ng-model="sort" btn-radio="'price'">Price</button>
-				</div>
-	            <label> Filter: </label>
-				<div class="btn-group">
-					<button class="btn btn-default" ng-model="filter" btn-radio="'produce'">Produce</button>
-					<button class="btn btn-default" ng-model="filter" btn-radio="'meat'">Meat</button>
-					<button class="btn btn-default" ng-model="filter" btn-radio="'processed-goods'">Processed Goods</button>
-					<button class="btn btn-default" ng-model="filter" btn-radio="'baked-goods'">Baked Goods</button>
-					<button class="btn btn-default" ng-model="filter" btn-radio="'dariy'">Dairy</button>
-					<button class="btn btn-default" ng-model="filter" btn-radio="'milk'">Milk</button>
-					<button class="btn btn-default" ng-model="filter" btn-radio="'none'">None</button>
-				</div>
+		<div class="container-fluid" id="store" ng-class="{menuOpen : panelDisplay}">
+			<div id="main-nav-and-sorting">
+            <button class="btn btn-link panel-btn" ng-click="panelDisplay = !panelDisplay"><i class="glyphicon" ng-class="{'glyphicon-chevron-left': !panelDisplay, 'glyphicon-chevron-right': panelDisplay}"></i></button>
+			<div>
+               <h1 class="highlight">Store of the NNFC</h1>
+                <h5>Local Sustainable Affordable</h5>
+            </div>
 			
+			<label> Sort: </label>
+			<div class="btn-group">
+				<button class="btn btn-primary" ng-model="sort" btn-radio="'producerCompanyName'">Producer</button>
+				<button class="btn btn-primary" ng-model="sort" btn-radio="'productName'">Alphabetical</button>
+				<button class="btn btn-primary" ng-model="sort" btn-radio="'price'">Price</button>
 			</div>
-				<div id="products-section" class="">
-					<div id="store-products">
-						<section ng-repeat="product in products" class="product-container">
-							<figure class="first-layer">
-								<img ng-src="upload-imgs/products/{{product.img}}">
-								<figcaption>
-									<h5>{{product.variety}} {{product.productName}}</h5>
-									<p>{{1.2 * product.price|currency}} / {{product.units}}</p>
-									
-							</figure>
-							<section class="details-layer" ng-click="open(product)">
-								<article class="details">
-									<h3>{{product.variety}} {{product.productName}}</h3>
-									<p ng-bind="blurb(product.description, 200)"></p>
-									<button class"btn btn-primary" ng-click="addToCart()">Add to Cart</button>
-								</article>
-							</section>
+            <label> Filter: </label>
+			<div class="btn-group">
+				<button class="btn btn-default" ng-model="filter" btn-radio="'produce'">Produce</button>
+				<button class="btn btn-default" ng-model="filter" btn-radio="'meat'">Meat</button>
+				<button class="btn btn-default" ng-model="filter" btn-radio="'processed-goods'">Processed Goods</button>
+				<button class="btn btn-default" ng-model="filter" btn-radio="'baked-goods'">Baked Goods</button>
+				<button class="btn btn-default" ng-model="filter" btn-radio="'dariy'">Dairy</button>
+				<button class="btn btn-default" ng-model="filter" btn-radio="'milk'">Milk</button>
+				<button class="btn btn-default" ng-model="filter" btn-radio="'none'">None</button>
+			</div>
+		
+			<div id="products-section">
+				<ul id="store-products">
+					<li ng-repeat="product in products | orderBy:sort " class="product-container" ng-controller="productUICtrl" ng-mouseleave="detailsVisible = false">
+						<figure class="first-layer" ng-mouseover="callDelayed()">
+							<img ng-src="upload-imgs/products/{{product.img}}">
+							<figcaption>
+								<h5>{{product.variety}} {{product.productName}}</h5>
+								<p>{{1.2 * product.price|currency}} / {{product.units}}</p>
+								
+						</figure>
+						<section class="details-layer" ng-click="open(product)" ng-class="{ 'details-layer-visible' : detailsVisible}" ng-mouseleave="detailsVisible = false">
+							<article class="details">
+								<h3>{{product.variety}} {{product.productName}}</h3>
+								<p>{{product.producerCompany}} <br>
+								<span ng-if="product.certification !== 'none' ">{{product.certification}}</span>
+								</p>
+								<p>{{product.shortDescription}}</p>
+								<button class="btn btn-primary" ng-click="addToCart()">Add to Cart</button>
+							</article>
 						</section>
-					</div>
-				</div>
+					</li>
+				</ul>
 			</div>
 		</div>
+	</div>
 			
 		
 	</div>   

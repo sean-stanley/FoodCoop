@@ -1,5 +1,7 @@
 /* @override http://localhost:8000/app/css/site.css */
 
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
 a:hover {
 	cursor: pointer;
 }
@@ -38,18 +40,79 @@ a:hover {
 }
 
 #sidebar {
-	margin: 0 20px;
 	width: 30%;
 	float: left;
     -webkit-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
     transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
-	background: #1d1d1d;
-	color: #fff;
+	position: fixed;
+	z-index: 999;
+	height: 100%;
 }
+
+#sidebar button{padding: 10px;}
 
 #products-section {
 	margin: 0 20px;
 }
+
+#store-products {/*div that contains the product containers. Flex container.*/
+	list-style: none;
+	margin: 0;
+	display: -webkit-box;
+	  display: -moz-box;
+	  display: -ms-flexbox;
+	  display: -webkit-flex;
+	  display: flex;
+	flex-flow: row wrap;
+	justify-content: center;
+	align-items: flex-start;
+	align-content: flex-start;
+	
+	
+}
+
+.product-container { /*section that is repeated for the store products. Flex items*/
+	position: relative;
+	width: 23%;
+	margin: 10px;
+	flex-grow: 1;
+	padding: 5px;
+	background: #fff;
+	overflow:hidden;
+
+}
+
+.product-container figure.first-layer img {
+	max-width: 100%;
+	max-height: 300px;
+	display: block;
+	margin: auto;
+}
+
+.details-layer {
+	position: absolute;
+	bottom: -100%;
+	left: 0;
+	right: 0;
+	background: #c5c5c5;
+	height: 100%;
+	visibility: hidden;
+	
+	-webkit-transition: all 0.4s ease;
+	-moz-transition: all 0.4s ease;
+	-ms-transition: all 0.4s ease;
+	-o-transition: all 0.4s ease;
+	transition: all 0.4s ease;
+	
+}
+
+.details-layer-visible {bottom:0; opacity:1; visibility: visible; -moz-transform: scale(1.1) rotate(-2deg);}
+	
+
+
+.details {padding: 5px 2%;}
+
+.details button {position: absolute; bottom: 5px; left: 5px;}
 
 #store {
 	margin-top: 20px;
@@ -57,7 +120,13 @@ a:hover {
     transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
 }
 
-.details {background: #c5c5c5;}
+.menuOpen {
+	margin-left: 30%;
+}
+
+
+
+
 
 
 

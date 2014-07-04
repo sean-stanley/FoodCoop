@@ -11,7 +11,6 @@ angular.module('co-op', [
 	'co-op.directives', 
 	'co-op.controllers', 
 	'ngAnimate', 
-	'ui.calendar',
 	'ui.bootstrap',
 	'restangular']).
 

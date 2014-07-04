@@ -24,7 +24,22 @@ exports.configAPI = function configAPI(app){
 		app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 	});
 	app.get("/api/product", function(req, res, next) {
-		models.Product.find(req.query, null, { sort:{ _id : 1 }}, function(e, results){
+		models.Product.find(req.query, null, { sort:{ _id : 1 }}, function(e, results) {
+			var lengthToCutTo = 200
+			
+			for (var i = results.length - 1; i >= 0; i--) {
+				var shortDescription = results[i].description;
+					if (shortDescription.length < lengthToCutTo) {
+						shortDescription = shortDescription.splice(0, lengthToCutTo) 
+						+ '<button class="btn btn-link" ng-click="open('+link+')"> more...</button>';
+					}
+					
+					results[i].shortDescription = shortDescription;
+					console.log('the '+ i + ' short Description is: ' + results[i].shortDescription)
+			}
+			
+			if (e) {console.log(e)}
+			
 			res.send(results)
 		})
 	});
