@@ -178,67 +178,108 @@ angular.module('co-op.directives', []).
   
   
   .directive('fileDropzone', function() {
-	return {
-	restrict: 'A',
-	scope: {
-		file: '=',
-		fileName: '='
-	},
-	link: function(scope, element, attrs) {
-		var checkSize, isTypeValid, processDragOverOrEnter, validMimeTypes;
-		processDragOverOrEnter = function(event) {
-			if (event !== null) {
-				event.preventDefault();
-			}
-			event.originalEvent.dataTransfer.effectAllowed = 'copy';
-			return false;
-		};
-		validMimeTypes = attrs.fileDropzone;
-		checkSize = function(size) {
-			var _ref;
-			if (((_ref = attrs.maxFileSize) === (void 0) || _ref === '') || (size / 1024) / 1024 < attrs.maxFileSize) {
-				return true;
-			} else {
-				alert("File must be smaller than " + attrs.maxFileSize + " MB");
-				return false;
-			}
-		};
-		isTypeValid = function(type) {
-			if ((validMimeTypes === (void 0) || validMimeTypes === '') || validMimeTypes.indexOf(type) > -1) {
-				return true;
-			} else {
-				alert("Invalid file type.  File must be one of following types " + validMimeTypes);
-				return false;
-			}
-		};
-		element.bind('dragover', processDragOverOrEnter);
-		element.bind('dragenter', processDragOverOrEnter);
-		return element.bind('drop', function(event) {
-			var file, name, reader, size, type;
-			if (event !== null) {
-				event.preventDefault();
-			}
-			reader = new FileReader();
-			reader.onload = function(evt) {
-				if (checkSize(size) && isTypeValid(type)) {
-					return scope.$apply(function() {
-						scope.file = evt.target.result;
-						if (angular.isString(scope.fileName)) {
-							scope.fileName = name;
-							return name;
-						}
-					});
-				}
-			};
-			file = event.originalEvent.dataTransfer.files[0];
-			name = file.name;
-			type = file.type;
-			size = file.size;
-			reader.readAsDataURL(file);
-			return false;
-		});
-	}
-};
-});
-
+      return {
+          restrict: 'A',
+          scope: {
+              file: '=',
+              fileName: '='
+          },
+          link: function(scope, element, attrs) {
+              var checkSize, isTypeValid, processDragOverOrEnter, validMimeTypes;
+              processDragOverOrEnter = function(event) {
+                  if (event !== null) {
+                      event.preventDefault();
+                  }
+                  event.originalEvent.dataTransfer.effectAllowed = 'copy';
+                  return false;
+              };
+              validMimeTypes = attrs.fileDropzone;
+              checkSize = function(size) {
+                  var _ref;
+                  if (((_ref = attrs.maxFileSize) === (void 0) || _ref === '') || (size / 1024) / 1024 < attrs.maxFileSize) {
+                      return true;
+                  } else {
+                      alert("File must be smaller than " + attrs.maxFileSize + " MB");
+                      return false;
+                  }
+              };
+              isTypeValid = function(type) {
+                  if ((validMimeTypes === (void 0) || validMimeTypes === '') || validMimeTypes.indexOf(type) > -1) {
+                      return true;
+                  } else {
+                      alert("Invalid file type.  File must be one of following types " + validMimeTypes);
+                      return false;
+                  }
+              };
+              element.bind('dragover', processDragOverOrEnter);
+              element.bind('dragenter', processDragOverOrEnter);
+              return element.bind('drop', function(event) {
+                  var file, name, reader, size, type;
+                  if (event !== null) {
+                      event.preventDefault();
+                  }
+                  reader = new FileReader();
+                  reader.onload = function(evt) {
+                      if (checkSize(size) && isTypeValid(type)) {
+                          return scope.$apply(function() {
+                              scope.file = evt.target.result;
+                              if (angular.isString(scope.fileName)) {
+                                  scope.fileName = name;
+                                  return name;
+                              }
+                          });
+                      }
+                  };
+                  file = event.originalEvent.dataTransfer.files[0];
+                  name = file.name;
+                  type = file.type;
+                  size = file.size;
+                  reader.readAsDataURL(file);
+                  return false;
+              });
+          }
+      };
+  })  
   
+  .directive('categoryChooser', ['ProductManager', function(ProductManager) {
+      return {
+          restrict: 'E',
+          replace: true,
+          scope: {
+              modelVar: '='
+          },
+          template: '<select ng-model="selectValue" ng-options="name for name in categoryNames"></select>',
+          link: function(scope, element, attrs, ctrl) {
+              var categoryIdToNameMapping = {}, categoryNameToIdMapping = {};
+              
+              scope.test = '';
+              
+              scope.categories = ProductManager.productCategories;
+              scope.$watch('categories', function (newValue) {
+                  scope.categoryNames = ['--- Select a Category ---'];
+                  categoryIdToNameMapping = {};
+                  categoryNameToIdMapping = {};
+                  newValue.forEach(function (category) {
+                      if (category.name) {
+                          scope.categoryNames.push(category.name);
+                          categoryIdToNameMapping[category.name] = category._id;
+                          categoryNameToIdMapping[category._id] = category.name;
+                      }
+                  });
+              }, true);
+              
+              scope.$watch('modelVar', function (newValue) {
+                  if (!newValue) {
+                      scope.selectValue = '--- Select a Category ---';
+                  } else {
+                      scope.selectValue = categoryIdToNameMapping[newValue];
+                  }
+              });
+              
+              scope.$watch('selectValue', function (newValue) {
+                  scope.modelVar = categoryNameToIdMapping[newValue];
+              });
+          }
+      };
+  }]);  
+
