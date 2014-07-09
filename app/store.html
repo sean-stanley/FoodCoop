@@ -42,65 +42,69 @@
 	<div id="wrap" ng-controller="storeCtrl"><!--Sticky footer hack: wrap all page content-->    		    			
 			
 		<div id="sidebar" ng-show="panelDisplay">
-			<button class="btn btn-link panel-btn" ng-click="panelDisplay = false">&times;</button>
-			
-			<section ng-if="currentUser === null">
-				<ng-include src=" 'partials/login-store.html' "></ng-include>
-				<br>
-			</section>
-	            
-			<accordion close-others="false">
-				<accordion-group is-open="isopen">
-					<accordion-heading>
-					Calendar <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isopen, 'glyphicon-chevron-right': !isopen}"></i>
-					</accordion-heading>
-					<div id="calendar">
-						<div id="calendar-container" ng-controller="calendarCtrl">
-							<p>
-								Ordering closes in <span class="highlight">5</span> days<br>
-								Delivery Day is in <span class="highlight">14</span> days
-							</p>
+	 	    <ul class="nav nav-pills">
+				<div ng-if="currentUser === null">
+					<ng-include src=" 'partials/login-store.html' "></ng-include>
+				</div>
+				<button class="btn btn-link panel-btn" ng-click="panelDisplay = false">&times;</button>
+				<li><a href="/">Main Site</a></li>
+				<li><a href="/#/contact">Contact Us</a></li>
+	 		</ul>
+			<br>
+			<div style="width:100%">
+				<accordion close-others="false">
+					<accordion-group is-open="isopen">
+						<accordion-heading>
+						Calendar <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isopen, 'glyphicon-chevron-right': !isopen}"></i>
+						</accordion-heading>
+						<div id="calendar">
+							<div id="calendar-container" ng-controller="calendarCtrl">
+								<p>
+									Ordering closes in <span class="highlight">5</span> days<br>
+									Delivery Day is in <span class="highlight">14</span> days
+								</p>
+							</div>
 						</div>
-					</div>
-				</accordion-group>
-				<accordion-group is-open="isopen2" ng-init="isopen2 = true">
-					<accordion-heading>
-					{{currentUser.name}} Cart <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isopen2, 'glyphicon-chevron-right': !isopen2}"></i>
-					</accordion-heading>
-					<div id="table-div" ng-controller="cartTableCtrl">
-						<table class="table">
-							<thead>
-								<tr>
-									<th></th>
-									<th>Product</th>
-									<th>Price</th>
-									<th>Quantity</th>
-								</tr>
-							</thead>
-							<tfoot>
-								<tr>
-									<td colspan="4"><strong>Total: {{total|currency}}</strong></td>
-								</tr>
-							</tfoot>
-							<tbody>
-								<tr ng-repeat="c in cart">
-									<td data-title=" 'remove' ">
-										<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
-										<td data-title="'Product'" >
-											<a href="#" ng-click="open(c)">{{c.product}}</a>
-										</td>
-										<td data-title="'Price'">
-											{{c.price | currency}}
-										</td>
-										<td data-title="'Quantity'">
-											<input type="number" ng-model="c.quantity" name="{{c.product}}-quantity"/>
-										</td>
+					</accordion-group>
+					<accordion-group is-open="isopen2" ng-init="isopen2 = true">
+						<accordion-heading>
+						{{currentUser.name}} Cart <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isopen2, 'glyphicon-chevron-right': !isopen2}"></i>
+						</accordion-heading>
+						<div id="table-div" ng-controller="cartTableCtrl">
+							<table class="table">
+								<thead>
+									<tr>
+										<th></th>
+										<th>Product</th>
+										<th>Price</th>
+										<th>Quantity</th>
 									</tr>
-								</tbody>
-							</table>
-						</div>
-				</accordion-group>
-			</accordion>
+								</thead>
+								<tfoot>
+									<tr>
+										<td colspan="4"><strong>Total: {{total|currency}}</strong></td>
+									</tr>
+								</tfoot>
+								<tbody>
+									<tr ng-repeat="c in cart">
+										<td data-title=" 'remove' ">
+											<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
+											<td data-title="'Product'" >
+												<a href="#" ng-click="open(c)">{{c.product}}</a>
+											</td>
+											<td data-title="'Price'">
+												{{c.price | currency}}
+											</td>
+											<td data-title="'Quantity'">
+												<input type="number" ng-model="c.quantity" name="{{c.product}}-quantity"/>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+					</accordion-group>
+				</accordion>
+			</div>
 		</div>
 				
 	    <header id="banner">
@@ -115,32 +119,42 @@
 	    </header>	
 			
 		<div class="container-fluid" id="store" ng-class="{menuOpen : panelDisplay}">
-		    
-			<div id="main-nav-and-sorting">
-            <button class=" btn btn-link menu-icon" ng-click="panelDisplay = !panelDisplay">&#9776;</button>
+			<div class="row">
+				<div class="col-md-9">
+					<section id="main-nav-and-sorting">
+			            <button class=" btn btn-link menu-icon" ng-click="panelDisplay = !panelDisplay">&#9776;</button>
 			
-			<label> Sort: </label>
-			<div class="btn-group">
-				<button class="btn btn-primary" ng-model="sort" btn-radio="'producerCompanyName'">Producer</button>
-				<button class="btn btn-primary" ng-model="sort" btn-radio="'productName'">Alphabetical</button>
-				<button class="btn btn-primary" ng-model="sort" btn-radio="'price'">Price</button>
-			</div>
-            <label> Filter: </label>
-			<div class="btn-group">
-				<button class="btn btn-default" ng-model="filter" btn-radio="'produce'">Produce</button>
-				<button class="btn btn-default" ng-model="filter" btn-radio="'meat'">Meat</button>
-				<button class="btn btn-default" ng-model="filter" btn-radio="'processed-goods'">Processed Goods</button>
-				<button class="btn btn-default" ng-model="filter" btn-radio="'baked-goods'">Baked Goods</button>
-				<button class="btn btn-default" ng-model="filter" btn-radio="'dariy'">Dairy</button>
-				<button class="btn btn-default" ng-model="filter" btn-radio="'milk'">Milk</button>
-				<button class="btn btn-default" ng-model="filter" btn-radio="'none'">None</button>
+						<label> Sort: </label>
+						<div class="btn-group">
+							<button class="btn btn-primary" ng-model="sort" btn-radio="'producerCompanyName'">Producer</button>
+							<button class="btn btn-primary" ng-model="sort" btn-radio="'productName'">Alphabetical</button>
+							<button class="btn btn-primary" ng-model="sort" btn-radio="'price'">Price</button>
+						</div>
+			            <label> Filter: </label>
+						<div class="btn-group">
+							<button class="btn btn-default" ng-model="search.category" btn-radio="'produce'">Produce</button>
+							<button class="btn btn-default" ng-model="search.category" btn-radio="'meat'">Meat</button>
+							<button class="btn btn-default" ng-model="search.category" btn-radio="'processed-goods'">Processed Goods</button>
+							<button class="btn btn-default" ng-model="search.category" btn-radio="'baked-goods'">Baked Goods</button>
+							<button class="btn btn-default" ng-model="search.category" btn-radio="'dariy'">Dairy</button>
+							<button class="btn btn-default" ng-model="search.category" btn-radio="'milk'">Milk</button>
+							<button class="btn btn-default" ng-model="search.category" btn-radio="">None</button>
+						</div>
+					</section>
+				</div>
+				<div class="col-md-3">
+					<form class="form-inline">
+						<label> Search: </label>
+						<input ng-model="search" name="search.$" class="form-control" type="search"/>
+					</form>
+				</div>
 			</div>
 		
-			<div id="products-section">
+			<div id="products-section" class="row">
 				<ul id="store-products">
-					<li ng-repeat="product in products | orderBy:sort " class="product-container" ng-controller="productUICtrl" ng-mouseleave="detailsVisible = false">
+					<li ng-repeat="product in products | orderBy:sort | filter:search" class="product-container" ng-controller="productUICtrl" ng-mouseleave="detailsVisible = false">
 						<figure class="first-layer" ng-mouseover="callDelayed()" ng-mouseleave="callCancelled()">
-							<img ng-src="upload-imgs/products/{{product.img}}">
+							<img ng-src="upload-imgs/products/{{product.img}}" class="img-responsive">
 							<figcaption>
 								<button class="btn btn-primary pull-right" ng-click="addToCart()">Add to Cart</button>
 								<h5>{{product.variety}} {{product.productName}}</h5>

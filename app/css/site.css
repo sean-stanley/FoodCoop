@@ -32,6 +32,9 @@ a:hover {
 	margin-top: 10%;
 }
 
+/*Modals*/
+ul {list-style: none; list-style-type: none; margin: 0; padding: 0;}
+
 /* Store */ 
 
 
@@ -176,6 +179,7 @@ ul.rating {
 #footer {
 	background-color: #652c4a;
 	color: white;
+	margin-top: 4em;
 }
 
 #footer-nav ul.nav > li > a {

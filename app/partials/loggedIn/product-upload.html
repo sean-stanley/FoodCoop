@@ -1,14 +1,28 @@
 <div class="row">
-	<div id="product-upload-preview-column" class="col-md-4">
+	<div id="product-upload-preview-column" class="col-md-4" >
 		<h2>Preview <small>Live</small></h2>
-		<div id="preview-container" class="preview-box">
-			<a href="#" class="thumbnail">
-				<img ng-src="{{productData.image}}" alt="product name" width="100%">
-				{{productData.certification.img}}
-		  	</a>
-			<h5>{{productData.variety}} {{productData.productName}}</h5>
-			<p>{{1.2 * productData.price|currency}} / {{productData.units}}  <small>{{productData.quantity}} Available</small></p> <!-- multiply the price by 1.2 to include markup -->
+		<div class="product-container" ng-controller="productUICtrl" ng-mouseleave="detailsVisible = false" style="width:100%">
+			<figure class="first-layer" ng-mouseover="callDelayed()" ng-mouseleave="callCancelled()">
+				<img ng-src="upload-imgs/products/{{product.img}}" class="img-responsive">
+				<figcaption>
+					<button class="btn btn-primary pull-right" ng-click="addToCart()">Add to Cart</button>
+					<h5>{{productData.variety}} {{productData.productName}}</h5>
+					<p>{{1.2 * productData.price|currency}} / {{productData.units}}</p>
+				</figcaption>
+			</figure>
+			<section class="details-layer" ng-click="open(product)" ng-class="{ 'details-layer-visible' : detailsVisible}" ng-mouseleave="detailsVisible = false">
+				<article class="details">
+					<h3>{{productData.variety}} {{productData.productName}}</h3>
+					<p>{{1.2 * productData.price|currency}} / {{productData.units}}</p>
+					<p>{{productData.producerCompany}} <br>
+					<span ng-if="product.certification !== 'none' ">{{productData.certification}}</span>
+					</p>
+					<p>{{productData.description | blurb}} <em>more...</em></p>
+					<button class="btn btn-primary" ng-click="">Add to Cart</button>
+				</article>
+			</section>
 		</div>
+	
 	
 		<div id="product-history-list">
 			<h3>Product History</h3>
@@ -42,7 +56,7 @@
 				<tbody>
 					<tr ng-repeat="i in data | orderBy:predicate:reverse ">
 						<td><a ng-click="editProduct(i)">{{i.productName}} {{i.variety}}</a></td>
-						<td>{{i.dateUploaded}}</td>
+						<td>{{i.dateUploaded|shortDate}}</td>
 					</tr>
 				</tbody>
 			</table>
@@ -63,19 +77,29 @@
 						</div>
 						<div class="form-group col-md-6">
 							<label for="product-image">Product Image Upload</label>	  
-							<div file-dropzone="[image/png, image/jpeg, image/gif]" file="productData.image" data-max-file-size="2" id="file-dropzone" class="image-drop">
-							  <span>Drop Product Image Here</span>
-							</div>    
+							<cropme
+								width="640"
+								height="400"
+								ratio="3:2"
+								icon-class=""
+								type="jpg"
+								destination-width="300">
+							</cropme>
+							
+							<!-- <div file-dropzone="[image/png, image/jpeg, image/gif]" file="productData.image" data-max-file-size="2" id="file-dropzone" class="image-drop">
+														  <span>Drop Product Image Here</span>
+							</div>   -->
+							 
 						</div>
 			    
 					<div class="row">
 						<div class="form-group col-md-6">
 							<label for="inputName">Product Name</label>
-							<input ng-model="productData.productName" type="text" class="form-control" id="inputName" maxlength="12" placeholder="e.g. {{productData.category.placeholderName}}" autofocus required>
+							<input ng-model="productData.productName" type="text" class="form-control" id="inputName" maxlength="12" placeholder="e.g. {{placeholderName}}" autofocus required>
 						</div>
 						<div class="form-group col-md-6">
 							<label for="inputVariety" ng-model="variety">Variety</label>
-							<input ng-model="productData.variety" type="text" class="form-control" id="inputVariety" maxlength="18" placeholder="e.g. {{productData.category.placeholderVariety}}">
+							<input ng-model="productData.variety" type="text" class="form-control" id="inputVariety" maxlength="18" placeholder="e.g. {{placeholderVariety}}">
 						</div>
 					</div>
 				
@@ -87,9 +111,7 @@
 						
 					    <div class="form-group col-md-4">
 							<label for="units">Quantity Units</label>
-							<select ng-model="productData.units" ng-options="unit for unit in productData.category.availableUnits" name="units" id="units" class="form-control" required>
-								<option value="">--- Select a Unit of Measurement ---</option>
-							</select>
+							<input type="text" ng-model="productData.units" name="units" id="units" class="form-control" placeholder ="e.g. kg or L or whole beast" required>
 					    </div>
 					    
 					    <div class="form-group col-md-4">

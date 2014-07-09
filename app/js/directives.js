@@ -253,9 +253,12 @@ angular.module('co-op.directives', []).
               var categoryIdToNameMapping = {}, categoryNameToIdMapping = {};
               
               scope.test = '';
+			  scope.placeholderName = '';
+			  scope.placeholderVariety = '';
               
               scope.categories = ProductManager.productCategories;
-              scope.$watch('categories', function (newValue) {
+              
+			  scope.$watch('categories', function (newValue) {
                   scope.categoryNames = ['--- Select a Category ---'];
                   categoryIdToNameMapping = {};
                   categoryNameToIdMapping = {};
@@ -264,6 +267,8 @@ angular.module('co-op.directives', []).
                           scope.categoryNames.push(category.name);
                           categoryIdToNameMapping[category.name] = category._id;
                           categoryNameToIdMapping[category._id] = category.name;
+						  scope.placeholderName = category.placeholderName;
+						  scope.placeholderVariety = category.placeholderVariety;
                       }
                   });
               }, true);

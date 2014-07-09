@@ -1,5 +1,5 @@
 <div class="modal-header">
-            <img ng-src="{{data.companyLogo}}" width="200px"/>
+            <img ng-src="{{data.companyLogo}}" width="200px" />
 	<h1>{{data.name}} <small>{{data.ProducerData.companyName}}</small></h1>
         </div>
         <div class="modal-body media">
@@ -15,7 +15,7 @@
 				<p>Feedback Rating: {{data.producerData.feedbackScore}} This features is just a placeholder and is completely arbitrary</p>
 
 	            
-	            <ul>
+	            <ul class="unstyled">
 	            	<li><span class="glyphicon glyphicon-earphone"></span> {{data.phone}}</li>
 					<li><span class="glyphicon glyphicon-envelope"></span> <a ng-href="mailto:data.email">{{data.email}}</a></li>
 					<li><span class="glyphicon glyphicon-map-marker"></span> {{data.address}}</li>

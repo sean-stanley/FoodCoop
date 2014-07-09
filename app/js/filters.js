@@ -9,15 +9,43 @@ angular.module('co-op.filters', []).
       return String(text).replace(/\%VERSION\%/mg, version);
     };
   }])
+  
   .filter('blurb', function() {
 	  return function(blurb) {
-		  if (blurb.length > 200) {
-			  return blurb.slice(0, 199);
+		  if (blurb) {
+			if (blurb.length > 200) {
+				return blurb.slice(0, 199);
+			}
+			else {
+				return blurb;
+			}
 		  }
 		  else {
-			  return blurb;
+			  return "No description has been written yet for this product.";
+		  }
+			  
+	  };
+  })
+  .filter('shortDate', function() {
+	  return function(shortDate) {
+		  var y, m, d;
+		  if (shortDate && Object.prototype.toString.call(shortDate) === "[object Date]") {
+			  y = shortDate.getFullYear();
+			  m = shortDate.getMonth();
+			  d = shortDate.getDate();
+			  return [d, m, y].join('/');
+		  }
+		  
+		  else if (shortDate && Object.prototype.toString.call(shortDate) == '[object String]') {
+			  y = shortDate.slice(1-1, 4);
+			  m = shortDate.slice(6-1, 7);
+			  d = shortDate.slice(9-1, 10);
+			  return [d, m, y].join('/');
+		  }
+		  
+		  else {
+			  return shortDate;
 		  }
 	  };
   })
-  
   ;

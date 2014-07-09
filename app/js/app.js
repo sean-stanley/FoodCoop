@@ -12,6 +12,7 @@ angular.module('co-op', [
 	'co-op.controllers', 
 	'ngAnimate', 
 	'ui.bootstrap',
+	'cropme',
 	'restangular']).
 
   config(['$routeProvider', 'RestangularProvider', function($routeProvider, RestangularProvider) {
@@ -75,6 +76,7 @@ angular.module('co-op', [
 				case '/users-rights': //remove this before going live	
 				case '/thankyou':
 				case '/login':
+				case '/product-upload': //remove when done testing
 					
 				    break;
 				default:	        	
