@@ -1,21 +1,23 @@
+<link rel="stylesheet" href="lib/bower_components/angular-cropme/cropme.css">
+
 <div class="row">
 	<div id="product-upload-preview-column" class="col-md-4" >
 		<h2>Preview <small>Live</small></h2>
-		<div class="product-container" ng-controller="productUICtrl" ng-mouseleave="detailsVisible = false" style="width:100%">
+		<div class="product-container" ng-controller="productUICtrl" ng-mouseleave="detailsVisible = false" style="width:100%; margin: 0">
 			<figure class="first-layer" ng-mouseover="callDelayed()" ng-mouseleave="callCancelled()">
-				<img ng-src="upload-imgs/products/{{product.img}}" class="img-responsive">
+				<img ng-src="{{img}}" class="img-responsive" style="width:100%; height: auto;">
 				<figcaption>
 					<button class="btn btn-primary pull-right" ng-click="addToCart()">Add to Cart</button>
 					<h5>{{productData.variety}} {{productData.productName}}</h5>
 					<p>{{1.2 * productData.price|currency}} / {{productData.units}}</p>
 				</figcaption>
 			</figure>
-			<section class="details-layer" ng-click="open(product)" ng-class="{ 'details-layer-visible' : detailsVisible}" ng-mouseleave="detailsVisible = false">
+			<section class="details-layer" ng-class="{ 'details-layer-visible' : detailsVisible}" ng-mouseleave="detailsVisible = false">
 				<article class="details">
 					<h3>{{productData.variety}} {{productData.productName}}</h3>
 					<p>{{1.2 * productData.price|currency}} / {{productData.units}}</p>
 					<p>{{productData.producerCompany}} <br>
-					<span ng-if="product.certification !== 'none' ">{{productData.certification}}</span>
+					<span ng-if="product.certification.name !== 'none' || product.certification">{{productData.certification.name}}</span>
 					</p>
 					<p>{{productData.description | blurb}} <em>more...</em></p>
 					<button class="btn btn-primary" ng-click="">Add to Cart</button>
@@ -64,7 +66,7 @@
 	</div>
 
 	<div id="product-upload-form-container" class="col-md-8" >
-		<form name="productUpload" autocomplete="on" ng-submit="submitForm();" novalidate>
+		<form name="productUpload" autocomplete="on" ng-submit="submitForm();" novalidate> <!-- add ng-submit="submitForm();" -->
 			<fieldset>
 				<legend>Upload a Product {{currentUser.name}}</legend>
 					<div class="row">
@@ -76,30 +78,17 @@
                             </select> -->
 						</div>
 						<div class="form-group col-md-6">
-							<label for="product-image">Product Image Upload</label>	  
-							<cropme
-								width="640"
-								height="400"
-								ratio="3:2"
-								icon-class=""
-								type="jpg"
-								destination-width="300">
-							</cropme>
-							
-							<!-- <div file-dropzone="[image/png, image/jpeg, image/gif]" file="productData.image" data-max-file-size="2" id="file-dropzone" class="image-drop">
-														  <span>Drop Product Image Here</span>
-							</div>   -->
-							 
+							<button type="button" class="btn btn-primary" ng-click="open()">Upload an image</button>
 						</div>
 			    
 					<div class="row">
 						<div class="form-group col-md-6">
 							<label for="inputName">Product Name</label>
-							<input ng-model="productData.productName" type="text" class="form-control" id="inputName" maxlength="12" placeholder="e.g. {{placeholderName}}" autofocus required>
+							<input ng-model="productData.productName" type="text" class="form-control" id="inputName" maxlength="12" placeholder="e.g. {{category.placeholderName}}" autofocus required>
 						</div>
 						<div class="form-group col-md-6">
 							<label for="inputVariety" ng-model="variety">Variety</label>
-							<input ng-model="productData.variety" type="text" class="form-control" id="inputVariety" maxlength="18" placeholder="e.g. {{placeholderVariety}}">
+							<input ng-model="productData.variety" type="text" class="form-control" id="inputVariety" maxlength="18" placeholder="e.g. {{category.placeholderVariety}}">
 						</div>
 					</div>
 				

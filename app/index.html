@@ -7,14 +7,13 @@
     
 	<link href="css/bootstrap.css" rel="stylesheet" media="screen">
     
-	<link href="css/site.css" title="site" type="text/css" media="screen">
-	<link rel="stylesheet" href="lib/bower_components/angular-cropme/cropme.css">
+	<link href="css/site.css" rel="stylesheet" type="text/css" media="screen">
+	
     <link href="css/banner.css" rel="stylesheet" media="screen">
-    <link rel="stylesheet" href="css/products.css" title="products" type="text/css" media="screen">
     <link rel="stylesheet" href="css/animations.css" title="animations" type="text/css" media="screen">
 
     
-	<script src="lib/bower_components/jquery/jquery.min.js"></script>
+	<script src="lib/bower_components/jquery/dist/jquery.min.js"></script>
   <!-- Include all compiled plugins (below), or include individual files as needed -->
     <!-- universal angular data here -->
 	<script src="lib/bower_components/angular/angular.min.js"></script>
@@ -41,7 +40,7 @@
 
 <script src="lib/bower_components/angular-sanitize/angular-sanitize.js"></script>
 <script src="lib/bower_components/angular-touch/angular-touch.js"></script>
-<script src="lib/bower_components/angular-superswipe/angular-superswipe.js"></script>
+<script src="lib/bower_components/angular-superswipe/superswipe.js"></script>
 <script src="lib/bower_components/angular-cropme/cropme.js"></script>
 	
 	<!-- Other plugins here -->	
@@ -90,7 +89,7 @@
         <div class="col-md-2 col-md-push-10" ng-controller="navCtrl">
                 <ul class="nav nav-pills nav-stacked">
                     <li ng-class="{active:isActive('/producer-list')}"><a href="#/producer-list">Producer List</a></li>
-                    <li><a href="#/faq">User FAQ</a></li>
+                    <li ng-class="{active:isActive('/faq')}"><a href="#/faq">User FAQ</a></li>
                     <li ng-class="{active:isActive('/contact')}"><a href="#/contact">Contact Us</a></li>
                 </ul>
                 <br>

@@ -1,9 +1,16 @@
 /* line 19, ../../styles/cropme.scss */
+/*
 html, body, .container {
   height: 100%;
   padding: 0;
   margin: 0;
+}*/
+html, body {
+  height: 100%;
+  padding: 0;
+  margin: 0;
 }
+
 
 /* line 25, ../../styles/cropme.scss */
 cropme {

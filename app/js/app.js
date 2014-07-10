@@ -6,6 +6,9 @@ angular.module('co-op', [
 	'ngRoute', 
 	'ngResource', 
 	'ngCookies', 
+	'ngSanitize',
+	'ngTouch',
+	'superswipe',
 	'co-op.filters', 
 	'co-op.services', 
 	'co-op.directives', 
@@ -35,6 +38,7 @@ angular.module('co-op', [
 	      });
 	$routeProvider.when('/about', {templateUrl: 'partials/about.html'});
     $routeProvider.when('/producer-list', {templateUrl: 'partials/producer-list.html', controller: 'producerListCtrl'});
+	$routeProvider.when('/faq', {templateUrl: 'partials/faq.html'});
     
 	$routeProvider.when('/product-upload', {templateUrl: 'partials/loggedIn/product-upload.html', controller: 'productUpload'});
     $routeProvider.when('/producer-profile', {templateUrl: 'partials/loggedIn/edit-producer-profile.html', controller: 'producerCtrl'});
@@ -70,6 +74,7 @@ angular.module('co-op', [
         	switch(next.originalPath) {
 				case '/home':
 				case '/about':
+				case '/faq':
 				case '/signup':
 				case '/contact':
 				case '/producer-list':
