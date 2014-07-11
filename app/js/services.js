@@ -8,16 +8,20 @@
 // In this case it is a simple value service.
 angular.module('co-op.services', [])
 	
-	.factory('Session', function ($resource) {
+	.factory('Session', function ($resource, User) {
 		return $resource('/auth/session/');
+        /*
+        .then(function (user) {
+            var properties;
+		    console.log("User", user);
+            properties = Object.getOwnPropertyNames(user);
+            properties.forEach(function (key) {
+                User[key] = user[key];
+            });
+		}); */
 	})
 	.factory('User', function ($resource) {
-		return $resource('/api/user/:id/', null,
-		  {
-			'update': {
-			  method:'PUT'
-			}
-		});
+		return {};
 	})
 	.factory('LoginManager', function Auth($location, $rootScope, Session, User, $cookieStore) {
 		$rootScope.currentUser = $cookieStore.get('User') || null;

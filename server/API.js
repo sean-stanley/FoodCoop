@@ -154,8 +154,21 @@ exports.configAPI = function configAPI(app){
 			var error = err || info;
 			if (error) { return res.json(400, error); }
 			req.logIn(user, function(err) {
-				if (err) { return res.send(err); }
-			res.json(req.user.user_info);
+                var userObject;
+                
+                if (req.user) {
+                   userObject = req.user.toObject();
+                } 
+                
+				if (err) { 
+                    return res.send(err); 
+                } else {
+                    if (userObject) {
+                        delete userObject.salt;
+                        delete userObject.hash;
+                        res.json(userObject);
+                    }
+                }
 			});
 		})(req, res, next);
 	});
