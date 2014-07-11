@@ -45,6 +45,24 @@ module.exports = function(grunt) {
                     options: {
                         stdout: true
                     }
+                },
+                encryptConfig: {
+                    command: 'openssl cast5-cbc -e -in config.js -out config.js.cast5',
+                    options: {
+                        stdout: true,
+                        execOptions: {
+                            cwd: path.join(__dirname, 'server')
+                        }
+                    }
+                },
+                decryptConfig: {
+                    command: 'openssl cast5-cbc -d -in config.js.cast5 -out config.js && chmod 600 config.js',
+                    options: {
+                        stdout: true,
+                        execOptions: {
+                            cwd: path.join(__dirname, 'server')
+                        }
+                    }
                 }
             },
             watch: {
@@ -107,5 +125,7 @@ module.exports = function(grunt) {
     // Default task(s).
     grunt.registerTask('dev', ['concurrent:dev']);
     grunt.registerTask('debug', ['concurrent:debug']);
+    grunt.registerTask('decrypt-config', ['shell:decryptConfig']);
+    grunt.registerTask('encrypt-config', ['shell:encryptConfig']);
     
 };
