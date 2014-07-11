@@ -4,11 +4,11 @@
 /* Controllers */
 
 angular.module('co-op.controllers', []).
-controller('MyCtrl1', [
-	function() {
+    controller('MyCtrl1', [
+    	function() {
 
-	}
-])
+    	}
+    ])
 	
 	.controller('navCtrl', ['$scope', '$location', 'LoginManager', 'CartRecords',
 		function($scope, $location, LoginManager, CartRecords) {
@@ -213,6 +213,8 @@ controller('MyCtrl1', [
 	function($scope, $rootScope, $modal, ProductManager, ProductHistory, Restangular) {
 		//	  $scope.theImage = ''; //sets empty variable to be populated if user uses the input[type=file] method to upload an image
 
+        $scope.productManager = ProductManager;
+        
 		ProductHistory.getData(function(result) {
 			$scope.data = result;
 		});
@@ -408,10 +410,10 @@ controller('MyCtrl1', [
 	}
 ])
 
-.controller('storeCtrl', ['$scope', '$filter', '$modal', 'Restangular',
-	function($scope, $filter, $modal, Restangular) {
+.controller('storeCtrl', ['$scope', '$filter', '$modal', 'Restangular', 'ProductManager',
+	function($scope, $filter, $modal, Restangular, ProductManager) {
 		$scope.products = Restangular.all('product').getList().$object;
-		
+        $scope.productManager = ProductManager;
 		$scope.sort="alphabetical";
 		
 		$scope.blurb = function(string, length, link) {

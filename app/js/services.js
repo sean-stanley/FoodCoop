@@ -129,21 +129,49 @@ angular.module('co-op.services', [])
 	})
 	
 	.factory('ProductManager', ['$http', 'Restangular', function($http, Restangular) {
-		return {
+        var module, productCategoryPromise, categoryIdMapping = {}, categoryNameMapping = {};
+        
+        productCategoryPromise = Restangular.all("category").getList();
+        
+        // When the categories are all loaded, cache a mapping from 
+        // the id and the name to the object
+        productCategoryPromise.then(function (categories) {
+            var i, category;
+            for (i in categories) {
+                if (categories.hasOwnProperty(i)) {
+                    category = categories[i];
+                    if (category) {
+                        categoryIdMapping[category._id] = category;
+                        categoryNameMapping[category.name] = category;
+                    }
+                }
+            }
+        });
+        
+		module = {
 			registerProduct : function(productData) {
 				//$http.post("api/product", productData);
 				Restangular.all('product').post(productData);
 			},
 			
-			productCategories : Restangular.all("category").getList().$object,
+			productCategories : productCategoryPromise.$object,
 			
 			certificationTypes: Restangular.all("certification").getList().$object,
 			
 			getUserProducts: function(callback){
 				$http.get("api/product?producerCompany=:currentUser.producerData.companyName");
-			}
-
+			},
+            
+            categoryByID: function (id) {
+                return categoryIdMapping[id];
+            },
+            
+            categoryByName: function (name) {
+                return categoryNameMapping[name];
+            }
 		};
+        
+        return module;
 	}])
 	
 	.factory('ProducerManager', ['$http', function($http) {

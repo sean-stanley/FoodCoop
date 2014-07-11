@@ -86,7 +86,7 @@
 						</div>
 						<div class="form-group col-md-6">
 							<label for="inputVariety" ng-model="variety">Variety</label>
-							<input ng-model="productData.variety" type="text" class="form-control" id="inputVariety" maxlength="18" placeholder="e.g. {{category.placeholderVariety}}">
+							<input ng-model="productData.variety" type="text" class="form-control" id="inputVariety" maxlength="18" placeholder="e.g. {{ productManager.categoryByID(productData.category).placeholderVariety }}">
 						</div>
 					</div>
 				
