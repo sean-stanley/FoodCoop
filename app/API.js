@@ -7,6 +7,7 @@ var util = require('util'),
 	express = require('express');
 	mongoose = require('mongoose'),
 	models = require('./models.js'),
+	mail = require('./mailer.js'),
 	passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy;
 
@@ -23,6 +24,10 @@ exports.configAPI = function configAPI(app){
 		app.use(express.static(__dirname));
 		app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 	});
+	app.post("/api/email", function(req, res, next) {
+		
+	});
+	
 	app.get("/api/product", function(req, res, next) {
 		models.Product.find(req.query, null, { sort:{ _id : 1 }}, function(e, results) {
 			res.send(results);
