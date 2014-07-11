@@ -309,8 +309,8 @@ controller('MyCtrl1', [
 
 ])
 
-.controller('imageModalEditorCtrl', ['$scope', '$sce', '$modalInstance', 'data',
-	function($scope, $sce, $modalInstance, data) {
+.controller('imageModalEditorCtrl', ['$scope', '$sce', '$modalInstance', 'data', '$rootScope',
+	function($scope, $sce, $modalInstance, data, $rootScope) {
 		$scope.imageChoices = data;
 
 		$scope.selected = {
@@ -318,12 +318,12 @@ controller('MyCtrl1', [
 		};
 
 		$scope.ok = function() {
-			$scope.$broadcast("cropme:ok");
-			$modalInstance.close($scope.selected.image);
+			$rootScope.$broadcast("cropme:ok");
+			// $modalInstance.close($scope.selected.image);
 		};
 
 		$scope.cancel = function() {
-			$scope.$broadcast("cropme:cancel");
+			$rootScope.$broadcast("cropme:cancel");
 			$modalInstance.dismiss('never mind');
 		};
 
@@ -331,6 +331,7 @@ controller('MyCtrl1', [
 			console.log(blob);
 			var fileURL = URL.createObjectURL(blob);
 			$scope.selected.image = $sce.trustAsResourceUrl(fileURL);
+            $modalInstance.close($scope.selected.image);
 		});
 	}
 ])

@@ -277,12 +277,12 @@ angular.module('co-op.directives', []).
                   if (!newValue) {
                       scope.selectValue = '--- Select a Category ---';
                   } else {
-                      scope.selectValue = categoryIdToNameMapping[newValue];
+                      scope.selectValue = categoryNameToIdMapping[newValue];
                   }
               });
               
               scope.$watch('selectValue', function (newValue) {
-                  scope.modelVar = categoryNameToIdMapping[newValue];
+                  scope.modelVar = categoryIdToNameMapping[newValue];
               });
           }
       };
