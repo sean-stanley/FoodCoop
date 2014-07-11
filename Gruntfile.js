@@ -86,7 +86,7 @@ module.exports = function(grunt) {
                         //watchedFolders: ['.', '../common/ui'],
                         delayTime: 1,
                         legacyWatch: true,
-                        cwd: 'app'
+                        cwd: 'server'
                     }
                 }
             },
