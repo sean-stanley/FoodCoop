@@ -3,6 +3,7 @@
 var util = require('util'),
     http = require('http'),
     fs = require('fs'),
+    path = require('path'),
     url = require('url'),
     events = require('events'),
 	express = require('express'),
@@ -23,7 +24,7 @@ var db = mongoose.connection;
 
 var app = API.configAPI(express());
 
-app.use(express.static(__dirname));
+app.use(express.static(path.normalize(path.join(__dirname, '../app'))));
 app.use(forgot.middleware);
 
 passport.use(models.User.createStrategy());
