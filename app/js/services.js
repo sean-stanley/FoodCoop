@@ -28,7 +28,7 @@ angular.module('co-op.services', [])
 		return {
 			login : function(provider, form, callback) {
 				var cb = callback || angular.noop;
-				Restangular.all('/auth/session/').post({
+				Restangular.all('auth/session/').post({
 					provider: 'local',
 					email: form.email,
 					password: form.password,
@@ -36,13 +36,14 @@ angular.module('co-op.services', [])
 					})
 				.then(function (user) {
 					var properties;
+					var User = {};
 					console.log("User ", user);
 					properties = Object.getOwnPropertyNames(user);
 					properties.forEach(function (key) {
 						User[key] = user[key];
 						});
-					$rootScope.currentUser = user;
-					$cookieStore.put('user', user);
+					$rootScope.currentUser = User;
+					$cookieStore.put('user', $rootScope.currentUser);
 					
 					return cb();
 					

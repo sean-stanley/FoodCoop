@@ -26,7 +26,6 @@ angular.module('co-op.controllers', []).
 
 		$scope.logOut = function() {
 			LoginManager.logout();
-			$location.path('/home');
 		};
 	}
 ])
