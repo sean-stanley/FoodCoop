@@ -67,7 +67,7 @@ angular.module('co-op.controllers', []).
 	function($scope, Restangular, $location) {
 
 		// First way of creating a Restangular object. Just saying the base URL
-		var allUsers = Restangular.all('user');
+		var allUsers = Restangular.all('api/user');
 
 		// This will query /user and return a promise.
 		allUsers.getList().then(function(users) {
@@ -127,7 +127,7 @@ angular.module('co-op.controllers', []).
 
 
 		$scope.submitForm = function() {
-			Restangular.all('user').post($scope.userData).then(function(user) {
+			Restangular.all('api/user').post($scope.userData).then(function(user) {
 			      LoginManager.login('local', user);
 				  $location.path('/thankyou');
 				  
@@ -275,7 +275,7 @@ angular.module('co-op.controllers', []).
 		};
 		
 		
-		var certifications = Restangular.all('certification');
+		var certifications = Restangular.all('api/certification');
 		
 		certifications.getList().then(function(certification) {
 			$scope.certifications = certification;
@@ -412,7 +412,7 @@ angular.module('co-op.controllers', []).
 
 .controller('storeCtrl', ['$scope', '$filter', '$modal', 'Restangular', 'ProductManager',
 	function($scope, $filter, $modal, Restangular, ProductManager) {
-		$scope.products = Restangular.all('product').getList().$object;
+		$scope.products = Restangular.all('api/product').getList().$object;
         $scope.productManager = ProductManager;
 		$scope.sort="alphabetical";
 		

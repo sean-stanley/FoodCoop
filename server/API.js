@@ -142,33 +142,32 @@ exports.configAPI = function configAPI(app){
 			res.send(results)
 		})
 	});
-	app.get('/auth/session', 
-	function ensureAuthenticated(req, res, next) {
+	app.get('/auth/session', function ensureAuthenticated(req, res, next) {
 		if (req.isAuthenticated()) { return next(); }
 		res.send(401);},
-	function (req, res) {
-		res.json(req.user.user_info);
+		function (req, res) {
+			res.json(req.user.user_info);
 	});
 	app.post('/auth/session', function (req, res, next) {
 		passport.authenticate('local', function(err, user, info) {
 			var error = err || info;
 			if (error) { return res.json(400, error); }
 			req.logIn(user, function(err) {
-                var userObject;
+				var userObject;
                 
-                if (req.user) {
-                   userObject = req.user.toObject();
-                } 
+				if (req.user) {
+					userObject = req.user.toObject();
+				} 
                 
 				if (err) { 
-                    return res.send(err); 
-                } else {
-                    if (userObject) {
-                        delete userObject.salt;
-                        delete userObject.hash;
-                        res.json(userObject);
-                    }
-                }
+					return res.send(err); 
+				} else {
+					if (userObject) {
+						delete userObject.salt;
+						delete userObject.hash;
+						res.json(userObject);
+					}
+				}
 			});
 		})(req, res, next);
 	});

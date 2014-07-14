@@ -3,27 +3,66 @@
 
 /* Services */
 
-
-// Demonstrate how to register services
-// In this case it is a simple value service.
 angular.module('co-op.services', [])
 	
-	.factory('Session', function ($resource, User) {
-		return $resource('/auth/session/');
-        /*
-        .then(function (user) {
-            var properties;
-		    console.log("User", user);
-            properties = Object.getOwnPropertyNames(user);
-            properties.forEach(function (key) {
-                User[key] = user[key];
-            });
-		}); */
+	.factory('Session', function (Restangular) {
+		//return $resource('/auth/session/');
+		return Restangular.all('/auth/session/');
+		
+		/*
+		.then(function (user) {
+					var properties;
+					console.log("User ", user);
+					properties = Object.getOwnPropertyNames(user);
+					properties.forEach(function (key) {
+						User[key] = user[key];
+					});
+				});*/
+		
 	})
 	.factory('User', function ($resource) {
 		return {};
 	})
-	.factory('LoginManager', function Auth($location, $rootScope, Session, User, $cookieStore) {
+	
+	.factory('LoginManager', function ($location, $rootScope, $cookieStore, Restangular){
+		return {
+			login : function(provider, form, callback) {
+				var cb = callback || angular.noop;
+				Restangular.all('/auth/session/').post({
+					provider: 'local',
+					email: form.email,
+					password: form.password,
+					rememberMe: form.rememberMe
+					})
+				.then(function (user) {
+					var properties;
+					console.log("User ", user);
+					properties = Object.getOwnPropertyNames(user);
+					properties.forEach(function (key) {
+						User[key] = user[key];
+						});
+					$rootScope.currentUser = user;
+					$cookieStore.put('user', user);
+					
+					return cb();
+					
+					}, 
+					function(err) {
+						console.log(err.data);
+						return cb();
+					}
+				);
+			},
+			
+			logout : function() {
+				$cookieStore.remove('user');
+				$rootScope.currentUser = null;
+				$location.path('/home');
+			}
+		};
+	})
+	
+	.factory('LoginManagerOLD', function Auth($location, $rootScope, Session, User, $cookieStore) {
 		$rootScope.currentUser = $cookieStore.get('User') || null;
 		$cookieStore.remove('user');
 
@@ -35,10 +74,9 @@ angular.module('co-op.services', [])
 			  provider: provider,
 			  email: user.email,
 			  password: user.password,
-			  rememberMe: user.rememberMe,
-			  user_type: User.user_type
-			}, function(user) {
-			  $rootScope.currentUser = user;
+			  rememberMe: user.rememberMe
+			}, function(User) {
+			  $rootScope.currentUser = User;
 			  return cb();
 			}, function(err) {
 			  return cb(err.data);
@@ -135,7 +173,7 @@ angular.module('co-op.services', [])
 	.factory('ProductManager', ['$http', 'Restangular', function($http, Restangular) {
         var module, productCategoryPromise, categoryIdMapping = {}, categoryNameMapping = {};
         
-        productCategoryPromise = Restangular.all("category").getList();
+        productCategoryPromise = Restangular.all("api/category").getList();
         
         // When the categories are all loaded, cache a mapping from 
         // the id and the name to the object
@@ -160,7 +198,7 @@ angular.module('co-op.services', [])
 			
 			productCategories : productCategoryPromise.$object,
 			
-			certificationTypes: Restangular.all("certification").getList().$object,
+			certificationTypes: Restangular.all("api/certification").getList().$object,
 			
 			getUserProducts: function(callback){
 				$http.get("api/product?producerCompany=:currentUser.producerData.companyName");

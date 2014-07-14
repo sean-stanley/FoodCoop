@@ -16,9 +16,9 @@ angular.module('co-op', [
 	'ngAnimate', 
 	'ui.bootstrap',
 	'cropme',
-	'restangular']).
+	'restangular'])
 
-  config(['$routeProvider', 'RestangularProvider', function($routeProvider, RestangularProvider) {
+  .config(['$routeProvider', 'RestangularProvider', function($routeProvider, RestangularProvider) {
     $routeProvider.when('/home', {templateUrl: 'partials/index-content.html', controller: 'MyCtrl1'});
     $routeProvider.when('/signup', {templateUrl: 'partials/signup.html', controller: 'userCtrl'});
     $routeProvider.when('/thankyou', {templateUrl: 'partials/thankyou.html', controller: 'signupInvoiceCtrl'});
@@ -55,7 +55,7 @@ angular.module('co-op', [
     $routeProvider.when('/store', {templateUrl: 'store.html'});
     $routeProvider.otherwise({redirectTo: '/home'});
     
-	RestangularProvider.setBaseUrl('/api');
+	// RestangularProvider.setBaseUrl('/api');
 	RestangularProvider.setRequestInterceptor(function(elem, operation, what) {        
 		if (operation === 'put') {
 			elem._id = undefined;
@@ -68,10 +68,16 @@ angular.module('co-op', [
 	});
 	
   }])
-  .run(function($rootScope, $location, LoginManager) {
-  
-        $rootScope.$on( '$routeChangeStart', function(event, next, current) {
-        	switch(next.originalPath) {
+	.run(function($rootScope, $location, $cookieStore, LoginManager) {
+		$rootScope.currentUser = null;
+		
+		if ($cookieStore.get('user')) {
+			$rootScope.currentUser = $cookieStore.get('user');
+		}
+		
+		
+		$rootScope.$on( '$routeChangeStart', function(event, next, current) {
+			switch(next.originalPath) {
 				case '/home':
 				case '/about':
 				case '/faq':
