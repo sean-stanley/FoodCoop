@@ -10,12 +10,12 @@ var ProductSchema = new Schema({
 			price: {type: Number, required: true},
 			quantity: {type: Number, required: true},
 			units: {type: String, required: true},
-			refrigeration: {type: String, required: true},
+			refrigeration: {type: String, required: false},
 			
 			ingredients: {type: String, required: false},
 			description: {type: String, required: false},
 			certification: {type: Schema.ObjectId, required: false},
-			producer_ID: {type:Schema.ObjectId, required: false}
+			producer_ID: {type:Schema.ObjectId, required: true}
 });
 var OrderSchema = new Schema({
 		datePlaced: {type: Date, default: Date.now()},

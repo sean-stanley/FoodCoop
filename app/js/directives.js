@@ -249,12 +249,14 @@ angular.module('co-op.directives', []).
               modelVar: '='
           },
           template: '<select ng-model="selectValue" ng-options="name for name in categoryNames"></select>',
+		  //template: '<div class="btn-group center-block"><label ng-repeat="category in categories" class="btn btn-primary" ng-model="productData.category" btn-radio="category._id">{{category.name}}</label></div>',
           link: function(scope, element, attrs, ctrl) {
               var categoryIdToNameMapping = {}, categoryNameToIdMapping = {};
               
               scope.test = '';
 			  scope.placeholderName = '';
 			  scope.placeholderVariety = '';
+			  scope.availableUnits = [];
               
               scope.categories = ProductManager.productCategories;
               

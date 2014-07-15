@@ -7,7 +7,7 @@ angular.module('co-op.services', [])
 	
 	.factory('Session', function (Restangular) {
 		//return $resource('/auth/session/');
-		return Restangular.all('/auth/session/');
+		return Restangular.all('auth/session/');
 		
 		/*
 		.then(function (user) {
@@ -24,11 +24,11 @@ angular.module('co-op.services', [])
 		return {};
 	})
 	
-	.factory('LoginManager', function ($location, $rootScope, $cookieStore, Restangular){
+	.factory('LoginManager', function ($location, $rootScope, $cookieStore, Session, Restangular){
 		return {
 			login : function(provider, form, callback) {
 				var cb = callback || angular.noop;
-				Restangular.all('auth/session/').post({
+				Session.post({
 					provider: 'local',
 					email: form.email,
 					password: form.password,
@@ -105,7 +105,7 @@ angular.module('co-op.services', [])
 		};
 	}])
 
-	.factory('UserManager', function Auth($http, $rootScope, Session, User) {
+	.factory('UserManager', function Auth($http, $rootScope, Restangular) {
 		return {
 			createUser: function(userinfo, callback) {
 				var cb = callback || angular.noop;
@@ -171,21 +171,25 @@ angular.module('co-op.services', [])
 		};
 	})
 	
-	.factory('ProductManager', ['$http', 'Restangular', function($http, Restangular) {
-        var module, productCategoryPromise, categoryIdMapping = {}, categoryNameMapping = {};
+	.factory('ProductManager', ['$http', 'Restangular', '$rootScope', function($http, Restangular, $rootScope) {
+        var module, productCategoryPromise, categoryIdMapping = {}, categoryNameMapping = {}, unitSuggestions = [];
         
-        productCategoryPromise = Restangular.all("api/category").getList();
+        productCategoryPromise = Restangular.all("api/category");
         
         // When the categories are all loaded, cache a mapping from 
         // the id and the name to the object
-        productCategoryPromise.then(function (categories) {
-            var i, category;
+        productCategoryPromise.getList().then(function (categories) {
+            var i, category, unit;
             for (i in categories) {
                 if (categories.hasOwnProperty(i)) {
                     category = categories[i];
                     if (category) {
                         categoryIdMapping[category._id] = category;
                         categoryNameMapping[category.name] = category;
+						for (unit in category.availableUnits) {
+							unitSuggestions.push(category.availableUnits[unit]);
+						}
+							
                     }
                 }
             }
@@ -194,10 +198,14 @@ angular.module('co-op.services', [])
 		module = {
 			registerProduct : function(productData) {
 				//$http.post("api/product", productData);
-				Restangular.all('product').post(productData);
+				Restangular.all('api/product').post(productData);
 			},
 			
-			productCategories : productCategoryPromise.$object,
+			unitSuggestions : unitSuggestions,
+			
+			productCategoryPromise : productCategoryPromise,
+			
+			productCategories : productCategoryPromise.getList().$object,
 			
 			certificationTypes: Restangular.all("api/certification").getList().$object,
 			

@@ -1,14 +1,30 @@
 {
   "name": "angular-superswipe",
-  "homepage": "https://github.com/standup75/superswipe",
-  "version": "0.0.1",
-  "_release": "0.0.1",
+  "version": "0.0.2",
+  "main": "superswipe.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/standup75/superswipe.git"
+  },
+  "homepage": "https://github.com/standup75/superswipe.git",
+  "description": "Same as angular $swipe factory, except works horizontally AND vertically (does not let the browser scroll in case of vertical swipe)",
+  "keywords": [
+    "swipe",
+    "angular",
+    "touch",
+    "vertical"
+  ],
+  "authors": [
+    "Stanislas Duprey <me@standupweb.net>"
+  ],
+  "license": "MIT",
+  "_release": "0.0.2",
   "_resolution": {
     "type": "version",
-    "tag": "0.0.1",
-    "commit": "c9218262f05b5a92f11b845d7476dc28c4fcaf0b"
+    "tag": "0.0.2",
+    "commit": "72ab3bc205f5e22691f91184a7a1ed56e780ef5c"
   },
   "_source": "git://github.com/standup75/superswipe.git",
-  "_target": "~0.0.1",
+  "_target": "~0.0.2",
   "_originalSource": "angular-superswipe"
 }

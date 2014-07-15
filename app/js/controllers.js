@@ -94,7 +94,7 @@ angular.module('co-op.controllers', []).
 		  };
 
 		  $scope.save = function() {
-		    $scope.project.put().then(function() {
+		    $scope.user.put().then(function() {
 		      $location.path('/');
 		    });
 		  };
@@ -210,9 +210,21 @@ angular.module('co-op.controllers', []).
 
 .controller('productUpload', ['$scope', '$rootScope', '$modal', 'ProductManager', 'ProductHistory', 'Restangular',
 	function($scope, $rootScope, $modal, ProductManager, ProductHistory, Restangular) {
-		//	  $scope.theImage = ''; //sets empty variable to be populated if user uses the input[type=file] method to upload an image
-
-        $scope.productManager = ProductManager;
+		$scope.productManager = ProductManager;
+		
+		$scope.ingredients = false; //show or hide ingredients field
+		$scope.onSelect = function ($item, $model, $label) {
+		    $scope.$item = $item;
+		    $scope.$model = $model;
+		    $scope.$label = $label;
+		};
+		$scope.categoryPromise = $scope.productManager.productCategoryPromise;
+		
+		
+		
+		
+		//$scope.availableUnits = ["kg","g","10kg","L","750ml","jar","bottle","unit"];
+		
         
 		ProductHistory.getData(function(result) {
 			$scope.data = result;
@@ -232,22 +244,9 @@ angular.module('co-op.controllers', []).
 		};
 		
 		
-		$scope.ingredients = false; //show or hide ingredients field
-
-		/*
-		$scope.$watch('productData.category', function(newValue, oldValue) {
-					if (newValue) {
-						$scope.availableUnits = newValue.availableUnits;
-						$scope.ingredients = newValue.ingredients;
-					}
-				});*/
-		
-		
-		
-		// The following two functions should be removed at some stage and .productData modified to just use producer_ID to find out info about the producer
 		$scope.producerName = function() {
 			var el = "";
-			if ($rootScope.currentUser.name) {
+			if ($rootScope.currentUser.hasOwnProperty('name')) {
 				el = $rootScope.currentUser.name;
 			}
 			else {
@@ -258,7 +257,7 @@ angular.module('co-op.controllers', []).
 		
 		$scope.producerCompany = function() {
 			var el = "";
-			if ($rootScope.currentUser.producerData) {
+			if ($rootScope.currentUser.producerData.hasOwnProperty('companyName')) {
 				el = $rootScope.currentUser.producerData.companyName;
 			}
 			else {
@@ -267,13 +266,19 @@ angular.module('co-op.controllers', []).
 			return el;
 		};
 		
-		$scope.productData = {
-			producerName: $scope.producerName,
-			producerCompany: $scope.producerCompany,
-			producer_ID: null //Need to set this to the object ID of the user once the currentUser object gets those properties from the database 
+		
+		$scope.setCategory = function(category) {
+			$scope.productData.category = category;
+			return $scope.productData.category;
 		};
 		
-		
+		$scope.productData = {
+			producerName: $scope.producerName(),
+			producerCompany: $scope.producerCompany(),
+			producer_ID: $rootScope.currentUser._id,
+			refrigeration: 'none'
+		};
+
 		var certifications = Restangular.all('api/certification');
 		
 		certifications.getList().then(function(certification) {
@@ -291,7 +296,7 @@ angular.module('co-op.controllers', []).
 			var modalInstance = $modal.open({
 				templateUrl: 'partials/cropme-modal.html',
 				controller: 'imageModalEditorCtrl',
-				size: 'lg',
+				size: 'md',
 				resolve: {
 					data: function() {
 						return $scope.imageChoices;
@@ -300,7 +305,7 @@ angular.module('co-op.controllers', []).
 			});
 			
 			modalInstance.result.then(function (selectedImg) {
-				$scope.img = selectedImg;
+				$scope.productData.img = selectedImg;
 			}, function () {
 				console.log('Modal dismissed at: ' + new Date());
 			});
