@@ -136,19 +136,19 @@
 			
 						<label> Sort: </label>
 						<div class="btn-group">
-							<label class="btn btn-primary" ng-model="sort" btn-radio="'producerCompanyName'">Producer</label>
-							<label class="btn btn-primary" ng-model="sort" btn-radio="'productName'">Alphabetical</label>
-							<label class="btn btn-primary" ng-model="sort" btn-radio="'price'">Price</label>
+							<button type='button' class="btn btn-primary" ng-model="sort" btn-radio="'producerCompanyName'" uncheckable>Producer</button>
+							<button type='button' class="btn btn-primary" ng-model="sort" btn-radio="'productName'" uncheckable>Alphabetical</button>
+							<button type='button' class="btn btn-primary" ng-model="sort" btn-radio="'price'" uncheckable>Price</button>
 						</div>
 			            <label> Filter: </label>
 						<div class="btn-group">
-							<label class="btn btn-default" ng-model="search.category" btn-radio="{{productManager.categoryByName('Produce')._id}}" uncheckable>Produce</label>
-							<label class="btn btn-default" ng-model="search.category" btn-radio="'meat'" uncheckable>Meat</label>
-							<label class="btn btn-default" ng-model="search.category" btn-radio="'processed-goods'" uncheckable>Processed Goods</label>
-							<label class="btn btn-default" ng-model="search.category" btn-radio="'baked-goods'" uncheckable>Baked Goods</label>
-							<label class="btn btn-default" ng-model="search.category" btn-radio="'dariy'" uncheckable>Dairy</label>
-							<label class="btn btn-default" ng-model="search.category" btn-radio="'milk'" uncheckable>Milk</label>
-							<label class="btn btn-default" ng-model="search.category" btn-radio="">None</label>
+							<button type='button' class="btn btn-default" ng-model="search.category" btn-radio="'{{productManager.categoryByName('Produce')._id}}'" uncheckable>Produce</button>
+							<button type='button' class="btn btn-default" ng-model="search.category" btn-radio="'meat'" uncheckable>Meat</button>
+							<button type='button' class="btn btn-default" ng-model="search.category" btn-radio="'processed-goods'" uncheckable>Processed Goods</button>
+							<button type='button' class="btn btn-default" ng-model="search.category" btn-radio="'baked-goods'" uncheckable>Baked Goods</button>
+							<button type='button' class="btn btn-default" ng-model="search.category" btn-radio="'dariy'" uncheckable>Dairy</button>
+							<button type='button' class="btn btn-default" ng-model="search.category" btn-radio="'milk'" uncheckable>Milk</button>
+							<button type='button' class="btn btn-default" ng-model="search.category" btn-radio="">None</button>
 						</div>
 					</section>
 				</div>

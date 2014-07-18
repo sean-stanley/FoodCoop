@@ -5,7 +5,7 @@
 		<h2>Preview <small>Live</small></h2>
 		<div class="product-container" ng-controller="productUICtrl" ng-mouseleave="detailsVisible = false" style="width:100%; margin: 0">
 			<figure class="first-layer" ng-mouseover="callDelayed()" ng-mouseleave="callCancelled()">
-				<img ng-src="{{productData.img}}" class="img-responsive" style="width:100%; height: auto;">
+				<img ng-src="{{productData.img}}" class="img-responsive">
 				<figcaption>
 					<button class="btn btn-primary pull-right" ng-click="addToCart()">Add to Cart</button>
 					<h5>{{productData.variety}} {{productData.productName}}</h5>

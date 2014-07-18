@@ -37,14 +37,21 @@ angular.module('co-op.services', [])
 				.then(function (user) {
 					var properties;
 					var User = {};
-					console.log("User ", user);
+					console.log("user: " + user);
 					properties = Object.getOwnPropertyNames(user);
 					properties.forEach(function (key) {
 						User[key] = user[key];
-						});
-					$rootScope.currentUser = User;
-					$cookieStore.put('user', $rootScope.currentUser);
+					});
+					if (User.producerData.hasOwnProperty('logo') ) {
+						User.producerData.logo = true;
+					}
+					else {
+						User.producerData.logo = null;
+					}
 					
+					$cookieStore.put('user', User);
+					
+					$rootScope.currentUser = User;
 					return cb();
 					
 					}, 
@@ -225,11 +232,27 @@ angular.module('co-op.services', [])
         return module;
 	}])
 	
-	.factory('ProducerManager', ['$http', function($http) {
+	.factory('ProducerManager', ['$http', 'Restangular', '$rootScope', '$cookieStore', function($http, Restangular, $rootScope, $cookieStore) {
 		return {
-			setProducer : function(producerData) {
-				$http.post("api/producerData/edit", producerData);
+			saveProducer : function() {
+				var userObject = $rootScope.currentUser;
+				if (userObject) {
+					delete userObject.producerData.logo;
+				}
+				$cookieStore.put('user', userObject);
+				console.log($rootScope.currentUser);
+				Restangular.all('api/user/producer/edit').post($rootScope.currentUser);
 			},
+			getProducerLogo : function(hasLogo) {
+				var id;
+				if (hasLogo) {
+					id = $rootScope.currentUser._id;
+					Restangular.one('api/user', id ).all('producer').customGET('logo').then(function(results) {
+						$rootScope.currentUser.producerData.logo = results.producerData.logo;
+					});
+				}
+				else return false;
+			} 
 		};
 	}])
 	

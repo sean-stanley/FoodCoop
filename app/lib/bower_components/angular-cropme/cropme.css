@@ -7,8 +7,6 @@ cropme {
   -moz-user-select: none;
   user-select: none;
 }
-    #cropme-cancel, #cropme-ok { display: none; }
-
 /* line 24, ../../styles/cropme.scss */
 cropme .step-1 {
   font-family: helvetica, arial, sans-serif;

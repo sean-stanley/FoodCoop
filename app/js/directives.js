@@ -176,7 +176,42 @@ angular.module('co-op.directives', []).
 
 })
   
-  
+.directive("fileread", [function () {
+    return {
+        restrict: 'A',
+		scope: {
+            fileread: "="
+        },
+        link: function (scope, element, attrs) {
+            var checkSize;
+            checkSize = function(size) {
+                var _ref;
+                if (((_ref = attrs.maxFileSize) === (void 0) || _ref === '') || (size / 1024) / 1024 < attrs.maxFileSize) {
+                    return true;
+                } else {
+                    alert("File must be smaller than " + attrs.maxFileSize + " MB");
+                    return false;
+                }
+            };
+			element.bind("change", function (changeEvent) {
+                var file, name, size, type;
+				var reader = new FileReader();
+                reader.onload = function (loadEvent) {
+					if (checkSize(size)) {
+					    scope.$apply(function () {
+	                        scope.fileread = loadEvent.target.result;
+	                    });
+					}
+				    
+                };
+				//file = event.originalEvent.dataTransfer.files[0];
+				file = changeEvent.target.files[0];
+				size = file.size;
+                reader.readAsDataURL(changeEvent.target.files[0]);
+            });
+        }
+    };
+}])
   .directive('fileDropzone', function() {
       return {
           restrict: 'A',

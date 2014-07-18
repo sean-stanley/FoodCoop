@@ -169,7 +169,6 @@ angular.module('co-op.controllers', []).
 			$scope.producerList = result;
 		});
 
-
 		$scope.predicate = 'dateJoined';
 
 		$scope.max = 5;
@@ -343,19 +342,16 @@ angular.module('co-op.controllers', []).
 ])
 
 
-.controller('producerCtrl', ['$scope', 'ProducerManager', '$location',
-	function($scope, ProducerManager, $location) {
-
-		$scope.producerData = {
-			image: '',
-			logo: '',
-			companyName: '',
-			description: '',
-		};
-
+.controller('producerCtrl', ['$scope', '$rootScope', '$sce', 'ProducerManager', '$location', '$modal',
+	function($scope, $rootScope, $sce, ProducerManager, $location, $modal) {
+		
+		if ($rootScope.currentUser.producerData.logo === true) {
+			ProducerManager.getProducerLogo(true);
+		}
+		
 		$scope.submitForm = function() {
-			ProducerManager.setProducer($scope.producerData);
-			$location.path('/product-upload');
+			ProducerManager.saveProducer();
+			//$location.path('/product-upload');
 		};
 
 	}
