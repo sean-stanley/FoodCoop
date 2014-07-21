@@ -26,6 +26,16 @@ angular.module('co-op.filters', []).
 			  
 	  };
   })
+  .filter('forURL', function() {
+	  return function(forURL) {
+		  var URLready;
+		  if (forURL) {
+			  forURL.toString();
+			  URLready = forURL.replace(/[ ]/g, "+");
+			  return URLready;
+		  }
+	  };
+  })
   .filter('shortDate', function() {
 	  return function(shortDate) {
 		  var y, m, d;

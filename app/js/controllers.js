@@ -94,7 +94,7 @@ angular.module('co-op.controllers', []).
 		  };
 
 		  $scope.save = function() {
-		    $scope.user.put().then(function() {
+		    $scope.user.post($scope.user._id).then(function() {
 		      $location.path('/');
 		    });
 		  };
@@ -163,35 +163,13 @@ angular.module('co-op.controllers', []).
 	}
 ])
 
-.controller('producerListCtrl', ['$scope', '$filter', '$modal', 'ProducerList',
-	function($scope, $filter, $modal, ProducerList) {
+.controller('producerListCtrl', ['$scope', '$filter', 'ProducerList',
+	function($scope, $filter, ProducerList) {
 		ProducerList.getData(function(result) {
 			$scope.producerList = result;
 		});
 
 		$scope.predicate = 'dateJoined';
-
-		$scope.max = 5;
-		$scope.isReadonly = true;
-
-		$scope.open = function(producer) {
-			var modalInstance = $modal.open({
-				templateUrl: 'partials/producer-modal.html',
-				controller: 'modalInstanceCtrl',
-				resolve: {
-					data: function() {
-						return producer;
-					}
-				}
-			});
-
-
-			modalInstance.result.then(function(selectedItem) {
-				$scope.selected = selectedItem;
-			}, function() {
-				console.log('Modal dismissed at: ' + new Date());
-			});
-		};
 
 	}
 ])

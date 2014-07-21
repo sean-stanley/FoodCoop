@@ -2,28 +2,36 @@
 
 <div class="form-group">
 	<label for="search">Search:</label>
-	<input ng-model="search" name="search" class="form-control" type="search"/>
+	<input ng-model="search" name="search" class="form-control" type="search" placeholder="what are you looking for?"/>
 </div>
 
-Sort by: 
-<ul class="nav nav-pills">
-	<li><a ng-click="predicate= 'feedbackScore'; reverse=!reverse">Feedback Rating</a></li>
-	<li><a ng-click="predicate= 'dateJoined'; reverse=!reverse">Date Joined</a></li>
-	<li><a ng-click="predicate= 'companyName'; reverse=!reverse">Company Name</a></li>
-	<li><a ng-click="predicate= 'producerName'; reverse=!reverse">Producer Name</a></li>
-	<li><a ng-click="predicate= 'rating'; reverse=!reverse">Producer Name</a></li>
+ <div class="btn-group" dropdown>
+      <button type="button" class="btn btn-primary dropdown-toggle" ng-disabled="disabled">
+        Sort By <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" role="menu">
+		<li><a ng-click="predicate= 'dateJoined'; reverse=!reverse">Date Joined</a></li>
+		<li><a ng-click="predicate= 'producerData.companyName'; reverse=!reverse">Company Name</a></li>
+		<li><a ng-click="predicate= 'name'; reverse=!reverse">Producer Name</a></li>
+      </ul>
+    </div>
 
-</ul>
-
-<div class="media" ng-repeat="i in producerList | orderBy:predicate:reverse | filter:search" ng-click="open(i)">
-	<a href="" class="pull-left">
-		<img ng-src="{{i.producerData.logo}}" height="100px"/>
+<div class="media producer-box" ng-repeat="i in producerList | orderBy:predicate:reverse | filter:search">
+	<a href="" class="pull-left" ng-show="i.producerData.logo">
+		<img class="producer-img-small" ng-src="{{i.producerData.logo}}" height="150px"/>
 	</a>
 
 	<div class="media-body">
-		<h4>{{i.producerData.companyName}} <small>{{i.name}}</small></h4>
-		<a ng-href="mailto:{{i.email}}">{{i.email}}</a>
-		<div fundoo-rating rating-value="i.feedbackScore" max="5" readonly="true"></div>
+		<a ng-href="#/producer/{{i.producerData.companyName | forURL}}-{{i.name | forURL}}"><button class="btn btn-default pull-right">More Details</button></a>
+		<h3>{{i.producerData.companyName}} <small>{{i.name}}</small></h3>
+        <ul class="unstyled">
+			<li><span class="glyphicon glyphicon-map-marker"></span> 
+				<a ng-href="//mapof.it/{{currentUser.address | forURL}}/{{i.address | forURL}}">{{i.address}}</a>
+			</li>
+        </ul>
+		<hr>
+		<article>{{i.producerData.description | blurb}}</article>
+		
+		
 	</div>
-	
 </div>

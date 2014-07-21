@@ -29,6 +29,26 @@ a:hover {
 .image-drop div {margin-top:2.3em;}
 .image-drop div p{margin-bottom:-10px;}
 
+
+/*
+ProducerList Page
+*/
+.producer-box {
+	padding: 10px;
+	margin: 15px 0;
+	border-bottom: 1px #cdcdcd solid;
+}
+
+.producer-img-small {
+	max-height: 150px;
+	border: 1px #cdcdcd solid;
+	padding: 2px;
+	background: white;
+	margin-right: 30px;
+}
+
+
+
 /*
 Content Pages
 */

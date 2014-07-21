@@ -97,8 +97,13 @@ exports.configAPI = function configAPI(app){
 		});
 	app.get("/api/user", function(req, res, next) {
 		models.User.find(req.query, null, { sort:{ _id : 1 }}, function(e, results){
-			res.send(results)
-		})
+			if (!e) {
+				res.send(results);
+			}
+			else {
+				console.log(e)
+			}
+		});
 	});
 	
 	
@@ -118,21 +123,21 @@ exports.configAPI = function configAPI(app){
 		});
 	});
 	app.post("/api/user/:id", function(req, res, next) {
-		var user = models.User.findById(req.params.id);
-		for (key in req.body) {
-			if (user[key] !== req.body[key]) {
-				console.log("we are now replacing the old user's "+key+" which evaluates to: "+user[key]+" with the new value of: "+req.body[key]);
-				user[key] = req.body[key];
-			}
-		}
-		user.save(function(e, user) {
+		models.User.findById(req.params.id, function(e, user) {
 			if (!e) {
+				var userObject = user.toObject();
+				for (key in req.body) {
+					if (userObject[key] !== req.body[key]) {
+						console.log("we are now replacing the old user's "+key+" which evaluates to: "+userObject[key]+" with the new value of: "+req.body[key]);
+						user[key] = req.body[key];
+					}
+				}
+				user.save();
 				res.send(user);
 			}
 			else {
 				console.log(e)
 			}
-		});
 		});
 	});
 	app.get("/api/user/:id", function(req, res, next) {
@@ -145,6 +150,17 @@ exports.configAPI = function configAPI(app){
 			}
 		});
 	});
+	app.get("/api/user/producer/:producerName", function(req, res, next) {
+		models.User.findOne({name: req.params.producerName}, null, { sort:{ _id : 1 }}, function(e, results){
+			if (!e) {
+				res.send(results);
+			}
+			else {
+				console.log(e)
+			}
+		});
+	});
+	
 	app.get("/api/user/:id/producer/logo", function(req, res, next) {
 		models.User.findById(req.params.id, 'producerData.logo', function(e, results){
 			if (!e) {

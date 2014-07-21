@@ -32,10 +32,18 @@ angular.module('co-op', [
 	        templateUrl:'partials/admin/details.html',
 	        resolve: {
 	          user: function(Restangular, $route){
-	            return Restangular.one('user', $route.current.params.userId).get();
+	            return Restangular.one('api/user', $route.current.params.userId).get();
 	          }
 	        }
 	      });
+	$routeProvider.when('/producer/:companyName-:userName', {
+		templateUrl:'partials/producer-page.html',
+		resolve: {
+			producer: function(Restangular, $route){
+				return Restangular.all('api/').get('user',{name: $route.current.params.userName});
+			}
+		}
+	});
 	$routeProvider.when('/about', {templateUrl: 'partials/about.html'});
     $routeProvider.when('/producer-list', {templateUrl: 'partials/producer-list.html', controller: 'producerListCtrl'});
 	$routeProvider.when('/faq', {templateUrl: 'partials/faq.html'});

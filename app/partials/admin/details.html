@@ -23,7 +23,7 @@
 	
 	<div class="form-group" ng-controller="geoCtrl">
 		<label for="address">Address</label>
-		<input type="text" id="Autocomplete" class="form-control" ng-autocomplete="userData.address" details="addressDetails" options="addressOptions" ng-model="user.address"/>
+		<input name="userAddress" type="text" class="form-control" ng-model="user.address"/>
 		
 		<div class="custom-error" ng-show="userEdit.address.$dirty && userEdit.address.$invalid">		Sorry:
 			<span ng-show="userEdit.userFullName.$error.required">A NZ address is required.</span>
