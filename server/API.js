@@ -24,6 +24,7 @@ exports.configAPI = function configAPI(app){
 		app.use(express.static(__dirname));
 		app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 	});
+	
 	app.post("/api/email", function(req, res, next) {
 		
 	});
@@ -182,39 +183,28 @@ exports.configAPI = function configAPI(app){
 			res.send(results)
 		})
 	});
-	app.get('/auth/session', function ensureAuthenticated(req, res, next) {
-		if (req.isAuthenticated()) { return next(); }
-		res.send(401);},
+	app.get('/auth/session', function (req, res, next) {
+		if (req.user) { 
+			//console.log('according to the server, this is req.user: ' + req.user)
+			res.send(req.user);
+		}
+		/*
 		function (req, res) {
-			res.json(req.user.user_info);
+					res.json(req.user.user_info);*/
+		
 	});
-	app.post('/auth/session', function (req, res, next) {
-		passport.authenticate('local', function(err, user, info) {
-			var error = err || info;
-			if (error) { return res.json(400, error); }
-			req.logIn(user, function(err) {
-				var userObject;
-                
-				if (req.user) {
-					userObject = req.user.toObject();
-				} 
-                
-				if (err) { 
-					return res.send(err); 
-				} else {
-					if (userObject) {
-						delete userObject.salt;
-						delete userObject.hash;
-						res.json(userObject);
-					}
-				}
-			});
-		})(req, res, next);
+	app.post('/auth/session', 
+		passport.authenticate('local', {failureFlash : true}),
+		function (req, res, next) {		
+			var userObject = req.user.toObject();                
+			delete userObject.salt;
+			delete userObject.hash;
+			res.json(userObject);
 	});
 	app.del('/auth/session', function (req, res) {
 	  if(req.user) {
 		req.logout();
-		res.send(200);
+		res.send(200, "Successfully Logged in");
 	  } else {
 		res.send(400, "Not logged in");
 	  }
@@ -226,11 +216,13 @@ exports.configAPI = function configAPI(app){
 			res.send(results)
 		})
 	});
+/*
 	app.get("/api/location", function(req, res, next) {
 		models.Location.find(req.query, null, { sort:{ _id : 1 }}, function(e, results){
 			res.send(results)
 		})
-	});
+	});*/
+
 	app.get("/api/certification", function(req, res, next) {
 		models.Certification.find(req.query, null, { sort:{ _id : 1 }}, function(e, results){
 			res.send(results)

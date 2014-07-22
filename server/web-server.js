@@ -27,10 +27,18 @@ var app = API.configAPI(express());
 app.use(express.static(path.normalize(path.join(__dirname, '../app'))));
 app.use(forgot.middleware);
 
+
+//Passport Setup
 passport.use(models.User.createStrategy());
 passport.serializeUser(models.User.serializeUser());
 passport.deserializeUser(models.User.deserializeUser());
-
+function loggedIn(req, res, next) {
+  if (req.user) {
+    next();
+  } else {
+    res.redirect('/');
+  }
+}
 
 
 app.listen(8081);

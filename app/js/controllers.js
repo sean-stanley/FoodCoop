@@ -174,6 +174,29 @@ angular.module('co-op.controllers', []).
 	}
 ])
 
+.controller('producerPageCtrl', ['$scope', 'Restangular', 'producer',
+	function($scope, Restangular, producer) {
+		$scope.producer = producer.plain();
+		
+		$scope.rate = 3;
+		  $scope.max = 5;
+		  $scope.isReadonly = false;
+
+		  $scope.hoveringOver = function(value) {
+		    $scope.overStar = value;
+		    $scope.percent = 100 * (value / $scope.max);
+		  };
+
+		  $scope.ratingStates = [
+		    {stateOn: 'glyphicon-ok-sign', stateOff: 'glyphicon-ok-circle'},
+		    {stateOn: 'glyphicon-star', stateOff: 'glyphicon-star-empty'},
+		    {stateOn: 'glyphicon-heart', stateOff: 'glyphicon-ban-circle'},
+		    {stateOn: 'glyphicon-heart'},
+		    {stateOff: 'glyphicon-off'}
+		  ];
+	}
+])
+
 .controller('modalInstanceCtrl', ['$scope', '$modalInstance', 'data',
 	function($scope, $modalInstance, data) {
 
@@ -322,10 +345,6 @@ angular.module('co-op.controllers', []).
 
 .controller('producerCtrl', ['$scope', '$rootScope', '$sce', 'ProducerManager', '$location', '$modal',
 	function($scope, $rootScope, $sce, ProducerManager, $location, $modal) {
-		
-		if ($rootScope.currentUser.producerData.logo === true) {
-			ProducerManager.getProducerLogo(true);
-		}
 		
 		$scope.submitForm = function() {
 			ProducerManager.saveProducer();

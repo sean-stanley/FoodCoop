@@ -1,30 +1,32 @@
-<div class="modal-header">
-            <img ng-src="{{data.companyLogo}}" width="200px" />
-	<h1>{{data.name}} <small>{{data.ProducerData.companyName}}</small></h1>
-        </div>
-        <div class="modal-body media">
-            <img class="pull-left" ng-src="{{data.ProducerData.companyImg}}" height="200px"/>
+<div class="page-header">
+	<h1>{{producer.producerData.companyName}}</h1>
+</div>
+<img ng-src="{{producer.producerData.logo}}" width="200px" class="center-block"/>
+<div class="row">
+<div class="col-md-9">            
+	<article>
+		<h4>Company Description</h4>
+		<p>{{producer.producerData.companyName}}</p>
+		{{producer.producerData.description}}
+		<hr>
+		<h5>Contact Details</h5>
+		<ul class="unstyled" id="contact-details">
+			<li><span class="glyphicon glyphicon-earphone"></span> {{producer.phone}}</li>
+			<li><span class="glyphicon glyphicon-envelope"></span> <a ng-href="mailto:producer.email">{{producer.email}}</a></li>
+			<li><span class="glyphicon glyphicon-map-marker"></span> {{producer.address}}</li>
+			<li><img src="../img/glyphicons/Globe.png" width="18" alt="Globe"> <a href="http://{{producer.producerData.website}}" target="_blank">{{producer.producerData.website}}</a></li>
+		</ul>
+	</article>
 
-            <div class="media-body">
-				<article>
-					<h2>Company Description</h2>
-					{{data.ProducerData.description}}
-				</article>
+
+	
+</div>
+
+<div class="col-md-3 well">
+	<h4>{{producer.name}}</h4>
+	{{producer.producerData.personalBio}}
+</div>
+</div>
 				
-	            <div fundoo-rating rating-value="data.feedbackScore" max="5" readonly="true"></div>
-				<p>Feedback Rating: {{data.producerData.feedbackScore}} This features is just a placeholder and is completely arbitrary</p>
 
-	            
-	            <ul class="unstyled">
-	            	<li><span class="glyphicon glyphicon-earphone"></span> {{data.phone}}</li>
-					<li><span class="glyphicon glyphicon-envelope"></span> <a ng-href="mailto:data.email">{{data.email}}</a></li>
-					<li><span class="glyphicon glyphicon-map-marker"></span> {{data.address}}</li>
-	            </ul>
-				<br>
-				
-            </div>
-
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-warning" ng-click="cancel()">Close</button>
-        </div>
+        

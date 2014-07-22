@@ -38,10 +38,11 @@ var UserSchema = new Schema({
 						},
 			producerData : {
 							companyName : {type: String},
-							image : {},
 							logo : {},
 							description : {type: String},
 							certification : {type: String},
+							website : {type: String},
+							personalBio : {type: String},
 							feedbackScore : {type: Number}
 						}
 });

@@ -7,7 +7,7 @@ angular.module('co-op.services', [])
 	
 	.factory('Session', function (Restangular) {
 		//return $resource('/auth/session/');
-		return Restangular.all('auth/session/');
+		return Restangular.all('auth/session');
 		
 		/*
 		.then(function (user) {
@@ -35,34 +35,48 @@ angular.module('co-op.services', [])
 					rememberMe: form.rememberMe
 					})
 				.then(function (user) {
-					var properties;
-					var User = {};
-					console.log("user: " + user);
-					properties = Object.getOwnPropertyNames(user);
-					properties.forEach(function (key) {
-						User[key] = user[key];
-					});
-					if (User.producerData.hasOwnProperty('logo') ) {
-						User.producerData.logo = true;
+					if (typeof user === 'object') {
+						var properties;
+						var User = {};
+						if (typeof user.plain === 'function'){
+							user = user.plain();
+						}
+						console.log("user: " + user);
+						properties = Object.getOwnPropertyNames(user);
+						properties.forEach(function (key) {
+							User[key] = user[key];
+						});
+										
+						$rootScope.currentUser = User;
+						return cb();
 					}
-					else {
-						User.producerData.logo = null;
-					}
-					
-					$cookieStore.put('user', User);
-					
-					$rootScope.currentUser = User;
-					return cb();
-					
-					}, 
+				}, 
 					function(err) {
 						console.log(err.data);
 						return cb();
 					}
+				
 				);
 			},
 			
+			isLoggedIn : function() {
+				var loggedInUser, isLoggedIn;
+				Session.customGET().then(function(user) {
+					loggedInUser = user.plain();
+					if (loggedInUser.hasOwnProperty('email')) {
+						delete loggedInUser.salt;
+						delete loggedInUser.hash;
+						console.log(loggedInUser);
+						$rootScope.currentUser = loggedInUser;
+						isLoggedIn = true;
+					}
+					else {isLoggedIn = false;}
+					return isLoggedIn;
+				});
+			},
+			
 			logout : function() {
+				Session.remove();
 				$cookieStore.remove('user');
 				$rootScope.currentUser = null;
 				$location.path('/home');
@@ -234,25 +248,10 @@ angular.module('co-op.services', [])
 	
 	.factory('ProducerManager', ['$http', 'Restangular', '$rootScope', '$cookieStore', function($http, Restangular, $rootScope, $cookieStore) {
 		return {
-			saveProducer : function() {
-				var userObject = $rootScope.currentUser;
-				if (userObject) {
-					delete userObject.producerData.logo;
-				}
-				$cookieStore.put('user', userObject);
+			saveProducer : function() {				
 				console.log($rootScope.currentUser);
-				Restangular.all('api/user/producer/edit').post($rootScope.currentUser);
-			},
-			getProducerLogo : function(hasLogo) {
-				var id;
-				if (hasLogo) {
-					id = $rootScope.currentUser._id;
-					Restangular.one('api/user', id ).all('producer').customGET('logo').then(function(results) {
-						$rootScope.currentUser.producerData.logo = results.producerData.logo;
-					});
-				}
-				else return false;
-			} 
+				Restangular.one('api/user', $rootScope.currentUser._id).customPOST($rootScope.currentUser, 'producer/edit');
+			}
 		};
 	}])
 	

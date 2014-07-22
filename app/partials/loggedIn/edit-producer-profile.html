@@ -1,8 +1,8 @@
 <link rel="stylesheet" href="lib/bower_components/angular-cropme/cropme.css">	
 	<div id="producer-preview-column" class="col-md-4">
 		
-		<div id="preview-container" class="preview-box" ng-if="currentUser.producerData.logo !== true">
-			<img ng-src="{{currentUser.producerData.logo}}" alt=" logo placeholder " class="img-responsive" style="width:100%; height: auto;">	
+		<div id="preview-container" class="preview-box">
+			<img ng-if="currentUser.producerData.hasOwnProperty('logo')" ng-src="{{currentUser.producerData.logo}}" alt=" logo placeholder " class="img-responsive" style="width:100%; height: auto;">	
 			<h5>{{currentUser.producerData.companyName}} <small>{{currentUser.name}}</small></h5>
 			<p>{{currentUser.producerData.description}}</p>
 		</div>
@@ -17,7 +17,8 @@
 				<div class="form-group">	
 					<div file-dropzone="[image/png, image/jpeg, image/gif]" file="currentUser.producerData.logo" data-max-file-size="3" id="file-dropzone" class="image-drop form-group">
 						<div>
-							<p class="text-muted">Drop photo here</p>
+							<p class="text-muted" ng-if="currentUser.producerData.logo">Drop a new photo here</p>
+							<p class="text-muted" ng-if="!currentUser.producerData.logo">Drop a photo here</p>
 								<h1 class="text-muted"><span class="glyphicon glyphicon-cloud-upload"></span></h1>
 							<button type="button" class="btn btn-default btn-sm upload">
 								<span class="text-muted">Or click to upload</span>
@@ -40,8 +41,16 @@
 					<input ng-model="currentUser.producerData.companyName" name="inputCompany" type="text" class="form-control" id="inputName" placeholder="e.g. {{currentUser.name}} Farms" autofocus required>
 				</div>
 				<div class="form-group">
-					<label for="description">Description</label> 
+					<label for="inputCompany">Company Website <small>If you have one</small></label>
+					<input ng-model="currentUser.producerData.website" name="inputCompany" type="text" class="form-control" id="inputName" placeholder="e.g. www.{{currentUser.name | forURL}}.com" autofocus required>
+				</div>
+				<div class="form-group">
+					<label for="description">Company Description</label> 
 					<textarea class="form-control" ng-model="currentUser.producerData.description" id="description" maxlength="6000" placeholder="Write a few paragraphs for customers to see about your business and methadologies" rows="9" style="width: 100%;" required></textarea>  
+				</div>
+				<div class="form-group">
+					<label for="description">Personal Bio <small>(Optional)</small></label> 
+					<textarea class="form-control" ng-model="currentUser.producerData.personalBio" id="description" maxlength="6000" placeholder="Write a few paragraphs about yourself for people to see." rows="9" style="width: 100%;" required></textarea>  
 				</div>
 			</div>
    

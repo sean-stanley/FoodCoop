@@ -37,10 +37,11 @@ angular.module('co-op', [
 	        }
 	      });
 	$routeProvider.when('/producer/:companyName-:userName', {
+		controller: 'producerPageCtrl',
 		templateUrl:'partials/producer-page.html',
 		resolve: {
 			producer: function(Restangular, $route){
-				return Restangular.all('api/').get('user',{name: $route.current.params.userName});
+				return Restangular.one('api/user/producer', $route.current.params.userName).get();
 			}
 		}
 	});
@@ -77,11 +78,13 @@ angular.module('co-op', [
 	
   }])
 	.run(function($rootScope, $location, $cookieStore, LoginManager) {
-		$rootScope.currentUser = null;
+		LoginManager.isLoggedIn(); // true or false
 		
+		/*
 		if ($cookieStore.get('user')) {
-			$rootScope.currentUser = $cookieStore.get('user');
-		}
+					$rootScope.currentUser = $cookieStore.get('user');
+				}*/
+		
 		
 		
 		$rootScope.$on( '$routeChangeStart', function(event, next, current) {
@@ -95,7 +98,6 @@ angular.module('co-op', [
 				case '/users-rights': //remove this before going live	
 				case '/thankyou':
 				case '/login':
-				case '/product-upload': //remove when done testing
 					
 				    break;
 				default:	        	
