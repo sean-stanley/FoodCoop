@@ -16,7 +16,8 @@
 			<th><a href="" ng-click="predicate = 'name'; reverse=!reverse ">Name</a></th>
 			<th><a href="" ng-click="predicate = 'address'; reverse=!reverse ">Address</a></th>
 			<th><a href="" ng-click="predicate = 'phone'; reverse=!reverse ">Phone Number</a></th>
-			<th><a href="" ng-click="predicate = 'date joined'; reverse=!reverse ">Date Joined</a></th>
+			<th><a href="" ng-click="predicate = 'user_type.name'; reverse=!reverse ">Membership</a></th>
+			<th><a href="" ng-click="predicate = 'dateJoined'; reverse=!reverse ">Date Joined</a></th>
 			<!--
 			<th>Can Buy</th>
 						<th>Can Sell</th>-->
@@ -41,8 +42,11 @@
 	        <td data-title="'phone'">
 	            {{user.phone}}
 	        </td>
+	        <td data-title="'membership'">
+	            {{user.user_type.name}}
+	        </td>
 	        <td data-title="'Date Joined'">
-	            {{user.dateJoined}}
+	            {{user.dateJoined | shortDate}}
 	        </td>
 	       <!--
 	        <td data-title="'Buying Permission'">

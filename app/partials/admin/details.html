@@ -1,3 +1,7 @@
+<div class="page-header">
+	<h1>{{user.name}} <small>{{user.user_type.name}}</small></h1>
+</div>
+
 <form name="userEdit">
 	<div class="form-group">
 		<label for="email">Email address</label>
@@ -47,9 +51,9 @@
 		<input type="checkbox" ng-model="user.user_type.canBuy">
 	</div>
         <br>
-        <a href="#/" class="btn">Cancel</a>
+        <a href="#/users-rights" class="btn">Cancel</a>
         <button ng-click="save()" ng-disabled="isClean() || userEdit.$invalid"
                 class="btn btn-primary">Save</button>
         <button ng-click="destroy()"
-                ng-show="project._id" class="btn btn-danger">Delete</button>
+                ng-show="user._id" class="btn btn-danger">Delete</button>
       </form>

@@ -5,33 +5,58 @@ var util = require('util'),
     events = require('events'),
 	flash = require('connect-flash'),
 	express = require('express');
+	bodyParser = require('body-parser'),
+	methodOverride = require('method-override'),
+	cookieParser = require('cookie-parser'),
+	session = require('express-session'),
+	errorHandler = require('express-error-handler'),
 	mongoose = require('mongoose'),
 	models = require('./models.js'),
-	//mail = require('./mailer.js'),
+	mail = require('./mailer.js'),
+	mailDefaults = require('./staticMail'),
 	passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy;
 
+
 exports.configAPI = function configAPI(app){
-	app.configure(function(){
-		app.use(express.bodyParser());
-		app.use(express.methodOverride());
-		app.use(express.cookieParser());
-		app.use(flash());
-		app.use(express.session({ secret: 'Intrinsic Definability' }));
-		app.use(passport.initialize());
-		app.use(passport.session());
-		app.use(app.router);
-		app.use(express.static(__dirname));
-		app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-	});
+	app.use(bodyParser.json());
+	app.use(methodOverride());
+	app.use(cookieParser());
+	app.use(flash());
+	app.use(session({ 
+		secret: 'Intrinsic Definability',
+		resave: true,
+		saveUninitialized: true
+	}));
+	app.use(passport.initialize());
+	app.use(passport.session());
+		//app.use(app.router); removed in express v4
+		
 	
-	app.post("/api/email", function(req, res, next) {
+	app.post("/api/mail", function(req, res, next) {
+		console.log(req.body.mail)
+		var message = {
+			from: req.body.mail.name + ' &lt;' + req.body.email + '&gt;', //grab form data from the request body object
+			to: mailDefaults.companyEmail,
+			subject: req.body.mail.subject,
+			text: req.body.mail.message
+		};
+		mail.transport.sendmail(message, function(error, response){
+			if (error) {
+				console.log(error);
+			}
+			//Yay!! Email sent
+			else {
+				console.log("Message sent successfully!")
+			}
+		});
+		mail.transport.sendmail()
 		
 	});
 	
 	app.get("/api/product", function(req, res, next) {
 		models.Product.find(req.query, null, { sort:{ _id : 1 }}, function(e, results) {
-			res.send(results);
+			res.json(results);
 		})
 	});
 	app.post("/api/product", function(req, res, next) {
@@ -74,7 +99,7 @@ exports.configAPI = function configAPI(app){
 	});
 	app.get("/api/order", function(req, res, next) {
 		models.Order.find(req.query, null, { sort:{ _id : 1 }}, function(e, results){
-			res.send(results)
+			res.json(results)
 		})
 	});
 	app.post("/api/order", function(req, res, next) {
@@ -96,6 +121,7 @@ exports.configAPI = function configAPI(app){
 							{multi: true}, function(err,num,raw){
 							})
 		});
+	
 	app.get("/api/user", function(req, res, next) {
 		models.User.find(req.query, null, { sort:{ _id : 1 }}, function(e, results){
 			if (!e) {
@@ -183,37 +209,38 @@ exports.configAPI = function configAPI(app){
 			res.send(results)
 		})
 	});
-	app.get('/auth/session', function (req, res, next) {
-		if (req.user) { 
-			//console.log('according to the server, this is req.user: ' + req.user)
-			res.send(req.user);
-		}
-		/*
-		function (req, res) {
-					res.json(req.user.user_info);*/
+	app.route('/auth/session')
+		.get(function (req, res, next) {
+			if (req.user) { 
+				//console.log('according to the server, this is req.user: ' + req.user)
+				res.json(req.user);
+			}
+			/*
+			function (req, res) {
+						res.json(req.user.user_info);*/
 		
-	});
-	app.post('/auth/session', 
-		passport.authenticate('local', {failureFlash : true}),
-		function (req, res, next) {		
-			var userObject = req.user.toObject();                
-			delete userObject.salt;
-			delete userObject.hash;
-			res.json(userObject);
-	});
-	app.del('/auth/session', function (req, res) {
-	  if(req.user) {
-		req.logout();
-		res.send(200, "Successfully Logged in");
-	  } else {
-		res.send(400, "Not logged in");
-	  }
-	});
+		})
+		.post(passport.authenticate('local', {failureFlash	: 'Login Failed for some reason',
+											failureRedirect	: 'http://localhost:8081/#/login-failed'}), //redirect not working for some reason. Possibly an angularJS issue?
+			function (req, res, next) {		
+				var userObject = req.user.toObject();                
+				delete userObject.salt;
+				delete userObject.hash;
+				res.json(userObject);
+		})
+		.delete(function (req, res) {
+			if(req.user) {
+				req.logout();
+				res.send(200, "Successfully Logged out");
+			} else {
+				res.send(400, "Not logged in");
+			}
+		});
  
 	//Static stuff, won't be changed by users.
 	app.get("/api/category", function(req, res, next) {
 		models.Category.find(req.query, null, { sort:{ _id : 1 }}, function(e, results){
-			res.send(results)
+			res.json(results)
 		})
 	});
 /*
@@ -225,8 +252,11 @@ exports.configAPI = function configAPI(app){
 
 	app.get("/api/certification", function(req, res, next) {
 		models.Certification.find(req.query, null, { sort:{ _id : 1 }}, function(e, results){
-			res.send(results)
+			res.json(results)
 		})
 	});
+	
+	app.use(express.static(__dirname));
+	app.use(errorHandler({ dumpExceptions: true, showStack: true }));
 	return app;
 }

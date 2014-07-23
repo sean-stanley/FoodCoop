@@ -1,0 +1,69 @@
+<div class="page-header">
+	<h1>{{user.name}} <small>{{user.user_type.name}}</small></h1>
+</div>
+
+<form name="editMe" novalidate>
+	<div class="form-group">
+		<label for="email">Email address</label>
+		<input ng-model="user.email" name="email" type="email" class="form-control" placeholder="Enter email" autofocus required>
+		<div class="custom-error" ng-show="userEdit.email.$dirty && userEdit.email.$invalid">Sorry:
+			<span ng-show="userEdit.email.$error.required">email is required.</span>
+			<span ng-show="userEdit.email.$error.email">Please, write a valid email address.</span>
+		</div>
+	</div>
+		
+	<div class="form-group">
+		<label for="pw">Create a new Password</label>
+		<input type="password" class="form-control" ng-model="user.password" name="pw" placeholder="Enter a Password" required>
+	</div>
+		
+		
+	<div class="form-group">
+		<a href="/password_reset">Reset Password</a>
+	</div>
+	
+	<div class="form-group">
+		<label for="userFullName">Full Name</label>
+		<input ng-model="user.name" name="userFullName" type="text" class="form-control" placeholder="Full Name" required>
+		<div class="custom-error" ng-show="userEdit.userFullName.$dirty && userEdit.userFullName.$invalid">		Sorry:
+			<span ng-show="userEdit.userFullName.$error.required">Full name is required.</span>
+		</div>
+	</div>
+		
+		
+		<div class="form-group" ng-controller="geoCtrl">
+			<label for="address">Address currently is: {{user.address}}</label>
+			<input type="text" id="Autocomplete" class="form-control" ng-autocomplete="" details="addressDetails" options="addressOptions" ng-model="user.address"/>
+			
+			<div class="custom-error" ng-show="editMe.address.$dirty && editMe.address.$invalid">		Sorry:
+				<span ng-show="editMe.userFullName.$error.required">Your NZ address is required.</span>
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label for="phone">Phone</label>
+			<input type="tel" class="form-control" ng-model="user.phone" name="phone" placeholder="Enter your preferred phone number" required>
+			<div class="custom-error" ng-show="editMe.phone.$dirty && editMe.phone.$invalid">		Sorry:
+				<span ng-show="editMe.userFullName.$error.required">Please give us a valid phone number to use to quickly sort out issues.</span>
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<div class="btn-group">
+				<button type='button' class="btn btn-primary" ng-model="user.user_type.canSell" btn-radio="false">Customer</button>
+				<button type='button' class="btn btn-primary" ng-model="user.user_type.canSell" btn-radio="true">Producer</button>
+			</div>
+		</div>
+
+		<div class="form-group">
+	        <button ng-click="save()" ng-disabled="isClean() || userEdit.$invalid"
+	                class="btn btn-primary">Save</button>
+	        <button ng-click="destroy()"
+	                ng-show="user._id" class="btn btn-danger">Delete</button>
+		</div>
+</form>
+
+	
+	
+<br>
+<br>

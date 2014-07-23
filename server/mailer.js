@@ -1,7 +1,7 @@
 var config = require('./config').Config;
 
 var nodemailer = require('nodemailer'),
-	contentTemplates = require('./staticMail');
+	mailTemplate = require('./staticMail');
 
 
 // Create a SMTP transport object
@@ -19,7 +19,7 @@ console.log('SMTP Configured');
 
 console.log('Sending Mail');
 
-transport.sendMail(contentTemplates.serverStartUp, function(error){
+transport.sendMail(mailTemplate.serverStartUp, function(error){
     if(error){
         console.log('Error occured');
         console.log(error.message);
@@ -32,4 +32,4 @@ transport.sendMail(contentTemplates.serverStartUp, function(error){
 });
 
 
-module.exports.transport = transport;
+exports.transport = transport;

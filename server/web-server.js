@@ -25,10 +25,11 @@ var db = mongoose.connection;
 var app = API.configAPI(express());
 
 app.use(express.static(path.normalize(path.join(__dirname, '../app'))));
-app.use(forgot.middleware);
+
 
 
 //Passport Setup
+app.use(forgot.middleware); //forgotten password middleware
 passport.use(models.User.createStrategy());
 passport.serializeUser(models.User.serializeUser());
 passport.deserializeUser(models.User.deserializeUser());

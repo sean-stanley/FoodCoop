@@ -36,12 +36,12 @@ angular.module('co-op', [
 	          }
 	        }
 	      });
-	$routeProvider.when('/producer/:companyName-:userName', {
-		controller: 'producerPageCtrl',
-		templateUrl:'partials/producer-page.html',
+	$routeProvider.when('/me/:userId', {
+		controller: 'userEditCtrl',
+		templateUrl:'partials/loggedIn/edit-me.html',
 		resolve: {
-			producer: function(Restangular, $route){
-				return Restangular.one('api/user/producer', $route.current.params.userName).get();
+			user: function(Restangular, $route){
+				return Restangular.one('api/user', $route.current.params.userId).get();
 			}
 		}
 	});
@@ -59,6 +59,7 @@ angular.module('co-op', [
     $routeProvider.when('/login', {templateUrl: 'partials/login.html'});
     $routeProvider.when('/must-login', {templateUrl: 'partials/must-login.html'});
     $routeProvider.when('/forgot-password', {templateUrl: 'partials/forgot-password.html', controller: 'resetPwdCtrl'}); //needs to be sorted and replaced with the node server script for password resetting. Mailer has to be setup first though.
+    $routeProvider.when('/login-failed', {templateUrl: 'partials/login-failed.html'});
     
 
     $routeProvider.when('/store', {templateUrl: 'store.html'});

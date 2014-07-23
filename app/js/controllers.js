@@ -80,24 +80,35 @@ angular.module('co-op.controllers', []).
 	function($scope, Restangular, $location, user) {
 		
 		var original = user;
-		  $scope.user = Restangular.copy(original);
+		
+		$scope.user = Restangular.copy(original);
   
+  		$scope.$watch('user.user_type.canSell', function(newValue) {
+  			if ($scope.user.user_type.canSell) {
+  				$scope.user.user_type.name = "Producer";
+  			} else {
+  				$scope.user.user_type.name = "Customer";
+  			}
+  		});
+		  
+		$scope.isClean = function() {
+			return angular.equals(original, $scope.user);
+		};
 
-		  $scope.isClean = function() {
-		    return angular.equals(original, $scope.user);
-		  };
+		$scope.destroy = function() {
+			var lastChance = confirm('Are you sure you want to delete the profile of ' + user.name +'?');
+			if (lastChance) {
+				original.remove().then(function() {
+					$location.path('/');
+				});
+			}
+		};
 
-		  $scope.destroy = function() {
-		    original.remove().then(function() {
-		      $location.path('/');
-		    });
-		  };
-
-		  $scope.save = function() {
-		    $scope.user.post($scope.user._id).then(function() {
-		      $location.path('/');
-		    });
-		  };
+		$scope.save = function() {
+			$scope.user.post($scope.user._id).then(function() {
+				$location.path('/');
+			});
+		};
 	}
 ])
 
@@ -389,18 +400,23 @@ angular.module('co-op.controllers', []).
 	}
 ])
 
-.controller('contactCtrl', ['$scope', 'MailManager',
-	function($scope, MailManager) {
-
+.controller('contactCtrl', ['$scope', 'MailManager', '$location', 'flash',
+	function($scope, MailManager, $location, flash) {		
 		$scope.mail = {
 			name: '',
 			email: '',
 			subject: '',
-			message: '',
+			message: ''
 		};
-
-		$scope.submitForm = function() {
+		
+		$scope.flash = flash;
+		$scope.message = "Hello World";
+		
+		
+		$scope.submitForm = function(message) {
 			MailManager.sendMail($scope.mail);
+			flash.setMessage(message);
+			$location.path("/page");
 		};
 
 

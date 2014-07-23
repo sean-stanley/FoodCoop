@@ -9,19 +9,29 @@ angular.module('co-op.services', [])
 		//return $resource('/auth/session/');
 		return Restangular.all('auth/session');
 		
-		/*
-		.then(function (user) {
-					var properties;
-					console.log("User ", user);
-					properties = Object.getOwnPropertyNames(user);
-					properties.forEach(function (key) {
-						User[key] = user[key];
-					});
-				});*/
-		
 	})
+	/*
 	.factory('User', function ($resource) {
-		return {};
+			return {};
+		})*/
+	
+	
+	.factory("flash", function($rootScope) {
+		var queue = [];
+		var currentMessage = "";
+
+		$rootScope.$on("$routeChangeSuccess", function() {
+			currentMessage = queue.shift() || "";
+		});
+
+		return {
+			setMessage: function(message) {
+				queue.push(message);
+			},
+			getMessage: function() {
+				return currentMessage;
+			}
+		};
 	})
 	
 	.factory('LoginManager', function ($location, $rootScope, $cookieStore, Session, Restangular){
@@ -259,6 +269,10 @@ angular.module('co-op.services', [])
 		return {
 			mail : function(mail) {
 				console.log('email message', mail);
+				$http.post('/api/mail', mail).success(function(response) {
+					console.log('email message successfully sent');
+					return response;
+				});
 			}
 		};
 	}])

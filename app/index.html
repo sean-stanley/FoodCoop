@@ -95,10 +95,17 @@
                 </ul>
                 <br>
                 <ul class="nav nav-pills nav-stacked">
-                    <li ng-class="{active:isActive('/my-cart')}" ng-show="currentUser != null"><a href="#/my-cart">My Cart <span class="badge">{{items}}</span></a></li>
-                    <li ng-class="{active:isActive('/order-manager')}" ng-show="currentUser != null"><a href="#/order-manager">My Orders</a></li>
-                    <li ng-class="{active:isActive('/product-upload')}" ng-show="currentUser != null"><a href="#/product-upload">Upload a Product</a></li>
-                    <li ng-class="{active:isActive('/producer-profile')}" ng-show="currentUser != null"><a href="#/producer-profile">Edit Producer Profile</a></li>
+                    <li ng-class="{active:isActive('/my-cart')}" ng-show="currentUser"><a href="#/my-cart">My Cart <span class="badge">{{items}}</span></a></li>
+                    <li ng-class="{active:isActive('/order-manager')}" 
+					ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
+					><a href="#/order-manager">My Orders</a></li>
+                    <li ng-class="{active:isActive('/product-upload')}" 
+					ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
+					><a href="#/product-upload">Upload a Product</a></li>
+                    <li ng-class="{active:isActive('/producer-profile')}" 
+					ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
+					><a href="#/producer-profile">Edit Producer Profile</a></li>
+					<li ng-class="{active:isActive('/me/{{currentUser._id}}')}" ng-show="currentUser"><a ng-href="#/me/{{currentUser._id}}">My Settings</a></li>
                     
                 </ul>
             </div>
@@ -107,6 +114,11 @@
             This is where the partials go for the forms and information pages.
             /-->    
             <div class="col-md-10 col-md-pull-2">
+				<div class="alert" ng-show="flash.getMessage()">
+					<b>Alert!</b>
+					<p>{{flash.getMessage()}}</p>
+				</div>
+				
                 <div ng-view></div>
 
             </div> 
