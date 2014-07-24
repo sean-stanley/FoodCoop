@@ -268,7 +268,7 @@ angular.module('co-op.services', [])
 	.factory('MailManager', ['$http', function($http) {
 		return {
 			mail : function(mail) {
-				console.log('email message', mail);
+				console.log('email message: ',  mail);
 				$http.post('/api/mail', mail).success(function(response) {
 					console.log('email message successfully sent');
 					return response;

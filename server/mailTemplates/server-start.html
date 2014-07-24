@@ -1,4 +1,19 @@
-<p><b>Hello</b> The server was just started up by someone! And the mail settings are all working!</p>
+<html>
+<head>
+	<title>Server Started Up</title>
+</head>
+<body>
+	<p><b>Hello {{name}}</b> the server was just started up by someone! And the mail settings are all working!</p>
 
-<p>Here is some data about the server:</p>
+	<p>Here is some data about the server:</p>
+	<ul>
+		<li>AngularJS version: {{AngularVersion}}</li>
+		<li>Express version: {{expressVersion}}</li>
+		<li>Time the server started: {{currentTime}}</li>
+	</ul>
+	
+	<p>
+		<a href="http://foodcoop.org.nz"><img src="cid:logo@foodcoop" /></a>
+	</p>
+</body>
 	

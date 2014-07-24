@@ -89,6 +89,7 @@ angular.module('co-op.controllers', []).
   			} else {
   				$scope.user.user_type.name = "Customer";
   			}
+			$scope.user.swappedTypes = true;
   		});
 		  
 		$scope.isClean = function() {
@@ -414,7 +415,7 @@ angular.module('co-op.controllers', []).
 		
 		
 		$scope.submitForm = function(message) {
-			MailManager.sendMail($scope.mail);
+			MailManager.mail($scope.mail);
 			flash.setMessage(message);
 			$location.path("/page");
 		};

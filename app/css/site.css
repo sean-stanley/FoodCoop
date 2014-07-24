@@ -1,5 +1,8 @@
-/* @override http://localhost:8000/app/css/site.css */
-
+body {
+	font-family: 'Raleway', sans-serif;
+	font-weight: 500;
+}
+h1 {font-weight: 700;}
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
 
 a:hover {

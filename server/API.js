@@ -12,8 +12,8 @@ var util = require('util'),
 	errorHandler = require('express-error-handler'),
 	mongoose = require('mongoose'),
 	models = require('./models.js'),
-	mail = require('./mailer.js'),
-	mailDefaults = require('./staticMail'),
+	mail = require('./staticMail.js'),
+	Emailer = require('./emailer'),
 	passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy;
 
@@ -34,23 +34,53 @@ exports.configAPI = function configAPI(app){
 		
 	
 	app.post("/api/mail", function(req, res, next) {
-		console.log(req.body.mail)
-		var message = {
-			from: req.body.mail.name + ' &lt;' + req.body.email + '&gt;', //grab form data from the request body object
-			to: mailDefaults.companyEmail,
-			subject: req.body.mail.subject,
-			text: req.body.mail.message
+		var toMeoptions = {
+			template: "contact-form",
+			subject: req.body.subject,
+			to: mail.companyEmail
 		};
-		mail.transport.sendmail(message, function(error, response){
-			if (error) {
-				console.log(error);
+
+		var toMedata = {
+			from: req.body.name,
+			subject: req.body.subject,
+			email: req.body.email,
+			message: req.body.message
+		};
+		  
+		var toClientOptions = {
+			template: 'thankyou',
+			subject: 'Message sent successfully',
+			to: {
+				email: req.body.email,
+				name : req.body.name
 			}
-			//Yay!! Email sent
-			else {
-				console.log("Message sent successfully!")
+		};
+		
+		var toClientData = {
+			name: req.body.name,
+			message: req.body.message
+		};
+
+		toMe = new Emailer(toMeoptions, toMedata);
+		toClient = new Emailer(toClientOptions, toClientData);
+
+		
+		toMe.send(function(err, result) {
+			if (err) {
+				return console.log(err);
 			}
+			console.log("Message sent")
 		});
-		mail.transport.sendmail()
+		
+		toClient.send(function(err, result) {
+			if (err) {
+				return console.log(err);
+			}
+			console.log("Message sent")
+		});
+		
+		console.log(req.body)
+		
 		
 	});
 	
