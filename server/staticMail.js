@@ -31,12 +31,14 @@ var data = {
 serverStart = new Emailer(options, data);
 
 
+/*
 serverStart.send(function(err, result) {
   if (err) {
     return console.log(err);
   }
   console.log("Message sent")
-});
+});*/
+
 
 
 exports.adminEmail = adminRecipients;

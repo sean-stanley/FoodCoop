@@ -47,6 +47,17 @@ angular.module('co-op', [
 	});
 	$routeProvider.when('/about', {templateUrl: 'partials/about.html'});
     $routeProvider.when('/producer-list', {templateUrl: 'partials/producer-list.html', controller: 'producerListCtrl'});
+	$routeProvider.when('/producer/:companyName-:userName', {
+			controller: 'producerPageCtrl',
+	 		templateUrl:'partials/producer-page.html',
+	 		resolve: {
+	 			producer: function(Restangular, $route){
+				return Restangular.one('api/user/producer', $route.current.params.userName).get();
+	 			}
+	 		}
+	 	});
+	
+	
 	$routeProvider.when('/faq', {templateUrl: 'partials/faq.html'});
     
 	$routeProvider.when('/product-upload', {templateUrl: 'partials/loggedIn/product-upload.html', controller: 'productUpload'});
@@ -55,6 +66,15 @@ angular.module('co-op', [
     $routeProvider.when('/order-manager', {templateUrl: 'partials/loggedIn/order-manager.html'});
 
 	$routeProvider.when('/contact', {templateUrl: 'partials/contact.html', controller: 'contactCtrl'});
+	$routeProvider.when('/contact/:userId', {
+		templateUrl: 'partials/contact.html', 
+		controller: 'producerContactCtrl',
+		resolve: {
+			producer: function(Restangular, $route){
+				return Restangular.one('api/user', $route.current.params.userId).get();
+			}
+		}
+	});
 	
     $routeProvider.when('/login', {templateUrl: 'partials/login.html'});
     $routeProvider.when('/must-login', {templateUrl: 'partials/must-login.html'});

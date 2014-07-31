@@ -1,5 +1,9 @@
-<h1>Contact Form <small>Instructions</small></h1>
-<p>Please feel free to contact us about any questions you have.</p>
+<div class="page-header">
+	<h1>Contact Form</h1>
+</div>
+
+<p ng-if="!producer">Please feel free to contact us about any questions you have.</p>
+<p ng-if="producer">Use this form to contact <strong>{{producer.name}}</strong> at her email address of {{producer.email}}</p>
 
 <form name="contactUs" ng-submit="submitForm(message);">
 	<fieldset>
@@ -8,32 +12,33 @@
 	
 		<div class="form-group">
 	    	<label for="senderName">Full Name</label>
-			<input ng-model="mail.name" name="senderName" type="text" class="form-control" placeholder="your full name here" ng-minlength=3 ng-maxlength=20  required>
-			<div class="custom-error" ng-show="contactUs.senderName.$dirty && contactUs.senderName.$invalid">Sorry:
-				<span ng-show="contactUs.senderName.$error.required">Your name is required. We want to know who we are corresponding with.</span>
-			</div>
+			<input ng-model="mail.name" name="senderName" type="text" class="form-control" placeholder="your full name here" ng-maxlength=20  required>
+			<alert type="danger" 
+			ng-show="contactUs.senderName.$dirty && contactUs.senderName.$invalid && contactUs.senderName.$error.required">
+				<span>Sorry: Your name is required.</span>
+			</alert>
 		</div>
 		<div class="form-group">
 	    	<label for="senderEmail">Email</label>
 			<input ng-model="mail.email" name="senderEmail" type="email" class="form-control" placeholder="your email here" required>
-			<div class="custom-error" ng-show="contactUs.senderEmail.$dirty && contactUs.senderEmail.$invalid">Sorry:
+			<alert type="danger" ng-show="contactUs.senderEmail.$dirty && contactUs.senderEmail.$invalid">Sorry:
 			  <span ng-show="contactUs.senderEmail.$error.required">email is required.</span>
 			  <span ng-show="contactUs.senderEmail.$error.email">Please, write a valid email address. So we will know who to reply too.</span>
-	      </div>
+	      </alert>
 		</div>
 		<div class="form-group">
 	    	<label for="senderSubject">Subject</label>
 			<input ng-model="mail.subject" name="senderSubject" type="text" class="form-control" placeholder="email subject" required>
-			<div class="custom-error" ng-show="contactUs.senderSubject.$dirty && contactUs.senderSubject.$invalid">Sorry:
+			<alert type="danger" ng-show="contactUs.senderSubject.$dirty && contactUs.senderSubject.$invalid">Sorry:
 				<span ng-show="contactUs.senderSubject.$error.required">A subject is required. For reasons of courtesy.</span>
-			</div>
+			</alert>
 		</div>
 		<div class="form-group">
 	    	<label for="senderMessage">Message</label>
 			<textarea ng-model="mail.message" name="senderMessage" type="text" class="form-control" rows="5" placeholder="Your message here" required></textarea>
-			<div class="custom-error" ng-show="contactUs.senderMessage.$dirty && contactUs.senderMessage.$invalid">Sorry:
-				<span ng-show="contactUs.senderMessage.$error.required">A message is required. Or do you not want to talk to us after all?</span>
-			</div>
+			<alert type="danger" ng-show="contactUs.senderMessage.$dirty && contactUs.senderMessage.$invalid">Sorry:
+				<span ng-show="contactUs.senderMessage.$error.required">A message is required.</span>
+			</alert>
 		</div>
 		
 		<button type="reset" class="btn btn-default">Reset</button>    

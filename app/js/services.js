@@ -72,8 +72,12 @@ angular.module('co-op.services', [])
 			isLoggedIn : function() {
 				var loggedInUser, isLoggedIn;
 				Session.customGET().then(function(user) {
-					loggedInUser = user.plain();
-					if (loggedInUser.hasOwnProperty('email')) {
+					if (user === 'Not logged in') {
+						console.log(user);
+						return;
+					}
+					if (user.hasOwnProperty('email')) {
+						loggedInUser = user.plain();
 						delete loggedInUser.salt;
 						delete loggedInUser.hash;
 						console.log(loggedInUser);

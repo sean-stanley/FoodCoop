@@ -142,20 +142,20 @@
 						</div>
 			            <label> Filter: </label>
 						<div class="btn-group">
-							<button type='button' class="btn btn-default" ng-model="search.category" btn-radio="'{{productManager.categoryByName('Produce')._id}}'" uncheckable>Produce</button>
-							<button type='button' class="btn btn-default" ng-model="search.category" btn-radio="'meat'" uncheckable>Meat</button>
-							<button type='button' class="btn btn-default" ng-model="search.category" btn-radio="'processed-goods'" uncheckable>Processed Goods</button>
-							<button type='button' class="btn btn-default" ng-model="search.category" btn-radio="'baked-goods'" uncheckable>Baked Goods</button>
-							<button type='button' class="btn btn-default" ng-model="search.category" btn-radio="'dariy'" uncheckable>Dairy</button>
-							<button type='button' class="btn btn-default" ng-model="search.category" btn-radio="'milk'" uncheckable>Milk</button>
-							<button type='button' class="btn btn-default" ng-model="search.category" btn-radio="">None</button>
+							<button type='button' class="btn btn-default" ng-model="search.category.name" btn-radio="'Produce'" uncheckable>Produce</button>
+							<button type='button' class="btn btn-default" ng-model="search.category.name" btn-radio="'Meat'" uncheckable>Meat</button>
+							<button type='button' class="btn btn-default" ng-model="search.category.name" btn-radio="'Processed-Goods'" uncheckable>Processed Goods</button>
+							<button type='button' class="btn btn-default" ng-model="search.category.name" btn-radio="'Baked Goods'" uncheckable>Baked Goods</button>
+							<button type='button' class="btn btn-default" ng-model="search.category.name" btn-radio="'Dairy'" uncheckable>Dairy</button>
+							<button type='button' class="btn btn-default" ng-model="search.category.name" btn-radio="'milk'" uncheckable>Milk</button>
+							<button type='button' class="btn btn-default" ng-model="search" btn-radio="">None</button>
 						</div>
 					</section>
 				</div>
 				<div class="col-md-3">
 					<form class="form-inline">
 						<label> Search: </label>
-						<input ng-model="search" name="search.$" class="form-control" type="search"/>
+						<input ng-model="search.productName" name="search.$" class="form-control" type="search"/>
 					</form>
 				</div>
 			</div>
@@ -176,7 +176,8 @@
 								<h3>{{product.variety}} {{product.productName}}</h3>
 								<p>{{1.2 * product.price|currency}} / {{product.units}}</p>
 								<p>{{product.producerCompany}} <br>
-								<span ng-if="product.certification !== 'none' ">{{product.certification}}</span>
+									{{product.category.name}}
+								<span ng-if="product.certification !== 'none' ">{{product.certification.name}}</span>
 								</p>
 								<p>{{product.description | blurb}} <em>more...</em></p>
 								<button class="btn btn-primary" ng-click="addToCart()">Add to Cart</button>

@@ -189,23 +189,6 @@ angular.module('co-op.controllers', []).
 .controller('producerPageCtrl', ['$scope', 'Restangular', 'producer',
 	function($scope, Restangular, producer) {
 		$scope.producer = producer.plain();
-		
-		$scope.rate = 3;
-		  $scope.max = 5;
-		  $scope.isReadonly = false;
-
-		  $scope.hoveringOver = function(value) {
-		    $scope.overStar = value;
-		    $scope.percent = 100 * (value / $scope.max);
-		  };
-
-		  $scope.ratingStates = [
-		    {stateOn: 'glyphicon-ok-sign', stateOff: 'glyphicon-ok-circle'},
-		    {stateOn: 'glyphicon-star', stateOff: 'glyphicon-star-empty'},
-		    {stateOn: 'glyphicon-heart', stateOff: 'glyphicon-ban-circle'},
-		    {stateOn: 'glyphicon-heart'},
-		    {stateOff: 'glyphicon-off'}
-		  ];
 	}
 ])
 
@@ -231,12 +214,6 @@ angular.module('co-op.controllers', []).
 		    $scope.$label = $label;
 		};
 		$scope.categoryPromise = $scope.productManager.productCategoryPromise;
-		
-		
-		
-		
-		//$scope.availableUnits = ["kg","g","10kg","L","750ml","jar","bottle","unit"];
-		
         
 		ProductHistory.getData(function(result) {
 			$scope.data = result;
@@ -400,9 +377,8 @@ angular.module('co-op.controllers', []).
 
 	}
 ])
-
-.controller('contactCtrl', ['$scope', 'MailManager', '$location', 'flash',
-	function($scope, MailManager, $location, flash) {		
+.controller('contactCtrl', ['$scope', 'MailManager', '$location',
+	function($scope, MailManager, $location) {		
 		$scope.mail = {
 			name: '',
 			email: '',
@@ -410,13 +386,33 @@ angular.module('co-op.controllers', []).
 			message: ''
 		};
 		
-		$scope.flash = flash;
-		$scope.message = "Hello World";
+		$scope.submitForm = function(message) {
+			MailManager.mail($scope.mail);
+			$location.path("/page");
+		};
+
+
+	}
+])
+.controller('producerContactCtrl', ['$scope', 'MailManager', '$location', 'producer',
+	function($scope, MailManager, $location, producer) {		
+		$scope.mail = {
+			to: '',
+			name: '',
+			email: '',
+			subject: '',
+			message: ''
+		};
+		
+		$scope.producer = producer.plain();
+		$scope.mail.to = $scope.producer.email;
+		$scope.mail.toName = $scope.producer.name;
+		console.log('mail is to be sent to: ' + $scope.mail.toName + " " + $scope.mail.to);
+		
 		
 		
 		$scope.submitForm = function(message) {
 			MailManager.mail($scope.mail);
-			flash.setMessage(message);
 			$location.path("/page");
 		};
 

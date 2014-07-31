@@ -1,62 +1,88 @@
-<form name="signUp" autocomplete="on" ng-submit="submitForm()" novalidate>
-	<fieldset>
-    	<legend>Join the Northland Natural Food Co-op</legend>
+<div class="page-header">
+	<h1>Join the Northland Natural Food Co-op</h1>
+</div>
+<div class="col-md-6">
+	<table class="table">
+		<thead>
+			<td>MEMBERSHIP</td>
+			<td>COST</td>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Customer</td>
+				<td>$60</td>
+			</tr>
+			<tr>
+				<td>Producer</td>
+				<td>$120</td>
+			</tr>
+		</tbody>
+	</table>
+	<p>Members all own one share of the Northland Natural Food Co-op</p>
+	<p>This share entitles the holder to vote at the AGM and any other shareholder meetings of the NNFC as outlined in the constitution. It also entitles the shareholder’s household to participate in services run and organised by the NNFC for member’s benifit.</p>
+	
+	<p>As we are a grassroots movement attempting to keep costs down, we do not have any systems for handling payments through our website at this time. Should you wish to be a member, we will send you an invoice via email. We would appreciate you paying for this as soon as possible as the money goes to support our services and costs of business.</p>
+	
+	<p>Please note that membership is 100% refundable should you no longer wish to be a member.</p>
 		
-		<div class="form-group">
-			<label for="email">Email address</label>
-			<input ng-model="userData.email" name="email" type="email" class="form-control" placeholder="Enter email" autofocus required>
-			<div class="custom-error" ng-show="signUp.email.$dirty && signUp.email.$invalid">Sorry:
-				<span ng-show="signUp.email.$error.required">email is required.</span>
-				<span ng-show="signUp.email.$error.email">Please, write a valid email address.</span>
-			</div>
-		</div>
-		
-		<div class="form-group">
-			<label for="pw">Create a Password</label>
-			<input type="password" class="form-control" ng-model="userData.password" name="pw" placeholder="Enter a Password" required>
-			<ul ng-hide="signUp.pw.$pristine || signUp.pw.$invalid" id="strength" check-strength="userData.pw" ></ul>
-		</div>
-		
-		<div class="form-group">
-			<label for="userFullName">Full Name</label>
-			<input ng-model="userData.name" name="userFullName" type="text" class="form-control" placeholder="Full Name" required>
-			<div class="custom-error" ng-show="signUp.userFullName.$dirty && signUp.userFullName.$invalid">		Sorry:
-				<span ng-show="signUp.userFullName.$error.required">Full name is required.</span>
-			</div>
-		</div>
-		
-		
-		<div class="form-group" ng-controller="geoCtrl">
-			<label for="address">Address</label>
-			<input type="text" id="Autocomplete" class="form-control" ng-autocomplete="userData.address" details="addressDetails" options="addressOptions" ng-model="userData.address"/>
-			
-			<div class="custom-error" ng-show="signUp.address.$dirty && signUp.address.$invalid">		Sorry:
-				<span ng-show="signUp.userFullName.$error.required">Your NZ address is required.</span>
-			</div>
-		</div>
-		
-		<div class="form-group">
-			<label for="phone">Phone</label>
-			<input type="tel" class="form-control" ng-model="userData.phone" name="phone" placeholder="Enter your preferred phone number" required>
-			<div class="custom-error" ng-show="signUp.phone.$dirty && signUp.phone.$invalid">		Sorry:
-				<span ng-show="signUp.userFullName.$error.required">Please give us a valid phone number to use to quickly sort out issues.</span>
-			</div>
-		</div>
-		
-		<div class="checkbox">
-			<label>
-			<input type="checkbox" ng-model="userData.user_type.canSell"> I want to sell products too!
-			</label>
-		</div>
-		
-		<div class="form-group">
-			<small>By clicking submit you agree to the <a href="#terms-cons">Terms and Conditions</a> as well as our <a href="#priv-pol">Privacy Policy</a></small>
-		</div>
+</div>
 
-		<div class="form-group">
-			<button type="submit" class="btn btn-default" ng-disabled="signUp.$invalid">Submit</button>
+<form name="signUp" autocomplete="on" ng-submit="submitForm()" novalidate class="col-md-6">		
+	<legend>Fill out this form to become a member</legend>
+	<div class="form-group">
+		<label for="email">Email address</label>
+		<input ng-model="userData.email" name="email" type="email" class="form-control" placeholder="Enter email" autofocus required>
+		<div class="custom-error" ng-show="signUp.email.$dirty && signUp.email.$invalid">Sorry:
+			<span ng-show="signUp.email.$error.required">email is required.</span>
+			<span ng-show="signUp.email.$error.email">Please, write a valid email address.</span>
 		</div>
-	</fieldset>
+	</div>
+	
+	<div class="form-group">
+		<label for="pw">Create a Password</label>
+		<input type="password" class="form-control" ng-model="userData.password" name="pw" placeholder="Enter a Password" required>
+		<ul ng-hide="signUp.pw.$pristine || signUp.pw.$invalid" id="strength" check-strength="userData.pw" ></ul>
+	</div>
+	
+	<div class="form-group">
+		<label for="userFullName">Full Name</label>
+		<input ng-model="userData.name" name="userFullName" type="text" class="form-control" placeholder="Full Name" required>
+		<div class="custom-error" ng-show="signUp.userFullName.$dirty && signUp.userFullName.$invalid">		Sorry:
+			<span ng-show="signUp.userFullName.$error.required">Full name is required.</span>
+		</div>
+	</div>
+	
+	
+	<div class="form-group" ng-controller="geoCtrl">
+		<label for="address">Address</label>
+		<input type="text" id="Autocomplete" class="form-control" ng-autocomplete="userData.address" details="addressDetails" options="addressOptions" ng-model="userData.address"/>
+		
+		<div class="custom-error" ng-show="signUp.address.$dirty && signUp.address.$invalid">		Sorry:
+			<span ng-show="signUp.userFullName.$error.required">Your NZ address is required.</span>
+		</div>
+	</div>
+	
+	<div class="form-group">
+		<label for="phone">Phone</label>
+		<input type="tel" class="form-control" ng-model="userData.phone" name="phone" placeholder="Enter your preferred phone number" required>
+		<div class="custom-error" ng-show="signUp.phone.$dirty && signUp.phone.$invalid">		Sorry:
+			<span ng-show="signUp.userFullName.$error.required">Please give us a valid phone number to use to quickly sort out issues.</span>
+		</div>
+	</div>
+	
+	<div class="checkbox">
+		<label>
+		<input type="checkbox" ng-model="userData.user_type.canSell"> I want to sell products too!
+		</label>
+	</div>
+	
+	<div class="form-group">
+		<small>By clicking submit you agree to the <a href="#terms-cons">Terms and Conditions</a> as well as our <a href="#priv-pol">Privacy Policy</a></small>
+	</div>
+
+	<div class="form-group">
+		<button type="submit" class="btn btn-default" ng-disabled="signUp.$invalid">Join</button>
+	</div>
 </form>
 
 	
