@@ -1,8 +1,10 @@
 <div class="page-header">
 	<h1>Contact Form</h1>
 </div>
-
-<p ng-if="!producer">Please feel free to contact us about any questions you have.</p>
+<article ng-if="!producer">
+	<p>Please feel free to contact us about any questions you have.</p>
+	<p>Also feel free to phone or text us your questions at <strong><span class="glyphicon glyphicon-earphone"></span> 021 040 9066</strong>.</p>
+</article>
 <p ng-if="producer">Use this form to contact <strong>{{producer.name}}</strong> at her email address of {{producer.email}}</p>
 
 <form name="contactUs" ng-submit="submitForm(message);">

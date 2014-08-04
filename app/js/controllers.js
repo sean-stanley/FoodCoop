@@ -30,8 +30,11 @@ angular.module('co-op.controllers', []).
 	}
 ])
 
-.controller('loginCtrl', ['$scope', '$location', 'LoginManager',
-	function($scope, $location, LoginManager) {
+.controller('loginCtrl', ['$scope', '$location', 'LoginManager', 'flash',
+	function($scope, $location, LoginManager, flash) {
+		$scope.flash = flash;
+		$scope.message = "Hello World";
+		
 		$scope.showLogin = false;
 
 		$scope.loginData = {
@@ -40,10 +43,21 @@ angular.module('co-op.controllers', []).
 			rememberMe: false
 		};
 
-		$scope.submitForm = function() {
+		$scope.submitForm = function(message) {
 			LoginManager.login('local', $scope.loginData, function() {
+				flash.setMessage(message);
 				$location.path('/my-cart');
 			});
+		};
+	}
+])
+
+// Used by Forgot page for requesting a password reset for a user
+.controller('forgotCtrl', ['$scope', '$location', 'Restangular',
+	function($scope, $location, Restangular) {
+
+		$scope.passwordReset = function() {
+			Restangular.all('api/forgot').post({email: $scope.email});
 		};
 	}
 ])
@@ -92,7 +106,7 @@ angular.module('co-op.controllers', []).
 		
 		// sends a request for a password reset email to be sent to this user's email.
 		$scope.passwordReset = function() {
-			Restangular.all('forgot').post({email: original.email});
+			Restangular.all('api/forgot').post({email: original.email});
 		};
 		
 		$scope.save = function() {
@@ -114,7 +128,7 @@ angular.module('co-op.controllers', []).
 		$scope.user = Restangular.copy(user);
 		
 		$scope.save = function() {
-			Restangular.one('reset', $scope.user.resetPasswordToken).post().then(function(result) {
+			Restangular.one('reset', $scope.user.resetPasswordToken).customPOST({password: $scope.user.password}).then(function(result) {
 				LoginManager.login('local', {
 					email: result.email,
 					password: $scope.user.password,

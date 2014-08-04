@@ -45,7 +45,7 @@ angular.module('co-op', [
 			}
 		}
 	});
-	$routeProvider.when('/forgot', {templateUrl: 'partials/forgot-password.html'});
+	$routeProvider.when('/forgot', {templateUrl: 'partials/forgot-password.html', controller: 'forgotCtrl'});
 	$routeProvider.when('/reset/:token', {
 		controller: 'resetCtrl',
 		templateUrl:'partials/reset-password.html',

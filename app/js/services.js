@@ -45,6 +45,7 @@ angular.module('co-op.services', [])
 					rememberMe: form.rememberMe
 					})
 				.then(function (user) {
+					console.log(user);
 					if (typeof user === 'object') {
 						var properties;
 						var User = {};

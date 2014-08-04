@@ -2,6 +2,8 @@ var util = require('util'),
 	http = require('http'),
 	fs = require('fs'), // file system
 	url = require('url'),
+	async = require('async'),
+	crypto = require('crypto'),
 	events = require('events'),
 	express = require('express'); // handles routing and such
 bodyParser = require('body-parser'), // creates a req.body object to allow easy access of request data in the api.
@@ -76,7 +78,6 @@ exports.configAPI = function configAPI(app) {
 				email: req.body.email,
 				message: req.body.message
 			};
-
 			toClientOptions = {
 				template: 'thankyou',
 				subject: 'Message sent successfully',
@@ -578,7 +579,6 @@ exports.configAPI = function configAPI(app) {
 				if (req.body.password && req.body.oldPassword) {
 					user.authenticate(req.body.oldPassword, function(e, checksOut) {
 						if (checksOut) {
-							console.log(user.salt)
 							user.setPassword(req.body.password, function() {
 								var changeOptions, changeData, changeEmail;
 								user.save(function(e) {
@@ -586,7 +586,10 @@ exports.configAPI = function configAPI(app) {
 										changeOptions = {
 											template: "password-change",
 											subject: 'Food Co-op Password Changed',
-											to: user.email
+											to: {
+												email: user.email,
+												name: user.name
+											}
 										};
 				
 										changeData = {name: user.name};
@@ -598,9 +601,7 @@ exports.configAPI = function configAPI(app) {
 												return console.log(err);
 											}
 											// a response is sent so the client request doesn't timeout and get an error.
-											req.flash('success', 'An email has been sent to ' + user.email + ' confirming their password change.');
 											console.log("Message sent to user confirming password change");
-											done(err, 'done');
 										});
 									}
 								});
@@ -675,6 +676,7 @@ exports.configAPI = function configAPI(app) {
 			res.send(401);
 		}
 	});
+	
 	// delete a user and all their products and their cart. A user can only delete
 	// themself. An admin can delete any user. An email is sent to the user thanking
 	// them for their membership and to expect a refund soon. Another email is sent
@@ -682,7 +684,7 @@ exports.configAPI = function configAPI(app) {
 	app.delete("/api/user/:id/", function(req, res, next) {
 		var toUser, toUserOptions, toUserData, toAdmin, toAdminOptions, toAdminData;
 		if (req.user._id === req.params.id || req.user.user_type.name === 'admin') {
-			models.findById(req.params.id, function(e, user) {
+			models.User.findById(req.params.id, function(e, user) {
 				if (!e) {
 					toUserOptions = {
 						template: 'goodbye'
@@ -738,8 +740,8 @@ exports.configAPI = function configAPI(app) {
 			}
 		});
 	
-	// Password reset request email gets sent with a unique key and an expiry date.	
-	app.post('/forgot', function(req, res) {
+	// Sends an email for resetting a user's password. Token will expires in 1 hour.
+	app.post('/api/forgot', function(req, res) {
 		async.waterfall([
 			// generate a random and probably unique key
 			function(done) {
@@ -750,14 +752,14 @@ exports.configAPI = function configAPI(app) {
 			},
 			//find the user who has forgotten their password
 			function(token, done) {
-				User.findOne({ email: req.body.email }, function(err, user) {
+				models.User.findOne({ email: req.body.email }, function(err, user) {
 					if (!user) {
 						req.flash('error', 'No account with that email address exists.');
 						return res.redirect('#/forgot');
 					}
 					user.resetPasswordToken = token;
-					user.resetPasswordExpires = Date.today().add(1).hour(); // 1 hour
-
+					user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+					console.log('expires in: ' + user.resetPasswordExpires);
 					user.save(function(err) {
 						done(err, token, user);
 					});
@@ -770,7 +772,10 @@ exports.configAPI = function configAPI(app) {
 				resetOption = {
 					template: "reset-password",
 					subject: 'Food Co-op Password Reset',
-					to: user.email
+					to: {
+						email: user.email,
+						name: user.name
+					}
 				};
 				
 				resetData = {host: req.headers.host, token: token };
@@ -796,14 +801,16 @@ exports.configAPI = function configAPI(app) {
 		});
 	
 	// Get a user to have their password reset
-	app.get('api/reset/:token', function(req,res) {
-		User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
-			if (!user) {
-				req.flash('error', 'Password reset token is invalid or has expired.');
-				return res.redirect('/forgot');
+	app.get('/api/reset/:token', function(req,res) {
+		models.User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+			if (user) {
+				user.toObject();
+				res.send(user);
 			}
-			user.toObject();
-			res.JSON(user);
+			else {
+				res.send(403, 'Password reset token is invalid or has expired.');
+			}
+			
 		});
 	});
 	
@@ -812,22 +819,22 @@ exports.configAPI = function configAPI(app) {
 		async.waterfall([
 			// find and save the user's new password as well as reseting their token values.
 			function(done) {
-				User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+				models.User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
 					if (!user) {
-						req.flash('error', 'Password reset token is invalid or has expired.');
-						return res.redirect('back');
+						return res.send(401, 'Password reset token is invalid or has expired');
 					}
+					console.log(user.salt);
+					user.setPassword(req.body.password, function() {
+						user.resetPasswordToken = undefined;
+						user.resetPasswordExpires = undefined;
 
-					user.setPassword(req.body.password);
-					user.resetPasswordToken = undefined;
-					user.resetPasswordExpires = undefined;
-
-					user.save(function(err) {
-						req.logIn(user, function(err) {
-							res.json(user);
+						user.save(function(err) {
+							if (err) console.log(err);
+							console.log(user.salt);
 							done(err, user);
 						});
 					});
+					
 				});
 			},
 			// send an email to the user informing them of their password being changed.
@@ -837,7 +844,10 @@ exports.configAPI = function configAPI(app) {
 				changeOptions = {
 					template: "password-change",
 					subject: 'Food Co-op Password Changed',
-					to: user.email
+					to: {
+						email: user.email,
+						name: user.name
+					}
 				};
 				
 				changeData = {name: user.name};
@@ -851,11 +861,16 @@ exports.configAPI = function configAPI(app) {
 					// a response is sent so the client request doesn't timeout and get an error.
 					req.flash('success', 'An email has been sent to ' + user.email + ' confirming their password change.');
 					console.log("Message sent to user confirming password change");
+					req.logIn(user, function(err) {
+						user.toObject();
+						res.send(user);
+					});
 					done(err, 'done');
 				});
 			}
 			], function(err) {
-				res.redirect('/');
+				console.log(err);
+				
 			});
 	});
 	

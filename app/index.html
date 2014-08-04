@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="co-op">
 <head>
-    <meta charset="utf-8">
-    <title>NNFC -- Northland Natural Food Co-op</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset="utf-8">
+	<title>NNFC -- Northland Natural Food Co-op</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     
 	<!-- Google Font -->
 	<link href='http://fonts.googleapis.com/css?family=Raleway:700,500' rel='stylesheet' type='text/css'>
@@ -12,12 +12,12 @@
     
 	<link href="css/site.css" rel="stylesheet" type="text/css" media="screen">
 	
-    <link href="css/banner.css" rel="stylesheet" media="screen">
-    <link rel="stylesheet" href="css/animations.css" title="animations" type="text/css" media="screen">
+	<link href="css/banner.css" rel="stylesheet" media="screen">
+	<link rel="stylesheet" href="css/animations.css" title="animations" type="text/css" media="screen">
 
 	<script src="lib/bower_components/jquery/dist/jquery.min.js"></script>
-  <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <!-- universal angular data here -->
+	<!-- Include all compiled plugins (below), or include individual files as needed -->
+	<!-- universal angular data here -->
 	
 	<script src="lib/bower_components/angular/angular.min.js"></script>
 	
@@ -40,132 +40,132 @@
 	
 	
 	
-<!-- cropme dependencies -->
+	<!-- cropme dependencies -->
 
-<script src="lib/bower_components/angular-sanitize/angular-sanitize.js"></script>
-<script src="lib/bower_components/angular-touch/angular-touch.js"></script>
-<script src="lib/bower_components/angular-superswipe/superswipe.js"></script>
-<script src="lib/bower_components/angular-cropme/cropme.js"></script>
+	<script src="lib/bower_components/angular-sanitize/angular-sanitize.js"></script>
+	<script src="lib/bower_components/angular-touch/angular-touch.js"></script>
+	<script src="lib/bower_components/angular-superswipe/superswipe.js"></script>
+	<script src="lib/bower_components/angular-cropme/cropme.js"></script>
 	
 	<!-- Other plugins here -->	
-<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?&libraries=places&sensor=true"></script>
+	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?&libraries=places&sensor=true"></script>
 
 </head>
 
 <body>
 	
   
-    <header id="banner">
-        <div id="grass-containter">
+	<header id="banner">
+		<div id="grass-containter">
 			<div class="container">
 				<section class="feature-box">
 					<h1 class="logo">NNFC</h1>
 					<h2 class="slogan">Local • Sustainable • Affordable</h2>
 				</section>
 			</div>
-        </div>
-    </header>
+		</div>
+	</header>
 	
- 	<div id="wrap" class="container"><!--Sticky footer hack: wrap all page content-->
-     <div class="row" ng-controller="navCtrl">
- 	    <ul class="nav nav-pills pull-left">
-			<div ng-if="currentUser == null">
-				<ng-include src=" 'partials/login.html' "></ng-include>
-			</div>
-			 
- 		</ul>
- 		<ul class="nav nav-pills pull-right" ng-controller="logoutCtrl">
-			<li><a href="/store.html">Store</a></li>
-			<li ng-class="{active:isActive('/home')}"><a href="#home">Home</a></li>
-			<li ng-class="{active:isActive('/about')}"><a href="#/about">About Us</a></li>
- 			<li ng-class="{active:isActive('/signup')}" ng-hide="currentUser != null"><a href="#signup">Join Us</a></li>
- 	        <li ng-class="{active:isActive('/contact')}"><a href="#contact">Contact Us</a></li>
- 	        <li><a href="http://foodcoop.org.nz">Blog</a></li>
- 	        <li ng-show="currentUser != null"><a ng-click="logOut()">Log Out</a>
- 		</ul>
-     </div>
-    </div>
-	<hr>
-    
-
-    <div class="container">
-    <div class="row">
-        
-        <div class="col-md-2 col-md-push-10" ng-controller="navCtrl">
-                <ul class="nav nav-pills nav-stacked">
-                    <li ng-class="{active:isActive('/producer-list')}"><a href="#/producer-list">Producer List</a></li>
-                    <li ng-class="{active:isActive('/faq')}"><a href="#/faq">User FAQ</a></li>
-                    <li ng-class="{active:isActive('/contact')}"><a href="#/contact">Contact Us</a></li>
-                </ul>
-                <br>
-                <ul class="nav nav-pills nav-stacked">
-                    <li ng-class="{active:isActive('/my-cart')}" ng-show="currentUser"><a href="#/my-cart">My Cart <span class="badge">{{items}}</span></a></li>
-                    <li ng-class="{active:isActive('/order-manager')}" 
-					ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
-					><a href="#/order-manager">My Orders</a></li>
-                    <li ng-class="{active:isActive('/product-upload')}" 
-					ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
-					><a href="#/product-upload">Upload a Product</a></li>
-                    <li ng-class="{active:isActive('/producer-profile')}" 
-					ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
-					><a href="#/producer-profile">Edit Producer Profile</a></li>
-					<li ng-class="{active:isActive('/me/{{currentUser._id}}')}" ng-show="currentUser"><a ng-href="#/me/{{currentUser._id}}">My Settings</a></li>
-                    
-                </ul>
-            </div>
-            
-            <!--  
-            This is where the partials go for the forms and information pages.
-            /-->    
-            <div class="col-md-10 col-md-pull-2">
-				<div class="alert" ng-show="flash.getMessage()">
-					<b>Alert!</b>
-					<p>{{flash.getMessage()}}</p>
+	<div id="wrap" class="container"><!--Sticky footer hack: wrap all page content-->
+		<div class="row" ng-controller="navCtrl">
+			<ul class="nav nav-pills pull-left">
+				<div ng-if="currentUser == null">
+					<ng-include src=" 'partials/login.html' "></ng-include>
 				</div>
-				
-                <div ng-view></div>
-
-            </div> 
-    </div> <!-- End of "row" /--> 
-    </div> <!-- End of "container" /--> 
-    
-    <div id="push"></div>
-</div><!--End hack-->
-
-    <div id="footer">
-        <div class="container">
-            <div class="row">
-				<section class="col-md-6">
-					<h3>NNFC</h3>
-					<h4>Local • Sustainable • Affordable</h4>
-				</section>
-				<section class="col-md-3 col-md-push-4">
-					<nav id="footer-nav">
-						<ul class="nav">
-							<li><a href="#/about">About Us</a></li>
-							<li><a href="#/contact">Contact Us</a></li>
-							<li><a href="#/terms-cons">Terms and Conditions</a></li>
-							<li><a href="#/priv-pol">Privacy Policy</a></li>
-						</ul>
-					</nav>
-				</section>
+			 
+			</ul>
+			<ul class="nav nav-pills pull-right" ng-controller="logoutCtrl">
+				<li><a href="/store.html">Store</a></li>
+				<li ng-class="{active:isActive('/home')}"><a href="#home">Home</a></li>
+				<li ng-class="{active:isActive('/about')}"><a href="#/about">About Us</a></li>
+				<li ng-class="{active:isActive('/signup')}" ng-hide="currentUser != null"><a href="#signup">Join Us</a></li>
+				<li ng-class="{active:isActive('/contact')}"><a href="#contact">Contact Us</a></li>
+				<li><a href="http://foodcoop.org.nz" target="_blank">Blog</a></li>
+				<li ng-show="currentUser != null"><a ng-click="logOut()">Log Out</a>
+				</ul>
 			</div>
-        </div>
-    </div>
+		</div>
+		<hr>
+    
+
+		<div class="container">
+			<div class="row">
+        
+				<div class="col-md-2 col-md-push-10" ng-controller="navCtrl">
+					<ul class="nav nav-pills nav-stacked">
+						<li ng-class="{active:isActive('/producer-list')}"><a href="#/producer-list">Producer List</a></li>
+						<li ng-class="{active:isActive('/faq')}"><a href="#/faq">User FAQ</a></li>
+					</ul>
+					<br>
+					<ul class="nav nav-pills nav-stacked">
+						<li ng-class="{active:isActive('/my-cart')}" ng-show="currentUser"><a href="#/my-cart">My Cart <span class="badge">{{items}}</span></a></li>
+						<li ng-class="{active:isActive('/order-manager')}" 
+						ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
+						><a href="#/order-manager">My Orders</a></li>
+						<li ng-class="{active:isActive('/product-upload')}" 
+						ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
+						><a href="#/product-upload">Upload a Product</a></li>
+						<li ng-class="{active:isActive('/producer-profile')}" 
+						ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
+						><a href="#/producer-profile">Edit Producer Profile</a></li>
+						<li ng-class="{active:isActive('/me/{{currentUser._id}}')}" ng-show="currentUser"><a ng-href="#/me/{{currentUser._id}}">My Settings</a></li>
+                    
+					</ul>
+				</div>
+            
+				<!--  
+					This is where the partials go for the forms and information pages.
+					/-->    
+					<div class="col-md-10 col-md-pull-2">
+						
+						<alert class="warning" ng-show="flash.getMessage()">
+							<b>Alert!</b>
+							<p>{{flash.getMessage()}}</p>
+						</alert>
+				
+						<div id="view" ng-view></div>
+
+					</div> 
+				</div> <!-- End of "row" /--> 
+			</div> <!-- End of "container" /--> 
+    
+			<div id="push"></div>
+		</div><!--End hack-->
+
+		<div id="footer">
+			<div class="container">
+				<div class="row">
+					<section class="col-md-6">
+						<h3>NNFC</h3>
+						<h4>Local • Sustainable • Affordable</h4>
+					</section>
+					<section class="col-md-3 col-md-push-4">
+						<nav id="footer-nav">
+							<ul class="nav">
+								<li><a href="#/about">About Us</a></li>
+								<li><a href="#/contact">Contact Us</a></li>
+								<li><a href="#/terms-cons">Terms and Conditions</a></li>
+								<li><a href="#/priv-pol">Privacy Policy</a></li>
+							</ul>
+						</nav>
+					</section>
+				</div>
+			</div>
+		</div>
     
 
 
 
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-  ga('create', 'UA-45071933-1', 'strategicdevelopment.co.nz');
-  ga('send', 'pageview');
+		ga('create', 'UA-45071933-1', 'strategicdevelopment.co.nz');
+		ga('send', 'pageview');
 
-</script>
+		</script>
 
-</body>
-</html>
+	</body>
+	</html>
