@@ -6,7 +6,6 @@
 	smtpTransport = require('nodemailer-smtp-transport');
 	config = require('./config').Config;
 	fs = require("fs");
-
 	_ = require("underscore");
 
 	Emailer = (function() {

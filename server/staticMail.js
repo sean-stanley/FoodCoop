@@ -25,19 +25,22 @@ var data = {
   name: "Sean Stanley",
   AngularVersion: "1.3.0-beta.5",
   expressVersion: "4.6.1",
-  currentTime: currentTimeString
+  currentTime: currentTimeString,
+  data: [1, 2, 3, 4, 5]
   };
 
 serverStart = new Emailer(options, data);
 
 
 /*
+
 serverStart.send(function(err, result) {
   if (err) {
     return console.log(err);
   }
   console.log("Message sent")
 });*/
+
 
 
 

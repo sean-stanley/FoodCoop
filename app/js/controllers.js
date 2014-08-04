@@ -47,20 +47,6 @@ angular.module('co-op.controllers', []).
 		};
 	}
 ])
-	.controller('resetPwdCtrl', ['$scope', 'PwdResetManager',
-		function($scope, PwdResetManager) {
-			$scope.resetData = {
-				email: '',
-				dob: '',
-				securityQuestion: '',
-				securityAnswer: '',
-				loginTries: $scope.loginAttemts,
-			};
-			$scope.submitForm = function() {
-				PwdResetManager.pwdReset($scope.resetData);
-			};
-		}
-	])
 
 .controller('userAdminCtrl', ['$scope', 'Restangular', '$location',
 	function($scope, Restangular, $location) {
@@ -89,7 +75,6 @@ angular.module('co-op.controllers', []).
   			} else {
   				$scope.user.user_type.name = "Customer";
   			}
-			$scope.user.swappedTypes = true;
   		});
 		  
 		$scope.isClean = function() {
@@ -104,19 +89,46 @@ angular.module('co-op.controllers', []).
 				});
 			}
 		};
-
+		
+		// sends a request for a password reset email to be sent to this user's email.
+		$scope.passwordReset = function() {
+			Restangular.all('forgot').post({email: original.email});
+		};
+		
 		$scope.save = function() {
-			$scope.user.post($scope.user._id).then(function() {
-				$location.path('/');
-			});
+			if (!$scope.isClean()) {
+				$scope.user.post($scope.user._id).then(function() {
+					$location.path('/');
+				});
+			}
+			else {
+				return;
+			}
+			
 		};
 	}
 ])
+
+.controller('resetCtrl', ['$scope', 'Restangular', '$location', 'user', 'LoginManager', 
+	function($scope, Restangular, $location, user, LoginManager){
+		$scope.user = Restangular.copy(user);
+		
+		$scope.save = function() {
+			Restangular.one('reset', $scope.user.resetPasswordToken).post().then(function(result) {
+				LoginManager.login('local', {
+					email: result.email,
+					password: $scope.user.password,
+					rememeberMe: false
+				});
+			});
+		};
+}])
 
 .controller('userCtrl', ['$scope', 'Restangular', 'LoginManager', '$location',
 	function($scope, Restangular, LoginManager, $location) {
 
 		$scope.userData = {
+			cost: 60,
 			password: '',
 			email: '',
 			name: '',
@@ -131,8 +143,10 @@ angular.module('co-op.controllers', []).
 		$scope.$watch('userData.user_type.canSell', function(newValue) {
 			if ($scope.userData.user_type.canSell) {
 				$scope.userData.user_type.name = "Producer";
+				$scope.userData.cost = 120;
 			} else {
 				$scope.userData.user_type.name = "Customer";
+				$scope.userData.cost = 60;
 			}
 		});
 
@@ -332,8 +346,8 @@ angular.module('co-op.controllers', []).
 ])
 
 
-.controller('producerCtrl', ['$scope', '$rootScope', '$sce', 'ProducerManager', '$location', '$modal',
-	function($scope, $rootScope, $sce, ProducerManager, $location, $modal) {
+.controller('producerCtrl', ['$scope', '$rootScope', 'ProducerManager', '$location',
+	function($scope, $rootScope, ProducerManager, $location) {
 		
 		$scope.submitForm = function() {
 			ProducerManager.saveProducer();

@@ -13,12 +13,6 @@ var util = require('util'),
 	passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy;
 
-var forgot = require('password-reset')({
-    uri : 'http://localhost:8080/password_reset',
-    from : 'password-robot@localhost',
-    host : 'localhost', port : 25,
-});
-
 mongoose.connect('mongodb://localhost/mydb');
 var db = mongoose.connection;
 
@@ -26,10 +20,7 @@ var app = API.configAPI(express());
 
 app.use(express.static(path.normalize(path.join(__dirname, '../app'))));
 
-
-
-//Passport Setup
-app.use(forgot.middleware); //forgotten password middleware
+// Passport Authentication Setup
 passport.use(models.User.createStrategy());
 passport.serializeUser(models.User.serializeUser());
 passport.deserializeUser(models.User.deserializeUser());

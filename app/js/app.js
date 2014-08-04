@@ -45,6 +45,16 @@ angular.module('co-op', [
 			}
 		}
 	});
+	$routeProvider.when('/forgot', {templateUrl: 'partials/forgot-password.html'});
+	$routeProvider.when('/reset/:token', {
+		controller: 'resetCtrl',
+		templateUrl:'partials/reset-password.html',
+		resolve: {
+			user: function(Restangular, $route) {
+				return Restangular.one('api/reset', $route.current.params.token).get();
+			}
+		}
+	});
 	$routeProvider.when('/about', {templateUrl: 'partials/about.html'});
     $routeProvider.when('/producer-list', {templateUrl: 'partials/producer-list.html', controller: 'producerListCtrl'});
 	$routeProvider.when('/producer/:companyName-:userName', {

@@ -51,7 +51,7 @@ angular.module('co-op.services', [])
 						if (typeof user.plain === 'function'){
 							user = user.plain();
 						}
-						console.log("user: " + user);
+						console.log(user);
 						properties = Object.getOwnPropertyNames(user);
 						properties.forEach(function (key) {
 							User[key] = user[key];
