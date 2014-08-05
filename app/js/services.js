@@ -35,6 +35,8 @@ angular.module('co-op.services', [])
 	})
 	
 	.factory('LoginManager', function ($location, $rootScope, $cookieStore, Session, Restangular){
+		$rootScope.failedAttempts = 0;
+		
 		return {
 			login : function(provider, form, callback) {
 				var cb = callback || angular.noop;
@@ -45,11 +47,9 @@ angular.module('co-op.services', [])
 					rememberMe: form.rememberMe
 					})
 				.then(function (user) {
-					console.log(user);
+					var properties, User = {}, remainingAttempts;
 					if (typeof user === 'object') {
-						var properties;
-						var User = {};
-						if (typeof user.plain === 'function'){
+						if (user.hasOwnProperty('plain') ){
 							user = user.plain();
 						}
 						console.log(user);
@@ -59,8 +59,24 @@ angular.module('co-op.services', [])
 						});
 										
 						$rootScope.currentUser = User;
-						return cb();
 					}
+					// incorrect login attempt
+					else {
+						
+						remainingAttempts = function(maxAttempts) {
+							if (maxAttempts > 0 && maxAttempts - $rootScope.failedAttempts > 0) {
+								return maxAttempts - $rootScope.failedAttempts;
+							}
+							else {
+								return 0;
+							}
+						};
+						var remaining = remainingAttempts(9);
+						$rootScope.flash.setMessage('Login failed! Please check your username and password and try again. You have ' + remaining +' remaining attempts left');
+						$rootScope.failedAttempts++;
+						$location.path('/login-failed'+'/attempts='+$rootScope.failedAttempts);
+					}
+					return cb();
 				}, 
 					function(err) {
 						console.log(err.data);
@@ -70,29 +86,35 @@ angular.module('co-op.services', [])
 				);
 			},
 			
-			isLoggedIn : function() {
+			isLoggedIn : function(callback) {
 				var loggedInUser, isLoggedIn;
-				Session.customGET().then(function(user) {
-					if (user === 'Not logged in') {
-						console.log(user);
-						return;
-					}
-					if (user.hasOwnProperty('email')) {
-						loggedInUser = user.plain();
-						delete loggedInUser.salt;
-						delete loggedInUser.hash;
-						console.log(loggedInUser);
-						$rootScope.currentUser = loggedInUser;
-						isLoggedIn = true;
-					}
-					else {isLoggedIn = false;}
-					return isLoggedIn;
-				});
+				var cb = callback || angular.noop;
+				// check if the user is logged in with the app.
+				if ($rootScope.currentUser && $rootScope.currentUser.hasOwnProperty('email')) {
+					isLoggedIn = true;
+				}
+				// attempt to get the user from the app
+				else {
+					Session.customGET().then(function(user) {
+						if (user === 'Not logged in') {
+							console.log(user);
+							isLoggedIn = false;
+						}
+						else if (typeof user === 'object' && user.hasOwnProperty('email')) {
+							loggedInUser = user.plain();
+							console.log(loggedInUser);
+							// if the user is already authenticated, save the data for the app to use.
+							$rootScope.currentUser = loggedInUser;
+							isLoggedIn = true;
+						}
+						else {isLoggedIn = false;}
+						cb(isLoggedIn);
+					});
+				}
 			},
 			
 			logout : function() {
 				Session.remove();
-				$cookieStore.remove('user');
 				$rootScope.currentUser = null;
 				$location.path('/home');
 			}

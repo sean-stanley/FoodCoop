@@ -19,45 +19,37 @@ angular.module('co-op', [
 	'restangular'])
 
   .config(['$routeProvider', 'RestangularProvider', function($routeProvider, RestangularProvider) {
-    $routeProvider.when('/home', {templateUrl: 'partials/index-content.html', controller: 'MyCtrl1'});
-    $routeProvider.when('/signup', {templateUrl: 'partials/signup.html', controller: 'userCtrl'});
-    $routeProvider.when('/thankyou', {templateUrl: 'partials/thankyou.html', controller: 'signupInvoiceCtrl'});
-	
-    $routeProvider.when('/terms-cons', {templateUrl: 'partials/legal/terms-cons.html'});
-    $routeProvider.when('/priv-pol', {templateUrl: 'partials/legal/priv-pol.html'});
-
-    $routeProvider.when('/users-rights', {templateUrl: 'partials/admin/users-rights.html', controller: 'userAdminCtrl'});
-	$routeProvider.when('/user/:userId', {
-	        controller: 'userEditCtrl', 
-	        templateUrl:'partials/admin/details.html',
-	        resolve: {
-	          user: function(Restangular, $route){
-	            return Restangular.one('api/user', $route.current.params.userId).get();
-	          }
-	        }
-	      });
-	$routeProvider.when('/me/:userId', {
-		controller: 'userEditCtrl',
-		templateUrl:'partials/loggedIn/edit-me.html',
-		resolve: {
-			user: function(Restangular, $route){
-				return Restangular.one('api/user', $route.current.params.userId).get();
+    $routeProvider
+		.when('/home', {templateUrl: 'partials/index-content.html', controller: 'MyCtrl1'})
+		.when('/signup', {templateUrl: 'partials/signup.html', controller: 'userCtrl'})
+		.when('/thankyou', {templateUrl: 'partials/thankyou.html', controller: 'signupInvoiceCtrl'})
+		.when('/terms-cons', {templateUrl: 'partials/legal/terms-cons.html'})
+		.when('/priv-pol', {templateUrl: 'partials/legal/priv-pol.html'})
+		.when('/users-rights', {templateUrl: 'partials/admin/users-rights.html', controller: 'userAdminCtrl', adminOnly: true})
+		.when('/user/:userId', {
+			controller: 'userEditCtrl', 
+			templateUrl:'partials/admin/details.html',
+			adminOnly: true,
+			resolve: {
+				user: function(Restangular, $route){
+					return Restangular.one('api/user', $route.current.params.userId).get();
+				}
 			}
-		}
-	});
-	$routeProvider.when('/forgot', {templateUrl: 'partials/forgot-password.html', controller: 'forgotCtrl'});
-	$routeProvider.when('/reset/:token', {
-		controller: 'resetCtrl',
-		templateUrl:'partials/reset-password.html',
-		resolve: {
-			user: function(Restangular, $route) {
-				return Restangular.one('api/reset', $route.current.params.token).get();
+		})
+		
+		.when('/forgot', {templateUrl: 'partials/forgot-password.html', controller: 'forgotCtrl'})
+		.when('/reset/:token', {
+			controller: 'resetCtrl',
+			templateUrl:'partials/reset-password.html',
+			resolve: {
+				user: function(Restangular, $route) {
+					return Restangular.one('api/reset', $route.current.params.token).get();
+				}
 			}
-		}
-	});
-	$routeProvider.when('/about', {templateUrl: 'partials/about.html'});
-    $routeProvider.when('/producer-list', {templateUrl: 'partials/producer-list.html', controller: 'producerListCtrl'});
-	$routeProvider.when('/producer/:companyName-:userName', {
+		})
+		.when('/about', {templateUrl: 'partials/about.html'})
+		.when('/producer-list', {templateUrl: 'partials/producer-list.html', controller: 'producerListCtrl'})
+		.when('/producer/:companyName-:userName', {
 			controller: 'producerPageCtrl',
 	 		templateUrl:'partials/producer-page.html',
 	 		resolve: {
@@ -65,35 +57,44 @@ angular.module('co-op', [
 				return Restangular.one('api/user/producer', $route.current.params.userName).get();
 	 			}
 	 		}
-	 	});
+	 	})
 	
 	
-	$routeProvider.when('/faq', {templateUrl: 'partials/faq.html'});
+		.when('/faq', {templateUrl: 'partials/faq.html'})
     
-	$routeProvider.when('/product-upload', {templateUrl: 'partials/loggedIn/product-upload.html', controller: 'productUpload'});
-    $routeProvider.when('/producer-profile', {templateUrl: 'partials/loggedIn/edit-producer-profile.html', controller: 'producerCtrl'});
-	$routeProvider.when('/my-cart', {templateUrl: 'partials/loggedIn/my-cart.html'});
-    $routeProvider.when('/order-manager', {templateUrl: 'partials/loggedIn/order-manager.html'});
-
-	$routeProvider.when('/contact', {templateUrl: 'partials/contact.html', controller: 'contactCtrl'});
-	$routeProvider.when('/contact/:userId', {
-		templateUrl: 'partials/contact.html', 
-		controller: 'producerContactCtrl',
-		resolve: {
-			producer: function(Restangular, $route){
-				return Restangular.one('api/user', $route.current.params.userId).get();
+		.when('/product-upload', {templateUrl: 'partials/loggedIn/product-upload.html', controller: 'productUpload', loggedInOnly: true})
+		.when('/producer-profile', {templateUrl: 'partials/loggedIn/edit-producer-profile.html', controller: 'producerCtrl', loggedInOnly: true})
+		.when('/my-cart', {templateUrl: 'partials/loggedIn/my-cart.html', loggedInOnly: true})
+    	.when('/order-manager', {templateUrl: 'partials/loggedIn/order-manager.html', loggedInOnly: true})
+		.when('/me/:userId', {
+			controller: 'userEditCtrl',
+			templateUrl:'partials/loggedIn/edit-me.html',
+			loggedInOnly: true,
+			resolve: {
+				user: function(Restangular, $route){
+					return Restangular.one('api/user', $route.current.params.userId).get();
+				}
 			}
-		}
-	});
-	
-    $routeProvider.when('/login', {templateUrl: 'partials/login.html'});
-    $routeProvider.when('/must-login', {templateUrl: 'partials/must-login.html'});
-    $routeProvider.when('/forgot-password', {templateUrl: 'partials/forgot-password.html', controller: 'resetPwdCtrl'}); //needs to be sorted and replaced with the node server script for password resetting. Mailer has to be setup first though.
-    $routeProvider.when('/login-failed', {templateUrl: 'partials/login-failed.html'});
-    
+		})
 
-    $routeProvider.when('/store', {templateUrl: 'store.html'});
-    $routeProvider.otherwise({redirectTo: '/home'});
+		.when('/contact', {templateUrl: 'partials/contact.html', controller: 'contactCtrl'})
+		.when('/contact/:userId', {
+			templateUrl: 'partials/contact.html', 
+			controller: 'producerContactCtrl',
+			resolve: {
+				producer: function(Restangular, $route){
+					return Restangular.one('api/user', $route.current.params.userId).get();
+				}
+			}
+		})
+	
+    .when('/login', {templateUrl: 'partials/login.html', isLogin: true})
+    .when('/must-login', {templateUrl: 'partials/must-login.html', isLogin: true})
+    .when('/login-failed', {templateUrl: 'partials/login-failed.html'})
+    .when('/login-failed/attempts=:tries', {templateUrl: 'partials/login-failed.html'})
+
+    .when('/store', {templateUrl: 'store.html'})
+    .otherwise({redirectTo: '/home'});
     
 	// RestangularProvider.setBaseUrl('/api');
 	RestangularProvider.setRequestInterceptor(function(elem, operation, what) {        
@@ -108,35 +109,33 @@ angular.module('co-op', [
 	});
 	
   }])
-	.run(function($rootScope, $location, $cookieStore, LoginManager) {
-		LoginManager.isLoggedIn(); // true or false
-		
-		/*
-		if ($cookieStore.get('user')) {
-					$rootScope.currentUser = $cookieStore.get('user');
-				}*/
+	.run(function($rootScope, $location, LoginManager, flash) {
+		// without a callback this function simply checks if the user is authenticated
+		// and if he is, saves his data to the rootScope. Handy for getting the data
+		// when a session hasn't expired yet. It runs once when the app starts.
+		$rootScope.flash = flash;
+		LoginManager.isLoggedIn();
 		
 		
 		
 		$rootScope.$on( '$routeChangeStart', function(event, next, current) {
-			switch(next.originalPath) {
-				case '/home':
-				case '/about':
-				case '/faq':
-				case '/signup':
-				case '/contact':
-				case '/producer-list':
-				case '/users-rights': //remove this before going live	
-				case '/thankyou':
-				case '/login':
-					
-				    break;
-				default:	        	
-					if ($rootScope.currentUser === null && next.templateUrl !== '/partials/login.html') {
-						$location.path("/must-login");
-					}
-		            break;
-		    }
+			LoginManager.isLoggedIn(function(isAuth) {
+				var message;
+				// redirect a user who is not logged in from going to a logged in only page
+				if (!isAuth && next.loggedInOnly || next.adminOnly) {
+					$rootScope.savedLocation = $location.url();
+					$location.path('/must-login');
+				}
+				// redirect a non-admin from viewing an admin only page
+				else if (isAuth && !$rootScope.currentUser.user_type.isAdmin && next.adminOnly) {
+					message = "Sorry! That page is only available to Administrators";
+					$rootScope.flash.setMessage(message);
+					$location.path(current);
+				}
+			});
+			
+			
+			
         });
 
   });

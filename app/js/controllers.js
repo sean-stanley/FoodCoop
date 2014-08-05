@@ -30,9 +30,9 @@ angular.module('co-op.controllers', []).
 	}
 ])
 
-.controller('loginCtrl', ['$scope', '$location', 'LoginManager', 'flash',
-	function($scope, $location, LoginManager, flash) {
-		$scope.flash = flash;
+.controller('loginCtrl', ['$scope', '$rootScope', '$location', 'LoginManager', 'flash',
+	function($scope, $rootScope, $location, LoginManager, flash) {
+		$rootScope.flash = flash;
 		$scope.message = "Hello World";
 		
 		$scope.showLogin = false;
@@ -45,8 +45,10 @@ angular.module('co-op.controllers', []).
 
 		$scope.submitForm = function(message) {
 			LoginManager.login('local', $scope.loginData, function() {
-				flash.setMessage(message);
-				$location.path('/my-cart');
+				$rootScope.flash.setMessage(message);
+				if ($rootScope.savedLocation) {
+					$location.path($rootScope.savedLocation);
+				}
 			});
 		};
 	}
@@ -263,7 +265,7 @@ angular.module('co-op.controllers', []).
 		
 		$scope.producerName = function() {
 			var el = "";
-			if ($rootScope.currentUser.hasOwnProperty('name')) {
+			if (typeof $rootScope.currentUser === "object" && $rootScope.currentUser.hasOwnProperty('name')) {
 				el = $rootScope.currentUser.name;
 			}
 			else {
@@ -274,7 +276,7 @@ angular.module('co-op.controllers', []).
 		
 		$scope.producerCompany = function() {
 			var el = "";
-			if ($rootScope.currentUser.producerData.hasOwnProperty('companyName')) {
+			if (typeof $rootScope.currentUser === "object" && $rootScope.currentUser.producerData.hasOwnProperty('companyName')) {
 				el = $rootScope.currentUser.producerData.companyName;
 			}
 			else {

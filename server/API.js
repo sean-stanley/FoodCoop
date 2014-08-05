@@ -49,7 +49,6 @@ exports.configAPI = function configAPI(app) {
 		// form validation is extensive and sufficient. However, more validation could
 		// be done at a later point just to be safe.
 
-
 		if (!req.body.hasOwnProperty('to')) {
 
 			// the message originated in the `contact us` page and thus has no 'to' in the req.body then...
@@ -64,8 +63,6 @@ exports.configAPI = function configAPI(app) {
 			// The data objects here correspond to whatever template was chosen in a options
 			// object. Different templates require different data. Each property of the data
 			// object evaluates to a variable name in the template.
-
-
 
 			toMeoptions = {
 				template: "contact-form",
@@ -507,9 +504,11 @@ exports.configAPI = function configAPI(app) {
 						}
 						else itemName = 'Customer Membership'
 						
+						//create a promise of a new invoice
 						invoice = models.Invoice.create({
 							_id: newTotal,
-							recipient: req.body.name,
+							invoicee: account._id,
+							title: 'Membership',
 							items: [{name:itemName, cost:req.body.cost}],
 							dueDate: dueDate
 						});
@@ -525,7 +524,10 @@ exports.configAPI = function configAPI(app) {
 							memberEmailOptions = {
 								template: "new-member",
 								subject: 'Welcome to the NNFC online Store',
-								to: account.email
+								to: {
+									email: account.email,
+									name: account.name
+								}
 							};
 							
 							memberEmailData = {
@@ -683,60 +685,171 @@ exports.configAPI = function configAPI(app) {
 	// to the NNFC admin to arrange refunds.
 	app.delete("/api/user/:id/", function(req, res, next) {
 		var toUser, toUserOptions, toUserData, toAdmin, toAdminOptions, toAdminData;
-		if (req.user._id === req.params.id || req.user.user_type.name === 'admin') {
+		if (req.user._id === req.params.id || req.user.user_type.isAdmin) {
 			models.User.findById(req.params.id, function(e, user) {
 				if (!e) {
-					toUserOptions = {
-						template: 'goodbye'
-					};
+					async.waterfall([
+						// looks up the user's original membership invoice
+						function(done) {
+							models.Invoice.findOne({ invoicee: user._id, title: 'Membership'}, function(e, invoice){
+								if (e) handleError(e);
+								done(e, invoice);
+							})
+						},
+						
+						// next send an email to the admin saying this user is being deleted
+						function(invoice, done) {
+							if (invoice) {
+								toAdminOptions = {
+									template: 'member-leaving',
+									subject: function() {
+										return user.name + ' wants to leave the NNFC';
+									},
+									to: mail.companyEmail
+								},
+								
+								toAdminData = {name: user.name};
+								
+								toAdmin = new Emailer(toAdminOptions, toAdminData);
+								
+								toAdmin.send(function(err, result){
+									if (err) {
+										return console.log(err);
+									}
+									// a response is sent so the client request doesn't timeout and get an error.
+									console.log("Message sent to user about leaving the NNFC");
+									done(e, invoice)
+								})
+							}
+							else {
+								done(e, null)
+							}
+						},
+						
+						// next we send an email notifying the user they will be re-imbursed for their membership fee
+						function(invoice, done) {
+							if (invoice) {
+								toUserOptions = {
+									template: "goodbye",
+									subject: 'Leaving the NNFC',
+									to: {
+										email: user.email,
+										name: user.name
+									}
+								};
+								toUserData = {name: user.name, code: invoice._id, items: invoice.items};
+								toUser = new Emailer(toUserOptions, toUserData);
+								toUser.send(function(err, result) {
+									if (err) {
+										return console.log(err);
+									}
+									// a response is sent so the client request doesn't timeout and get an error.
+									console.log("Message sent to user about leaving the NNFC");
+									done(e, 'message done')
+								});
+							}
+						}
+						], 
+						// if the email sent successfully, delete the user's data
+						function(err, results) {
+							if (results === 'message done') {
+								async.series([
+									//remove an account's cart first
+									function(done) {
+										models.Order.remove({
+											customer: req.params.id
+										}, function(e) {
+											if (e) return handleError(e);
+											done(e, 'cart');
+										});
+									},
+									// then remove an account's products 
+									function(done) {
+										models.Products.remove({
+											producer_ID: req.params.id
+										}, function(e) {
+											if (e) return handleError(e);
+											done(e, 'products')
+										});
+									},
+									// finally remove the user itself
+									function(done) {
+										models.User.remove({
+											_id: req.params.id
+										}, function(e) {
+											if (e) return handleError(e);
+											done(e, 'user')
+										});	
+									}
+								],	function(err, results){
+										if (_.contains(results, 'user') ){
+											console.log('The user and their products and orders are deleted')
+										}
+								});	
+							}
+							else {
+								console.log(results);
+							}
+							
+							
+						});
+					
+					
+					
+					
+					
+					
+
+					
+
+					
 				}
 			})
-
-			//add an email here
-
-			models.User.remove({
-				_id: req.params.id
-			}, function(e) {
-				if (e) return handleError(e);
-			});
-			models.Products.remove({
-				producer_ID: req.params.id
-			}, function(e) {
-				if (e) return handleError(e);
-			});
-			models.Order.remove({
-				customer: req.params.id
-			}, function(e) {
-				if (e) return handleError(e);
-			});
+		}
+		else {
+			res.send(400, "You are not authorized to remove that user");
 		}
 
 
 	});
+	
 	app.route('/auth/session')
+	// check to see if the user is logged in
 		.get(function(req, res, next) {
 			if (req.user) {
-				res.json(req.user);
+				var userObject = req.user.toObject();
+				delete userObject.salt;
+				delete userObject.hash;
+				res.send(userObject);
 			} else {
 				res.send('text/plain', 'Not logged in');
 			}
 
 		})
-		.post(passport.authenticate('local', {
-				failureFlash: 'Login Failed for some reason',
-				failureRedirect: '#/login-failed'
-			}), // redirect and flash not working for some reason. Possibly an angularJS issue?
-
-			function(req, res, next) {
-				var userObject = req.user.toObject();
-				res.json(userObject);
-			})
+		// attempt to log the user in
+		.post(function(req, res, next) {
+			passport.authenticate('local', function(err, user, info) {
+				if (err) { return next(err); }
+				if (!user) {
+					req.session.messages =  [info.message];
+					return res.send('Failed to authenticate user');
+				}
+				req.logIn(user, function(err) {
+					if (err) { console.log(err); }
+					var userObject = req.user.toObject();
+					delete userObject.salt;
+					delete userObject.hash;
+					res.send(userObject);
+				});
+			})(req, res, next);
+		})
+		// log the user out and delete their session	
 		.delete(function(req, res) {
 			if (req.user) {
 				req.logout();
 				res.send(200, "Successfully Logged out");
 			} else {
-				res.send(400, "Not logged in");
+				res.send(400, "You are not logged in");
 			}
 		});
 	
@@ -797,15 +910,14 @@ exports.configAPI = function configAPI(app) {
 			function(err) {
 				if (err) return next(err);
 				res.redirect('/#/forgot');
-			});
 		});
+	});
 	
 	// Get a user to have their password reset
 	app.get('/api/reset/:token', function(req,res) {
 		models.User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
 			if (user) {
-				user.toObject();
-				res.send(user);
+				res.json(user);
 			}
 			else {
 				res.send(403, 'Password reset token is invalid or has expired.');
@@ -871,7 +983,7 @@ exports.configAPI = function configAPI(app) {
 			], function(err) {
 				console.log(err);
 				
-			});
+		});
 	});
 	
 	// Static stuff, won't be changed by users.

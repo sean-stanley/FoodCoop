@@ -1,0 +1,52 @@
+<html>
+    <head>
+        <title> Goodbye from the NNFC </title>
+    </head>
+    <body>
+        <p> Hi {{name}},</p>
+        <p> Thanks for your time as a member of the NNFC. </p>
+		<p> Since you've requested to leave the co-op, we've deleted all personal information we've stored about you in compliance with our Terms of Use. We are sorry to have you leave us and hope your time with us was satisfactory.</p>
+		<p> We'd really appreciate it if you'd write and tell us your reasons for leaving. It would only take a moment of your time. <a href="mailto:sean@maplekiwi.com">Click here</a> to write to us.</p>
+		
+		<p> As you are leaving the co-op you are entitled to a refund of your initial membership cost. This is outlined below. We'll need to hear from you how best to refund your money. For instance, would you like a cheque in the mail? Or would you prefer an internet banking transfer.</p>
+		
+        <p> Once we hear from you we will do our best to refund you within 30 days of receiving your notice.</p> 
+       
+       <table>
+           <thead>
+               <tr>
+                   <td>Invoice #{{code}}</td>
+				   <td>Membership Invoice for {{name}}</td>
+               </tr>
+           </thead>
+           <tbody>
+               
+			  <% _.each(items, function(item) { %> 
+                 <tr>
+                     <td>{{item.name}} </td>
+                     <td>${{item.cost}} </td>
+                 </tr>
+			<% }); %>
+           </tbody>
+           <tfooter>
+               <tr>
+                   <td> Total: ${{cost}}</td>
+               </tr>
+           </tfooter>
+       </table>
+	   
+       
+	   <hr>
+       
+        <p>Thank you again for being a member of the NNFC.</p>
+		
+        <p>Goodbye, <br>
+        The NNFC team </p>
+        
+		<p>
+			<a href="http://foodcoop.org.nz"><img src="cid:logo@foodcoop" /></a>
+		</p>
+    </body>
+    
+</html>
+	

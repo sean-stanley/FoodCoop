@@ -1,3 +1,27 @@
 <h1>:-( Sorry</h1>
 <p>You must login to see this page</p>
-<p>Please sign-in above or sign-up instead!</p>
+<p>Please sign-in here or sign-up instead!</p>
+
+		<form class="form-horizontal" name="signIn" autocomplete="on" ng-submit="submitForm()" novalidate ng-controller="loginCtrl">
+			<div class="form-group">
+				<!-- <label for="inputEmail" class="col-lg-2 control-label">Email</label> -->
+				<input ng-model="loginData.email" type="email" name="email" class="form-control" id="inputEmail" placeholder="Email">
+				<div class="alert alert-warning" ng-show="signIn.email.$dirty && signIn.email.$invalid">Sorry:
+					<span ng-show="signIn.email.$error.required">email is required.</span>
+					<span ng-show="signIn.email.$error.email">Please, write a valid email address.</span>
+				</div>				      
+			</div>
+			<div class="form-group">
+				<!-- <label for="inputPassword" class="col-lg-2 control-label">Password</label> -->
+				<input ng-model="loginData.password" type="password" name="password" class="form-control" id="inputPassword" placeholder="Password">
+				<!--
+					<div class="checkbox" style="margin-bottom: 35px;">
+					<br>
+					<input type="checkbox" ng-model="loginData.rememberMe" value="true"> <p>Remember me</p>
+					</div>-->
+			</div>
+			<div class="form-group">
+				<button type="submit" class="btn btn-default" ng-click="showLogin = false;">Sign in</button>
+			</div>
+		</form>
+		<a href="#/forgot" ng-click="showLogin = false">Forgot my password?</a>

@@ -13,6 +13,9 @@ Features include:
 
 Setting Up
 ==========
+You need to have node.js installed on your machine to run the site.
+
+We hope before long to have a live demo available online. Just waiting on the man with the server to give me access really.
 
 Install the necessary modules:
 
@@ -29,9 +32,19 @@ Then install sample data from the database with
 
 This will give you access to a collection of sample users, sample products, categories and certification types.
 
+You may also need to go to the app/lib directory where the bower components are stored and run
+
+	bower install
+or 
+
+	bower update
+
+
 Developing
 ==========
 
 To start the server:
 
     grunt dev
+
+Then go to localhost:8081 to see the site.

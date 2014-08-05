@@ -90,7 +90,11 @@
 
 		<div class="container">
 			<div class="row">
-        
+        		
+				<alert class="warning" ng-show="flash.getMessage()">
+					<p>{{flash.getMessage()}}</p>
+				</alert>
+				
 				<div class="col-md-2 col-md-push-10" ng-controller="navCtrl">
 					<ul class="nav nav-pills nav-stacked">
 						<li ng-class="{active:isActive('/producer-list')}"><a href="#/producer-list">Producer List</a></li>
@@ -118,10 +122,7 @@
 					/-->    
 					<div class="col-md-10 col-md-pull-2">
 						
-						<alert class="warning" ng-show="flash.getMessage()">
-							<b>Alert!</b>
-							<p>{{flash.getMessage()}}</p>
-						</alert>
+						
 				
 						<div id="view" ng-view></div>
 
