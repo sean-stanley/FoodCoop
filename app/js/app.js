@@ -22,7 +22,7 @@ angular.module('co-op', [
     $routeProvider
 		.when('/home', {templateUrl: 'partials/index-content.html', controller: 'MyCtrl1'})
 		.when('/signup', {templateUrl: 'partials/signup.html', controller: 'userCtrl'})
-		.when('/thankyou', {templateUrl: 'partials/thankyou.html', controller: 'signupInvoiceCtrl'})
+		.when('/welcome', {templateUrl: 'partials/thankyou.html', controller: 'signupInvoiceCtrl'})
 		.when('/terms-cons', {templateUrl: 'partials/legal/terms-cons.html'})
 		.when('/priv-pol', {templateUrl: 'partials/legal/priv-pol.html'})
 		.when('/users-rights', {templateUrl: 'partials/admin/users-rights.html', controller: 'userAdminCtrl', adminOnly: true})
@@ -36,6 +36,7 @@ angular.module('co-op', [
 				}
 			}
 		})
+		.when('/admin/invoices', { controller: 'invoiceCtrl', templateUrl: 'partials/admin/invoices.html' })
 		
 		.when('/forgot', {templateUrl: 'partials/forgot-password.html', controller: 'forgotCtrl'})
 		.when('/reset/:token', {
@@ -97,13 +98,7 @@ angular.module('co-op', [
     .otherwise({redirectTo: '/home'});
     
 	// RestangularProvider.setBaseUrl('/api');
-	RestangularProvider.setRequestInterceptor(function(elem, operation, what) {        
-		if (operation === 'put') {
-			elem._id = undefined;
-			return elem;
-		}
-		return elem;
-	});
+	
 	RestangularProvider.setRestangularFields({
 		id: '_id.$oid'
 	});

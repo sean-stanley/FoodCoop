@@ -9,10 +9,10 @@ var util = require('util'),
 bodyParser = require('body-parser'), // creates a req.body object to allow easy access of request data in the api.
 methodOverride = require('method-override'), // an express module for overriding default http methods
 cookieParser = require('cookie-parser'), // an express module for reading, writing and parsing cookies. In the app it is used for session cookies.
-flash = require('connect-flash'),
 session = require('express-session'), // an express module for creating browser sessions.
 errorHandler = require('express-error-handler'), // an express module for handling errors in the app.
 mongoose = require('mongoose'), // used to connect to MongoDB and perform common CRUD operations with the API.
+ObjectId = require('mongoose').Types.ObjectId; 
 models = require('./models.js'), // this file stores the mongoose schema data for our MongoDB database.
 mail = require('./staticMail.js'), // this file stores some common mail settings.
 Emailer = require('./emailer.js'), // this is a custom class expanded upon nodemailer to allow html templates to be used for the emails.
@@ -34,7 +34,6 @@ exports.configAPI = function configAPI(app) {
 	app.use(methodOverride()); // here we initilize the methodOverride middleware for use in the API.
 	app.use(cookieParser('Intrinsic Definability')); // here we initilize the cookieParser middleware for use in the API.
 	app.use(session({cookie: { maxAge: 60000 }, saveUninitialized: true, resave: true}));
-	app.use(flash()); // here we initilize the flash middleware for use in the API.
 	app.use(passport.initialize()); // here we initilize Passport middleware for use in the app to handle user login.
 	app.use(passport.session()); // here we initilize passport's sessions which expand on the express sessions the ability to have our session confirm if a user is already logged in.
 
@@ -251,15 +250,13 @@ exports.configAPI = function configAPI(app) {
 
 	// this request will delete a product from the database. First we find the
 	// requested product.
-	app.post("/api/product/delete", function(req, res, next) {
+	app.delete("/api/product/", function(req, res, next) {
 
 		// ensure user is logged in to perform this request.		
 		if (req.user) {
 			// delete the product based on it's id and send a request confirming the deletion
 			// if it goes off without a hitch.
-			models.Product.remove({
-				id: req.body._id
-			}, function(e, results) {
+			models.Product.findByIdAndRemove(req.body._id, function(e, results) {
 				if (!e) { // if no errors
 					console.log(results);
 					res.send('text/plain', 'product deleted');
@@ -328,11 +325,11 @@ exports.configAPI = function configAPI(app) {
 	// get the orders made to a particular producer (the one logged in specifically)
 	app.get("api/order/:id", function(req, res, next) {
 		var opts, orderObject;
-		// check if the cuurent user is logged in and is requesting his or her own cart
-		if (req.user && req.user._id === req.params.id) {
+		// check if the current user is logged in and is requesting his or her own cart
+		if (req.user && req.user._id == req.params.id) {
 			// get the cart orders for the current user.
 			models.Order.find({
-				customer: req.params.id
+				customer: new ObjectId(req.params.id)
 			}, null, {
 				sort: {
 					datePlaced: 1
@@ -377,10 +374,10 @@ exports.configAPI = function configAPI(app) {
 		var opts, cartObject;
 		// check if the cuurent user is logged in and is requesting his or her own cart.
 		// Server-side validation.
-		if (req.user && req.user._id === req.params.id) {
+		if (req.user && req.user._id == req.params.id) {
 			// get the cart orders for the current user.
 			models.Order.find({
-				customer: req.params.id
+				customer: new ObjectId(req.params.id)
 			}, null, {
 				sort: {
 					datePlaced: 1
@@ -425,10 +422,10 @@ exports.configAPI = function configAPI(app) {
 	// Creates a new order from the 'add to cart' buttons in the app. No validation yet.
 	app.post("/api/order", function(req, res, next) {
 		new models.Order({
-			product: req.body.productId,
-			customer: req.body.customerId,
-			supplier: req.body.supplierId,
-			quantity: req.body.quantity,
+			product: new ObjectId(req.body.productId),
+			customer: new ObjectId(req.body.customerId),
+			supplier: new ObjectId(req.body.supplierId),
+			quantity: new ObjectId(req.body.quantity),
 			datePlaced: Date.now()
 		}).save()
 	});
@@ -441,7 +438,7 @@ exports.configAPI = function configAPI(app) {
 		if (req.user && req.user._id === req.params.id) {
 			// if (calendar.orderweek) ...
 			models.Order.remove({
-				product: req.params.product
+				product: new ObjectId(req.params.product)
 			}, function(e) {
 				if (!e) {
 					res.send(200, 'Product removed from cart')
@@ -450,6 +447,42 @@ exports.configAPI = function configAPI(app) {
 			})
 		}
 	});
+	
+	// get all the invoices or a query. Called in the app from the invoices page
+	app.get("/api/invoice", function(req, res, next) {
+		models.Invoice.find(req.query, null, {sort : {_id:1} }, function(e, invoices) {
+			models.Invoice.populate(invoices, {path:'invoicee', select: 'name address phone email -_id'}, function(e, invoices) {
+				if (e) return errorHandler(e);
+				
+				res.json(invoices);
+			});
+		});
+	});
+	
+	// update an invoice's status
+	app.put("/api/invoice/", function(req, res, next) {
+		models.Invoice.findByIdAndUpdate(req.body._id, {status: req.body.status}, function(e, invoice){
+			if (e) return errorHandler(e);
+			
+			// Save the time the invoice was modified
+			invoice.dateModified = Date();
+			invoice.save();
+			res.send(202);
+		});
+	});
+	
+	// get a query of one specific invoice by id
+	app.get("/api/invoice/:id", function(req, res, next) {
+		models.Invoice.findById(req.params.id, function(e, invoice) {
+			models.Invoice.populate(invoice, {path:'invoicee', select: 'name address phone email -_id'}, function(e, invoice) {
+				if (e) return errorHandler(e);
+				res.json(invoice);
+			});
+		});
+	});
+	
+	
+	
 	//Get and return users as JSON data based on a query. Only really used for the
 	//admin to look at all users.
 	app.get("/api/user", function(req, res, next) {
@@ -462,9 +495,11 @@ exports.configAPI = function configAPI(app) {
 			if (!e) { // if no errors
 				// The transform is called to remove the password data before sending to the client.
 				results.forEach(function(user) {
-					user.toObject();
+					var userObject = user.toObject();
+					delete userObject.hash;
+					delete userObject.salt;
 				});
-
+				console.log('User just requested from api/user/');
 				res.json(results);
 			} else {
 				console.log(e) // log the error
@@ -472,91 +507,135 @@ exports.configAPI = function configAPI(app) {
 		});
 	});
 
-	// This registers a new user and if no error occurs the user is logged in and
-	// redirected to the home page.
+	// This registers a new user and if no error occurs the user is logged in 
 	// A new email is sent to them as well.
 	app.post("/api/user", function(req, res, next) {
 		var memberEmailOptions, memberEmailData, memberEmail, dueDate, invoice, invoiceTotal;
-
-		models.User.register(new models.User({
-				dateJoined: Date.now(),
-				name: req.body.name,
-				email: req.body.email,
-				phone: req.body.phone,
-				address: req.body.address,
-				user_type: req.body.user_type
-			}),
-			req.body.password,
-			function(e, account) {
-				if (!e) {
-					// Count the total number of invoices and create a new one with an _id equal to
-					// the total++. The invoice is used in the email and also available to the app
-					// once it's saved to the database.
-					models.Invoice.count(function(e, count) {
-						var newTotal, itemName
-						invoiceTotal = count;
-						newTotal = count++;
-						dueDate = Date.today().addDays(31);
-						
-						if (req.body.user_type.name === 'Producer') {
-							
-							itemName = 'Producer Membership'
+		async.waterfall([
+			// create the new user and pass the user to the next function
+			function(done) {
+				models.User.register(new models.User({
+						dateJoined: Date.today(),
+						name: req.body.name,
+						email: req.body.email,
+						phone: req.body.phone,
+						address: req.body.address,
+						user_type: req.body.user_type
+					}),
+					req.body.password,
+					function(e, account) {
+						if (!e) {
+							done(e, account);
+						} else {
+							console.log(e);
+							console.log('This is the account created');
+							console.log(account);
+							res.send(500, 'Server error occured. Check the log for details');
 						}
-						else itemName = 'Customer Membership'
+					}
+				);
+				
+			},
+			
+			// Count the total number of invoices and create a new one with an _id equal to
+			// the total++. The invoice is used in the email and also available to the app
+			// because it's saved to the database.
+			function(user, done) {
+				if (user) {
+					models.Invoice.count(function(e, count) {
+						var itemName;
+						dueDate = Date.today().addDays(30);
+					
+						if (user.user_type.name === 'Producer') {
 						
+							itemName = 'Producer Membership';
+						}
+						else itemName = 'Customer Membership';
+					
 						//create a promise of a new invoice
-						invoice = models.Invoice.create({
-							_id: newTotal,
-							invoicee: account._id,
+						invoice = new models.Invoice({
+							_id: count + 1,
+							datePlaced: Date.today(),
+							invoicee: user._id,
 							title: 'Membership',
 							items: [{name:itemName, cost:req.body.cost}],
 							dueDate: dueDate
 						});
-					});
-					
-					
-					
-					// authenticate the newly created user
-					passport.authenticate('local')(request, result, function() {
 						
-						//Once the new invoice has been made, send an email containing the invoice.
-						invoice.then(function(invoice){
-							memberEmailOptions = {
-								template: "new-member",
-								subject: 'Welcome to the NNFC online Store',
-								to: {
-									email: account.email,
-									name: account.name
-								}
-							};
-							
-							memberEmailData = {
-								name: req.body.name,
-								dueDate: invoice.dueDate,
-								code: invoice._id,
-								items: invoice.items,
-								email: req.body.email,
-								password: req.body.password
-							};
+						memberEmailOptions = {
+							template: "new-member",
+							subject: 'Welcome to the NNFC online Store',
+							to: {
+								email: user.email,
+								name: user.name
+							}
+						};
+						
+						console.log('The total on the invoice is: ' + invoice.items.total)
+						//send an email invoice
+						memberEmailData = {
+							name: user.name,
+							dueDate: invoice.dueDate,
+							code: invoice._id,
+							items: invoice.items,
+							cost: invoice.total,
+							email: user.email,
+							password: req.body.password
+						};
 
-							memberEmail = new Emailer(memberEmailOptions, memberEmailData);
+						memberEmail = new Emailer(memberEmailOptions, memberEmailData);
 
-							memberEmail.send(function(err, result) {
-								if (err) {
-									return console.log(err);
-								}
-								// a response is sent so the client request doesn't timeout and get an error.
-								console.log("Message sent to new member");
-							});
+						memberEmail.send(function(err, result) {
+							if (err) {
+								return console.log(err);
+							}
+							// a response is sent so the client request doesn't timeout and get an error.
+							console.log("Message sent to new member");
 							
+							done(null, user);
 						});
-						// send the newly logged in user to the home screen
-						result.redirect('/');
+						
 					});
-				} else {
-					console.log(e);
-					console.log(account);
-					res.send(500, 'Server error occured. Check the log for details');
+				}
+				else {
+					console.log("No invoice created as User is " + User);
+					done(null, user);
+				}
+			}
+			//send the user-data to the app
+			],
+			function(err, user){
+				var userObject;
+				if (!err && user) {
+					// save the invoice made for the user;
+					invoice.save(function(err) {
+						if (err) return errorHandler(err);
+						console.log('Invoice saved');
+						
+					});
+					// authenticate the newly created user
+					passport.authenticate('local', function(err, user, info){
+						if (!user) {
+							console.log(err);
+							res.send(500);
+						}
+						else {
+							req.logIn(user, function(err){
+								// req.user should now be assigned
+								if (err) console.log(err);
+								console.log('this is the logged in user: ')
+								console.log(req.user);
+								userObject = req.user.toObject();
+								delete userObject.salt;
+								delete userObject.hash;
+								res.send(userObject);
+							});
+						}
+					})(req, res, next);
+				}
+				else {
+					console.log(err)
+					res.send(500);
 				}
 			}
 		);
@@ -634,8 +713,17 @@ exports.configAPI = function configAPI(app) {
 	app.get("/api/user/:id", function(req, res, next) {
 		models.User.findById(req.params.id, function(e, results) {
 			if (!e) {
-				results.toObject();
-				res.send(results);
+				if (results) {
+					var userObject = results.toObject();
+					delete userObject.hash;
+					delete userObject.salt;
+					console.log('User just requested from api/user/:id');
+					res.send(results);
+				}
+				else {
+					res.send(404);
+				}
+				
 			} else {
 				console.log(e);
 			}
@@ -683,134 +771,135 @@ exports.configAPI = function configAPI(app) {
 	// themself. An admin can delete any user. An email is sent to the user thanking
 	// them for their membership and to expect a refund soon. Another email is sent
 	// to the NNFC admin to arrange refunds.
-	app.delete("/api/user/:id/", function(req, res, next) {
+	app.delete("/api/user/:id", function(req, res, next) {
 		var toUser, toUserOptions, toUserData, toAdmin, toAdminOptions, toAdminData;
-		if (req.user._id === req.params.id || req.user.user_type.isAdmin) {
-			models.User.findById(req.params.id, function(e, user) {
-				if (!e) {
-					async.waterfall([
-						// looks up the user's original membership invoice
-						function(done) {
-							models.Invoice.findOne({ invoicee: user._id, title: 'Membership'}, function(e, invoice){
-								if (e) handleError(e);
-								done(e, invoice);
+		if (req.user._id == req.params.id || req.user.user_type.isAdmin) {
+			async.waterfall([
+				// look up the user and their membership invoice
+				function(done) {
+					models.User.findById(req.params.id, function(e, user) {
+						if (e) handleError(e);
+						if (user) {
+							models.Invoice.findOne({ invoicee: new ObjectId(user._id), title: 'Membership'}, function(e, invoice){
+								if (e) return handleError(e);
+								done(e, user, invoice);
 							})
-						},
-						
-						// next send an email to the admin saying this user is being deleted
-						function(invoice, done) {
-							if (invoice) {
-								toAdminOptions = {
-									template: 'member-leaving',
-									subject: function() {
-										return user.name + ' wants to leave the NNFC';
-									},
-									to: mail.companyEmail
-								},
-								
-								toAdminData = {name: user.name};
-								
-								toAdmin = new Emailer(toAdminOptions, toAdminData);
-								
-								toAdmin.send(function(err, result){
-									if (err) {
-										return console.log(err);
-									}
-									// a response is sent so the client request doesn't timeout and get an error.
-									console.log("Message sent to user about leaving the NNFC");
-									done(e, invoice)
-								})
-							}
-							else {
-								done(e, null)
-							}
-						},
-						
-						// next we send an email notifying the user they will be re-imbursed for their membership fee
-						function(invoice, done) {
-							if (invoice) {
-								toUserOptions = {
-									template: "goodbye",
-									subject: 'Leaving the NNFC',
-									to: {
-										email: user.email,
-										name: user.name
-									}
-								};
-								toUserData = {name: user.name, code: invoice._id, items: invoice.items};
-								toUser = new Emailer(toUserOptions, toUserData);
-								toUser.send(function(err, result) {
-									if (err) {
-										return console.log(err);
-									}
-									// a response is sent so the client request doesn't timeout and get an error.
-									console.log("Message sent to user about leaving the NNFC");
-									done(e, 'message done')
-								});
-							}
 						}
-						], 
-						// if the email sent successfully, delete the user's data
-						function(err, results) {
-							if (results === 'message done') {
-								async.series([
-									//remove an account's cart first
-									function(done) {
-										models.Order.remove({
-											customer: req.params.id
-										}, function(e) {
-											if (e) return handleError(e);
-											done(e, 'cart');
-										});
-									},
-									// then remove an account's products 
-									function(done) {
-										models.Products.remove({
-											producer_ID: req.params.id
-										}, function(e) {
-											if (e) return handleError(e);
-											done(e, 'products')
-										});
-									},
-									// finally remove the user itself
-									function(done) {
-										models.User.remove({
-											_id: req.params.id
-										}, function(e) {
-											if (e) return handleError(e);
-											done(e, 'user')
-										});	
-									}
-								],	function(err, results){
-										if (_.contains(results, 'user') ){
-											console.log('The user and their products and orders are deleted')
-										}
-								});	
+					});
+				},
+				
+				// next send an email to the admin saying this user is being deleted
+				function(user, invoice, done) {
+					toAdminOptions = {
+						template: 'member-leaving',
+						subject: user.name + ' wants to leave the NNFC',
+						to: mail.companyEmail
+					},
+					
+					toAdminData = {name: user.name};
+					
+					toAdmin = new Emailer(toAdminOptions, toAdminData);
+					
+					toAdmin.send(function(err, result){
+						if (err) {
+							return console.log(err);
+						}
+						// a response is sent so the client request doesn't timeout and get an error.
+						console.log("Message sent to user about leaving the NNFC");
+						done(null, user, invoice)
+					})
+				},
+				
+				// next we send an email notifying the user they will be re-imbursed for their membership fee
+				function(user, invoice, done) {
+					if (invoice) {
+						toUserOptions = {
+							template: "goodbye",
+							subject: 'Leaving the NNFC',
+							to: {
+								email: user.email,
+								name: user.name
 							}
-							else {
-								console.log(results);
+						};
+						
+						
+						toUserData = {name: user.name, code: invoice._id, items: invoice.items, cost: invoice.total};
+						
+						toUser = new Emailer(toUserOptions, toUserData);
+						toUser.send(function(err, result) {
+							if (err) {
+								return console.log(err);
 							}
-							
-							
+							// a response is sent so the client request doesn't timeout and get an error.
+							console.log("Message sent to user about leaving the NNFC");
+							done(null, user, invoice)
 						});
-					
-					
-					
-					
-					
-					
-
-					
-
-					
+					}
+					else {
+						//invoice not found
+						done(null, user, invoice)
+					}
+				},
+				// make changes to the membership invoice
+				function(user, invoice, done) {
+					if (invoice) {
+						
+						invoice.exInvoicee = 'ex-member ' + user.name;
+						console.log(invoice)
+						invoice.save()
+						
+						switch (invoice.status) {
+						case 'PAID':
+							invoice.status = 'To Refund';
+							invoice.save();
+							break;
+						case 'OVERDUE':
+							//continue to next case
+						case 'un-paid':
+							invoice.status = 'CANCELLED';
+							invoice.save();
+							break;
+						default:
+						}
+						
+						console.log(invoice.status);
+						done(null, user);
+					}
+					else done(null, user);
+				},
+				// delete the user from the database
+				function(user, done) {
+					//remove an account's cart first
+					models.Order.remove({customer: user._id}, function(e) {
+						if (e) return handleError(e);
+					});
+					// then remove an account's products 
+					models.Product.remove({producer_ID: user._id}, function(e) {
+						if (e) return handleError(e);
+					});
+					// finally remove the user itself
+					models.User.remove({_id: user.id}, function(e) {
+						if (e) return handleError(e);
+					});	
+					console.log('The user and their products and orders are deleted')
+					done(null, 'done');
 				}
-			})
+				
+				], 
+				// if the email sent successfully, delete the user's data
+				function(e, result) {
+					if (!e && result === 'done') {
+						res.send(202);
+					}
+					else {
+						console.log(results);
+						res.send(500);
+					}
+				});
 		}
 		else {
-			res.send(400, "You are not authorized to remove that user");
+			res.send(401, "You are not authorized to remove that user");
 		}
-
-
 	});
 	
 	app.route('/auth/session')
@@ -935,14 +1024,12 @@ exports.configAPI = function configAPI(app) {
 					if (!user) {
 						return res.send(401, 'Password reset token is invalid or has expired');
 					}
-					console.log(user.salt);
 					user.setPassword(req.body.password, function() {
-						user.resetPasswordToken = undefined;
-						user.resetPasswordExpires = undefined;
+						user.set(resetPasswordToken, undefined);
+						user.set(resetPasswordExpires, undefined);
 
 						user.save(function(err) {
 							if (err) console.log(err);
-							console.log(user.salt);
 							done(err, user);
 						});
 					});
@@ -971,7 +1058,6 @@ exports.configAPI = function configAPI(app) {
 						return console.log(err);
 					}
 					// a response is sent so the client request doesn't timeout and get an error.
-					req.flash('success', 'An email has been sent to ' + user.email + ' confirming their password change.');
 					console.log("Message sent to user confirming password change");
 					req.logIn(user, function(err) {
 						user.toObject();
@@ -980,8 +1066,8 @@ exports.configAPI = function configAPI(app) {
 					done(err, 'done');
 				});
 			}
-			], function(err) {
-				console.log(err);
+			], function(err, results) {
+				console.log(results);
 				
 		});
 	});

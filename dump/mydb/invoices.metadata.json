@@ -1,0 +1,1 @@
+{ "options" : { "create" : "invoices" }, "indexes" : [ { "v" : 1, "key" : { "_id" : 1 }, "ns" : "mydb.invoices", "name" : "_id_" } ] }

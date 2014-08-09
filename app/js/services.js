@@ -5,17 +5,17 @@
 
 angular.module('co-op.services', [])
 	
+	
+// Creates a Session Object that is a promise for connecting to the server and
+// for Authentication
 	.factory('Session', function (Restangular) {
-		//return $resource('/auth/session/');
 		return Restangular.all('auth/session');
 		
 	})
-	/*
-	.factory('User', function ($resource) {
-			return {};
-		})*/
 	
-	
+// Allows flash messages to be displayed on a page. Once a message is set though
+// it's generally not seen until the next route change. Primarily used for login
+// attempts and successful writes to the database.	
 	.factory("flash", function($rootScope) {
 		var queue = [];
 		var currentMessage = "";
@@ -30,10 +30,16 @@ angular.module('co-op.services', [])
 			},
 			getMessage: function() {
 				return currentMessage;
-			}
+			},
+			closeMessage: function() {
+				currentMessage = queue.shift() || "";
+			},
+			
 		};
 	})
-	
+
+// Is a collection of methods for logging a user in, checking if a user is
+// logged in and logging out.	
 	.factory('LoginManager', function ($location, $rootScope, $cookieStore, Session, Restangular){
 		$rootScope.failedAttempts = 0;
 		
@@ -62,7 +68,7 @@ angular.module('co-op.services', [])
 					}
 					// incorrect login attempt
 					else {
-						
+						$rootScope.failedAttempts++;
 						remainingAttempts = function(maxAttempts) {
 							if (maxAttempts > 0 && maxAttempts - $rootScope.failedAttempts > 0) {
 								return maxAttempts - $rootScope.failedAttempts;
@@ -73,8 +79,7 @@ angular.module('co-op.services', [])
 						};
 						var remaining = remainingAttempts(9);
 						$rootScope.flash.setMessage('Login failed! Please check your username and password and try again. You have ' + remaining +' remaining attempts left');
-						$rootScope.failedAttempts++;
-						$location.path('/login-failed'+'/attempts='+$rootScope.failedAttempts);
+						$location.path('/login-failed'+'/attempts='+$rootScope.failedAttempts);						
 					}
 					return cb();
 				}, 
@@ -120,115 +125,27 @@ angular.module('co-op.services', [])
 			}
 		};
 	})
-	
-	.factory('LoginManagerOLD', function Auth($location, $rootScope, Session, User, $cookieStore) {
-		$rootScope.currentUser = $cookieStore.get('User') || null;
-		$cookieStore.remove('user');
 
-		return {
-
-		  login: function(provider, user, callback) {
-			var cb = callback || angular.noop;
-			Session.save({
-			  provider: provider,
-			  email: user.email,
-			  password: user.password,
-			  rememberMe: user.rememberMe
-			}, function(User) {
-			  $rootScope.currentUser = User;
-			  return cb();
-			}, function(err) {
-			  return cb(err.data);
-			});
-		  },
-
-		  logout: function(callback) {
-			var cb = callback || angular.noop;
-			Session.delete(function(res) {
-				$rootScope.currentUser = null;
-				return cb();
-			  },
-			  function(err) {
-				return cb(err.data);
-			  });
-		  },
-		};
-	})
-	
-	.factory('PwdResetManager', ['$http', function($http) {
-		return {
-			pwdReset : function(resetData) {
-				console.log('Reset Data' + resetData);
-			}			
-		};
-	}])
-
-	.factory('UserManager', function Auth($http, $rootScope, Restangular) {
+	// called for creating new users as well as has a promise for getting all the users. Editing a
+	// user though is handled by the userEditCtrl Controller. 
+	.factory('UserManager', function($rootScope, Restangular, $location) {
 		return {
 			createUser: function(userinfo, callback) {
 				var cb = callback || angular.noop;
-				User.save(userinfo,
-				  function(user) {
+				Restangular.all('api/user').post(userinfo).then(function(user){
+					console.log(user);
 					$rootScope.currentUser = user;
-					return cb();
-				  },
-				  function(err) {
-					return cb(err.data);
-				  });
-			  },
-
-			currentUser: function() {
-				Session.get(function(user) {
-				  $rootScope.currentUser = user;
+					$location.path('/welcome');
+					cb();
 				});
-			  },
-
-			changePassword: function(email, oldPassword, newPassword, callback) {
-				var cb = callback || angular.noop;
-				User.update({
-				  email: email,
-				  oldPassword: oldPassword,
-				  newPassword: newPassword
-				}, function(user) {
-					console.log('password changed');
-					return cb();
-				}, function(err) {
-					return cb(err.data);
-				});
-			  },
-			
-			  getUserLibrary: function(callback) {
-			  	$http.get("api/user")
-					.success(function(data, status, headers, config) {
-						var users = data;
-						return users;
-					}).
-					error(function(data, status, headers, config) {
-						console.log('failed to get users from database' + status);
-					});
-				},
-			
-			removeUser: function(email, password, callback) {
-				var cb = callback || angular.noop;
-				User.delete({
-				 	email: email,
-				 	password: password
-				}, function(user) {
-					console.log(user + 'removed');
-					return cb();
-				}, function(err) {
-					return cb(err.data);
-				});
-			  },
-			userTypes : [
-				{name : "Guest", canBuy:false, canSell:false },
-				{name : "Customer", canBuy:true, canSell:false },
-				{name : "Producer", canBuy:true, canSell:true },
-			]
-			
+			},
+			// this is a promise. Call users.getList() to get the array of users. 
+			users: Restangular.all('api/user')
+			  
 		};
 	})
 	
+	//
 	.factory('ProductManager', ['$http', 'Restangular', '$rootScope', function($http, Restangular, $rootScope) {
         var module, productCategoryPromise, categoryIdMapping = {}, categoryNameMapping = {}, unitSuggestions = [];
         
@@ -283,11 +200,17 @@ angular.module('co-op.services', [])
         return module;
 	}])
 	
-	.factory('ProducerManager', ['$http', 'Restangular', '$rootScope', '$cookieStore', function($http, Restangular, $rootScope, $cookieStore) {
+	.factory('ProducerManager', ['$http', 'Restangular', '$rootScope', '$route', function($http, Restangular, $rootScope, $route) {
 		return {
-			saveProducer : function() {				
+			saveProducer : function(callback) {
+				var cb = callback || angular.noop;				
 				console.log($rootScope.currentUser);
-				Restangular.one('api/user', $rootScope.currentUser._id).customPOST($rootScope.currentUser, 'producer/edit');
+				Restangular.one('api/user', $rootScope.currentUser._id).customPOST($rootScope.currentUser, 'producer/edit').then(function(result) {
+					if (result.hasOwnProperty('_id')) {
+						$rootScope.flash.setMessage('Profile Updated Successfully');
+						$route.reload();
+					}
+				});
 			}
 		};
 	}])

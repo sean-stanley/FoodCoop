@@ -33,7 +33,6 @@
 			messageData = {
 				from: 'Northland Natural Food Co-op',
 				to: "'" + this.options.to.name + "' <" + this.options.to.email + ">",
-				
 				subject: this.options.subject,
 				html: html,
 				attachments: attachments

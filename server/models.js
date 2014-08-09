@@ -53,17 +53,35 @@ var InvoiceSchema = new Schema({
 	_id: Number,
 	datePlaced: {type: Date, required: true, default: Date.now()},
 	dueDate: {type:Date, required: true},
+	dateModified: Date,
 	invoicee: {type:Schema.ObjectId, ref: 'User'},
+	exInvoicee: String,
 	toCoop: {type: Boolean, default: false},
 	title: String,
 	items: {type: Array, required:true},
 	bankAccount: {type:String, required: true, default: '00-000-0000-0000-000-00'},
-	status: {type: String, required: true, default: 'un-paid', set:validStatus} //valid types are 'un-paid', 'PAID', 'overdue', 'to-refund', and 'refunded'.
+	//valid types are 'un-paid', 'PAID', 'overdue', 'To Refund', 'refunded' and
+	//'CANCELLED'.
+	status: {type: String, required: true, default: 'un-paid', set:validStatus} ,
+	
+	
+},{
+	toObject: { virtuals : true },
+	toJSON: { virtuals : true }
+});
+
+// sets a virtual property that is the financial total of the invoice.
+InvoiceSchema.virtual('total').get(function () {
+	var total = 0;
+	for (var i = 0; i < this.items.length; i++) {
+		total += this.items[i].cost;
+	}
+	return total;
 });
 
 //setter function for Invoice status that tests the value is in the validOptions range.
 function validStatus (val) {
-	var validOptions = ['un-paid', 'PAID', 'OVERDUE', 'To Refund', 'Refunded'];
+	var validOptions = ['un-paid', 'PAID', 'OVERDUE', 'To Refund', 'Refunded', 'CANCELLED'];
 	if ( _.contains(validOptions, val) ) {
 		return val
 	}
@@ -79,22 +97,26 @@ var UserSchema = new Schema({
 			phone : {type: String, required: false},
 			address : {type: String, required: true},
 			name : {type: String, required: true},
-
 			user_type : {
-							name: {type : String, required : true},
-							canBuy: {type : Boolean, required : true},
-							canSell: {type : Boolean, required : true},
-							isAdmin: Boolean
-						},
+				name: {type : String, required : true},
+				canBuy: {type : Boolean, required : true},
+				canSell: {type : Boolean, required : true},
+				isAdmin: Boolean
+			},
 			producerData : {
-							companyName : {type: String},
-							logo : {},
-							description : {type: String},
-							certification : {type: String},
-							website : {type: String},
-							personalBio : {type: String},
-							bankAccount : {type: String}
-						},
+				companyName : {type: String},
+				logo : {},
+				description : {type: String},
+				certification : {type: String},
+				website : {type: String},
+				personalBio : {type: String},
+				bankAccount : {type: String}
+			},
+			//amountSpentThisYear is assigned when a user is invoiced for an order and is a
+			//record of how much a user has spent in the co-op in the past year. This is
+			//used to figure out how much dividend the user should receive. This amount is
+			//to be reset every August.
+			amountSpentThisYear: Number,
 			resetPasswordToken: String,
 			resetPasswordExpires: Date
 });

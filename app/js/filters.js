@@ -53,6 +53,8 @@ angular.module('co-op.filters', []).
 			  return [d, m, y].join('/');
 		  }
 		  
+		  
+		  
 		  else {
 			  return shortDate;
 		  }

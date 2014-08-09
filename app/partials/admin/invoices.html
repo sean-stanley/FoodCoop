@@ -1,0 +1,60 @@
+<div class="page-header">
+	<h1>Invoices <small>Current Date: {{now | shortDate}}</h1>
+</div>
+
+<h3>Search</h3>
+<input type="searchbar" ng-model="search" class="form-control">
+
+<h3>Sort By: </h3>
+<ul class="nav nav-pills">
+	<li><a href="" ng-click="sort = 'datePlaced'; reverse=!reverse ">Date Created</a></li>
+	<li><a href="" ng-click="sort = 'dateModified'; reverse=!reverse ">Date Modified</a></li>
+</ul>
+<h3>Filter By: </h3>
+<ul class="nav nav-pills">
+	<li><a href="" ng-click="search = {}; search.title = 'Membership'; ">Membership Invoice</a></li>
+	<li><a href="" ng-click="search = {}; search.toCoop = true ">Order Invoice</a></li>
+	<li><a href="" ng-click="search = {}; search.status = 'OVERDUE' ">Overdue <span class="badge">{{overdue()}}</span></a></li>
+	<li><a href="" ng-click="search = {}; search.status = 'un-paid' ">Un-Paid <span class="badge">{{unPaid()}}</span></a></li>
+</ul>
+
+<section ng-repeat="invoice in invoices | orderBy:sort:reverse | filter:search:searchbar">
+	<alert ng-show="invoice.alert" type="{{invoice.alert.type}}">{{invoice.alert.message}}</alert>
+	<alert ng-if="invoice.dueDate &gt; now" type="danger">This invoice is OVERDUE</alert>
+	<alert ng-if="invoice.status !== 'OVERDUE' && invoice.dueDate &gt; soon" type="warning">This invoice is due soon</alert>
+	<alert ng-if="invoice.toCoop" type="info">The Co-op must pay this Invoice</alert>
+	<ul class="unstyled">
+		<li ng-hide="invoice.toCoop">
+			To be paid to the NNFC by <span ng-show="invoice.invoicee.name">{{invoice.invoicee.name}}</span><span ng-show="invoice.exInvoicee">{{invoice.exInvoicee}}</span>
+		</li>
+		<li ng-show="invoice.toCoop">
+			The NNFC must pay this invoice to {{invoice.invoicee.name}};
+		</li>
+		<li>Date Placed: {{invoice.datePlaced | shortDate}}</li>
+		<li>Due Date: {{invoice.dueDate | shortDate}}</li>
+	</ul>
+<table class="table">
+	<thead>
+		<tr><th colspan='2'>Invoice #{{invoice._id}} {{invoice.title}}</th></tr>
+	</thead>
+	<tfoot>
+		<tr><td colspan='2'><strong>Total: {{invoice.total | currency}}</strong></td></tr>
+	</tfoot>
+	<tbody>
+		<tr ng-repeat="item in invoice.items"><td>{{item.name}}</td><td>{{item.cost | currency}}</td></tr>
+	</tbody>
+</table>
+<p ng-show="invoice.toCoop">Payment is to be sent to <strong>{{invoice.bankAccount}}</strong></p>
+<div class="btn-group">
+	<button type='button' class="btn btn-default" ng-model="invoice.status" btn-radio=" 'un-paid' ">Un-paid</button>
+	<button type='button' class="btn btn-success" ng-model="invoice.status" btn-radio=" 'PAID' ">PAID</button>
+	<button type='button' class="btn btn-danger"  ng-model="invoice.status" btn-radio=" 'OVERDUE' ">OVERDUE</button>
+	<button type='button' class="btn btn-default" ng-model="invoice.status" btn-radio=" 'To Refund' ">To Refund</button>
+	<button type='button' class="btn btn-default" ng-model="invoice.status" btn-radio=" 'Refunded' ">Refunded</button>
+	<button type='button' class="btn btn-default" ng-model="invoice.status" btn-radio=" 'CANCELLED' ">CANCELLED</button>
+</div>
+<button type='button' class="btn btn-primary" ng-click="invoiceSave(invoice)"> Update Status</button>
+<hr>
+</section>
+
+

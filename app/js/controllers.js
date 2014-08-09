@@ -1,5 +1,5 @@
 'use strict';
-/*global angular*/
+/*global angular, _*/
 
 /* Controllers */
 
@@ -30,11 +30,8 @@ angular.module('co-op.controllers', []).
 	}
 ])
 
-.controller('loginCtrl', ['$scope', '$rootScope', '$location', 'LoginManager', 'flash',
-	function($scope, $rootScope, $location, LoginManager, flash) {
-		$rootScope.flash = flash;
-		$scope.message = "Hello World";
-		
+.controller('loginCtrl', ['$scope', '$rootScope', '$location', 'LoginManager',
+	function($scope, $rootScope, $location, LoginManager) {		
 		$scope.showLogin = false;
 
 		$scope.loginData = {
@@ -45,7 +42,6 @@ angular.module('co-op.controllers', []).
 
 		$scope.submitForm = function(message) {
 			LoginManager.login('local', $scope.loginData, function() {
-				$rootScope.flash.setMessage(message);
 				if ($rootScope.savedLocation) {
 					$location.path($rootScope.savedLocation);
 				}
@@ -57,29 +53,20 @@ angular.module('co-op.controllers', []).
 // Used by Forgot page for requesting a password reset for a user
 .controller('forgotCtrl', ['$scope', '$location', 'Restangular',
 	function($scope, $location, Restangular) {
-
 		$scope.passwordReset = function() {
 			Restangular.all('api/forgot').post({email: $scope.email});
 		};
 	}
 ])
 
-.controller('userAdminCtrl', ['$scope', 'Restangular', '$location',
-	function($scope, Restangular, $location) {
-
-		// First way of creating a Restangular object. Just saying the base URL
-		var allUsers = Restangular.all('api/user');
-
-		// This will query /user and return a promise.
-		allUsers.getList().then(function(users) {
-		  $scope.userLibrary = users;
-		});
-		
+.controller('userAdminCtrl', ['$scope', 'UserManager', '$location',
+	function($scope, UserManager, $location) {
+		$scope.userLibrary = UserManager.users.getlist().$object;
 	}
 ])
 
-.controller('userEditCtrl', ['$scope', 'Restangular', '$location', 'user',
-	function($scope, Restangular, $location, user) {
+.controller('userEditCtrl', ['$scope', '$rootScope', 'LoginManager', 'Restangular', '$route', 'user',
+	function($scope, $rootScope, LoginManager, Restangular, $route, user) {
 		
 		var original = user;
 		
@@ -100,8 +87,12 @@ angular.module('co-op.controllers', []).
 		$scope.destroy = function() {
 			var lastChance = confirm('Are you sure you want to delete the profile of ' + user.name +'?');
 			if (lastChance) {
-				original.remove().then(function() {
-					$location.path('/');
+				if ($scope.user._id === $rootScope.currentUser._id) {
+					LoginManager.logout();
+				}
+				original.customDELETE(original._id).then(function() {
+					$rootScope.flash.setMessage('User successfully Deleted');
+					$route.reload();
 				});
 			}
 		};
@@ -113,8 +104,9 @@ angular.module('co-op.controllers', []).
 		
 		$scope.save = function() {
 			if (!$scope.isClean()) {
-				$scope.user.post($scope.user._id).then(function() {
-					$location.path('/');
+				$scope.user.post($scope.user._id).then(function(response) {
+					// success!
+					$rootScope.flash.setMessage('Details saved successfully');
 				});
 			}
 			else {
@@ -128,7 +120,7 @@ angular.module('co-op.controllers', []).
 .controller('resetCtrl', ['$scope', 'Restangular', '$location', 'user', 'LoginManager', 
 	function($scope, Restangular, $location, user, LoginManager){
 		$scope.user = Restangular.copy(user);
-		
+				
 		$scope.save = function() {
 			Restangular.one('reset', $scope.user.resetPasswordToken).customPOST({password: $scope.user.password}).then(function(result) {
 				LoginManager.login('local', {
@@ -140,8 +132,53 @@ angular.module('co-op.controllers', []).
 		};
 }])
 
-.controller('userCtrl', ['$scope', 'Restangular', 'LoginManager', '$location',
-	function($scope, Restangular, LoginManager, $location) {
+.controller('invoiceCtrl', ['$scope', '$rootScope', 'Restangular', 
+	function($scope, $rootScope, Restangular){
+		$scope.now = new Date();
+		
+		$scope.soon = $scope.now.setDate($scope.now.getDate() - 7);
+		
+		// the array of invoices for use in the template
+		$scope.invoices = Restangular.all('api/invoice').getList().$object;
+		
+		// update the invoice
+		$scope.invoiceSave = function (invoice) {
+			invoice.put().then(function(result) {
+				if (result === "Accepted") {
+					invoice.alert = {
+						message: "Invoice Successfully updated",
+						type: "success"
+					};
+					$scope.unPaid();
+					$scope.overdue();
+				}
+				else {
+					invoice.alert = {
+						message: "Sorry! Failed to update the invoice for some reason",
+						type: "danger"
+					};
+				}
+				
+			});
+		};
+		
+		$scope.unPaid = function() {
+			var match;
+			match = _.where($scope.invoices, {status: 'un-paid'});
+			return match.length;
+		};
+		
+		$scope.overdue = function() {
+			var match;
+			match = _.where($scope.invoices, {status: 'OVERDUE'});
+			return match.length;
+		};
+		
+}])
+
+
+.controller('userCtrl', ['$scope', 'Restangular', 'UserManager', '$location',
+	function($scope, Restangular, UserManager, $location) {
 
 		$scope.userData = {
 			cost: 60,
@@ -168,11 +205,7 @@ angular.module('co-op.controllers', []).
 
 
 		$scope.submitForm = function() {
-			Restangular.all('api/user').post($scope.userData).then(function(user) {
-			      LoginManager.login('local', user);
-				  $location.path('/thankyou');
-				  
-			    });
+			UserManager.createUser($scope.userData);
 		};
 	}
 ])

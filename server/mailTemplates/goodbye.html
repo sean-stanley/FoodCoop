@@ -11,8 +11,10 @@
 		<p> As you are leaving the co-op you are entitled to a refund of your initial membership cost. This is outlined below. We'll need to hear from you how best to refund your money. For instance, would you like a cheque in the mail? Or would you prefer an internet banking transfer.</p>
 		
         <p> Once we hear from you we will do our best to refund you within 30 days of receiving your notice.</p> 
-       
-       <table>
+		
+		<p>If you have not paid your invoice yet and are now leaving the co-op. Then do not worry, as we have cancelled your invoice and you are no longer obligated to pay for your membership.</p>
+		
+       <table border="0" cellspacing="10" cellpadding="10">
            <thead>
                <tr>
                    <td>Invoice #{{code}}</td>
@@ -21,10 +23,10 @@
            </thead>
            <tbody>
                
-			  <% _.each(items, function(item) { %> 
+			  <% _.each(items, function(i) { %> 
                  <tr>
-                     <td>{{item.name}} </td>
-                     <td>${{item.cost}} </td>
+                     <td>{{i['name']}} </td>
+                     <td>${{i['cost']}} </td>
                  </tr>
 			<% }); %>
            </tbody>
