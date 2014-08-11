@@ -5,7 +5,9 @@
 		<h2>Preview <small>Live</small></h2>
 		<div class="product-container" ng-controller="productUICtrl" ng-mouseleave="detailsVisible = false" style="width:100%; margin: 0">
 			<figure class="first-layer" ng-mouseover="callDelayed()" ng-mouseleave="callCancelled()">
-				<img ng-src="{{productData.img}}" class="img-responsive">
+				<img ng-if="productData.certification != certifications[0]._id && productData.img"
+				 ng-src="img/certification/{{certificationImg(productData.certification)}}" class="certification-img">
+				<img ng-src="{{selectedImg}}" class="img-responsive">
 				<figcaption>
 					<button class="btn btn-primary pull-right" ng-click="addToCart()">Add to Cart</button>
 					<h5>{{productData.variety}} {{productData.productName}}</h5>
@@ -26,43 +28,45 @@
 		</div>
 	
 	
+		<!--
 		<div id="product-history-list">
-			<h3>Product History</h3>
-			<table class="table table-hover">
-				<caption>Current Month</caption>
-				<thead>
-					<tr>
-						<th>Name</th>
-						<th>Remove</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr ng-repeat="i in data">
-						<td><a ng-click="editProduct(i)">{{i.productName}} {{i.variety}}</a></td>
-						<td>
-							<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			<h5>Product History</h5>
-			
-			<table class="table table-hover">
-				<caption>Product History</caption>
-				<thead>
-					<tr>
-						<th><a href="" ng-click="predicate = 'name'; reverse=!reverse ">Name</th>
-						<th><a href="" ng-click="predicate = 'dateUploaded'; reverse=!reverse ">Date Added</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr ng-repeat="i in data | orderBy:predicate:reverse ">
-						<td><a ng-click="editProduct(i)">{{i.productName}} {{i.variety}}</a></td>
-						<td>{{i.dateUploaded|shortDate}}</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
+					<h3>Product History</h3>
+					<table class="table table-hover">
+						<caption>Current Month</caption>
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Remove</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="i in data">
+								<td><a ng-click="editProduct(i)">{{i.productName}} {{i.variety}}</a></td>
+								<td>
+									<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<h5>Product History</h5>
+					
+					<table class="table table-hover">
+						<caption>Product History</caption>
+						<thead>
+							<tr>
+								<th><a href="" ng-click="predicate = 'name'; reverse=!reverse ">Name</th>
+								<th><a href="" ng-click="predicate = 'dateUploaded'; reverse=!reverse ">Date Added</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="i in data | orderBy:predicate:reverse ">
+								<td><a ng-click="editProduct(i)">{{i.productName}} {{i.variety}}</a></td>
+								<td>{{i.dateUploaded|shortDate}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>-->
+		
 	</div>
 
 	<div id="product-upload-form-container" class="col-md-8" >
@@ -72,30 +76,35 @@
 					<div class="row">
 						<div class="form-group col-md-12">
 							<label for="Category">Product Category</label>
-                            <!--
-                            <category-chooser model-var="productData.category" name="category" 
-                                                                          class="form-control" id="category-menu" required>-->
-                            <div class="btn-group center-block">
-								<label ng-repeat="category in productManager.productCategories" class="btn btn-primary" ng-model="category" 
-								ng-click=" setCategory(category._id) ">{{category.name}}</label>
+                            <div class="btn-group">
+								<button type="button"
+								class="btn btn-primary"
+								ng-model="category"
+								ng-repeat="category in productManager.productCategories"
+								ng-click=" setCategory(category._id) ">
+									{{category.name}}
+								</button>
 							</div>
 						</div>
 					</div>
 				<div class="row">
 					<div class="form-group col-md-12">
 						<br>
-						<label type="button" class="btn btn-default btn-lg" ng-click="open()">Upload an image <span class="glyphicon glyphicon-cloud-upload"></span></label>
+						<label ng-disabled="!productData.hasOwnProperty('category')"
+						type="button" class="btn btn-default btn-lg" ng-click="open()">Upload an image <span class="glyphicon glyphicon-cloud-upload"></span></label>
 					</div>
 				</div>
 					<div class="row">
 						<div class="form-group col-md-6">
 							<label for="inputName">Product Name</label>
-							<input ng-model="productData.productName" type="text" class="form-control" id="inputName" maxlength="12" 
+							<input ng-disabled="!productData.hasOwnProperty('category')" 
+							ng-model="productData.productName" type="text" class="form-control" id="inputName" maxlength="12" 
 							placeholder="e.g. {{ productManager.categoryByID(productData.category).placeholderName }}" autofocus required>
 						</div>
 						<div class="form-group col-md-6">
 							<label for="inputVariety" ng-model="variety">Variety</label>
-							<input ng-model="productData.variety" type="text" class="form-control" id="inputVariety" maxlength="18" 
+							<input ng-disabled="!productData.hasOwnProperty('category')" 
+							ng-model="productData.variety" type="text" class="form-control" id="inputVariety" maxlength="18" 
 							placeholder="e.g. {{ productManager.categoryByID(productData.category).placeholderVariety }}">
 						</div>
 					</div>
@@ -103,7 +112,8 @@
 					<div class="row form-group">	
 						<div class="form-group col-md-4">
 							<label for="inputVariety">Price</label>
-							<input ng-model="productData.price" name="price" type="number" class="form-control" id="inputPrice" min="0" placeholder="e.g. $2.50" required>
+							<input ng-disabled="!productData.hasOwnProperty('category')"
+							ng-model="productData.price" name="price" type="number" class="form-control" id="inputPrice" min="0" placeholder="e.g. $2.50" required>
 						</div>
 						
 					    <div class="form-group col-md-4">
@@ -116,16 +126,19 @@
 					    
 					    <div class="form-group col-md-4">
 							<label for="quantity">Quantity Available</label>
-							<input ng-model="productData.quantity" name="quantity" type="number" max="1000" class="form-control" id="quantity" placeholder="e.g. 27" required>
+							<input ng-disabled="!productData.hasOwnProperty('category')"
+							ng-model="productData.quantity" name="quantity" type="number" max="1000" class="form-control" id="quantity" placeholder="e.g. 27" required>
 					    </div>
 				   </div>
 			    
 			    <div class="form-group">
 					<label for="refrigeration">Refrigeration Required</label>
 					<div class="btn-group">
-						<label type="button" 
+						<label type="button"
+						ng-disabled="!productData.hasOwnProperty('category')" 
 						class="btn btn-primary" ng-model="productData.refrigeration" btn-radio="'refrigeration'" uncheckable>Refrigeration</label>
-						<label type="button" 
+						<label type="button"
+						ng-disabled="!productData.hasOwnProperty('category')"
 						class="btn btn-primary" ng-model="productData.refrigeration" btn-radio="'frozen'" uncheckable>Frozen</label>
 					</div>
 				</div>
@@ -133,12 +146,16 @@
 			     
 			     <div ng-hide="!productData.hasOwnProperty('category') || productManager.categoryByID(productData.category).name == 'Produce' " id="ingredients" class="form-group">
 					<label for="ingredients">Ingredients</label> 
-					<textarea class="form-control" ng-model="productData.ingredients" id="ingredients" maxlength="1000" placeholder="Please list all ingredients of this product." rows="9" style="width: 100%;"></textarea>  
+					<textarea class="form-control" 
+					ng-disabled="!productData.hasOwnProperty('category')"
+					ng-model="productData.ingredients" id="ingredients" maxlength="1000" placeholder="Please list all ingredients of this product." rows="9" style="width: 100%;"></textarea>  
 			    </div>
 			    
 			    <div class="form-group">
 					<label for="description">Description</label> 
-					<textarea class="form-control" ng-model="productData.description" id="description" maxlength="2000" placeholder="Write a couple paragraphs about how special your product is." rows="9" style="width: 100%;"></textarea>  
+					<textarea class="form-control" 
+					ng-disabled="!productData.hasOwnProperty('category')"
+					ng-model="productData.description" id="description" maxlength="2000" placeholder="Write a couple paragraphs about how special your product is." rows="9" style="width: 100%;"></textarea>  
 			    </div> 
 			    
 			    <div class="form-group">

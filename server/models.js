@@ -23,9 +23,9 @@ var ProductSchema = new Schema({
 			refrigeration: {type: String, required: false},
 			ingredients: {type: String, required: false},
 			description: {type: String, required: false},
-			discount: {type: Number, required: true, default: 0},
 			certification: {type: Schema.ObjectId, required: false, ref: 'Certification'},
-			producer_ID: {type:Schema.ObjectId, required: true, ref: 'User'}
+			producer_ID: {type: Schema.ObjectId, required: true, ref: 'User'}
+			
 });
 
 // this represents an entry in a cart or producer order. It is made when a user

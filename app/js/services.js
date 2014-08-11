@@ -18,19 +18,22 @@ angular.module('co-op.services', [])
 // attempts and successful writes to the database.	
 	.factory("flash", function($rootScope) {
 		var queue = [];
-		var currentMessage = "";
+		var currentMessage ={message: '', type: ''};
 
 		$rootScope.$on("$routeChangeSuccess", function() {
-			currentMessage = queue.shift() || "";
+			currentMessage = queue.shift() || {message: '', type: ''};
 		});
 
 		return {
 			setMessage: function(message) {
-				queue.push(message);
+				if (message.hasOwnProperty('type') ) {
+					queue.push(message);
+				}
 			},
 			getMessage: function() {
-				return currentMessage;
+				return currentMessage.message;
 			},
+			getType: currentMessage.type,
 			closeMessage: function() {
 				currentMessage = queue.shift() || "";
 			},
@@ -78,7 +81,10 @@ angular.module('co-op.services', [])
 							}
 						};
 						var remaining = remainingAttempts(9);
-						$rootScope.flash.setMessage('Login failed! Please check your username and password and try again. You have ' + remaining +' remaining attempts left');
+						$rootScope.flash.setMessage({
+							type: 'danger',
+							message: 'Login failed! Please check your username and password and try again. You have ' + remaining +' remaining attempts left'
+						});
 						$location.path('/login-failed'+'/attempts='+$rootScope.failedAttempts);						
 					}
 					return cb();
@@ -95,9 +101,11 @@ angular.module('co-op.services', [])
 				var loggedInUser, isLoggedIn;
 				var cb = callback || angular.noop;
 				// check if the user is logged in with the app.
+				
 				if ($rootScope.currentUser && $rootScope.currentUser.hasOwnProperty('email')) {
 					isLoggedIn = true;
 				}
+				
 				// attempt to get the user from the app
 				else {
 					Session.customGET().then(function(user) {
@@ -121,6 +129,7 @@ angular.module('co-op.services', [])
 			logout : function() {
 				Session.remove();
 				$rootScope.currentUser = null;
+				$rootScope.flash.setMessage({type: 'success', message: 'Successfully logged out!'});
 				$location.path('/home');
 			}
 		};
@@ -145,8 +154,8 @@ angular.module('co-op.services', [])
 		};
 	})
 	
-	//
-	.factory('ProductManager', ['$http', 'Restangular', '$rootScope', function($http, Restangular, $rootScope) {
+	// collects and maps category id's with their names. 
+	.factory('ProductManager', ['$http', 'Restangular', '$rootScope', '$route', function($http, Restangular, $rootScope, $route) {
         var module, productCategoryPromise, categoryIdMapping = {}, categoryNameMapping = {}, unitSuggestions = [];
         
         productCategoryPromise = Restangular.all("api/category");
@@ -162,7 +171,9 @@ angular.module('co-op.services', [])
                         categoryIdMapping[category._id] = category;
                         categoryNameMapping[category.name] = category;
 						for (unit in category.availableUnits) {
-							unitSuggestions.push(category.availableUnits[unit]);
+							if (category.availableUnits.hasOwnProperty(unit)) {
+								unitSuggestions.push(category.availableUnits[unit]);
+							}
 						}
 							
                     }
@@ -173,7 +184,12 @@ angular.module('co-op.services', [])
 		module = {
 			registerProduct : function(productData) {
 				//$http.post("api/product", productData);
-				Restangular.all('api/product').post(productData);
+				Restangular.all('api/product').post(productData).then(function() {
+					$rootScope.flash.setMessage({type: 'success', 
+					message: 'Congratulations ' + $rootScope.currentUser.name + '! Your product ' + productData.variety + productData.productName + ' was successfully added to the store.'
+					});
+					$route.reload();
+				});
 			},
 			
 			unitSuggestions : unitSuggestions,
@@ -185,7 +201,7 @@ angular.module('co-op.services', [])
 			certificationTypes: Restangular.all("api/certification").getList().$object,
 			
 			getUserProducts: function(callback){
-				$http.get("api/product?producerCompany=:currentUser.producerData.companyName");
+				$http.get("api/product?producer_ID=:currentUser._id");
 			},
             
             categoryByID: function (id) {

@@ -266,17 +266,17 @@ angular.module('co-op.controllers', []).
 	}
 ])
 
-.controller('productUpload', ['$scope', '$rootScope', '$modal', 'ProductManager', 'ProductHistory', 'Restangular',
-	function($scope, $rootScope, $modal, ProductManager, ProductHistory, Restangular) {
+.controller('productUpload', ['$scope', '$rootScope', '$modal', '$sce', 'ProductManager', 'ProductHistory', 'Restangular',
+	function($scope, $rootScope, $modal, $sce, ProductManager, ProductHistory, Restangular) {
+		// make ProductManager methods available in the template
 		$scope.productManager = ProductManager;
 		
-		$scope.ingredients = false; //show or hide ingredients field
+		$scope.ingredients = false;
 		$scope.onSelect = function ($item, $model, $label) {
 		    $scope.$item = $item;
 		    $scope.$model = $model;
 		    $scope.$label = $label;
 		};
-		$scope.categoryPromise = $scope.productManager.productCategoryPromise;
         
 		ProductHistory.getData(function(result) {
 			$scope.data = result;
@@ -288,54 +288,36 @@ angular.module('co-op.controllers', []).
 			var itemToDelete = $scope.data[idx];
 			$scope.data.splice(idx, 1);
 		};
-
+		
+		// pass product to $scope.productData for editing in the main form
 		$scope.editProduct = function(product) {
 			$scope.productData = product;
 			console.log($scope.productData);
-			// pass product to productUpload controller $scope.productData
+			
 		};
-		
-		
-		$scope.producerName = function() {
-			var el = "";
-			if (typeof $rootScope.currentUser === "object" && $rootScope.currentUser.hasOwnProperty('name')) {
-				el = $rootScope.currentUser.name;
-			}
-			else {
-				el = "No Producer details saved";
-			}
-			return el;
-		};
-		
-		$scope.producerCompany = function() {
-			var el = "";
-			if (typeof $rootScope.currentUser === "object" && $rootScope.currentUser.producerData.hasOwnProperty('companyName')) {
-				el = $rootScope.currentUser.producerData.companyName;
-			}
-			else {
-				el = "No Producer Company saved";
-			}
-			return el;
-		};
-		
 		
 		$scope.setCategory = function(category) {
 			$scope.productData.category = category;
 			return $scope.productData.category;
 		};
 		
-		$scope.productData = {
-			producerName: $scope.producerName(),
-			producerCompany: $scope.producerCompany(),
-			producer_ID: $rootScope.currentUser._id,
-			refrigeration: 'none'
-		};
+		$scope.productData = {};
+		
+		$scope.productData.producer_ID = $rootScope.currentUser._id;		
+		$scope.productData.refrigeration = 'none';
 
 		var certifications = Restangular.all('api/certification');
 		
 		certifications.getList().then(function(certification) {
+			for (var i = 0; i < certification.length; i++) {
+				certification[i].plain();
+			}
 			$scope.certifications = certification;
-			$scope.productData.certification = $scope.certifications[0].name;
+			$scope.productData.certification = $scope.certifications[0]._id;
+			$scope.certificationImg = function(id) {
+				var el = _.findWhere($scope.certifications, {_id: $scope.productData.certification});
+				return el.img;
+			};
 		});
 
 		$scope.submitForm = function() {
@@ -357,7 +339,14 @@ angular.module('co-op.controllers', []).
 			});
 			
 			modalInstance.result.then(function (selectedImg) {
-				$scope.productData.img = selectedImg;
+				var reader = new window.FileReader();
+				reader.readAsDataURL(selectedImg);
+				reader.onloadend = function() {
+					$scope.productData.img = reader.result;
+					var fileURL = URL.createObjectURL(selectedImg);
+					$scope.selectedImg = $sce.trustAsResourceUrl(fileURL);
+				};				
+				
 			}, function () {
 				console.log('Modal dismissed at: ' + new Date());
 			});
@@ -367,8 +356,8 @@ angular.module('co-op.controllers', []).
 
 ])
 
-.controller('imageModalEditorCtrl', ['$scope', '$sce', '$modalInstance', 'data', '$rootScope',
-	function($scope, $sce, $modalInstance, data, $rootScope) {
+.controller('imageModalEditorCtrl', ['$scope', '$modalInstance', 'data', '$rootScope',
+	function($scope, $modalInstance, data, $rootScope) {
 		$scope.imageChoices = data;
 
 		$scope.selected = {
@@ -377,7 +366,6 @@ angular.module('co-op.controllers', []).
 
 		$scope.ok = function() {
 			$rootScope.$broadcast("cropme:ok");
-			// $modalInstance.close($scope.selected.image);
 		};
 
 		$scope.cancel = function() {
@@ -386,10 +374,7 @@ angular.module('co-op.controllers', []).
 		};
 
 		$scope.$on("cropme:done", function(e, blob, canvasEl) {
-			console.log(blob);
-			var fileURL = URL.createObjectURL(blob);
-			$scope.selected.image = $sce.trustAsResourceUrl(fileURL);
-            $modalInstance.close($scope.selected.image);
+            $modalInstance.close(blob);
 		});
 	}
 ])
@@ -483,9 +468,22 @@ angular.module('co-op.controllers', []).
 	}
 ])
 
-.controller('storeCtrl', ['$scope', '$filter', '$modal', 'Restangular', 'ProductManager',
-	function($scope, $filter, $modal, Restangular, ProductManager) {
-		$scope.products = Restangular.all('api/product').getList().$object;
+.controller('storeCtrl', ['$scope', '$filter', '$modal', '$sce', 'Restangular', 'ProductManager',
+	function($scope, $filter, $modal, $sce, Restangular, ProductManager) {
+		Restangular.all('api/product').getList().then(function(products){
+			var product, fileURL;
+			$scope.products = products;
+			for (product in $scope.products) {
+				if ($scope.products.length > 1 && $scope.products.hasOwnProperty(product)) {
+					fileURL = URL.createObjectURL(product.img);
+					product.img = $sce.trustAsResourceUrl(fileURL);
+				}
+			}
+			for (var i = $scope.products.length - 1; i >= 0; i--) {
+				product = $scope.products[i];
+				$scope.products[i].shortDescription = $scope.blurb($scope.products[i].description, 200, product);
+			}	
+		});
         $scope.productManager = ProductManager;
 		$scope.sort="alphabetical";
 		
@@ -498,10 +496,6 @@ angular.module('co-op.controllers', []).
 			}
 		};
 		
-		for (var i = $scope.products.length - 1; i >= 0; i--) {
-			var product = $scope.products[i];
-			$scope.products[i].shortDescription = $scope.blurb($scope.products[i].description, 200, product);
-		}
 		
 		$scope.addToCart = function(product) {
 			console.log("user added an item to the cart");

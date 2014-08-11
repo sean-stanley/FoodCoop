@@ -36,7 +36,7 @@ angular.module('co-op', [
 				}
 			}
 		})
-		.when('/admin/invoices', { controller: 'invoiceCtrl', templateUrl: 'partials/admin/invoices.html' })
+		.when('/admin/invoices', { controller: 'invoiceCtrl', templateUrl: 'partials/admin/invoices.html', adminOnly: true })
 		
 		.when('/forgot', {templateUrl: 'partials/forgot-password.html', controller: 'forgotCtrl'})
 		.when('/reset/:token', {
@@ -119,12 +119,13 @@ angular.module('co-op', [
 				// redirect a user who is not logged in from going to a logged in only page
 				if (!isAuth && next.loggedInOnly || next.adminOnly) {
 					$rootScope.savedLocation = $location.url();
+					$rootScope.flash.setMessage({type: 'warning', message: 'Not logged in'});
 					$location.path('/must-login');
 				}
 				// redirect a non-admin from viewing an admin only page
 				else if (isAuth && !$rootScope.currentUser.user_type.isAdmin && next.adminOnly) {
 					message = "Sorry! That page is only available to Administrators";
-					$rootScope.flash.setMessage(message);
+					$rootScope.flash.setMessage({type: 'warning', message: message});
 					$location.path(current);
 				}
 			});

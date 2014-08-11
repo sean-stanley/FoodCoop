@@ -3,13 +3,28 @@ FoodCoop
 
 Software for managing a local food co-op. This web app is built with a MEAN stack of MongoDB, Express v4, AngularJS v1.3 and Node.js
 
-Features include: 
+Check out the working demo [here](app.foodcoop.org.nz). You can even try signing up and logging in. Just be warned that I will get an email everytime someone signs up.
+
+Working Features include:
+-------------------------
 
 * local user authentication and email invoicing for membership
+* a page where an admin can check who has paid their membership and who hasn't
 * two different sorts of users: producers, and customers
 * producers can create a public profile about their operation and upload products to sell
-* a store lists all the products for sale currently
-* cart and order management (under development)
+* a store lists all the products and provides more details for working out the items
+* a contact form for contacting the administrators or another producer about their products.
+
+Features that are currently a work in progress:
+-----------------------------------------------
+
+* allow producers to manage previously uploaded products.
+* shopping carts (currently the carts are populated with mock data)
+* invoices for producers that list all the products ordered from them by all producers in a set time period.
+* event scheduling for resetting carts and order processing at the end of order week.
+* schedule mass email reminders about important co-op dates.
+* improve UX for mobile and tablet users.
+
 
 Setting Up
 ==========

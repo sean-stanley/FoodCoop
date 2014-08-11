@@ -30,10 +30,10 @@ exports.configAPI = function configAPI(app) {
 	
 	// Middleware
 	// ==========
-	app.use(bodyParser.json()); // here we load the bodyParser and tell it to parse the requests received as json data.
+	app.use(bodyParser.json({limit: '50mb'})); // here we load the bodyParser and tell it to parse the requests received as json data.
 	app.use(methodOverride()); // here we initilize the methodOverride middleware for use in the API.
 	app.use(cookieParser('Intrinsic Definability')); // here we initilize the cookieParser middleware for use in the API.
-	app.use(session({cookie: { maxAge: 60000 }, saveUninitialized: true, resave: true}));
+	app.use(session({saveUninitialized: true, resave: true})); // deleted cookie: { maxAge: 600000 } option
 	app.use(passport.initialize()); // here we initilize Passport middleware for use in the app to handle user login.
 	app.use(passport.session()); // here we initilize passport's sessions which expand on the express sessions the ability to have our session confirm if a user is already logged in.
 
@@ -168,7 +168,7 @@ exports.configAPI = function configAPI(app) {
 					select: 'name -_id'
 				}, {
 					path: 'certification',
-					select: 'name -_id'
+					select: 'name -_id img'
 				}, {
 					path: 'producer_ID',
 					select: 'name -_id'
@@ -227,7 +227,8 @@ exports.configAPI = function configAPI(app) {
 				});
 			} else {
 				newProduct = new models.Product({
-					dateUploaded: new Date.now(),
+					dateUploaded: new Date.today(),
+					img: req.body.img,
 					category: req.body.category,
 					productName: req.body.productName,
 					variety: req.body.variety,
@@ -238,9 +239,13 @@ exports.configAPI = function configAPI(app) {
 					ingredients: req.body.ingredients,
 					description: req.body.description,
 					certification: req.body.certification,
-					producer: req.body.producerName,
-					producerCompany: req.body.producerCompany
-				}).save();
+					producer_ID: req.body.producer_ID
+				}).save(function(e) {
+					if (!e) {
+						res.send(200, 'No changes detected');
+					}
+					else console.log(e)
+				});
 			}
 		} else {
 			res.send(401, 'Producer not signed in');

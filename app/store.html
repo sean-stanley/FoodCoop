@@ -164,7 +164,9 @@
 				<ul id="store-products">
 					<li ng-repeat="product in products | orderBy:sort | filter:search" class="product-container" ng-controller="productUICtrl" ng-mouseleave="detailsVisible = false">
 						<figure class="first-layer" ng-mouseover="callDelayed()" ng-mouseleave="callCancelled()">
-							<img ng-src="upload-imgs/products/{{product.img}}" class="img-responsive">
+							<img ng-if="product.certification.name !== 'none' && product.img && product.certification.img"
+							 ng-src="img/certification/{{product.certification.img}}" class="certification-img">
+							<img ng-src="{{product.img}}" class="img-responsive">
 							<figcaption>
 								<button class="btn btn-primary pull-right" ng-click="addToCart()">Add to Cart</button>
 								<h5>{{product.variety}} {{product.productName}}</h5>

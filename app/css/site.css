@@ -81,6 +81,16 @@ Content Pages
     }
 
 
+/*	---- Product Upload Page ----	*/
+.product-container figure.first-layer img.certification-img {
+	width: 33%;
+	max-width: 88px;
+	position: absolute;
+	top:15px;
+	left:15px;	
+}
+
+
 /*Modals*/
 ul {list-style: none; list-style-type: none; margin: 0; padding: 0;}
 
