@@ -427,11 +427,11 @@ exports.configAPI = function configAPI(app) {
 	// Creates a new order from the 'add to cart' buttons in the app. No validation yet.
 	app.post("/api/order", function(req, res, next) {
 		new models.Order({
-			product: new ObjectId(req.body.productId),
-			customer: new ObjectId(req.body.customerId),
-			supplier: new ObjectId(req.body.supplierId),
-			quantity: new ObjectId(req.body.quantity),
-			datePlaced: Date.now()
+			product: req.body.productId,
+			customer: req.body.customerId,
+			supplier: req.body.supplierId,
+			quantity: req.body.quantity,
+			datePlaced: Date()
 		}).save()
 	});
 
