@@ -82,7 +82,7 @@ Content Pages
 
 
 /*	---- Product Upload Page ----	*/
-.product-container figure.first-layer img.certification-img {
+.product-container figure.first-layer img.certification-img, img.certification-img {
 	width: 33%;
 	max-width: 88px;
 	position: absolute;
@@ -93,6 +93,8 @@ Content Pages
 
 /*Modals*/
 ul {list-style: none; list-style-type: none; margin: 0; padding: 0;}
+
+.modal-header section {position: relative}
 
 /* Store */ 
 
@@ -105,8 +107,6 @@ ul {list-style: none; list-style-type: none; margin: 0; padding: 0;}
 #sidebar {
 	width: 30%;
 	float: left;
-    -webkit-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
-    transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
 	position: fixed;
 	z-index: 999;
 	height: 100%;
@@ -195,8 +195,6 @@ ul {list-style: none; list-style-type: none; margin: 0; padding: 0;}
 
 #store {
 	margin-top: 20px;
-    -webkit-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
-    transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
 }
 
 .menuOpen {

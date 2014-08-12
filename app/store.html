@@ -5,11 +5,15 @@
     <title>NNFC Store -- Local Food Northland</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
+	<!-- Google Font -->
+	<link href='http://fonts.googleapis.com/css?family=Raleway:700,500' rel='stylesheet' type='text/css'>
+	
 	<link href="css/bootstrap.css" rel="stylesheet" media="screen">
+	<link rel="stylesheet" href="lib/bower_components/angular-loading-bar/build/loading-bar.css" type="text/css">
     
 	<link rel="stylesheet" href="css/site.css" title="site" type="text/css" media="screen">
     <link href="css/banner-store.css" rel="stylesheet" media="screen">
-    <link rel="stylesheet" href="css/animations.css" title="animations" type="text/css" media="screen">
+    <link rel="stylesheet" href="css/animations.css" type="text/css">
 
     <!-- Include all compiled plugins (below), or include individual files as needed -->
 	<!-- project-specific angular data here -->
@@ -29,6 +33,7 @@
 	<script src="js/directives.js"></script>
 	
 	<script src="lib/bower_components/angular-animate/angular-animate.js"></script>
+	<script src="lib/bower_components/angular-loading-bar/build/loading-bar.min.js"></script>
 
 	<script src="lib/bower_components/angular-bootstrap/ui-bootstrap-tpls.js" type="text/javascript" charset="utf-8"></script>
 	
@@ -51,7 +56,7 @@
 <body>
 	<div id="wrap" ng-controller="storeCtrl"><!--Sticky footer hack: wrap all page content-->    		    			
 			
-		<div id="sidebar" ng-show="panelDisplay">
+		<div id="sidebar" class="sidebar" ng-show="panelDisplay">
 	 	    <ul class="nav nav-pills">
 				<div ng-if="currentUser === null">
 					<ng-include src=" 'partials/login-store.html' "></ng-include>
@@ -122,7 +127,6 @@
 				<div class="container">
 					<section class="feature-box">
 						<h1 class="logo">NNFC Store</h1>
-						<h2 class="slogan">Local • Sustainable • Affordable</h2>
 					</section>
 				</div>
 	        </div>
@@ -136,18 +140,18 @@
 			
 						<label> Sort: </label>
 						<div class="btn-group">
-							<button type='button' class="btn btn-primary" ng-model="sort" btn-radio="'producerCompanyName'" uncheckable>Producer</button>
-							<button type='button' class="btn btn-primary" ng-model="sort" btn-radio="'productName'" uncheckable>Alphabetical</button>
+							<button type='button' class="btn btn-primary" ng-model="sort" btn-radio="'producerCompanyName'" >Producer</button>
+							<button type='button' class="btn btn-primary" ng-model="sort" btn-radio="'productName'" >Alphabetical</button>
 							<button type='button' class="btn btn-primary" ng-model="sort" btn-radio="'price'" uncheckable>Price</button>
 						</div>
 			            <label> Filter: </label>
 						<div class="btn-group">
-							<button type='button' class="btn btn-default" ng-model="search.category.name" btn-radio="'Produce'" uncheckable>Produce</button>
-							<button type='button' class="btn btn-default" ng-model="search.category.name" btn-radio="'Meat'" uncheckable>Meat</button>
-							<button type='button' class="btn btn-default" ng-model="search.category.name" btn-radio="'Processed-Goods'" uncheckable>Processed Goods</button>
-							<button type='button' class="btn btn-default" ng-model="search.category.name" btn-radio="'Baked Goods'" uncheckable>Baked Goods</button>
-							<button type='button' class="btn btn-default" ng-model="search.category.name" btn-radio="'Dairy'" uncheckable>Dairy</button>
-							<button type='button' class="btn btn-default" ng-model="search.category.name" btn-radio="'milk'" uncheckable>Milk</button>
+							<button type='button' class="btn btn-default" ng-model="search.category.name" btn-radio="'Produce'" >Produce</button>
+							<button type='button' class="btn btn-default" ng-model="search.category.name" btn-radio="'Meat'" >Meat</button>
+							<button type='button' class="btn btn-default" ng-model="search.category.name" btn-radio="'Processed-Goods'" >Processed Goods</button>
+							<button type='button' class="btn btn-default" ng-model="search.category.name" btn-radio="'Baked Goods'" >Baked Goods</button>
+							<button type='button' class="btn btn-default" ng-model="search.category.name" btn-radio="'Dairy'" >Dairy</button>
+							<button type='button' class="btn btn-default" ng-model="search.category.name" btn-radio="'milk'" >Milk</button>
 							<button type='button' class="btn btn-default" ng-model="search" btn-radio="">None</button>
 						</div>
 					</section>
@@ -162,7 +166,10 @@
 		
 			<div id="products-section" class="row">
 				<ul id="store-products">
-					<li ng-repeat="product in products | orderBy:sort | filter:search" class="product-container" ng-controller="productUICtrl" ng-mouseleave="detailsVisible = false">
+					<li ng-repeat="product in products | orderBy:sort | filter:search" class="product-container" 
+					ng-controller="productUICtrl" 
+					ng-mouseleave="detailsVisible = false"
+					>
 						<figure class="first-layer" ng-mouseover="callDelayed()" ng-mouseleave="callCancelled()">
 							<img ng-if="product.certification.name !== 'none' && product.img && product.certification.img"
 							 ng-src="img/certification/{{product.certification.img}}" class="certification-img">

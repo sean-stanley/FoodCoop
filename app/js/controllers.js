@@ -470,32 +470,9 @@ angular.module('co-op.controllers', []).
 
 .controller('storeCtrl', ['$scope', '$filter', '$modal', '$sce', 'Restangular', 'ProductManager',
 	function($scope, $filter, $modal, $sce, Restangular, ProductManager) {
-		Restangular.all('api/product').getList().then(function(products){
-			var product, fileURL;
-			$scope.products = products;
-			for (product in $scope.products) {
-				if ($scope.products.length > 1 && $scope.products.hasOwnProperty(product)) {
-					fileURL = URL.createObjectURL(product.img);
-					product.img = $sce.trustAsResourceUrl(fileURL);
-				}
-			}
-			for (var i = $scope.products.length - 1; i >= 0; i--) {
-				product = $scope.products[i];
-				$scope.products[i].shortDescription = $scope.blurb($scope.products[i].description, 200, product);
-			}	
-		});
+		$scope.products = Restangular.all('api/product').getList().$object;
         $scope.productManager = ProductManager;
 		$scope.sort="alphabetical";
-		
-		$scope.blurb = function(string, length, link) {
-			if (string.length < length) {
-				return string.splice(0, length) + '<button class="btn btn-link" ng-click="open('+link+')"> more...</button>';
-			}
-			else {
-				return string;
-			}
-		};
-		
 		
 		$scope.addToCart = function(product) {
 			console.log("user added an item to the cart");

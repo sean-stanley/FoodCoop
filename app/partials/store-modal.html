@@ -1,8 +1,10 @@
 <div class="modal-header">
             <h1>{{data.variety}} {{data.productName}} <small ng-if="data.certification !== 'none'">{{data.certification.name}}</small></h1>
-			<img ng-if="data.certification.name !== 'none' && data.img"
+			<section>
+				<img ng-if="data.certification.name !== 'none' && data.img"
 			 ng-src="img/certification/{{data.certification.img}}" class="certification-img">
-			<img class="product-image-modal" ng-src="{{data.img}}"/>
+				<img class="product-image-modal" ng-src="{{data.img}}"/>
+			</section>
 	
         </div>
         <div class="modal-body media">

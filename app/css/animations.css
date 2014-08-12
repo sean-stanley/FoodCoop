@@ -1,24 +1,89 @@
-#ingredients.ng-hide-add, 
-#ingredients.ng-hide-remove {
-  -webkit-transition:all linear 0.5s;
-  -moz-transition:all linear 0.5s;
-  -o-transition:all linear 0.5s;
-  transition:all linear 0.5s;
+.template-container.ng-enter, 
+.template-container.ng-leave
+{ 
+    -webkit-transition: 200ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    -moz-transition: 200ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    -ms-transition: 200ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    -o-transition: 200ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    transition: 200ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    position: relative;
+    display: block;
+    overflow: hidden;
+} 
+ 
+.template-container.ng-enter {
+	-moz-transform: translateX(100%);
+	-webkit-transform: translateX(100%);
+	-o-transform: translateX(100%);
+	-ms-transform: translateX(100%);
+	transform: translateX(130%);
+}
+ 
+.template-container.ng-enter-active, .template-container.ng-leave-active {
+	transform: translateX(0);
+}
+.template-container.ng-leave {
+    opacity: 0;
+	-moz-transform: translateX(-100%);
+	-webkit-transform: translateX(-100%);
+	-o-transform: translateX(-100%);
+	-ms-transform: translateX(-100%);
+	transform: translateX(-130%);
+	position: absolute;
+}
+
+.login {
+	-ms-transform-origin:center top;
+	-webkit-transform-origin:center top;
+	transform-origin:center top;
+	display: block;
+}
+
+
+.login.ng-hide-add, .login.ng-hide-remove {
+  /* this is required as of 1.3x to properly
+     apply all styling in a show/hide animation */
+  transition:0s linear all;
+ 
+  /* this must be set as block so the animation is visible */
   display:block!important;
 }
  
-#ingredients.ng-hide-add.ng-hide-add-active,
-#ingredients.ng-hide-remove {
-  line-height:0;
-  opacity:0;
-  padding:0 10px;
+.login.ng-hide-add-active,
+.login.ng-hide-remove-active {
+  /* the transition is defined in the active class */
+  transition:200ms linear all;
 }
  
-#ingredients.ng-hide-add,
-#ingredients.ng-hide-remove.ng-hide-remove-active {
-  line-height:20px;
-  opacity:1;
-  padding:10px;
-  border:1px solid black;
-  background:white;
+.login.ng-hide-add { transform: scaleY(1); }
+.login.ng-hide-remove { transform: scaleY(0); }
+.login.ng-hide-remove.ng-hide-remove-active { transform: scaleY(1); }
+.login.ng-hide-add.ng-hide-add-active { transform: scaleY(0); }
+
+.sidebar {
+	transition: 5s cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+	display: block;
 }
+
+
+.sidebar.ng-hide-add, .sidebar.ng-hide-remove {
+  /* this is required as of 1.3x to properly
+     apply all styling in a show/hide animation */
+  transition:0s linear all;
+ 
+  /* this must be set as block so the animation is visible */
+  display:block!important;
+}
+ 
+.sidebar.ng-hide-add-active,
+.sidebar.ng-hide-remove-active {
+  /* the transition is defined in the active class */
+  transition:400ms linear all;
+}
+ 
+.sidebar.ng-hide-add { left: 0%; }
+.sidebar.ng-hide-remove { left:-30%; }
+.sidebar.ng-hide-remove.ng-hide-remove-active { left: 0; }
+.sidebar.ng-hide-add.ng-hide-add-active { left:-30%; }
+
+

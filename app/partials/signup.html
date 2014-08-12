@@ -31,7 +31,7 @@
 	<legend>Fill out this form to become a member</legend>
 	<div class="form-group">
 		<label for="email">Email address</label>
-		<input ng-model="userData.email" name="email" type="email" class="form-control" placeholder="Enter email" autofocus required>
+		<input ng-model="userData.email" name="email" type="email" class="form-control" placeholder="Enter email" required>
 		<div class="custom-error" ng-show="signUp.email.$dirty && signUp.email.$invalid">Sorry:
 			<span ng-show="signUp.email.$error.required">email is required.</span>
 			<span ng-show="signUp.email.$error.email">Please, write a valid email address.</span>
