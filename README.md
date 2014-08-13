@@ -3,7 +3,6 @@ FoodCoop
 
 Software for managing a local food co-op. This web app is built with a MEAN stack of MongoDB, Express v4, AngularJS v1.3 and Node.js
 
-Check out the working demo [here](app.foodcoop.org.nz). You can even try signing up and logging in. Just be warned that I will get an email everytime someone signs up.
 
 Working Features include:
 -------------------------
