@@ -18,7 +18,8 @@
     "angular-bootstrap": "latest",
     "jquery": "latest",
     "restangular": "~1.4.0",
-    "angular-cropme": "~0.1.11"
+    "angular-cropme": "~0.1.11",
+    "datejs": "~1.0.0-rc1"
   },
   "moduleType": [
     "globals",

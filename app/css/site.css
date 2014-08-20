@@ -82,12 +82,12 @@ Content Pages
 
 
 /*	---- Product Upload Page ----	*/
-.product-container figure.first-layer img.certification-img, img.certification-img {
+img.certification-img {
 	width: 33%;
-	max-width: 88px;
+	max-width: 88px!important;
 	position: absolute;
 	top:15px;
-	left:15px;	
+	right:15px;	
 }
 
 
@@ -132,7 +132,9 @@ ul {list-style: none; list-style-type: none; margin: 0; padding: 0;}
 	margin: 20px;
 }
 
-#store-products {/*div that contains the product containers. Flex container.*/
+
+/*div that contains the product containers. Flex container.*/
+#store-products {
 	list-style: none;
 	margin: 0;
 	display: -webkit-box;
@@ -141,18 +143,15 @@ ul {list-style: none; list-style-type: none; margin: 0; padding: 0;}
 	  display: -webkit-flex;
 	  display: flex;
 	flex-flow: row wrap;
-	justify-content: center;
+	justify-content: left;
 	align-items: flex-start;
 	align-content: flex-start;
-	
-	
 }
 
 .product-container { /*section that is repeated for the store products. Flex items*/
 	position: relative;
-	width: 23%;
+	width: 33%;
 	margin: 10px;
-	flex-grow: 1;
 	padding: 15px;
 	overflow:hidden;
 	background:#ddd;
@@ -166,6 +165,9 @@ ul {list-style: none; list-style-type: none; margin: 0; padding: 0;}
 }
 
 .product-container figcaption{margin-top:25px;}
+
+.product-container figcaption .btn-group {margin-top: 0.8em}
+
 /*
 .product-container figure {background:#ddd;}
 */
@@ -195,10 +197,6 @@ ul {list-style: none; list-style-type: none; margin: 0; padding: 0;}
 
 #store {
 	margin-top: 20px;
-}
-
-.menuOpen {
-	margin-left: 30%;
 }
 
 

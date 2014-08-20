@@ -1,5 +1,5 @@
 'use strict';
-/*global angular, _*/
+/*global angular, _, Date*/
 
 /* Controllers */
 
@@ -10,13 +10,11 @@ angular.module('co-op.controllers', []).
     	}
     ])
 	
-	.controller('navCtrl', ['$scope', '$location', 'LoginManager', 'CartRecords',
-		function($scope, $location, LoginManager, CartRecords) {
+	.controller('navCtrl', ['$scope', '$location',
+		function($scope, $location) {
 			$scope.isActive = function(route) {
 				return route === $location.path();
 			};
-
-			$scope.items = CartRecords.getCart().length;
 
 		}
 	])
@@ -255,10 +253,22 @@ angular.module('co-op.controllers', []).
 	}
 ])
 
-.controller('modalInstanceCtrl', ['$scope', '$modalInstance', 'data',
-	function($scope, $modalInstance, data) {
-
+// This is used on the store page
+.controller('modalInstanceCtrl', ['$scope', '$location', '$modalInstance', 'data',
+	function($scope, $location, $modalInstance, data) {
+		
 		$scope.data = data;
+		
+		function producer() {
+			return data.producer_ID.producerData.companyName || data.producer_ID.name;
+		}
+		
+		$location.hash(data.fullName + "+" + producer()+ "&id=" + data._id);
+		
+		$scope.addToCart = function(product) {
+			$modalInstance.close($scope.data);
+			
+		};
 
 		$scope.cancel = function() {
 			$modalInstance.dismiss('cancel');
@@ -266,45 +276,55 @@ angular.module('co-op.controllers', []).
 	}
 ])
 
-.controller('productUpload', ['$scope', '$rootScope', '$modal', '$sce', 'ProductManager', 'ProductHistory', 'Restangular',
-	function($scope, $rootScope, $modal, $sce, ProductManager, ProductHistory, Restangular) {
-		// make ProductManager methods available in the template
-		$scope.productManager = ProductManager;
+.controller('productHistoryCtrl', ['$scope', '$http', 'ProductHistory',
+	function($scope, $http, ProductHistory) {
+
+		ProductHistory.getCurrentProducts(function(result) {
+			$scope.currentProducts = result;
+		});
 		
-		$scope.ingredients = false;
-		$scope.onSelect = function ($item, $model, $label) {
-		    $scope.$item = $item;
-		    $scope.$model = $model;
-		    $scope.$label = $label;
-		};
-        
-		ProductHistory.getData(function(result) {
-			$scope.data = result;
+		ProductHistory.getRecentProducts(function(result) {
+			$scope.lastMonthProducts = result;
+		});
+		
+		ProductHistory.getAllProducts(function(result) {
+			$scope.allProducts = result;
 		});
 
 		$scope.predicate = 'dateUploaded';
 
 		$scope.delete = function(idx) {
-			var itemToDelete = $scope.data[idx];
-			$scope.data.splice(idx, 1);
+			var itemToDelete = $scope.currentProducts[idx];
+			$scope.currentProducts.splice(idx, 1);
+			$http({method: 'DELETE', url: 'api/product/', data: itemToDelete}).then(function(status) {
+				console.log(status);
+			});
 		};
+	}
+])
+
+.controller('productUploadCtrl', ['$scope', '$rootScope', '$modal', '$sce', 'ProductManager', 'Restangular', 'product',
+	function($scope, $rootScope, $modal, $sce, ProductManager, Restangular, product) {
+		// make ProductManager methods available in the template
+		$scope.productData = product;
+		$scope.productData.refrigeration = product.refrigeration || 'none';
+		
+		$scope.selectedImg = $scope.productData.img || null;
+		
+		$scope.productManager = ProductManager;
+		
+		$scope.ingredients = false;
 		
 		// pass product to $scope.productData for editing in the main form
 		$scope.editProduct = function(product) {
 			$scope.productData = product;
 			console.log($scope.productData);
-			
 		};
 		
 		$scope.setCategory = function(category) {
 			$scope.productData.category = category;
 			return $scope.productData.category;
 		};
-		
-		$scope.productData = {};
-		
-		$scope.productData.producer_ID = $rootScope.currentUser._id;		
-		$scope.productData.refrigeration = 'none';
 
 		var certifications = Restangular.all('api/certification');
 		
@@ -313,7 +333,7 @@ angular.module('co-op.controllers', []).
 				certification[i].plain();
 			}
 			$scope.certifications = certification;
-			$scope.productData.certification = $scope.certifications[0]._id;
+			$scope.productData.certification = product.certification || $scope.certifications[0]._id;
 			$scope.certificationImg = function(id) {
 				var el = _.findWhere($scope.certifications, {_id: $scope.productData.certification});
 				return el.img;
@@ -385,48 +405,194 @@ angular.module('co-op.controllers', []).
 		
 		$scope.submitForm = function() {
 			ProducerManager.saveProducer();
-			//$location.path('/product-upload');
 		};
 
 	}
 ])
 
-.controller('orderTableCtrl', ['$scope', '$filter', 'OrderRecords',
-	function($scope, $filter, OrderRecords) {
-		$scope.orders = OrderRecords.getOrders();
-
+.controller('productOrderCtrl', ['$scope', 'myOrders', 'products', 'Calendar', 'ProductHistory', 
+	function($scope, myOrders, products, Calendar, ProductHistory) {
+		myOrders.getList().then(function(orders) {
+			$scope.orders = orders;
+			
+			Calendar.currentMonth(orders, 'datePlaced', function(result) {
+				$scope.currentOrders = result;
+			});
+			
+			Calendar.lastMonth(orders, 'datePlaced', function(result) {
+				$scope.recentOrders = result;
+			});
+						
+			$scope.orderTotal = function(list) {
+				var total;
+				for (var i = 0; i < list.length; i++) {
+					total += list[i].orderPrice;
+				}
+				return total;
+			};
+			
+			$scope.sortedOrders = [];
+			
+			var sort = function(order, idx, orders) {
+				var allOneCustomersOrders = _.where(orders, {customer: {_id: order.customer._id}});
+				
+				if ( !_.contains($scope.sortedOrders, order.customer._id) ) {
+					$scope.sortedOrders.push({
+						customer: order.customer.name,
+						_id : order.customer._id,
+						orders : allOneCustomersOrders
+					});
+				}
+			};
+			
+			$scope.currentOrders.forEach(sort);
+		});
+		
+		ProductHistory.getCurrentProducts(function(products) {
+			$scope.currentProducts = products;
+		});
+		
+		ProductHistory.getRecentProducts(function(products) {
+			$scope.recentProducts = products;
+		});
+		
+		$scope.products = products.getList().$object; 
+				
+		$scope.isOrdered = function(id) {
+			var numOrdered;
+			var ordersOfProduct = _.where($scope.orders, { product : {_id: id} });
+			if (ordersOfProduct.hasOwnProperty('length') ) {
+				for (var i = 0; i < ordersOfProduct.length; i++) {
+					numOrdered += ordersOfProduct[i].quantity;
+				}
+			}
+			return 0;
+		};
+		
+		$scope.lastMonth = Date.today().add(-1).months().toString('MMMM');
 		$scope.predicate = 'product';
-
-		$scope.total = OrderRecords.sumSales();
-
 	}
 ])
 
-.controller('cartTableCtrl', ['$scope', '$filter', 'CartRecords',
-	function($scope, $filter, CartRecords) {
-		$scope.cart = CartRecords.getCart();
-
-		$scope.$watch('$scope.cart.quantity', function(newValue) {
-			$scope.total = CartRecords.sumPrice($scope.cart);
+.controller('cartPageCtrl', ['$scope', '$rootScope', 'Cart',
+	function($scope, $rootScope, Cart) {
+		$scope.cart = [];
+		
+		Cart.getCurrentCart(function(cart) {
+			$scope.cartProduct_ids = [];
+			$scope.cart = cart;
+			getIds();
+			
+			
 		});
-
-		$scope.total = CartRecords.sumPrice($scope.cart);
-
+		
+		$scope.cartTotal = function(cart) {
+			$scope.total = 0;
+			if (Object.prototype.toString.call( cart ) === '[object Array]') {
+				for(var i=0; i < cart.length; i++) {
+				$scope.total += (cart[i].unitPriceWithMarkup * cart[i].quantity); 
+				}
+			}
+			return $scope.total;
+		};
+	
 		$scope.delete = function(idx) {
 			var itemToDelete = $scope.cart[idx];
+			Cart.deleteItem($scope.cart[idx]._id);
 			$scope.cart.splice(idx, 1);
-			$scope.total = CartRecords.sumPrice($scope.cart);
+			$scope.cartTotal();
+			for (var i = 0; i < $scope.cartProduct_ids.length; i++) {
+				if ($scope.cartProduct_ids[i] === itemToDelete.product._id) {
+					$scope.cartProduct_ids.splice(i, 1);
+				}
+			}
+			// $scope.cartProduct_ids = _.remove($scope.cartProduct_ids, itemToDelete.product._id);
+			// for the store page:
+			$scope.$emit('CART_IDS', $scope.cartProduct_ids);
 		};
-
-
-		//  API.DeleteItem({ id: itemToDelete.id}, function (success) {
-		//	  $scope.cart.splice(idx, 1);
-		//  })
+		
+		// update the cart on valid quantity changes and reset it on invalid ones;
+		$scope.$watchCollection(watchQuantity, function(newValue, oldValue) {
+			console.log(oldValue);
+			console.log(newValue);
+			
+			if (oldValue.length >= 1 && newValue.length >= 1) {
+				$scope.oldQuantities = oldValue;
+				console.log('test');
+			}
+			else {
+				$scope.oldQuantities = newValue;
+			}
+			
+		});
+		
+		function watchQuantity () {
+			if ($scope.cart) {
+				return $scope.cart.map(function(item, idx) {
+					return item.quantity;
+				});
+			}
+		}
+		
+		$scope.quantityChange = function (idx) {
+			var item, message, areYouSure;
+			item = $scope.cart[idx];
+			message = "Are you sure you want to change the amount of " + item.product.productName + " you are ordering to: " + item.quantity + "?";
+			areYouSure = confirm(message);
+			if (areYouSure) {
+				Cart.updateItem(item, function(result) {
+					if (result === "OK") {
+						$scope.cartTotal();
+					}
+					else {
+						// make a message on the store page
+						$scope.$emit('CANNOT_UPDATE_CART', result);
+						$scope.cart[idx].quantity = $scope.oldQuantities[idx];
+					}
+					
+				});
+			}
+			else {
+				$scope.cart[idx].quantity = $scope.oldQuantities[idx];
+			}
+		};
+		
+		
+		
+		
+		// only for the store.html page use of this controller
+		
+		function getIds() {
+			$scope.cart.forEach(function(item) {
+				$scope.cartProduct_ids.push(item.product._id);
+			});
+			$scope.$emit('CART_IDS', $scope.cartProduct_ids);
+		}
+		
+		$scope.$on('UPDATE_CART', function(event, item){
+			console.log(item);
+			$scope.cart.push(item);
+			$scope.cartProduct_ids.push(item.product._id);
+			$scope.$emit('CART_IDS', $scope.cartProduct_ids);
+		});
+		
+		$scope.open = function(item) {
+			$scope.$emit('OPEN_PRODUCT', item);
+		};
+		
+		
 
 	}
 ])
-.controller('contactCtrl', ['$scope', 'MailManager', '$location',
-	function($scope, MailManager, $location) {		
+.controller('cartHistoryCtrl', ['$scope', 'Cart', function($scope, Cart) {
+	Cart.getAllItems(function(items) {
+		$scope.cartHistory = items;
+	});
+}])
+
+
+.controller('contactCtrl', ['$scope', 'MailManager', '$route',
+	function($scope, MailManager, $route) {		
 		$scope.mail = {
 			name: '',
 			email: '',
@@ -434,52 +600,112 @@ angular.module('co-op.controllers', []).
 			message: ''
 		};
 		
-		$scope.submitForm = function(message) {
-			MailManager.mail($scope.mail);
-			$location.path("/page");
+		$scope.submitForm = function(mail) {
+			MailManager.mail(mail, function() {
+				$route.reload();
+			});
+			
 		};
 
 
 	}
 ])
-.controller('producerContactCtrl', ['$scope', 'MailManager', '$location', 'producer',
-	function($scope, MailManager, $location, producer) {		
+.controller('producerContactCtrl', ['$scope', 'MailManager', '$location', 'member',
+	function($scope, MailManager, $location, member) {				
 		$scope.mail = {
 			to: '',
+			toName: '',
 			name: '',
 			email: '',
 			subject: '',
 			message: ''
 		};
 		
-		$scope.producer = producer.plain();
-		$scope.mail.to = $scope.producer.email;
-		$scope.mail.toName = $scope.producer.name;
-		console.log('mail is to be sent to: ' + $scope.mail.toName + " " + $scope.mail.to);
-		
-		
-		
+		$scope.member = member.plain();
+		$scope.mail.to = $scope.member.email;
+		$scope.mail.toName = $scope.member.name;
+				
 		$scope.submitForm = function(message) {
 			MailManager.mail($scope.mail);
 			$location.path("/page");
 		};
-
-
 	}
 ])
 
-.controller('storeCtrl', ['$scope', '$filter', '$modal', '$sce', 'Restangular', 'ProductManager',
-	function($scope, $filter, $modal, $sce, Restangular, ProductManager) {
-		$scope.products = Restangular.all('api/product').getList().$object;
-        $scope.productManager = ProductManager;
-		$scope.sort="alphabetical";
+.controller('storeCtrl', ['$scope', '$rootScope', '$location', '$routeParams', '$modal', 'Restangular', 'Cart',
+	function($scope, $rootScope, $location, $routeParams, $modal, Restangular, Cart) {
+		$scope.searchObject = $location.search();
+		console.log($routeParams);
+		console.log($location.path());
 		
-		$scope.addToCart = function(product) {
-			console.log("user added an item to the cart");
+		
+		var findCartItems = function() {
+			if ($scope.cartProduct_ids && $scope.products) {
+				$scope.products.forEach(function(product, idx, collection) {
+					if ( _.contains($scope.cartProduct_ids, product._id) ) {
+						collection[idx].AlreadyInCart = true;
+					}
+					else collection[idx].AlreadyInCart = false;
+				});
+			}
 		};
 		
+		$scope.message = {type: 'danger', closeMessage: function() {if (this.message) this.message = null;} };
+		
+		Restangular.all('api/product').getList().then(function(products){
+			$scope.products = products.plain();
+			
+			// deal with all hash and search on product successful load;
+			(function() {
+				var hashID, product, key, searchObject;
+				// if we need to open a product modal
+				if ($location.hash()) {
+					console.log('page has hash');
+					hashID = $location.hash().split('&id=');
+					hashID = hashID[1];
+					product = _.findWhere($scope.products, {_id: hashID});
+					$scope.open(product);
+				}
+				if ($scope.searchObject) {
+					searchObject = $scope.searchObject;
+					for (key in searchObject) {
+						if (searchObject.hasOwnProperty(key)) {
+							switch (key) {
+								case 'menu':
+									$scope.panelDisplay = searchObject[key];
+									break;
+								case 'category':
+									$scope.filter.category.name = searchObject[key];
+									break;
+								case 'sort':
+									if ( searchObject[key] === 'producer') {
+										$scope.sort = 'producer_ID.producerData.companyName';
+									}
+									else $scope.sort = searchObject[key];
+									break;
+								case 'reverse':
+									$scope.reverse = searchObject[key];
+									break;
+								case 'search':
+									$scope.search = searchObject[key];
+									break;
+								default:
+									console.log("no match found for " + key);
+									
+							}
+						}
+					}
+				}
+			}());
+			
+			
+			// this will do nothing if the products are loaded before the cart is ready
+			// or no user is logged in
+			findCartItems();
+		});
+				
+		// open the modal
 		$scope.open = function(product) {
-			console.log('$scope.open got called for' + product);
 			var modalInstance = $modal.open({
 				templateUrl: 'partials/store-modal.html',
 				controller: 'modalInstanceCtrl',
@@ -491,23 +717,123 @@ angular.module('co-op.controllers', []).
 				}
 			});
 
-			modalInstance.result.then(function(selectedItem) {
-				$scope.selected = selectedItem;
+			modalInstance.result.then(function(product) {
+				$location.hash('');
+				$scope.addToCart(product);
+				
 			}, function() {
+				$location.hash('');
 				console.log('Modal dismissed at: ' + new Date());
 			});
-			
-			$scope.addToCart = function(product) {
-				console.log("user added an item to the cart from the modal");
-			};
 		};
+		
+		$scope.$on('OPEN_PRODUCT', function(event, item) {
+			if ($scope.products) {
+				var product = _.find($scope.products, {_id: item.product._id});
+				$scope.open(product);
+			}
+			else console.log("can't open product because it's undefined currently");
+		});
+		
+		$scope.$on('NOT_IN_CART', function(event, id) {
+			if ($scope.products) {
+				findCartItems();
+			}
+		});
+		
+		$scope.$on('CANNOT_UPDATE_CART', function(event, message) {
+			$scope.message.message = message;
+		});
+		
+		// if the user has items in their cart that are also in the store
+		// flag those items with the bool AlreadyInCart = true;
+		$scope.$on('CART_IDS', function(event, cartProduct_ids) {
+			$scope.cartProduct_ids = cartProduct_ids;
+			// this will do nothing if the cart is loaded before the products are ready
+			findCartItems();
+		});
+		
+			
+		$scope.addToCart = function(product) {
+			
+			var order = {
+			product: product._id,
+			customer: $rootScope.currentUser._id,
+			supplier: product.producer_ID._id,
+			quantity: 1
+			};
+			Cart.addToCart(order, function(cartOrder){
+				if (cartOrder === "Sorry, you can't try to buy your own products") {
+					$scope.message.message = cartOrder;
+				}
+				else {
+					$scope.$broadcast('UPDATE_CART', cartOrder);
+					Cart.getTally();
+					$scope.panelDisplay = true;
+				}
+				
+			});
+		};
+		
+		// route params
+		$scope.$watch('panelDisplay', function(newValue) {
+			if (newValue === true) {
+				$location.search('menu', true);
+			}
+			else {
+				$location.search('menu', null);
+			}
+		});
+				
+		$scope.$watch('filter.category.name', function(newValue) {
+			// if newValue is falsey
+			if (!newValue) {
+				$location.search('category', null);
+			}
+			else {
+				$location.search('category' , newValue);
+			}
+		});
+		
+		$scope.$watch('sort', function(newValue) {
+			// if newValue is falsey
+			if (!newValue) {
+				$location.search('sort', null);
+			}
+			else {
+				if (newValue === 'producer_ID.producerData.companyName') {
+					newValue = 'producer';
+				}
+				$location.search('sort' , newValue);
+			}
+		});
+		
+		$scope.$watch('reverse', function(newValue) {
+			// if newValue is falsey
+			if (!newValue) {
+				$location.search('reverse', null);
+			}
+			else {
+				$location.search('reverse' , true);
+			}
+		});
+		
+		$scope.$watch('search', function(newValue) {
+			// if newValue is falsey
+			if (!newValue) {
+				$location.search('search', null);
+			}
+			else {
+				$location.search('search' , newValue);
+			}
+		});
 
 	}
 
 ])
-.controller('calendarCtrl', ['$scope',
-	function($scope) {
-		
+.controller('calendarCtrl', ['$scope', 'Calendar',
+	function($scope, Calendar) {
+		$scope.daysLeftUntilDeliveryDay = Calendar.daysUntil(Calendar.deliveryDay());
 	}
 ])
 

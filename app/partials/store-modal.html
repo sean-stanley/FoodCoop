@@ -1,5 +1,5 @@
 <div class="modal-header">
-            <h1>{{data.variety}} {{data.productName}} <small ng-if="data.certification !== 'none'">{{data.certification.name}}</small></h1>
+            <h1>{{data.fullName}} <small ng-if="data.certification.name !== 'none'">{{data.certification.name}}</small></h1>
 			<section>
 				<img ng-if="data.certification.name !== 'none' && data.img"
 			 ng-src="img/certification/{{data.certification.img}}" class="certification-img">
@@ -12,7 +12,7 @@
             <div class="media-body col-lg-6">
 	            {{data.producerName}}<br>
 				
-				<div class="well"><h2>Price: {{data.price|currency}} / {{data.units}}</h2></div>
+				<div class="well"><h2>Price: {{data.priceWithMarkup|currency}} / {{data.units}}</h2></div>
 			</div>
 			<div class="media-body col-lg-6">
 				
@@ -24,6 +24,14 @@
 
         </div>
         <div class="modal-footer">
-			<button class="btn btn-primary" ng-click="addToCart(data)">Add to Cart</button>
+			<button class="btn btn-danger" disabled ng-if="data.quantity === 0">
+				SOLD OUT
+			</button>
+			<button class="btn btn-primary" ng-click="addToCart(data)" ng-if="!data.AlreadyInCart" ng-disabled="!currentUser">
+				Add to Cart
+			</button>
+			<button class="btn btn-primary" disabled ng-if="data.AlreadyInCart">
+				Added to Cart
+			</button>
             <button class="btn btn-warning" ng-click="cancel()">Close</button>
         </div>

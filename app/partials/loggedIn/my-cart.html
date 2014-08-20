@@ -1,49 +1,87 @@
-<h1>My Carts <small>Updated Live until ordering finishes</small></h1>
+<h1>My Cart <small>Live Updates</small></h1>
 <p>Here is where you will see all your orders. You will get an email of this list at the end of order week and you can also view past month's shopping here.</p>
 
-<div id="table-div" ng-controller="cartTableCtrl">
+<h2>{{month}} Cart</h2>
+<div id="table-div">
 [ <a href="" ng-click="predicate=''">unsorted</a> ]
 <table class="table">
-	<caption>October Cart</caption>
 	<thead>
 		<tr>
-			<th>Remove</th>
-			<th>Product</th>
-			<th>Quantity</th>
-			<th>Price</th>
-			<th>Producer</th>
+			<th><a href="" ng-click="predicate = '_id'; reverse=!reverse">Remove</a></th>
+			<th><a href="" ng-click="predicate = 'product.productName'; reverse=!reverse">Product</a></th>
+			<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse">Quantity</a></th>
+			<th><a href="" ng-click="predicate = 'orderPriceWithMarkup'; reverse=!reverse">Price</a></th>
+			<th><a href="" ng-click="predicate = 'supplier.producerData.companyName' || 'supplier.name'; reverse=!reverse">Producer</a></th>
 		</tr>
 	</thead>
 	<tfoot>
 		<tr>
-			
-			<td></td>
-			<td></td>
-			<td></td>
-			<td><strong>Total: {{total|currency}}</strong></td>
+			<td colspan="5"><strong>Total: {{cartTotal(cart)|currency}}</strong></td>
 		</tr>
 	</tfoot>
 	<tbody>
-		<tr ng-repeat="c in cart" >
+		<tr ng-repeat="c in cart | orderBy:predicate:reverse" >
 	        <td data-title=" 'remove' ">
 	        	<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
 			</td>
 	        <td data-title="'Product'" >
-	            {{c.product}}
+	            {{c.product.fullName}}
 	        </td>
 	        <td data-title="'Quantity'">
-	            {{c.quantity}}
+	           <input type="number" class="form-control" ng-change="quantityChange($index)" ng-model="c.quantity">
 	        </td>
 	        <td data-title="'Price'">
-	            {{c.price | currency}}
+	            {{c.unitPriceWithMarkup * c.quantity | currency}}
 	        </td>
 	        <td data-title="'Customer'">
-	            {{c.producer}}
+	            {{c.supplier.producerData.companyName || c.supplier.name}}
 	        </td>
 	    </tr>
 	</tbody>
 </table>
 </div>
+<accordion>
+	<accordion-group heading="Cart History" ng-controller="cartHistoryCtrl">
+		<div ng-controller="cartHistoryCtrl">
+			[ <a href="" ng-click="predicate=''">unsorted</a> ]
+			<table class="table">
+				<thead>
+					<tr>
+						<th><a href="" ng-click="predicate = 'datePlaced'; reverse=!reverse">Date</a></th>										   
+						<th><a href="" ng-click="predicate = 'product.productName'; reverse=!reverse">Product</a></th>							   
+						<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse">Quantity</a></th>									   
+						<th><a href="" ng-click="predicate = 'orderPriceWithMarkup'; reverse=!reverse">Price</a></th>							   
+						<th><a href="" ng-click="predicate = 'supplier.producerData.companyName' || 'supplier.name'; reverse=!reverse">Producer</a></th>
+					</tr>
+				</thead>
+				<tfoot>
+					<tr>
+						<td colspan="5"><strong>Total: {{cartTotal(cartHistory)|currency}}</strong></td>
+					</tr>
+				</tfoot>
+				<tbody>
+					<tr ng-repeat="c in cartHistory | orderBy:predicate:reverse" >
+				        <td data-title=" 'Date' ">
+				        	{{c.datePlaced | shortDate}}
+						</td>
+				        <td data-title="'Product'" >
+				            {{c.product.fullName}}
+				        </td>
+				        <td data-title="'Quantity'">
+				           {{c.quantity}}
+				        </td>
+				        <td data-title="'Price'">
+				            {{c.orderPriceWithMarkup | currency}}
+				        </td>
+				        <td data-title="'Customer'">
+				            {{c.supplier.producerData.companyName || c.supplier.name}}
+				        </td>
+				    </tr>
+				</tbody>
+			</table>
+		</div>
+	</accordion-group>
+</accordion>
 
 
 

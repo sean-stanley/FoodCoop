@@ -1,68 +1,200 @@
-<h1>Orders <small>Live Updates until Ordering Closes</small></h1>
-<p>Here is where you will see all the orders for {{producerData.companyName}}. You will get an email of the list for this month at the end of order week. Please be sure to pack all the goods on the month's current order as listed here and bring them to Woods for sorting in Whangarei. For your reference, scroll to see past month's orders.</p>
+<h1>
+	<span ng-hide="currentUser.producerData.companyName">My</span>
+	<span ng-show="currentUser.producerData.companyName"> {{currentUser.producerData.companyName}}</span>
+	Products <small>Live Updates</small>
+</h1>
+<p>Here you can see all the products you've ever uploaded as well information about products being purchased.</p>
 
-<div id="table-div" ng-controller="orderTableCtrl">
+<div class="col-md-6">
+
+<h2>{{month}} Products</h2>
 [ <a href="" ng-click="predicate=''">unsorted</a> ]
 <table class="table">
-	<caption>October Orders</caption>
-	<thead>
-		<tr>
-			<th><a href="" ng-click="predicate = 'product'; reverse=!reverse ">Product</a></th>
-			<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Quantity</a></th>
-			<th><a href="" ng-click="predicate = 'price'; reverse=!reverse ">Price</a></th>
-			<th><a href="" ng-click="predicate = 'customer'; reverse=!reverse ">Customer</a></th>
-		</tr>
-	<tbody>
-		<tr ng-repeat="order in orders | orderBy:predicate:reverse " >
-	        <td data-title="'Product'" >
-	            {{order.product}}
-	        </td>
-	        <td data-title="'Quantity'">
-	            {{order.quantity}}
-	        </td>
-	        <td data-title="'Price'">
-	            {{order.price | currency}}
-	        </td>
-	        <td data-title="'Customer'">
-	            {{order.customer}}
-	        </td>
-	    </tr>
-	</tbody>
-</table>
-<strong>Total: {{total|currency}}</strong>
-<br>
+<thead>
+	<tr>
+		<th><a href="" ng-click="predicate = 'productName'; reverse=!reverse ">Product</a></th>
+		<th><a href="" ng-click="predicate = 'price'; reverse=!reverse ">Price</a></th>
+		<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Inventory</a></th>
+		<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Ordered Amount</a></th>
+	</tr>
+</thead>
+<tbody>
+	<tr ng-repeat="i in currentProducts | orderBy:predicate:reverse " >
+        <td data-title="'Product'" >
+            {{i.fullName}}
+        </td>
 
+        <td data-title="'Price'">
+            {{i.price | currency}} / {{i.units}}
+        </td>
+		<td data-title="'Quantity'">
+			{{i.quantity}}
+		</td>
+		<td data-title="'times Ordered'">
+			{{isOrdered(i._id)}}
+		</td>
+    </tr>
+</tbody>
+</table>
+
+<accordion>
+	<accordion-group heading="{{lastMonth}} Products">
+		[ <a href="" ng-click="predicate=''">unsorted</a> ]
+		<table class="table">
+			<thead>
+				<tr>
+					<th><a href="" ng-click="predicate = 'productName'; reverse=!reverse ">Product</a></th>
+					<th><a href="" ng-click="predicate = 'price'; reverse=!reverse ">Price</a></th>
+					<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Inventory</a></th>
+					<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Ordered Amount</a></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="i in recentProducts | orderBy:predicate:reverse " >
+			        <td data-title="'Product'" >
+			            {{i.fullName}}
+			        </td>
+	       
+			        <td data-title="'Price'">
+			            {{i.price | currency}} / {{i.units}}
+			        </td>
+					<td data-title="'Quantity'">
+						{{i.quantity}}
+					</td>
+					<td data-title="'times Ordered'">
+						{{isOrdered(i._id)}}
+					</td>
+			    </tr>
+			</tbody>
+		</table>
+	</accordion-group>
+	<accordion-group heading="All Products">
+		[ <a href="" ng-click="predicate=''">unsorted</a> ]
+		<table class="table">
+			<thead>
+				<tr>
+					<th><a href="" ng-click="predicate = 'productName'; reverse=!reverse ">Product</a></th>
+					<th><a href="" ng-click="predicate = 'price'; reverse=!reverse ">Price</a></th>
+					<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Inventory</a></th>
+					<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Ordered Amount</a></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="i in products | orderBy:predicate:reverse " >
+			        <td data-title="'Product'" >
+			            {{i.fullName}}
+			        </td>
+	       
+			        <td data-title="'Price'">
+			            {{i.price | currency}} / {{i.units}}
+			        </td>
+					<td data-title="'Quantity'">
+						{{i.quantity}}
+					</td>
+					<td data-title="'times Ordered'">
+						{{isOrdered(i._id)}}
+					</td>
+			    </tr>
+			</tbody>
+		</table>
+	</accordion-group>
+</accordion>
 </div>
-
-<div id="table-div" ng-controller="orderTableCtrl">
-<br>
-<br>
-[ <a href="" ng-click="predicate=''">unsorted</a> ]
-<table class="table">
-	<caption>September Orders</caption>
-	<thead>
-		<tr>
-			<th><a href="" ng-click="predicate = 'product'; reverse=!reverse ">Product</a></th>
-			<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Quantity</a></th>
-			<th><a href="" ng-click="predicate = 'price'; reverse=!reverse ">Price</a></th>
-			<th><a href="" ng-click="predicate = 'customer'; reverse=!reverse ">Customer</a></th>
-		</tr>
-	<tbody>
-		<tr ng-repeat="order in orders | orderBy:predicate:reverse " >
-	        <td data-title="'Product'" >
-	            {{order.product}}
-	        </td>
-	        <td data-title="'Quantity'">
-	            {{order.quantity}}
-	        </td>
-	        <td data-title="'Price'">
-	            {{order.price | currency}}
-	        </td>
-	        <td data-title="'Customer'">
-	            {{order.customer}}
-	        </td>
-	    </tr>
-	</tbody>
-</table>
-<strong>Total: {{total|currency}}</strong>
+<div class="col-md-6">
+	<h2>Unfulfilled Orders</h2>
+	<table class="table">
+		<thead ng-repeat-start="order in sortedOrders">
+			<tr><th colspan="4"><a ng-href="#/contact/{{order._id}}">{{order.customer}}</th></tr>
+		</thead>
+		<tbody ng-repeat-end>
+			<tr ng-repeat="i in order.orders">
+		        <td data-title="'Product'" >
+		            {{i.fullName}}
+		        </td>
+ 				<td data-title="'Quantity'">
+ 					{{i.quantity}}
+ 				</td>
+		        <td data-title="'Price'">
+		            {{i.orderPrice | currency}} / {{i.product.units}}
+		        </td>
+				<td data-title="'times Ordered'">
+					{{i.producerPrice * i.quantity | currency}}
+				</td>
+			</tr>
+		</tbody>
+		<tfooter colspan="4" ng-if="sortedOrders">
+			<strong>Total: {{orderTotal(currentOrders)}}</strong>
+		</tfooter>
+	</table>
+	<accordion>
+		<accordion-group heading="Last Month's Orders">
+			<table class="table">
+				<thead>
+					<tr>
+						<th><a href="" ng-click="predicate = 'customer.name'; reverse=!reverse ">customer</a></th>
+						<th><a href="" ng-click="predicate = 'product.productName'; reverse=!reverse ">Product</a></th>
+						<th><a href="" ng-click="predicate = 'producerPrice'; reverse=!reverse ">Unit Price</a></th>
+						<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Ordered Amount</a></th>
+						<th><a href="" ng-click="predicate = 'orderPrice'; reverse=!reverse ">Price</a></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="i in recentOrders | orderBy:predicate:reverse " >
+				        <td data-title="'Customer'">
+							{{i.customer.name}}
+						</td>
+						<td data-title="'Product'" >
+				            {{i.product.fullName}}
+				        </td>
+				        <td data-title="'Price'">
+				            {{i.unitPrice | currency}} / {{i.product.units}}
+				        </td>
+						<td data-title="'Quantity'">
+							{{i.quantity}}
+						</td>
+						<td data-title="'times Ordered'">
+							{{i.orderPrice | currency}}
+						</td>
+				    </tr>
+				</tbody>
+			</table>
+		</accordion-group>
+		<accordion-group heading="All Orders">
+			<table class="table">
+				<thead>
+					<tr>
+						<th><a href="" ng-click="predicate = 'datePlaced'; reverse=!reverse ">Date</a></th>
+						<th><a href="" ng-click="predicate = 'customer.name'; reverse=!reverse ">customer</a></th>
+						<th><a href="" ng-click="predicate = 'product.productName'; reverse=!reverse ">Product</a></th>
+						<th><a href="" ng-click="predicate = 'producerPrice'; reverse=!reverse ">Unit Price</a></th>
+						<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Ordered Amount</a></th>
+						<th><a href="" ng-click="predicate = 'orderPrice'; reverse=!reverse ">Price</a></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="i in orders | orderBy:predicate:reverse " >
+				        <td data-title="'Date Placed'">
+							{{i.datePlaced | shortDate}}
+						</td>
+						<td data-title="'Customer'">
+							{{i.customer.name}}
+						</td>
+						<td data-title="'Product'" >
+				            {{i.product.fullName}}
+				        </td>
+				        <td data-title="'Price'">
+				            {{i.unitPrice | currency}} / {{i.product.units}}
+				        </td>
+						<td data-title="'Quantity'">
+							{{i.quantity}}
+						</td>
+						<td data-title="'times Ordered'">
+							{{i.orderPrice | currency}}
+						</td>
+				    </tr>
+				</tbody>
+			</table>
+		</accordion-group>
+	</accordion>
+		
 </div>

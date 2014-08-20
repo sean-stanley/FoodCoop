@@ -16,6 +16,10 @@
     <link rel="stylesheet" href="css/animations.css" type="text/css">
 
     <!-- Include all compiled plugins (below), or include individual files as needed -->
+	
+	<!-- DateJS -->
+	<script src="lib/bower_components/datejs/build/date-en-NZ.js" type="text/javascript" charset="utf-8"></script>
+	
 	<!-- project-specific angular data here -->
 	<script src="lib/bower_components/jquery/dist/jquery.min.js"></script>
   <!-- Include all compiled plugins (below), or include individual files as needed -->
@@ -67,6 +71,10 @@
 	 		</ul>
 			<br>
 			<div style="width:100%">
+				<input ng-model="search" class="form-control" type="search" placeholder="search"/>
+				
+				<br>
+				
 				<accordion close-others="false">
 					<accordion-group is-open="isopen">
 						<accordion-heading>
@@ -76,44 +84,50 @@
 							<div id="calendar-container" ng-controller="calendarCtrl">
 								<p>
 									Ordering closes in <span class="highlight">5</span> days<br>
-									Delivery Day is in <span class="highlight">14</span> days
+									Delivery Day is in <span class="highlight">{{daysLeftUntilDeliveryDay}}</span> days
 								</p>
 							</div>
 						</div>
 					</accordion-group>
-					<accordion-group is-open="isopen2" ng-init="isopen2 = true">
+					<accordion-group is-open="isopen2" ng-init="isopen2 = true" ng-if="currentUser">
 						<accordion-heading>
-						{{currentUser.name}} Cart <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isopen2, 'glyphicon-chevron-right': !isopen2}"></i>
+						{{currentUser.name}} Cart <span class="badge">{{cartTally}}</span><i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isopen2, 'glyphicon-chevron-right': !isopen2}"></i>
 						</accordion-heading>
-						<div id="table-div" ng-controller="cartTableCtrl">
-							<table class="table">
-								<thead>
-									<tr>
-										<th></th>
-										<th>Product</th>
-										<th>Price</th>
-										<th>Quantity</th>
-									</tr>
-								</thead>
-								<tfoot>
-									<tr>
-										<td colspan="4"><strong>Total: {{total|currency}}</strong></td>
-									</tr>
-								</tfoot>
-								<tbody>
-									<tr ng-repeat="c in cart">
-										<td data-title=" 'remove' ">
-											<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
-											<td data-title="'Product'" >
-												<a href="#" ng-click="open(c)">{{c.product}}</a>
-											</td>
-											<td data-title="'Price'">
-												{{c.price | currency}}
-											</td>
-											<td data-title="'Quantity'">
-												<input type="number" ng-model="c.quantity" name="{{c.product}}-quantity"/>
-											</td>
+							<div ng-controller="cartPageCtrl">
+								[ <a href="" ng-click="predicate=''">unsorted</a> ]
+								<table class="table">
+									<thead>
+										<tr>
+											<th><a href="" ng-click="predicate = '_id'; reverse=!reverse">Remove</a></th>
+											<th><a href="" ng-click="predicate = 'product.productName'; reverse=!reverse">Product</a></th>
+											<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse">Quantity</a></th>
+											<th><a href="" ng-click="predicate = 'orderPriceWithMarkup'; reverse=!reverse">Price</a></th>
+											<th><a href="" ng-click="predicate = 'supplier.producerData.companyName' || 'supplier.name'; reverse=!reverse">Producer</a></th>
 										</tr>
+									</thead>
+									<tfoot>
+										<tr>
+											<td colspan="5"><strong>Total: {{cartTotal(cart)|currency}}</strong></td>
+										</tr>
+									</tfoot>
+									<tbody>
+										<tr ng-repeat="c in cart | orderBy:predicate:reverse" >
+									        <td data-title=" 'remove' ">
+									        	<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
+											</td>
+									        <td data-title="'Product'" >
+									            <a href="" ng-click="open(c)">{{c.product.fullName}}</a>
+									        </td>
+									        <td data-title="'Quantity'">
+									           <input type="number" class="form-control" ng-change="quantityChange($index)" ng-model="c.quantity">
+									        </td>
+									        <td data-title="'Price'">
+									            {{c.unitPriceWithMarkup * c.quantity | currency}}
+									        </td>
+									        <td data-title="'Customer'">
+									            {{c.supplier.producerData.companyName || c.supplier.name}}
+									        </td>
+									    </tr>
 									</tbody>
 								</table>
 							</div>
@@ -132,41 +146,51 @@
 	        </div>
 	    </header>	
 			
-		<div class="container-fluid" id="store" ng-class="{menuOpen : panelDisplay}">
+		<div class="container-fluid store-body" id="store" ng-class="{menuOpen : panelDisplay}">
 			<div class="row">
-				<div class="col-md-9">
+				<div class="col-md-12">
+					
+					<alert type="{{message.type}}" ng-show="message.message" close="message.closeMessage()" role="alert">
+						{{message.message}}
+					</alert>
+					
 					<section id="main-nav-and-sorting">
 			            <button class=" btn btn-link menu-icon" ng-click="panelDisplay = !panelDisplay">&#9776;</button>
-			
-						<label> Sort: </label>
+						
+			            <label> Categories: </label>
 						<div class="btn-group">
-							<button type='button' class="btn btn-primary" ng-model="sort" btn-radio="'producerCompanyName'" >Producer</button>
-							<button type='button' class="btn btn-primary" ng-model="sort" btn-radio="'productName'" >Alphabetical</button>
-							<button type='button' class="btn btn-primary" ng-model="sort" btn-radio="'price'" uncheckable>Price</button>
+							<button type='button' class="btn btn-default" ng-model="filter.category.name" btn-radio="'Produce'" >Produce</button>
+							<button type='button' class="btn btn-default" ng-model="filter.category.name" btn-radio="'Meat'" >Meat</button>
+							<button type='button' class="btn btn-default" ng-model="filter.category.name" btn-radio="'Processed-Goods'" >Processed Goods</button>
+							<button type='button' class="btn btn-default" ng-model="filter.category.name" btn-radio="'Baked Goods'" >Baked Goods</button>
+							<button type='button' class="btn btn-default" ng-model="filter.category.name" btn-radio="'Dairy'" >Dairy</button>
+							<button type='button' class="btn btn-default" ng-model="filter" btn-radio="">All</button>
 						</div>
-			            <label> Filter: </label>
-						<div class="btn-group">
-							<button type='button' class="btn btn-default" ng-model="search.category.name" btn-radio="'Produce'" >Produce</button>
-							<button type='button' class="btn btn-default" ng-model="search.category.name" btn-radio="'Meat'" >Meat</button>
-							<button type='button' class="btn btn-default" ng-model="search.category.name" btn-radio="'Processed-Goods'" >Processed Goods</button>
-							<button type='button' class="btn btn-default" ng-model="search.category.name" btn-radio="'Baked Goods'" >Baked Goods</button>
-							<button type='button' class="btn btn-default" ng-model="search.category.name" btn-radio="'Dairy'" >Dairy</button>
-							<button type='button' class="btn btn-default" ng-model="search.category.name" btn-radio="'milk'" >Milk</button>
-							<button type='button' class="btn btn-default" ng-model="search" btn-radio="">None</button>
+						
+						<div class="pull-right">
+							<label> Sort: </label>
+							<div class="btn-group">
+								<button type='button' class="btn btn-primary" 
+								ng-click="sort = 'producer_ID.producerData.companyName' || 'producer_ID.name'; reverse=!reverse">
+									 <span class="glyphicon glyphicon-sort"></span>  Producer
+								</button>
+								<button type='button' class="btn btn-primary" 
+								ng-click="sort = 'fullName' || 'productName'; reverse=!reverse">
+									  <span class="glyphicon glyphicon-sort"></span>  Alphabetical
+								</button>
+								<button type='button' class="btn btn-primary" 
+								ng-click="sort = 'price'; reverse=!reverse">  <span class="glyphicon glyphicon-sort"></span>  Price</button>
+							</div>
 						</div>
+			           
 					</section>
 				</div>
-				<div class="col-md-3">
-					<form class="form-inline">
-						<label> Search: </label>
-						<input ng-model="search.productName" name="search.$" class="form-control" type="search"/>
-					</form>
-				</div>
+				
 			</div>
 		
 			<div id="products-section" class="row">
 				<ul id="store-products">
-					<li ng-repeat="product in products | orderBy:sort | filter:search" class="product-container" 
+					<li ng-repeat="product in products | orderBy:sort:reverse | filter:search | filter:filter" class="product-container" 
 					ng-controller="productUICtrl" 
 					ng-mouseleave="detailsVisible = false"
 					>
@@ -175,21 +199,45 @@
 							 ng-src="img/certification/{{product.certification.img}}" class="certification-img">
 							<img ng-src="{{product.img}}" class="img-responsive">
 							<figcaption>
-								<button class="btn btn-primary pull-right" ng-click="addToCart()">Add to Cart</button>
-								<h5>{{product.variety}} {{product.productName}}</h5>
-								<p>{{1.2 * product.price|currency}} / {{product.units}}</p>
+								<div class="btn-group pull-right">
+									<button class="btn btn-primary pull-right" 
+									ng-click="addToCart(product)" ng-if="!product.AlreadyInCart" 
+									ng-disabled="!currentUser" ng-hide="product.quantity <= 0">
+										Add to Cart
+									</button>
+									<button class="btn btn-primary pull-right" disabled ng-if="product.AlreadyInCart">
+										Added to Cart
+									</button>
+									<button class="btn btn-danger pull-right" disabled ng-if="product.quantity === 0">
+										SOLD OUT
+									</button>
+								</div>
+								<h3>{{product.fullName}}</h3>
+								<p>{{product.priceWithMarkup|currency}} / {{product.units}}</p>
 							</figcaption>
 						</figure>
 						<section class="details-layer" ng-click="open(product)" ng-class="{ 'details-layer-visible' : detailsVisible}" ng-mouseleave="detailsVisible = false">
 							<article class="details">
-								<h3>{{product.variety}} {{product.productName}}</h3>
+								<h4>{{product.producer_ID.producerData.companyName}}</h4>
+								<h3>{{product.fullName}}</h3>
 								<p>{{1.2 * product.price|currency}} / {{product.units}}</p>
-								<p>{{product.producerCompany}} <br>
-									{{product.category.name}}
-								<span ng-if="product.certification !== 'none' ">{{product.certification.name}}</span>
-								</p>
+								
 								<p>{{product.description | blurb}} <em>more...</em></p>
-								<button class="btn btn-primary" ng-click="addToCart()">Add to Cart</button>
+								<hr>
+								<p> Category: {{product.category.name}} 
+								<span ng-if="product.certification !== 'none' ">Certification: {{product.certification.name}}</span>
+								</p>
+								<div class="btn-group">
+									<button class="btn btn-danger pull-right" disabled ng-if="product.quantity === 0">
+										SOLD OUT
+									</button>
+									<button class="btn btn-warning">
+										More Info
+									</button>
+									<button class="btn btn-primary" disabled ng-if="product.AlreadyInCart" ng-hide="product.AlreadyInCart">
+										Added to Cart
+									</button>
+								</div>
 							</article>
 						</section>
 					</li>

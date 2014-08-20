@@ -1,13 +1,13 @@
 <div class="page-header">
 	<h1>Contact Form</h1>
 </div>
-<article ng-if="!producer">
+<article ng-if="!member">
 	<p>Please feel free to contact us about any questions you have.</p>
 	<p>Also feel free to phone or text us your questions at <strong><span class="glyphicon glyphicon-earphone"></span> 021 040 9066</strong>.</p>
 </article>
-<p ng-if="producer">Use this form to contact <strong>{{producer.name}}</strong> at her email address of {{producer.email}}</p>
+<p ng-if="member">Use this form to contact <strong>{{member.name}}</strong> at the email address of {{member.email}}</p>
 
-<form name="contactUs" ng-submit="submitForm(message);">
+<form name="contactUs" ng-submit="submitForm(mail);">
 	<fieldset>
 		
 		<legend>Contact Us</legend>
@@ -17,7 +17,7 @@
 			<input ng-model="mail.name" name="senderName" type="text" class="form-control" placeholder="your full name here" ng-maxlength=20  required>
 			<alert type="danger" 
 			ng-show="contactUs.senderName.$dirty && contactUs.senderName.$invalid && contactUs.senderName.$error.required">
-				<span>Sorry: Your name is required.</span>
+				Sorry: Your name is required.
 			</alert>
 		</div>
 		<div class="form-group">

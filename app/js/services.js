@@ -1,5 +1,5 @@
 'use strict';
-/*global angular, User, Session*/
+/*global angular, _, Date, Session*/
 
 /* Services */
 
@@ -33,7 +33,9 @@ angular.module('co-op.services', [])
 			getMessage: function() {
 				return currentMessage.message;
 			},
-			getType: currentMessage.type,
+			getType: function() {
+				return currentMessage.type;
+				},
 			closeMessage: function() {
 				currentMessage = queue.shift() || "";
 			},
@@ -43,7 +45,7 @@ angular.module('co-op.services', [])
 
 // Is a collection of methods for logging a user in, checking if a user is
 // logged in and logging out.	
-	.factory('LoginManager', function ($location, $rootScope, $cookieStore, Session, Restangular){
+	.factory('LoginManager', function ($location, $rootScope, $cookieStore, Session, Restangular, Cart){
 		$rootScope.failedAttempts = 0;
 		
 		return {
@@ -56,18 +58,14 @@ angular.module('co-op.services', [])
 					rememberMe: form.rememberMe
 					})
 				.then(function (user) {
-					var properties, User = {}, remainingAttempts;
+					var remainingAttempts;
 					if (typeof user === 'object') {
 						if (user.hasOwnProperty('plain') ){
 							user = user.plain();
 						}
-						console.log(user);
-						properties = Object.getOwnPropertyNames(user);
-						properties.forEach(function (key) {
-							User[key] = user[key];
-						});
 										
-						$rootScope.currentUser = User;
+						$rootScope.currentUser = user;
+						Cart.getTally();
 					}
 					// incorrect login attempt
 					else {
@@ -119,6 +117,7 @@ angular.module('co-op.services', [])
 							// if the user is already authenticated, save the data for the app to use.
 							$rootScope.currentUser = loggedInUser;
 							isLoggedIn = true;
+							Cart.getTally();
 						}
 						else {isLoggedIn = false;}
 						cb(isLoggedIn);
@@ -175,7 +174,6 @@ angular.module('co-op.services', [])
 								unitSuggestions.push(category.availableUnits[unit]);
 							}
 						}
-							
                     }
                 }
             }
@@ -186,7 +184,7 @@ angular.module('co-op.services', [])
 				//$http.post("api/product", productData);
 				Restangular.all('api/product').post(productData).then(function() {
 					$rootScope.flash.setMessage({type: 'success', 
-					message: 'Congratulations ' + $rootScope.currentUser.name + '! Your product ' + productData.variety + productData.productName + ' was successfully added to the store.'
+					message: 'Congratulations ' + $rootScope.currentUser.name + '! Your product ' + productData.variety + " " + productData.productName + ' was successfully added to the store.'
 					});
 					$route.reload();
 				});
@@ -231,88 +229,158 @@ angular.module('co-op.services', [])
 		};
 	}])
 	
-	.factory('MailManager', ['$http', function($http) {
+	// Client side date managment. This job is shared by the client and server.
+	.factory('Calendar', ['$http', function($http) {
+		var monthStart, lastMonthStart, deliveryDay;
+		monthStart = Date.today().moveToFirstDayOfMonth();
+		lastMonthStart = Date.today().addMonths(-1).moveToFirstDayOfMonth();
+		deliveryDay = Date.today().final().wednesday();
+						
 		return {
-			mail : function(mail) {
-				console.log('email message: ',  mail);
+			// return this month's delivery day
+			deliveryDay: function() {
+				return deliveryDay;
+			},
+			// counts how many days until @date. Returns @INTEGER or NaN
+			// a negative result means that @date is in the past
+			daysUntil: function(date) {				
+				var result, a, b;
+				
+				a = new Date(date);
+				
+				b = new Date();
+				
+				result = Math.floor( 
+					(Date.UTC(a.getFullYear(), a.getMonth(), a.getDate()) -
+					Date.UTC(b.getFullYear(), b.getMonth(), b.getDate()) ) /
+					(1000 * 60 * 60 * 24) );
+				return result;
+			},
+			// This method filters an array to only contain stuff from the 
+			// current month. An example is products and orders. 
+			// @group is the array to be reduced
+			// @dateProperty is a string of the key containing a date in @group
+			// example: orders is an array of all orders and has the (key, value)
+			// of (datePlaced: date) so use currentMonth(orders, 'datePlaced');
+			// to return an array of orders created in the current month.
+			currentMonth : function(group, dateProperty, callback) {
+				var cb = callback || angular.noop;
+				var list = _.filter(group, function(item) {
+					if ( Date.parse(item[dateProperty]).between( monthStart, Date.today().add(1).days() ) )
+					return item;
+				});
+				cb(list);
+				return list;
+			},
+			// This method filters an array to only contain stuff from one 
+			// month ago. An example is products and orders. 
+			// @group is the array to be reduced
+			// @dateProperty is a string of the key containing a date in @group
+			// example: orders is an array of all orders and has the (key, value)
+			// of (datePlaced: date) so use currentMonth(orders, 'datePlaced');
+			// to return an array of orders created during the last month.
+			lastMonth : function(group, dateProperty, callback) {
+				var cb = callback || angular.noop;
+				var list = _.filter(group, function(item) {
+					if (Date.parse(item[dateProperty]).between(lastMonthStart, monthStart)) {
+						return item;
+					}
+				});
+				cb(list);
+				return list;
+			}
+		};
+	}])
+	
+	.factory('MailManager', ['$rootScope', '$http', function($rootScope, $http) {
+		return {
+			mail : function(mail, callback) {
+				var cb = callback || angular.noop, recipient;
+				if (mail.hasOwnProperty('to')) {
+					recipient = mail.toName;
+				}
+				else recipient = "the NNFC";
+				
 				$http.post('/api/mail', mail).success(function(response) {
-					console.log('email message successfully sent');
-					return response;
+					$rootScope.setMessage({
+						type: 'success', 
+						message: 'message sent successfully to ' + recipient
+					});
+					cb();
 				});
 			}
 		};
 	}])
-	.service('OrderRecords', ['$http', function($http) {
-		
-		this.getOrders = function() {
-			return orders;
+	
+.factory('Cart', ['$rootScope','Restangular', 'Calendar', 
+	function($rootScope, Restangular, Calendar){
+				
+		return {
+			getTally : function() {
+				Restangular.one('api/cart', $rootScope.currentUser._id)
+				.customGET('length').then(function(count) {
+					$rootScope.cartTally = count;
+				});
+			},
+			getAllItems : function(callback) {
+				Restangular.one('api/cart', $rootScope.currentUser._id)
+				.get().then(callback);
+			},
+			// optional @callback function will have @list which holds the cart items of
+			// the current month
+			getCurrentCart : function(callback) {
+				var currentCart;
+				Restangular.one('api/cart', $rootScope.currentUser._id)
+				.get().then(function(cart) {
+					currentCart = Calendar.currentMonth(cart, 'datePlaced', callback);
+					return currentCart;					
+				});
+			},
+			addToCart : function(order, callback) {
+				Restangular.all("api/order").post(order).then(callback);
+			},
+			
+			updateItem : function(item, callback) {
+				var cb = callback || angular.noop;
+				Restangular.all('api/cart').post(item).then(function(result) {
+					console.log(result);
+					if (result === "OK") {
+						$rootScope.flash.setMessage({
+							type: 'success',
+							message: "You're cart was successfully updated"
+						});
+					}
+					else {
+						$rootScope.flash.setMessage({
+							type: 'danger',
+							message: result
+						});
+					}
+					cb(result);
+				});
+			},
+			deleteItem : function(id) {
+				Restangular.all('api/cart')
+				.customDELETE(id)
+				.then(function() {
+					$rootScope.cartTally --;
+				});
+			}
 		};
-		
-		this.addOrder = function(orderData) {
-			orders.push(orderData);
-		};
-		
-		this.sumSales = function() {
-		 var total = 0;
-		 for(var i=0; i < orders.length; i++) {
-		 	console.log(i, ' order items = ', orders[i].price);
-		 	total += orders[i].price; 
-		 }
-		 return total;
-	  };
+	}
+])
 
-		
-		var orders = [
-			{product: 'Granny Smith Apples', quantity: 30, price: 2*30, customer: 'Sean Stanley'},
-            {product: 'Spray-Free Oranges', quantity: 12, price: 2.5*12, customer: 'Matt Stanley'},
-            {product: 'Romaine Lettuce', quantity: 27, price: 4*27, customer: 'Myles Green'},
-            {product: 'Organic Basil', quantity: 7, price: 1.5*7, customer: 'Rowan Clements'},
-            {product: 'Dozen Eggs', quantity: 4, price: 8*4, customer: 'Lisa Taylor'}
-		];
-	}])
-	.service('CartRecords', ['$http', function($http) {
-		
-		this.getCart = function() {
-			return cartItems;
-		};
-		
-		this.addItem = function(productData) {
-			cartItems.push(productData);
-		};
-		
-		this.removeItem = function(i) {
-			cartItems.splice(i, 1);
-		};
-		
-		this.sumPrice = function() {
-		 var total = 0;
-		 for(var i=0; i < cartItems.length; i++) {
-		 	total += cartItems[i].price; 
-		 }
-		 return total;
-	  };
-
-		
-		var cartItems = [
-			{product: 'Organic Blue-Veined Cheese', quantity: 1, price: 10, producer: 'Hiki Dairy Farm'},
-            {product: 'Spray-Free Oranges', quantity: 2, price: 2.5*2, producer: 'Northland Naturals'},
-            {product: 'Romaine Lettuce', quantity: 6, price: 4*6, producer: 'EcoBikes'},
-            {product: 'Rosemary bunches', quantity: 4, price: 1*4, producer: 'Rowan Clements'},
-            {product: 'Loafs of Gluten Free Bread', quantity: 3, price: 3.2*4, producer: 'Lisa Taylor'},
-            {product: 'Organic Garlic and Basil Sausages', quantity: 2, price: 8.50*2, producer: 'Lisa Taylor'}
-		];
-	}])
 	
 	.factory('ProductHistory', ['$http', function($http) {
 		var module = {
-						
-			getData : function(callback) {
-				this.products = $http.get("/api/product").success(callback);
-	        },
-			addProduct : function(newData) {
-				module.data.push(newData);
-				console.log(module.data);
-				return module.data;
+			getCurrentProducts : function(callback) {
+				this.currentProducts = $http.get("/api/product-list/current").success(callback);
+			},
+			getAllProducts : function(callback) {
+				this.recentProducts = $http.get("/api/product-list").success(callback);
+			},
+			getRecentProducts : function(callback) {
+				this.allProducts = $http.get("/api/product-list/recent").success(callback);								
 			}
 		};
 		return module;

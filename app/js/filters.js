@@ -1,5 +1,5 @@
 'use strict';
-/*global angular*/
+/*global angular, Date*/
 
 /* Filters */
 
@@ -37,27 +37,8 @@ angular.module('co-op.filters', []).
 	  };
   })
   .filter('shortDate', function() {
-	  return function(shortDate) {
-		  var y, m, d;
-		  if (shortDate && Object.prototype.toString.call(shortDate) === "[object Date]") {
-			  y = shortDate.getFullYear();
-			  m = shortDate.getMonth();
-			  d = shortDate.getDate();
-			  return [d, m, y].join('/');
-		  }
-		  
-		  else if (shortDate && Object.prototype.toString.call(shortDate) == '[object String]') {
-			  y = shortDate.slice(1-1, 4);
-			  m = shortDate.slice(6-1, 7);
-			  d = shortDate.slice(9-1, 10);
-			  return [d, m, y].join('/');
-		  }
-		  
-		  
-		  
-		  else {
-			  return shortDate;
-		  }
-	  };
+	return function(shortDate) {
+		return Date.parse(shortDate).toString('d/M/yyyy');  
+	};
   })
   ;

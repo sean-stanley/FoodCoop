@@ -2,56 +2,50 @@
 
 <div class="row">
 	<div id="product-upload-preview-column" class="col-md-4" >
-		<h2>Preview <small>Live</small></h2>
-		<div class="product-container" ng-controller="productUICtrl" ng-mouseleave="detailsVisible = false" style="width:100%; margin: 0">
-			<figure class="first-layer" ng-mouseover="callDelayed()" ng-mouseleave="callCancelled()">
-				<img ng-if="productData.certification != certifications[0]._id && productData.img"
-				 ng-src="img/certification/{{certificationImg(productData.certification)}}" class="certification-img">
-				<img ng-src="{{selectedImg}}" class="img-responsive">
-				<figcaption>
-					<button class="btn btn-primary pull-right" ng-click="addToCart()">Add to Cart</button>
-					<h5>{{productData.variety}} {{productData.productName}}</h5>
-					<p>{{1.2 * productData.price|currency}} / {{productData.units}}</p>
-				</figcaption>
-			</figure>
-			<section class="details-layer" ng-class="{ 'details-layer-visible' : detailsVisible}" ng-mouseleave="detailsVisible = false">
-				<article class="details">
-					<h3>{{productData.variety}} {{productData.productName}}</h3>
-					<p>{{1.2 * productData.price|currency}} / {{productData.units}}</p>
-					<p>{{productData.producerCompany}} <br>
-					<span ng-if="product.certification.name !== 'none' || product.certification">{{productData.certification.name}}</span>
-					</p>
-					<p>{{productData.description | blurb}} <em>more...</em></p>
-					<button class="btn btn-primary" ng-click="">Add to Cart</button>
-				</article>
-			</section>
-		</div>
+		<section ng-show="productData.category">
+			<h2>Preview <small>Live</small></h2>
+			<div class="product-container" ng-controller="productUICtrl" ng-mouseleave="detailsVisible = false" 
+			style="width:100%; margin: 0">
+				<figure class="first-layer" ng-mouseover="callDelayed()" ng-mouseleave="callCancelled()">
+					<img ng-if="productData.certification != certifications[0]._id && productData.img"
+					 ng-src="img/certification/{{certificationImg(productData.certification)}}" class="certification-img">
+					<img ng-src="{{selectedImg}}" class="img-responsive">
+					<figcaption>
+						<button class="btn btn-primary pull-right" ng-click="addToCart()">Add to Cart</button>
+						<h5>{{productData.variety}} {{productData.productName}}</h5>
+						<p>{{1.2 * productData.price|currency}} / {{productData.units}}</p>
+					</figcaption>
+				</figure>
+				<section class="details-layer" ng-class="{ 'details-layer-visible' : detailsVisible}" ng-mouseleave="detailsVisible = false">
+					<article class="details">
+						<h3>{{productData.variety}} {{productData.productName}}</h3>
+						<p>{{1.2 * productData.price|currency}} / {{productData.units}}</p>
+						<p>{{productData.producerCompany}} <br>
+						<span 
+						ng-if="product.certification.name !== 'none' || product.certification">
+							{{productData.certification.name}}
+						</span>
+						</p>
+						<p>{{productData.description | blurb}} <em>more...</em></p>
+						<button class="btn btn-primary" ng-click="">Add to Cart</button>
+					</article>
+				</section>
+			</div>
+		</section>
 	
-	
-		<!--
-		<div id="product-history-list">
-					<h3>Product History</h3>
+		<h2>View an Old Product</h2>
+		<div ng-controller="productHistoryCtrl">
+			<accordion id="product-history-list" close-others="false">
+				<accordion-group heading="This Month's Products">
+					<ul>
+						<li ng-repeat="i in currentProducts">
+							<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
+							<a ng-href="#/product-upload/{{i._id}}">{{i.productName}} {{i.variety}}</a>
+						</li>
+					</ul>
+				</accordion-group>
+				<accordion-group heading="Last Month's Products">
 					<table class="table table-hover">
-						<caption>Current Month</caption>
-						<thead>
-							<tr>
-								<th>Name</th>
-								<th>Remove</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr ng-repeat="i in data">
-								<td><a ng-click="editProduct(i)">{{i.productName}} {{i.variety}}</a></td>
-								<td>
-									<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-					<h5>Product History</h5>
-					
-					<table class="table table-hover">
-						<caption>Product History</caption>
 						<thead>
 							<tr>
 								<th><a href="" ng-click="predicate = 'name'; reverse=!reverse ">Name</th>
@@ -59,14 +53,32 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr ng-repeat="i in data | orderBy:predicate:reverse ">
-								<td><a ng-click="editProduct(i)">{{i.productName}} {{i.variety}}</a></td>
+							<tr ng-repeat="i in lastMonthProducts | orderBy:predicate:reverse ">
+								<td><a ng-href="#/product-upload/{{i._id}}">{{i.productName}} {{i.variety}}</a></td>
 								<td>{{i.dateUploaded|shortDate}}</td>
 							</tr>
 						</tbody>
 					</table>
-				</div>-->
+				</accordion-group>
+				<accordion-group heading="All Products">
+					<table class="table table-hover">
+						<thead>
+							<tr>
+								<th><a href="" ng-click="predicate = 'name'; reverse=!reverse ">Name</th>
+								<th><a href="" ng-click="predicate = 'dateUploaded'; reverse=!reverse ">Date Added</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="i in allProducts | orderBy:predicate:reverse ">
+								<td><a ng-href="#/product-upload/{{i._id}}">{{i.productName}} {{i.variety}}</a></td>
+								<td>{{i.dateUploaded|shortDate}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</accordion-group>
 		
+			</accordion>
+		</div>
 	</div>
 
 	<div id="product-upload-form-container" class="col-md-8" >

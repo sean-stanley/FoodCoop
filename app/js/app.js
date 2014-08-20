@@ -21,7 +21,7 @@ angular.module('co-op', [
 
   .config(['$routeProvider', 'RestangularProvider', function($routeProvider, RestangularProvider) {
     $routeProvider
-		.when('/home', {templateUrl: 'partials/index-content.html', controller: 'MyCtrl1'})
+		.when('/', {templateUrl: 'partials/index-content.html', controller: 'MyCtrl1'})
 		.when('/signup', {templateUrl: 'partials/signup.html', controller: 'userCtrl'})
 		.when('/welcome', {templateUrl: 'partials/thankyou.html', controller: 'signupInvoiceCtrl'})
 		.when('/terms-cons', {templateUrl: 'partials/legal/terms-cons.html'})
@@ -56,18 +56,44 @@ angular.module('co-op', [
 	 		templateUrl:'partials/producer-page.html',
 	 		resolve: {
 	 			producer: function(Restangular, $route){
-				return Restangular.one('api/user/producer', $route.current.params.userName).get();
+					return Restangular.one('api/user/producer', $route.current.params.userName).get();
 	 			}
 	 		}
 	 	})
 	
-	
 		.when('/faq', {templateUrl: 'partials/faq.html'})
     
-		.when('/product-upload', {templateUrl: 'partials/loggedIn/product-upload.html', controller: 'productUpload', loggedInOnly: true})
+		.when('/product-upload', {
+			templateUrl: 'partials/loggedIn/product-upload.html', 
+			controller: 'productUploadCtrl', 
+			loggedInOnly: true,
+			resolve: { product: function() { return {}; } }
+		})
+		.when('/product-upload/:productId', {
+			controller: 'productUploadCtrl',
+			templateUrl: 'partials/loggedIn/product-upload.html',
+			loggedInOnly: true,
+			resolve: {
+				product: function(Restangular, $route) {
+					return Restangular.one('api/product', $route.current.params.productId).get();
+				}
+			}
+		})
 		.when('/producer-profile', {templateUrl: 'partials/loggedIn/edit-producer-profile.html', controller: 'producerCtrl', loggedInOnly: true})
-		.when('/my-cart', {templateUrl: 'partials/loggedIn/my-cart.html', loggedInOnly: true})
-    	.when('/order-manager', {templateUrl: 'partials/loggedIn/order-manager.html', loggedInOnly: true})
+		.when('/my-cart', {templateUrl: 'partials/loggedIn/my-cart.html', controller: 'cartPageCtrl', loggedInOnly: true})
+    	.when('/product-manager', {
+			templateUrl: 'partials/loggedIn/order-manager.html', 
+			controller: 'productOrderCtrl',
+			loggedInOnly: true,
+			resolve: {
+				products: function(Restangular, $route) {
+					return Restangular.all('api/product-list');
+				},
+				myOrders: function(Restangular, $route) {
+					return Restangular.all('api/order/me');
+				}
+			}
+		})
 		.when('/me/:userId', {
 			controller: 'userEditCtrl',
 			templateUrl:'partials/loggedIn/edit-me.html',
@@ -84,7 +110,7 @@ angular.module('co-op', [
 			templateUrl: 'partials/contact.html', 
 			controller: 'producerContactCtrl',
 			resolve: {
-				producer: function(Restangular, $route){
+				member: function(Restangular, $route){
 					return Restangular.one('api/user', $route.current.params.userId).get();
 				}
 			}
@@ -94,9 +120,11 @@ angular.module('co-op', [
     .when('/must-login', {templateUrl: 'partials/must-login.html', isLogin: true})
     .when('/login-failed', {templateUrl: 'partials/login-failed.html'})
     .when('/login-failed/attempts=:tries', {templateUrl: 'partials/login-failed.html'})
+    
+    // store routes
+	.when('category/:category', {})
 
-    .when('/store', {templateUrl: 'store.html'})
-    .otherwise({redirectTo: '/home'});
+    .otherwise({redirectTo: '/', reloadOnSearch: false});
     
 	// RestangularProvider.setBaseUrl('/api');
 	
@@ -109,6 +137,7 @@ angular.module('co-op', [
 		// without a callback this function simply checks if the user is authenticated
 		// and if he is, saves his data to the rootScope. Handy for getting the data
 		// when a session hasn't expired yet. It runs once when the app starts.
+		$rootScope.month =  Date.today().toString('MMMM');
 		$rootScope.flash = flash;
 		LoginManager.isLoggedIn();
 		
@@ -136,3 +165,4 @@ angular.module('co-op', [
         });
 
   });
+  

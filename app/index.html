@@ -15,7 +15,10 @@
 	
 	<link href="css/banner.css" rel="stylesheet" media="screen">
 	<link rel="stylesheet" href="css/animations.css" title="animations" type="text/css" media="screen">
-
+	
+	<!-- DateJS -->
+	<script src="lib/bower_components/datejs/build/date-en-NZ.js" type="text/javascript" charset="utf-8"></script>
+		
 	<script src="lib/bower_components/jquery/dist/jquery.min.js"></script>
 	<!-- Include all compiled plugins (below), or include individual files as needed -->
 	<!-- universal angular data here -->
@@ -33,15 +36,11 @@
 	<script src="js/filters.js"></script>
 	<script src="js/directives.js"></script>
 	<script src="lib/bower_components/angular-loading-bar/build/loading-bar.min.js"></script>
-	
-	
-	
+		
 	<script src="lib/bower_components/angular-bootstrap/ui-bootstrap-tpls.js" type="text/javascript" charset="utf-8"></script>
 	<script src="lib/bower_components/lodash/dist/lodash.compat.min.js" type="text/javascript" charset="utf-8"></script>
 	<!--lodash: Restangular Dependency-->
 	<script src="lib/bower_components/restangular/dist/restangular.min.js"></script>
-	
-	
 	
 	<!-- cropme dependencies -->
 
@@ -105,7 +104,7 @@
 
 		<div class="container">
 			<div class="row">
-        		
+				
 				<alert type="{{flash.getType}}" ng-show="flash.getMessage()" close="flash.closeMessage()" role="alert">
 					{{flash.getMessage()}}
 				</alert>
@@ -117,10 +116,10 @@
 					</ul>
 					<br>
 					<ul class="nav nav-pills nav-stacked">
-						<li ng-class="{active:isActive('/my-cart')}" ng-show="currentUser"><a href="#/my-cart">My Cart <span class="badge">{{items}}</span></a></li>
+						<li ng-class="{active:isActive('/my-cart')}" ng-show="currentUser"><a href="#/my-cart">My Cart <span class="badge">{{cartTally}}</span></a></li>
 						<li ng-class="{active:isActive('/order-manager')}" 
 						ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
-						><a href="#/order-manager">My Orders</a></li>
+						><a href="#/product-manager">My Products</a></li>
 						<li ng-class="{active:isActive('/product-upload')}" 
 						ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
 						><a href="#/product-upload">Upload a Product</a></li>

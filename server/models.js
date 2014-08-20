@@ -2,6 +2,9 @@ var mongoose = require('mongoose'); // middleware for connecting to the mongodb 
 var Schema = mongoose.Schema; // mongoose schema object for defining collections.
 var passportLocalMongoose = require('passport-local-mongoose');
 var _ = require('underscore'); // this creates salted and hashed passwords
+var config = require('./coopConfig.js')
+
+var markup = config.markup;
 
 // this is a helpful setter function to return a value as lowercase. It is used
 // to keep email addresses as all lowercase.
@@ -26,7 +29,17 @@ var ProductSchema = new Schema({
 			certification: {type: Schema.ObjectId, required: false, ref: 'Certification'},
 			producer_ID: {type: Schema.ObjectId, required: true, ref: 'User'}
 			
+}, {
+	toObject: { virtuals : true },
+	toJSON: { virtuals : true }
 });
+ProductSchema.virtual('priceWithMarkup').get(function () {
+	return (this.price * (markup/100 + 1)).toFixed(2);
+});
+ProductSchema.virtual('fullName').get(function () {
+	return this.variety + ' ' + this.productName;
+});
+
 
 // this represents an entry in a cart or producer order. It is made when a user
 // add's a product to his or her cart.
@@ -37,16 +50,28 @@ var OrderSchema = new Schema({
 		supplier: {type: Schema.ObjectId, required: true, ref: 'User'},
 		quantity: {type: Number, required: true},
 		// markup as a percentage so 20 is equal to 20% whereas 0.2 is 0.2%
-		markup: {type: Number, required: true, default: 20}
+		markup: {type: Number, required: true, default: markup} // 20%
+}, {
+	toObject: { virtuals : true },
+	toJSON: { virtuals : true }
 });
-// A method that generates new properties when toObject() is called on the
-// results of a query to Orders.
-if (!OrderSchema.options.toObject) OrderSchema.options.toObject = {};
-OrderSchema.options.toObject.transform = function (doc, ret, options) {
-	ret.customerPrice = ret.product.price * (ret.markup / 100);
-	ret.producerPrice = ret.product.price;
-	ret.markupAmount = ret.customerPrice - ret.producerPrice;
-}
+
+// these functions create virtual properties for common calculations
+OrderSchema.virtual('unitPriceWithMarkup').get(function () {
+	return (this.product.price * (this.markup/100 + 1)).toFixed(2);
+});
+OrderSchema.virtual('unitPrice').get(function () {
+	return this.product.price;
+});
+OrderSchema.virtual('unitMarkup').get(function () {
+	return (this.unitPriceWithMarkup - this.unitPrice).toFixed(2);
+});
+OrderSchema.virtual('orderPrice').get(function () {
+	return this.product.price * this.quantity;
+});
+OrderSchema.virtual('orderPriceWithMarkup').get(function () {
+	return this.unitPriceWithMarkup * this.quantity;
+});
 
 // Schema for Invoice Data
 var InvoiceSchema = new Schema({

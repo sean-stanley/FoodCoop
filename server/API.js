@@ -20,7 +20,7 @@ passport = require('passport'), // middleware that provides authentication tools
 LocalStrategy = require('passport-local').Strategy; // the passport strategy employed by this API.
 
 require('datejs'); // provides the best way to do date manipulation.
-
+calendar = require('./calendarHelper.js')
 // sets date locality and formats to be for new zealand.
 Date.i18n.setLanguage("en-NZ");
 
@@ -171,7 +171,7 @@ exports.configAPI = function configAPI(app) {
 					select: 'name -_id img'
 				}, {
 					path: 'producer_ID',
-					select: 'name -_id'
+					select: 'name producerData.companyName'
 				}]
 
 				// replace the id references in the product with the names of the category, certification and producer
@@ -187,13 +187,46 @@ exports.configAPI = function configAPI(app) {
 			}
 		})
 	});
+	
+	// return just one product for editing or use as a template for another product
+	app.get("/api/product/:id", function(req, res, next) {
+		console.log(req.params.id);
+		if (req.user) {
+			models.Product.findById(req.params.id, function(e, product) {
+				if (!e) {
+					if (product) {
+						var productObject = product.toObject();
+						// if truthy then the product being requested is to be sold this month so pass the _id as well.
+						if (Date.parse(productObject.dateUploaded).between(calendar.ProductUploadStart, calendar.ProductUploadStop) ) {
+							res.send(productObject);
+						}
+						
+						else {
+							delete _id;
+							res.send(productObject);
+						}
+					}
+					else {
+						res.send(404);
+					}
+				
+				} else {
+					console.log(e);
+				}
+			});
+		}
+		else res.send(401);
+		
+	});
+	
+	
 
 	// this either creates a new product or updates an existing product with data from the req.body. It is
 	// usually only called from the product-upload page of the app.
 	app.post("/api/product", function(req, res, next) {
 		var productObject, needsSave, key, newProduct;
 
-		if (req.user) {
+		if (req.user && req.user.user_type.canSell) {
 			// this tests if a user is authenticated.
 			if (req.body._id) {
 				// If the body for a product contains an ID, it must already exist so we will
@@ -207,7 +240,6 @@ exports.configAPI = function configAPI(app) {
 						for (key in req.body) {
 							if (productObject[key] !== req.body[key]) {
 								// compare the values of the database object to the values of the request object.
-								console.log("we are now replacing the old product's " + key + " which evaluates to: " + productObject[key] + " with the new value of: " + req.body[key]);
 								product[key] = req.body[key]; // update the product's properties
 								needsSave = true;
 							}
@@ -239,10 +271,10 @@ exports.configAPI = function configAPI(app) {
 					ingredients: req.body.ingredients,
 					description: req.body.description,
 					certification: req.body.certification,
-					producer_ID: req.body.producer_ID
+					producer_ID: req.user._id
 				}).save(function(e) {
 					if (!e) {
-						res.send(200, 'No changes detected');
+						res.send(200);
 					}
 					else console.log(e)
 				});
@@ -255,7 +287,7 @@ exports.configAPI = function configAPI(app) {
 
 	// this request will delete a product from the database. First we find the
 	// requested product.
-	app.delete("/api/product/", function(req, res, next) {
+	app.delete("/api/product", function(req, res, next) {
 
 		// ensure user is logged in to perform this request.		
 		if (req.user) {
@@ -272,6 +304,66 @@ exports.configAPI = function configAPI(app) {
 		} else {
 			res.send(400, 'Not logged in');
 		}
+	});
+
+	// return a compact list of all the current user's products.
+	app.get("/api/product-list", function(req, res, next) {
+		if (req.user) {
+			models.Product.find(req.query)
+			.where('producer_ID').equals(new ObjectId(req.user._id))
+			.select('productName variety dateUploaded price quantity units')
+			.sort('datePlaced')
+			.exec(function(e, products){
+				if (!e) {
+					res.json(products);
+				} else {
+					console.log(e);
+					res.send(500);
+				}
+			});
+		}
+		else res.send(401);
+	});
+	// return a compact list of all the current user's products for the current month.
+	app.get("/api/product-list/current", function(req, res, next) {
+		console.log(new Date( calendar.startOfMonth.toString("yyyy-MM-dd HH:mm:ssZ") ))
+		if (req.user) {
+			models.Product.find({
+				producer_ID : new ObjectId(req.user._id),
+				dateUploaded : { $gte: new Date( calendar.startOfMonth.toString("yyyy-MM-dd HH:mm:ssZ") ) }
+			}, 'productName variety dateUploaded price quantity units', { sort: {datePlaced: 1} }, function(e, products) {
+				if (!e) {
+					console.log('current products are: ' + products);
+					res.json(products);
+				}
+				else {
+					console.log(e);
+				}
+			});
+		}
+		else res.send(401);
+	});
+	// return a compact list of all the current user's products for the last month.
+	app.get("/api/product-list/recent", function(req, res, next) {
+		if (req.user) {
+			models.Product.find({
+				producer_ID : new ObjectId(req.user._id),
+				dateUploaded : { 
+					$gte: new Date( calendar.startOfMonth.addMonths(-1).toString("yyyy-MM-dd HH:mm:ssZ") ), 
+					$lt: new Date( calendar.startOfMonth.toString("yyyy-MM-dd HH:mm:ssZ") ) 
+				}
+			}, 'productName variety dateUploaded price quantity units', { sort: {datePlaced: 1} },
+				function(e, products) {
+				if (!e) {
+					console.log('recent products are: ' + products);
+					res.json(products);
+				}
+				else {
+					console.log(e);
+				}
+			});
+		}
+		else res.send(401);
 	});
 
 	// this request will return orders based on a query. Generally this is used to
@@ -294,7 +386,7 @@ exports.configAPI = function configAPI(app) {
 					opts = [{
 						path: 'product',
 						model: 'models.Product',
-						select: 'name variety price producer_ID'
+						select: 'fullName price units producer_ID productName variety'
 					}, {
 						path: 'customer',
 						model: 'models.User',
@@ -302,7 +394,7 @@ exports.configAPI = function configAPI(app) {
 					}, {
 						path: 'product.producer_ID',
 						model: 'models.User',
-						select: 'name email producerData'
+						select: 'name email producerData.companyName'
 					}];
 
 					// replace the ID's in an order with proper values before sending to the app.
@@ -314,8 +406,7 @@ exports.configAPI = function configAPI(app) {
 						console.log(orders);
 						// send the results to the app if no error occurred.
 						if (!e) {
-							orderObject = orders.toObject();
-							res.json(orderObject);
+							res.json(orders);
 						} else console.log(e);
 
 					});
@@ -327,14 +418,14 @@ exports.configAPI = function configAPI(app) {
 		}
 
 	});
-	// get the orders made to a particular producer (the one logged in specifically)
-	app.get("api/order/:id", function(req, res, next) {
+	// get the orders made to the currently authenticated producer/supplier
+	app.get("/api/order/me", function(req, res, next) {
 		var opts, orderObject;
-		// check if the current user is logged in and is requesting his or her own cart
-		if (req.user && req.user._id == req.params.id) {
+		// check if the current user is authenticated
+		if (req.user) {
 			// get the cart orders for the current user.
 			models.Order.find({
-				customer: new ObjectId(req.params.id)
+				supplier: req.user._id
 			}, null, {
 				sort: {
 					datePlaced: 1
@@ -347,13 +438,13 @@ exports.configAPI = function configAPI(app) {
 					// property in the collections' Schema object.
 					opts = [{
 						path: 'product',
-						select: 'name variety price producer_ID'
+						select: 'fullName price units productName variety'
 					}, {
 						path: 'customer',
-						select: 'name'
+						select: 'name email'
 					}, {
-						path: 'product.producer_ID',
-						select: 'name email producerData'
+						path: 'supplier',
+						select: 'name email producerData.companyName'
 					}];
 
 					// replace the ID's in an order with proper values before sending to the app.
@@ -362,46 +453,58 @@ exports.configAPI = function configAPI(app) {
 					// @e is the error
 					// @cart is the returned array or object of order data
 					models.Order.populate(results, opts, function(e, orders) {
-						console.log(orders);
 						// send the results to the app if no error occurred.
-						if (!e) {
-							orderObject = order.toObject();
-							res.json(orderObject);
-						} else console.log(e);
+						if (!e && orders) {
+							res.json(orders);
+						} else {
+							console.log(e);
+							res.send(500);
+						}
 					});
 				} else console.log(e);
 			});
 		}
 	});
-	// get a customer's cart by using their customer ID as a request parameter. The
-	// app knows the id of signed in users.
-	app.get("api/cart/:id", function(req, res, next) {
+	app.get("/api/cart/:user/length", function(req, res, next) {
+		if (req.user && req.user._id == req.params.user) {
+			models.Order.count({customer: new ObjectId(req.params.user)}, function(e, count) {
+				if (!e) {
+					res.send(count.toString());
+				}
+				else {
+					console.log(e);
+					res.send(500);
+				}
+			})
+		}
+	});
+	// get a customer's cart items by using their customer ID as a request parameter.
+	app.get("/api/cart/:user", function(req, res, next) {
 		var opts, cartObject;
 		// check if the cuurent user is logged in and is requesting his or her own cart.
 		// Server-side validation.
-		if (req.user && req.user._id == req.params.id) {
+		if (req.user && req.user._id == req.params.user) {
 			// get the cart orders for the current user.
 			models.Order.find({
-				customer: new ObjectId(req.params.id)
+				customer: new ObjectId(req.params.user)
 			}, null, {
 				sort: {
 					datePlaced: 1
 				}
 			}, function(e, results) {
 				if (!e) {
-
 					// define options for replacing ID's in the order with the appropriate data from
 					// other collections. The other collections are specified with the 'ref'
 					// property in the collections' Schema object.
 					opts = [{
 						path: 'product',
-						select: 'name variety price producer_ID'
+						select: 'fullName price productName variety'
 					}, {
 						path: 'customer',
 						select: 'name'
 					}, {
-						path: 'product.producer_ID',
-						select: 'name email producerData'
+						path: 'supplier',
+						select: 'name email producerData.companyName'
 					}];
 
 					// replace the ID's in an order with proper values before sending to the app.
@@ -410,47 +513,153 @@ exports.configAPI = function configAPI(app) {
 					// @e is the error
 					// @cart is the returned array or object of order data
 					models.Order.populate(results, opts, function(e, cart) {
-						console.log(cart);
 						// send the results to the app if no error occurred.
 						if (!e) {
+							// quick test we got the right cart items
+							cart.forEach(function(item) {
+								if (item.customer.name !== req.user.name) {
+									console.log('these cart items are not for the right user');
+								}
+							});
 							// converts and transforms the cart data into plain javascript before sending it
 							// to the client.
-							cartObject = cart.toObject();
-							res.json(cartObject);
+							res.json(cart);
 						} else console.log(e);
 					});
 				} else console.log(e);
 			});
 		}
+		else res.send(401);
 	});
-
-	// Creates a new order from the 'add to cart' buttons in the app. No validation yet.
-	app.post("/api/order", function(req, res, next) {
-		new models.Order({
-			product: req.body.productId,
-			customer: req.body.customerId,
-			supplier: req.body.supplierId,
-			quantity: req.body.quantity,
-			datePlaced: Date()
-		}).save()
-	});
-
-	// Deletes a specific item from a users own cart.
-	app.delete("/api/cart/:id/:product", function(req, res, next) {
-		// Check if the current user is logged in and their ID in the params matches the
-		// id of their user data. If it does, delete that item from the cart. Items
-		// entered after the end of ordering week can't be changed.
-		if (req.user && req.user._id === req.params.id) {
+	// update an order from a user's perspective. Only allowed to change quantity
+	app.post("/api/cart", function(req, res, next) {
+		if (req.user) {
 			// if (calendar.orderweek) ...
-			models.Order.remove({
-				product: new ObjectId(req.params.product)
-			}, function(e) {
+			async.waterfall([
+				function(callback) {
+					models.Order.findById(req.body._id, 'quantity product', function(e, order) {
+						if (!e) {
+							callback(null, order.quantity, req.body.quantity, order);
+						}
+						else {
+							console.log(e);
+							callback(e);
+						}
+					});
+				},
+				function(oldQuantity, newQuantity, order, callback) {
+					models.Product.findById(order.product, function(e, product) {
+						if (!e) {
+							if (product.quantity + (oldQuantity - newQuantity) >= 0) {
+								product.quantity = product.quantity + (oldQuantity - newQuantity);
+								product.save();
+								order.quantity = newQuantity;
+								order.save();
+								
+								res.send(200);
+							}
+							else {
+								res.send("Sorry! Insufficient inventory to add more than " + product.quantity + " to your cart" );
+							}
+						}
+						else {
+							callback(e);
+						}
+					});
+				}
+				], 
+				function(err) {
+					console.log(err);
+					res.send(500);
+			});
+			
+			
+			
+			
+			
+			
+		}
+		else res.send(401);
+		
+	});
+	// Deletes a specific item from a users own cart.
+	app.delete("/api/cart/:id", function(req, res, next) {
+		// Check if the current user is logged in and their ID in the params matches the
+		// id of their user data. If it does, delete that order from the database. Items
+		// entered after the end of ordering week can't be changed.
+		if (req.user) {
+			// if (calendar.orderweek) ...
+			models.Order.findById(req.params.id, function(e, order) {
 				if (!e) {
-					res.send(200, 'Product removed from cart')
+					// adjust the inventory of the product available
+					models.Product.findByIdAndUpdate(order.product, { $inc: {quantity : order.quantity}}, function(e, product) {
+						if (!e) {
+							// delete the requested order
+							order.remove();
+						}
+					});
+					// respond with a basic HTML message
+					res.send(204, 'Product removed from cart');
 				}
 
 			})
 		}
+		else res.send(401);
+	});
+	
+	// Creates a new order from the 'add to cart' buttons in the app. Returns the populated order.
+	app.post("/api/order", function(req, res, next) {
+		if (req.user) {
+			if (req.body.customer !== req.body.supplier) {
+				async.waterfall([
+					function(callback) {
+						models.Order.create({
+							product: req.body.product,
+							customer: req.body.customer,
+							supplier: req.body.supplier,
+							quantity: req.body.quantity,
+							datePlaced: Date()
+						}, function(e, newOrder) {
+							if (!e) {
+								callback(null, newOrder);
+						
+							}
+							else {
+								console.log(e);
+								res.send(500);
+								callback(e);
+							}
+						});
+						
+					},
+					function(newOrder, callback) {
+						models.Product.findByIdAndUpdate(newOrder.product, { $inc: {quantity : newOrder.quantity * -1}}, function(e, product) {
+							if (!e) {
+								console.log(product.quantity);
+								callback(null, newOrder);
+							}
+							else callback(e);
+						});
+					},
+					function(newOrder, callback) {
+						
+						newOrder
+						.populate('product', 'price units fullName productName variety')
+						.populate('supplier', 'name email producerData.companyName', function(e, order) {
+							if (!e) res.json(newOrder);
+							else callback(e);
+						});
+						
+					}
+				], function(error) { 
+					console.log(error); 
+					res.send(500); 
+					return errorHandler(error);
+				});
+			}
+			else res.send("Sorry, you can't try to buy your own products");
+		}
+		else res.send(401);
 	});
 	
 	// get all the invoices or a query. Called in the app from the invoices page
@@ -465,7 +674,7 @@ exports.configAPI = function configAPI(app) {
 	});
 	
 	// update an invoice's status
-	app.put("/api/invoice/", function(req, res, next) {
+	app.put("/api/invoice", function(req, res, next) {
 		models.Invoice.findByIdAndUpdate(req.body._id, {status: req.body.status}, function(e, invoice){
 			if (e) return errorHandler(e);
 			
@@ -722,7 +931,6 @@ exports.configAPI = function configAPI(app) {
 					var userObject = results.toObject();
 					delete userObject.hash;
 					delete userObject.salt;
-					console.log('User just requested from api/user/:id');
 					res.send(results);
 				}
 				else {
