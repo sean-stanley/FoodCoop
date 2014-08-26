@@ -1,0 +1,91 @@
+<alert type="{{message.type}}" ng-show="message.message" close="message.closeMessage()" role="alert">
+	{{message.message}}
+</alert>
+					
+<section id="main-nav-and-sorting">
+						
+    <div ng-class="{ 'pull-left' : !panelDisplay}">
+    	<label> Categories: </label>
+		<div class="btn-group">
+			<button type='button' class="btn btn-default" ng-model="filter.category.name" btn-radio="'Produce'" >Produce</button>
+			<button type='button' class="btn btn-default" ng-model="filter.category.name" btn-radio="'Meat'" >Meat</button>
+			<button type='button' class="btn btn-default" ng-model="filter.category.name" btn-radio="'Processed-Goods'" >Processed Goods</button>
+			<button type='button' class="btn btn-default" ng-model="filter.category.name" btn-radio="'Baked Goods'" >Baked Goods</button>
+			<button type='button' class="btn btn-default" ng-model="filter.category.name" btn-radio="'Dairy'" >Dairy</button>
+			<button type='button' class="btn btn-default" ng-model="filter" btn-radio="">All</button>
+		</div>
+	</div>
+						
+	<div ng-class="{ 'pull-right' : !panelDisplay, 'sort-buttons-menu-open' : panelDisplay }">
+		<label> Sort: </label>
+		<div class="btn-group">
+			<button type='button' class="btn btn-primary" 
+			ng-click="sort = 'producer_ID.producerData.companyName' || 'producer_ID.name'; reverse=!reverse">
+				 <span class="glyphicon glyphicon-sort"></span>  Producer
+			</button>
+			<button type='button' class="btn btn-primary" 
+			ng-click="sort = 'fullName' || 'productName'; reverse=!reverse">
+				  <span class="glyphicon glyphicon-sort"></span>  Alphabetical
+			</button>
+			<button type='button' class="btn btn-primary" 
+			ng-click="sort = 'price'; reverse=!reverse">  <span class="glyphicon glyphicon-sort"></span>  Price</button>
+		</div>
+	</div>
+           
+</section>
+
+<div id="products-section" class="row">
+	<ul id="store-products">
+		<li ng-repeat="product in products | orderBy:sort:reverse | filter:search | filter:filter" class="product-container" 
+		ng-controller="productUICtrl" 
+		ng-mouseleave="detailsVisible = false"
+		>
+			<figure class="first-layer" ng-mouseover="callDelayed()" ng-mouseleave="callCancelled()">
+				<img ng-if="product.certification.name !== 'none' && product.img && product.certification.img"
+				 ng-src="img/certification/{{product.certification.img}}" class="certification-img" alt="organic certification">
+				<img ng-src="{{product.img}}" class="img-responsive" alt="product image">
+				<figcaption>
+					<div class="btn-group pull-right">
+						<button class="btn btn-primary pull-right" 
+						ng-click="addToCart(product)" ng-if="!product.AlreadyInCart" 
+						ng-hide="product.quantity <= 0">
+							Add to Cart
+						</button>
+						<button class="btn btn-primary pull-right" disabled ng-if="product.AlreadyInCart">
+							Added to Cart
+						</button>
+						<button class="btn btn-danger pull-right" disabled ng-if="product.quantity === 0">
+							SOLD OUT
+						</button>
+					</div>
+					<h3>{{product.fullName}}</h3>
+					<p>{{product.priceWithMarkup|currency}} / {{product.units}}</p>
+				</figcaption>
+			</figure>
+			<section class="details-layer" ng-click="open(product)" ng-class="{ 'details-layer-visible' : detailsVisible}" ng-mouseleave="detailsVisible = false">
+				<article class="details">
+					<h4>{{product.producer_ID.producerData.companyName}}</h4>
+					<h3>{{product.fullName}}</h3>
+					<p>{{1.2 * product.price|currency}} / {{product.units}}</p>
+					
+					<p>{{product.description | blurb}} <em>more...</em></p>
+					<hr>
+					<p> Category: {{product.category.name}} 
+					<span ng-if="product.certification !== 'none' ">Certification: {{product.certification.name}}</span>
+					</p>
+					<div class="btn-group">
+						<button class="btn btn-danger pull-right" disabled ng-if="product.quantity === 0">
+							SOLD OUT
+						</button>
+						<button class="btn btn-warning">
+							More Info
+						</button>
+						<button class="btn btn-primary" disabled ng-if="product.AlreadyInCart" ng-hide="product.AlreadyInCart">
+							Added to Cart
+						</button>
+					</div>
+				</article>
+			</section>
+		</li>
+	</ul>
+</div>

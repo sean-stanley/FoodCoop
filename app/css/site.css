@@ -19,6 +19,34 @@ a:hover {
 	border-radius: 0 0 2px 2px;
 }
 
+.horizontal-nav {
+	clear: both;
+	overflow: auto;
+	padding-bottom: 3px;
+	border-bottom: #eee 1px solid;
+	
+}
+
+/*	-------------
+	-- Sidebar --
+	-------------	*/
+
+#sidebar {
+	width: 35%;
+	min-width: 320px;
+	position: fixed;
+	z-index: 999;
+	height: 100%;
+	padding: 0 10px;
+	background: #fff;
+	border-right: 1px solid #dddddd;
+	overflow: scroll;
+}
+
+#sidebar button{padding: 10px;}
+
+
+
 .image-drop {
 	display: block;
 	width: 50%;
@@ -99,26 +127,28 @@ ul {list-style: none; list-style-type: none; margin: 0; padding: 0;}
 /* Store */ 
 
 
-.panel-btn {
-	margin-right: 1em;
-	float: left;
+.panel-btn-lg {
+	font-size: 2.5em;
 }
 
-#sidebar {
-	width: 30%;
-	float: left;
-	position: fixed;
-	z-index: 999;
-	height: 100%;
-	padding: 10px;
-	background: #fff;
-	border-right: 1px solid #dddddd;
-	overflow: scroll;
+.panel-btn:hover {
+	text-decoration: none;
 }
 
-#sidebar button{padding: 10px;}
+a.panel-btn-sml {
+	font-size: 1em;
+}
+
+#main-nav-and-sorting {
+	overflow: hidden;
+	clear: both;
+}
 
 #main-nav-and-sorting label{margin: 0 0.5em;}
+
+.sort-buttons-menu-open {margin-top: 10px}
+#main-nav-and-sorting .sort-buttons-menu-open label {margin-right: 3.6em;}
+
 
 .menu-icon {
 	font-size: 2em;
@@ -129,7 +159,7 @@ ul {list-style: none; list-style-type: none; margin: 0; padding: 0;}
 }
 
 #products-section {
-	margin: 20px;
+	margin: 20px 0;
 }
 
 
@@ -143,15 +173,13 @@ ul {list-style: none; list-style-type: none; margin: 0; padding: 0;}
 	  display: -webkit-flex;
 	  display: flex;
 	flex-flow: row wrap;
-	justify-content: left;
+	justify-content: space-between;
 	align-items: flex-start;
 	align-content: flex-start;
 }
 
 .product-container { /*section that is repeated for the store products. Flex items*/
 	position: relative;
-	width: 33%;
-	margin: 10px;
 	padding: 15px;
 	overflow:hidden;
 	background:#ddd;
@@ -195,9 +223,7 @@ ul {list-style: none; list-style-type: none; margin: 0; padding: 0;}
 
 .details button {position: absolute; bottom: 5px; left: 5px;}
 
-#store {
-	margin-top: 20px;
-}
+
 
 
 

@@ -21,12 +21,21 @@ angular.module('co-op', [
 
   .config(['$routeProvider', 'RestangularProvider', function($routeProvider, RestangularProvider) {
     $routeProvider
-		.when('/', {templateUrl: 'partials/index-content.html', controller: 'MyCtrl1'})
+		.when('/', {templateUrl: 'partials/index-content.html', controller: 'MyCtrl1', reloadOnSearch: false})
 		.when('/signup', {templateUrl: 'partials/signup.html', controller: 'userCtrl'})
 		.when('/welcome', {templateUrl: 'partials/thankyou.html', controller: 'signupInvoiceCtrl'})
 		.when('/terms-cons', {templateUrl: 'partials/legal/terms-cons.html'})
 		.when('/priv-pol', {templateUrl: 'partials/legal/priv-pol.html'})
-		.when('/users-rights', {templateUrl: 'partials/admin/users-rights.html', controller: 'userAdminCtrl', adminOnly: true})
+		.when('/users-rights', {
+			templateUrl: 'partials/admin/users-rights.html', 
+			controller: 'userAdminCtrl', 
+			adminOnly: true,
+			resolve: {
+				users: function(Restangular) {
+					return Restangular.all('api/user');
+				}
+			}
+			})
 		.when('/user/:userId', {
 			controller: 'userEditCtrl', 
 			templateUrl:'partials/admin/details.html',
@@ -119,12 +128,13 @@ angular.module('co-op', [
     .when('/login', {templateUrl: 'partials/login.html', isLogin: true})
     .when('/must-login', {templateUrl: 'partials/must-login.html', isLogin: true})
     .when('/login-failed', {templateUrl: 'partials/login-failed.html'})
+    .when('/login-page', {templateUrl: 'partials/login-page.html', reloadOnSearch: false})
     .when('/login-failed/attempts=:tries', {templateUrl: 'partials/login-failed.html'})
     
     // store routes
-	.when('category/:category', {})
+	.when('/store', {templateUrl: 'partials/store/store-template.html', controller: 'storeCtrl', reloadOnSearch: false})
 
-    .otherwise({redirectTo: '/', reloadOnSearch: false});
+    .otherwise({redirectTo: '/'});
     
 	// RestangularProvider.setBaseUrl('/api');
 	
@@ -133,18 +143,23 @@ angular.module('co-op', [
 	});
 	
   }])
-	.run(function($rootScope, $location, LoginManager, flash) {
+	.run(function($rootScope, $route, $location, LoginManager, flash, Session) {
 		// without a callback this function simply checks if the user is authenticated
 		// and if he is, saves his data to the rootScope. Handy for getting the data
 		// when a session hasn't expired yet. It runs once when the app starts.
 		$rootScope.month =  Date.today().toString('MMMM');
 		$rootScope.flash = flash;
-		LoginManager.isLoggedIn();
+		Session.customGET().then(function(user) {
+			if (typeof user === 'object' && user.hasOwnProperty('email')) {
+				console.log(user.plain());
+				// if the user has a session save this data for the app to use.
+				$rootScope.currentUser = user.plain();
+			}
+		});
 		
-		
-		
-		$rootScope.$on( '$routeChangeStart', function(event, next, current) {
-			LoginManager.isLoggedIn(function(isAuth) {
+		// good but not ideal way to do authentication. Need to find a solution that doesn't trigger a routeChange until after authentication has been resolved 
+		/*$rootScope.$on( '$routeChangeStart', function(event, next, current) {
+			LoginManager.isLoggedIn().then(function(isAuth) {
 				var message;
 				// redirect a user who is not logged in from going to a logged in only page
 				if (!isAuth && next.loggedInOnly || next.adminOnly) {
@@ -158,10 +173,42 @@ angular.module('co-op', [
 					$rootScope.flash.setMessage({type: 'warning', message: message});
 					$location.path(current);
 				}
+
 			});
-			
-			
-			
+        });*/
+        
+        $rootScope.$on( '$locationChangeStart', function(event, next, current) {
+	        var nextPath = $location.path(); // return next path (not full URL);
+	        var nextRoute = $route.routes[nextPath]; // returns undefined if a route param is part of the next path
+	        	        
+	        nextRoute.loggedInOnly = nextRoute.hasOwnProperty('loggedInOnly') ? nextRoute.loggedInOnly : false;
+	        
+	        if (!$rootScope.currentUser && nextRoute.loggedInOnly) {
+		        event.preventDefault();
+		        
+		        LoginManager.isLoggedIn().then(function(isAuth) {
+					var message;
+					// redirect a user who is not logged in from going to a logged in only page
+					if (!isAuth && nextRoute.loggedInOnly || nextRoute.adminOnly) {
+						$rootScope.savedLocation = $location.url();
+						$rootScope.flash.setMessage({type: 'warning', message: 'Not logged in'});
+						$location.path('/must-login');
+					}
+					// redirect a non-admin from viewing an admin only page
+					else if (isAuth && !$rootScope.currentUser.user_type.isAdmin && nextRoute.adminOnly) {
+						message = "Sorry! That page is only available to Administrators";
+						$rootScope.flash.setMessage({type: 'warning', message: message});
+						$location.url(current);
+					}
+					// allow a logged in user or admin to see a loggedInOnly page
+					else if (isAuth && nextRoute.loggedInOnly) {
+						//$route.updateParams(nextRoute.originalPath); not working
+						$route.reload();
+					}
+	
+				});
+	        }
+	        
         });
 
   });

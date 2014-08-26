@@ -6,21 +6,25 @@ var util = require('util'),
 	crypto = require('crypto'),
 	events = require('events'),
 	express = require('express'); // handles routing and such
-bodyParser = require('body-parser'), // creates a req.body object to allow easy access of request data in the api.
-methodOverride = require('method-override'), // an express module for overriding default http methods
-cookieParser = require('cookie-parser'), // an express module for reading, writing and parsing cookies. In the app it is used for session cookies.
-session = require('express-session'), // an express module for creating browser sessions.
-errorHandler = require('express-error-handler'), // an express module for handling errors in the app.
-mongoose = require('mongoose'), // used to connect to MongoDB and perform common CRUD operations with the API.
-ObjectId = require('mongoose').Types.ObjectId; 
-models = require('./models.js'), // this file stores the mongoose schema data for our MongoDB database.
-mail = require('./staticMail.js'), // this file stores some common mail settings.
-Emailer = require('./emailer.js'), // this is a custom class expanded upon nodemailer to allow html templates to be used for the emails.
-passport = require('passport'), // middleware that provides authentication tools for the API.
-LocalStrategy = require('passport-local').Strategy; // the passport strategy employed by this API.
+	bodyParser = require('body-parser'), // creates a req.body object to allow easy access of request data in the api.
+	methodOverride = require('method-override'), // an express module for overriding default http methods
+	cookieParser = require('cookie-parser'), // an express module for reading, writing and parsing cookies. In the app it is used for session cookies.
+	session = require('express-session'), // an express module for creating browser sessions.
+	errorHandler = require('express-error-handler'), // an express module for handling errors in the app.
+	mongoose = require('mongoose'), // used to connect to MongoDB and perform common CRUD operations with the API.
+	ObjectId = require('mongoose').Types.ObjectId,
+	models = require('./models.js'), // this file stores the mongoose schema data for our MongoDB database.
+	mail = require('./staticMail.js'), // this file stores some common mail settings.
+	Emailer = require('./emailer.js'), // this is a custom class expanded upon nodemailer to allow html templates to be used for the emails.
+	passport = require('passport'), // middleware that provides authentication tools for the API.
+	LocalStrategy = require('passport-local').Strategy; // the passport strategy employed by this API.
 
 require('datejs'); // provides the best way to do date manipulation.
-calendar = require('./calendarHelper.js')
+var calendar = require('./calendarHelper.js');
+
+var scheduler = require('./scheduler.js');
+
+
 // sets date locality and formats to be for new zealand.
 Date.i18n.setLanguage("en-NZ");
 
@@ -30,12 +34,17 @@ exports.configAPI = function configAPI(app) {
 	
 	// Middleware
 	// ==========
-	app.use(bodyParser.json({limit: '50mb'})); // here we load the bodyParser and tell it to parse the requests received as json data.
-	app.use(methodOverride()); // here we initilize the methodOverride middleware for use in the API.
-	app.use(cookieParser('Intrinsic Definability')); // here we initilize the cookieParser middleware for use in the API.
-	app.use(session({saveUninitialized: true, resave: true})); // deleted cookie: { maxAge: 600000 } option
+	// here we load the bodyParser and tell it to parse the requests received as json data.
+	app.use(bodyParser.json({limit: '50mb'})); 
+	// here we initilize the methodOverride middleware for use in the API.
+	app.use(methodOverride()); 
+	// here we initilize the cookieParser middleware for use in the API.
+	app.use(cookieParser()); 
+	app.use(session({saveUninitialized: true, resave: true, secret: 'Intrinsic Definability'}));
 	app.use(passport.initialize()); // here we initilize Passport middleware for use in the app to handle user login.
-	app.use(passport.session()); // here we initilize passport's sessions which expand on the express sessions the ability to have our session confirm if a user is already logged in.
+	// here we initilize passport's sessions which expand on the express sessions
+	// the ability to have our session confirm if a user is already logged in.
+	app.use(passport.session()); 
 
 
 	// Routes
@@ -225,14 +234,23 @@ exports.configAPI = function configAPI(app) {
 	// usually only called from the product-upload page of the app.
 	app.post("/api/product", function(req, res, next) {
 		var productObject, needsSave, key, newProduct;
-
+		// this tests if a user is authenticated.
 		if (req.user && req.user.user_type.canSell) {
-			// this tests if a user is authenticated.
+			
+			// convert ingredients string to an array
+			if (typeof req.body.ingredients === "string" && req.body.ingredients.length > 0) {
+				req.body.ingredients = req.body.ingredients.split(/,\s*/);
+			}
+			
+			else if (req.body.ingredients instanceof Array) {
+				req.body.ingredients = req.body.ingredients.join();
+				req.body.ingredients = req.body.ingredients.split(/,\s*/);
+			}
+						
+			// If the body for a product contains an ID, it must already exist so we will
+			// update it. Only an admin or the user who
+			// created a product can update it. The original product is looked up by id.
 			if (req.body._id) {
-				// If the body for a product contains an ID, it must already exist so we will
-				// update it. Ideally only an admin or the user who
-				// created a product can update it. The original product is looked up by id.
-
 				models.Product.findById(req.body._id, function(e, product) { // first find the right product by it's ID
 					if (!e) {
 						productObject = product.toObject();
@@ -271,7 +289,8 @@ exports.configAPI = function configAPI(app) {
 					ingredients: req.body.ingredients,
 					description: req.body.description,
 					certification: req.body.certification,
-					producer_ID: req.user._id
+					producer_ID: req.user._id,
+					cycle: scheduler.currentCycle
 				}).save(function(e) {
 					if (!e) {
 						res.send(200);
@@ -330,7 +349,7 @@ exports.configAPI = function configAPI(app) {
 		if (req.user) {
 			models.Product.find({
 				producer_ID : new ObjectId(req.user._id),
-				dateUploaded : { $gte: new Date( calendar.startOfMonth.toString("yyyy-MM-dd HH:mm:ssZ") ) }
+				cycle: scheduler.currentCycle || 0
 			}, 'productName variety dateUploaded price quantity units', { sort: {datePlaced: 1} }, function(e, products) {
 				if (!e) {
 					console.log('current products are: ' + products);
@@ -348,10 +367,7 @@ exports.configAPI = function configAPI(app) {
 		if (req.user) {
 			models.Product.find({
 				producer_ID : new ObjectId(req.user._id),
-				dateUploaded : { 
-					$gte: new Date( calendar.startOfMonth.addMonths(-1).toString("yyyy-MM-dd HH:mm:ssZ") ), 
-					$lt: new Date( calendar.startOfMonth.toString("yyyy-MM-dd HH:mm:ssZ") ) 
-				}
+				cycle: scheduler.currentCycle -1 || 0
 			}, 'productName variety dateUploaded price quantity units', { sort: {datePlaced: 1} },
 				function(e, products) {
 				if (!e) {
@@ -379,7 +395,6 @@ exports.configAPI = function configAPI(app) {
 					datePlaced: 1
 				}
 			}, function(e, results) {
-				console.log(results);
 				if (!e) { // if no errors
 
 					// define options for replacing ID's in the order with the appropriate data from other collections
@@ -467,8 +482,9 @@ exports.configAPI = function configAPI(app) {
 	});
 	app.get("/api/cart/:user/length", function(req, res, next) {
 		if (req.user && req.user._id == req.params.user) {
-			models.Order.count({customer: new ObjectId(req.params.user)}, function(e, count) {
+			models.Order.count({customer: new ObjectId(req.params.user), cycle: scheduler.currentCycle}, function(e, count) {
 				if (!e) {
+					console.log("current cycle is %s", scheduler.currentCycle)
 					res.send(count.toString());
 				}
 				else {
@@ -534,10 +550,10 @@ exports.configAPI = function configAPI(app) {
 	// update an order from a user's perspective. Only allowed to change quantity
 	app.post("/api/cart", function(req, res, next) {
 		if (req.user) {
-			// if (calendar.orderweek) ...
+
 			async.waterfall([
 				function(callback) {
-					models.Order.findById(req.body._id, 'quantity product', function(e, order) {
+					models.Order.findById(req.body._id, 'quantity product cycle', function(e, order) {
 						if (!e) {
 							callback(null, order.quantity, req.body.quantity, order);
 						}
@@ -550,17 +566,25 @@ exports.configAPI = function configAPI(app) {
 				function(oldQuantity, newQuantity, order, callback) {
 					models.Product.findById(order.product, function(e, product) {
 						if (!e) {
-							if (product.quantity + (oldQuantity - newQuantity) >= 0) {
-								product.quantity = product.quantity + (oldQuantity - newQuantity);
-								product.save();
-								order.quantity = newQuantity;
-								order.save();
+							// will return an error if scheduler.currentCycle is undefined
+							if (order.cycle === product.cycle && product.cycle === scheduler.currentCycle) {
+								if (product.quantity + (oldQuantity - newQuantity) >= 0) {
+									product.quantity = product.quantity + (oldQuantity - newQuantity);
+									product.save();
+									order.quantity = newQuantity;
+									order.save();
 								
-								res.send(200);
+									res.send(200);
+								}
+								else {
+									res.send("Sorry! Insufficient inventory to add more than " + product.quantity + " to your cart" );
+								}
 							}
 							else {
-								res.send("Sorry! Insufficient inventory to add more than " + product.quantity + " to your cart" );
+								res.send("Sorry! That product cannot be changed at this time. Contact technical support for assistance");
 							}
+							
+							
 						}
 						else {
 							callback(e);
@@ -572,12 +596,6 @@ exports.configAPI = function configAPI(app) {
 					console.log(err);
 					res.send(500);
 			});
-			
-			
-			
-			
-			
-			
 		}
 		else res.send(401);
 		
@@ -588,9 +606,12 @@ exports.configAPI = function configAPI(app) {
 		// id of their user data. If it does, delete that order from the database. Items
 		// entered after the end of ordering week can't be changed.
 		if (req.user) {
-			// if (calendar.orderweek) ...
 			models.Order.findById(req.params.id, function(e, order) {
 				if (!e) {
+					// make sure only recent orders are being deleted
+					if (order.cycle === scheduler.currentCycle) {
+						
+					}
 					// adjust the inventory of the product available
 					models.Product.findByIdAndUpdate(order.product, { $inc: {quantity : order.quantity}}, function(e, product) {
 						if (!e) {
@@ -618,7 +639,8 @@ exports.configAPI = function configAPI(app) {
 							customer: req.body.customer,
 							supplier: req.body.supplier,
 							quantity: req.body.quantity,
-							datePlaced: Date()
+							datePlaced: Date(),
+							cycle: scheduler.currentCycle
 						}, function(e, newOrder) {
 							if (!e) {
 								callback(null, newOrder);
@@ -693,6 +715,20 @@ exports.configAPI = function configAPI(app) {
 				res.json(invoice);
 			});
 		});
+	});
+	
+	// get a query of all the invoices for a specific user sorted by date
+	app.get("/api/invoice/me", function(req, res, next) {
+		if (req.user) {
+			models.Invoice.find({invoicee: req.user._id}, null, {sort : {datePlaced:1} }, function(e, invoices) {
+				models.Invoice.populate(invoices, {path:'invoicee', select: 'name address phone email -_id'}, function(e, invoices) {
+					if (e) return errorHandler(e);
+					res.json(invoices);
+				});
+			});
+		}
+		else res.send(400);
+		
 	});
 	
 	

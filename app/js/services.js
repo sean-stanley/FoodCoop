@@ -45,7 +45,7 @@ angular.module('co-op.services', [])
 
 // Is a collection of methods for logging a user in, checking if a user is
 // logged in and logging out.	
-	.factory('LoginManager', function ($location, $rootScope, $cookieStore, Session, Restangular, Cart){
+	.factory('LoginManager', function ($location, $rootScope, $q, Session, Restangular, Cart){
 		$rootScope.failedAttempts = 0;
 		
 		return {
@@ -94,35 +94,40 @@ angular.module('co-op.services', [])
 				
 				);
 			},
-			
-			isLoggedIn : function(callback) {
-				var loggedInUser, isLoggedIn;
-				var cb = callback || angular.noop;
+			// a promise that resolves true if the user is logged in, or false if not.
+			isLoggedIn : function() {
+				var result = $q.defer();
+				var isLoggedIn;
 				// check if the user is logged in with the app.
 				
 				if ($rootScope.currentUser && $rootScope.currentUser.hasOwnProperty('email')) {
 					isLoggedIn = true;
+					result.resolve(isLoggedIn);
 				}
 				
 				// attempt to get the user from the app
 				else {
+					
 					Session.customGET().then(function(user) {
 						if (user === 'Not logged in') {
 							console.log(user);
 							isLoggedIn = false;
+							result.resolve(isLoggedIn);
 						}
 						else if (typeof user === 'object' && user.hasOwnProperty('email')) {
-							loggedInUser = user.plain();
-							console.log(loggedInUser);
+							console.log(user.plain());
 							// if the user is already authenticated, save the data for the app to use.
-							$rootScope.currentUser = loggedInUser;
+							$rootScope.currentUser = user.plain();
 							isLoggedIn = true;
 							Cart.getTally();
+							result.resolve(isLoggedIn);
 						}
-						else {isLoggedIn = false;}
-						cb(isLoggedIn);
+						else result.reject(user);
+						
 					});
+					
 				}
+				return result.promise;
 			},
 			
 			logout : function() {
@@ -266,8 +271,9 @@ angular.module('co-op.services', [])
 			currentMonth : function(group, dateProperty, callback) {
 				var cb = callback || angular.noop;
 				var list = _.filter(group, function(item) {
-					if ( Date.parse(item[dateProperty]).between( monthStart, Date.today().add(1).days() ) )
-					return item;
+					if ( Date.parse(item[dateProperty]).between( monthStart, Date.today().add(1).days() ) ) {
+						return item;
+					}
 				});
 				cb(list);
 				return list;

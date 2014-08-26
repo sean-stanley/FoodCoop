@@ -105,11 +105,12 @@
 	<table class="table">
 		<thead ng-repeat-start="order in sortedOrders">
 			<tr><th colspan="4"><a ng-href="#/contact/{{order._id}}">{{order.customer}}</th></tr>
+			<tr><th>Product</th><th>Quantity</th><th>Unit Price</th><th>Price</th></tr>
 		</thead>
 		<tbody ng-repeat-end>
 			<tr ng-repeat="i in order.orders">
 		        <td data-title="'Product'" >
-		            {{i.fullName}}
+		            {{i.product.fullName}}
 		        </td>
  				<td data-title="'Quantity'">
  					{{i.quantity}}
@@ -118,7 +119,7 @@
 		            {{i.orderPrice | currency}} / {{i.product.units}}
 		        </td>
 				<td data-title="'times Ordered'">
-					{{i.producerPrice * i.quantity | currency}}
+					{{i.orderPrice * i.quantity | currency}}
 				</td>
 			</tr>
 		</tbody>

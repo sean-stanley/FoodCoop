@@ -24,10 +24,11 @@ var ProductSchema = new Schema({
 			quantity: {type: Number, required: true},
 			units: {type: String, required: true},
 			refrigeration: {type: String, required: false},
-			ingredients: {type: String, required: false},
+			ingredients: {type: Array, required: false},
 			description: {type: String, required: false},
 			certification: {type: Schema.ObjectId, required: false, ref: 'Certification'},
-			producer_ID: {type: Schema.ObjectId, required: true, ref: 'User'}
+			producer_ID: {type: Schema.ObjectId, required: true, ref: 'User'},
+			cycle: {type: Number, required: true},
 			
 }, {
 	toObject: { virtuals : true },
@@ -40,6 +41,11 @@ ProductSchema.virtual('fullName').get(function () {
 	return this.variety + ' ' + this.productName;
 });
 
+// for keeping records of all possible cycle codes. Codes are used by products
+// and orders to determine what has been bought and uploaded each cycle.
+var cycleShema = new Schema({
+	_id: Number,
+});
 
 // this represents an entry in a cart or producer order. It is made when a user
 // add's a product to his or her cart.
@@ -49,11 +55,11 @@ var OrderSchema = new Schema({
 		customer: {type: Schema.ObjectId, required: true, ref: 'User'},
 		supplier: {type: Schema.ObjectId, required: true, ref: 'User'},
 		quantity: {type: Number, required: true},
-		// markup as a percentage so 20 is equal to 20% whereas 0.2 is 0.2%
-		markup: {type: Number, required: true, default: markup} // 20%
+		markup: {type: Number, required: true, default: markup}, // 20%
+		cycle: {type: Number, required: true},
 }, {
 	toObject: { virtuals : true },
-	toJSON: { virtuals : true }
+	toJSON: { virtuals : true } 
 });
 
 // these functions create virtual properties for common calculations
@@ -84,12 +90,11 @@ var InvoiceSchema = new Schema({
 	toCoop: {type: Boolean, default: false},
 	title: String,
 	items: {type: Array, required:true},
-	bankAccount: {type:String, required: true, default: '00-000-0000-0000-000-00'},
+	bankAccount: {type:String, required: true, default: config.bankAccount},
 	//valid types are 'un-paid', 'PAID', 'overdue', 'To Refund', 'refunded' and
 	//'CANCELLED'.
-	status: {type: String, required: true, default: 'un-paid', set:validStatus} ,
-	
-	
+	status: {type: String, required: true, default: 'un-paid', set:validStatus},
+	cycle: {type: Number, required: true},	
 },{
 	toObject: { virtuals : true },
 	toJSON: { virtuals : true }
@@ -121,6 +126,11 @@ var UserSchema = new Schema({
 			email : {type: String, required: true, set: toLower},
 			phone : {type: String, required: false},
 			address : {type: String, required: true},
+			// this is for a future feature that will be a map of all our producers
+			geo : {
+				lat: Number,
+				long: Number
+			},
 			name : {type: String, required: true},
 			user_type : {
 				name: {type : String, required : true},
@@ -184,4 +194,5 @@ exports.Invoice = mongoose.model('Invoice', InvoiceSchema);
 exports.User = mongoose.model('User', UserSchema);
 exports.Category = mongoose.model('Category', CategorySchema);
 exports.Certification = mongoose.model('Certification', CertificationSchema);
+exports.Cycle = mongoose.model('Cycle', cycleShema);
 

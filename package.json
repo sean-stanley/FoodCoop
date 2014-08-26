@@ -48,6 +48,7 @@
     "mongodb": "~1.4.8",
     "mongojs": "~0.12.1",
     "mongoose": "~3.8.8",
+    "node-schedule": "^0.1.13",
     "nodemailer": "~1.0.3",
     "nodemailer-smtp-transport": "^0.1.12",
     "passport": "~0.2.0",

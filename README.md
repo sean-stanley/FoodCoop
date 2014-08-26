@@ -62,3 +62,12 @@ To start the server:
     grunt dev
 
 Then go to localhost:8081 to see the site.
+
+Configuring
+===========
+
+CALENDAR CYCLE
+
+The coopConfig.js file in the server directory contains static useful data for configuring a co-op. It also includes the dates that determine the co-op's ordering cycle. Different ordering cycles will require changes to these values. The datejs module is crucial for calculating these dates. If you wish to change the cycle, look at the documentation and examples [here](https://code.google.com/p/datejs/)
+
+At the moment these values are set once each time the server is started up. Later an event will be scheduled to update these values the day after delivery day.

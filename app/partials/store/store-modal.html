@@ -19,7 +19,8 @@
 				<strong>Quantity left:</strong> {{data.quantity}}<br>
 				
 				<strong>Description:</strong> {{data.description}}<br>
-				<span ng-if="data.ingredients"><strong>Ingredients: </strong>{{data.ingredients}}</span>
+				<span ng-if="data.ingredients"><strong>Ingredients:</strong> 
+				<span ng-repeat="item in data.ingredients"><a ng-href="#/store?search={{item}}">{{item}} </a> </span>
             </div>
 
         </div>

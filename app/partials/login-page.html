@@ -1,0 +1,34 @@
+<br>
+
+<div ng-class="{ 'col-md-3' : !panelDisplay, 'col-md-6' : panelDisplay}">
+	<img src="/img/agricultural_landscape_image_credit_Berta_Mart%C3%ADn_L%C3%B3pez.jpg.jpg" alt="agricultural_landscape_image_credit_Berta_Mart%C3%ADn_L%C3%B3pez.jpg" width="675" height="1000" class="img-responsive"/>
+</div>
+
+<div ng-class="{ 'col-md-3' : !panelDisplay, 'col-md-6' : panelDisplay}">
+
+<form name="signIn" autocomplete="on" ng-submit="submitForm()" novalidate ng-controller="loginCtrl">
+	<div class="form-group">
+		<input ng-model="loginData.email" type="email" name="email" class="form-control" id="inputEmail" placeholder="Email">
+		<div class="alert alert-warning" ng-show="signIn.email.$dirty && signIn.email.$invalid">Sorry:
+			<span ng-show="signIn.email.$error.required">email is required.</span>
+			<span ng-show="signIn.email.$error.email">Please, write a valid email address.</span>
+		</div>				      
+	</div>
+	<div class="form-group">
+		<input ng-model="loginData.password" type="password" name="password" class="form-control" id="inputPassword" placeholder="Password">
+	</div>
+	<div class="form-group">
+		<button type="submit" class="btn btn-default btn-block" ng-click="showLogin = false;">Sign in</button>
+	</div>
+</form>
+<a href="#/forgot" ng-click="showLogin = false">Forgot my password?</a>
+
+</div>
+
+
+<div class="col-md-3" ng-hide="panelDisplay">
+	<img src="/img/Muwin-Estates-Orchard-tall.jpg" alt="Muwin-Estates-Orchard-tall" width="675" height="1000" class="img-responsive"/>
+</div>
+<div class="col-md-3" ng-hide="panelDisplay">
+	<img src="../img/heifersHereford-lg.jpg" alt="heifersHereford-lg" width="675" height="1000" class="img-responsive"/>
+</div>

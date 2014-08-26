@@ -40,7 +40,7 @@
 					<ul>
 						<li ng-repeat="i in currentProducts">
 							<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
-							<a ng-href="#/product-upload/{{i._id}}">{{i.productName}} {{i.variety}}</a>
+							<a ng-href="#/product-upload/{{i._id}}">{{i.fullName}}</a>
 						</li>
 					</ul>
 				</accordion-group>
@@ -54,7 +54,7 @@
 						</thead>
 						<tbody>
 							<tr ng-repeat="i in lastMonthProducts | orderBy:predicate:reverse ">
-								<td><a ng-href="#/product-upload/{{i._id}}">{{i.productName}} {{i.variety}}</a></td>
+								<td><a ng-href="#/product-upload/{{i._id}}">{{i.fullName}}</a></td>
 								<td>{{i.dateUploaded|shortDate}}</td>
 							</tr>
 						</tbody>
@@ -70,7 +70,7 @@
 						</thead>
 						<tbody>
 							<tr ng-repeat="i in allProducts | orderBy:predicate:reverse ">
-								<td><a ng-href="#/product-upload/{{i._id}}">{{i.productName}} {{i.variety}}</a></td>
+								<td><a ng-href="#/product-upload/{{i._id}}">{{i.fullName}}</a></td>
 								<td>{{i.dateUploaded|shortDate}}</td>
 							</tr>
 						</tbody>
@@ -156,11 +156,11 @@
 				</div>
 			
 			     
-			     <div ng-hide="!productData.hasOwnProperty('category') || productManager.categoryByID(productData.category).name == 'Produce' " id="ingredients" class="form-group">
+			     <div id="ingredients" class="form-group">
 					<label for="ingredients">Ingredients</label> 
 					<textarea class="form-control" 
 					ng-disabled="!productData.hasOwnProperty('category')"
-					ng-model="productData.ingredients" id="ingredients" maxlength="1000" placeholder="Please list all ingredients of this product." rows="9" style="width: 100%;"></textarea>  
+					ng-model="productData.ingredients" id="ingredients" maxlength="1000" placeholder="Please list all ingredients of this product in a format like follows: rice flour, organic sugar, raw milk butter, salt." rows="9" style="width: 100%;"></textarea>  
 			    </div>
 			    
 			    <div class="form-group">
