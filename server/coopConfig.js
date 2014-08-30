@@ -53,14 +53,50 @@ exports.cycle = {
 	ShoppingStop		: Date.today().third().monday(),
 	PaymentDueDay		: Date.today().final().monday(),
 	DeliveryDay			: Date.today().final().wednesday(),
-	
-	
 };
 
 
+// always make sure this data is the same as how the variables are assigned in
+// exports.cycle. If i can find a better way to reset the values I'll implement
+// it later.
+exports.cycleReset = function(date) {
+	if (exports.cycle) exports.oldCycle = exports.cycle;
+	exports.cycle = {
+		cycleIncrementDay	: Date.parse(date).moveToFirstDayOfMonth(), 
+		ProductUploadStart 	: Date.parse(date).first().monday(),
+		ProductUploadStop 	: Date.parse(date).second().monday(),
+		ShoppingStart 		: Date.parse(date).second().monday(),
+		ShoppingStop		: Date.parse(date).third().monday(),
+		PaymentDueDay		: Date.parse(date).final().monday(),
+		DeliveryDay			: Date.parse(date).final().wednesday(),
+	};
+	console.log(exports.oldCycle);
+	console.log(exports.cycle);
+	return exports.cycle;
+};
+
+// get what the cycle dates will be for a particular month. 
+// @date is to be a parsable string for a particluar date.
+// common format is 't + 1 month'
+exports.getCycleDates = function(date) {
+	var start = Date.parse(date);
+	console.log(start);
+	if (typeof start.moveToFirstDayOfMonth === 'function') {
+		var cycle = {
+			cycleIncrementDay	: Date.parse(date).moveToFirstDayOfMonth(), 
+			ProductUploadStart 	: Date.parse(date).first().monday(),
+			ProductUploadStop 	: Date.parse(date).second().monday(),
+			ShoppingStart 		: Date.parse(date).second().monday(),
+			ShoppingStop		: Date.parse(date).third().monday(),
+			PaymentDueDay		: Date.parse(date).final().monday(),
+			DeliveryDay			: Date.parse(date).final().wednesday(),
+		};
+		return cycle;
+	} 
+	
+};
+
 exports.cycle.testDay = Date.today();
-
-
 
 // SENSITIVE //
 exports.bankAccount = "01-0000-0000000-0000-000";

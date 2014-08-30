@@ -22,14 +22,15 @@ angular.module('co-op', [
   .config(['$routeProvider', 'RestangularProvider', function($routeProvider, RestangularProvider) {
     $routeProvider
 		.when('/', {templateUrl: 'partials/index-content.html', controller: 'MyCtrl1', reloadOnSearch: false})
-		.when('/signup', {templateUrl: 'partials/signup.html', controller: 'userCtrl'})
-		.when('/welcome', {templateUrl: 'partials/thankyou.html', controller: 'signupInvoiceCtrl'})
-		.when('/terms-cons', {templateUrl: 'partials/legal/terms-cons.html'})
-		.when('/priv-pol', {templateUrl: 'partials/legal/priv-pol.html'})
+		.when('/calendar', {templateUrl: 'partials/calendar.html', controller: 'calendarCtrl', reloadOnSearch: false})
+		.when('/signup', {templateUrl: 'partials/signup.html', controller: 'userCtrl', reloadOnSearch: false})
+		.when('/welcome', {templateUrl: 'partials/thankyou.html', controller: 'signupInvoiceCtrl', reloadOnSearch: false})
+		.when('/terms-cons', {templateUrl: 'partials/legal/terms-cons.html', reloadOnSearch: false})
+		.when('/priv-pol', {templateUrl: 'partials/legal/priv-pol.html', reloadOnSearch: false})
 		.when('/users-rights', {
 			templateUrl: 'partials/admin/users-rights.html', 
 			controller: 'userAdminCtrl', 
-			adminOnly: true,
+			adminOnly: true, reloadOnSearch: false,
 			resolve: {
 				users: function(Restangular) {
 					return Restangular.all('api/user');
@@ -39,30 +40,31 @@ angular.module('co-op', [
 		.when('/user/:userId', {
 			controller: 'userEditCtrl', 
 			templateUrl:'partials/admin/details.html',
-			adminOnly: true,
+			adminOnly: true, reloadOnSearch: false,
 			resolve: {
 				user: function(Restangular, $route){
 					return Restangular.one('api/user', $route.current.params.userId).get();
 				}
 			}
 		})
-		.when('/admin/invoices', { controller: 'invoiceCtrl', templateUrl: 'partials/admin/invoices.html', adminOnly: true })
+		.when('/admin/invoices', { controller: 'invoiceCtrl', templateUrl: 'partials/admin/invoices.html', adminOnly: true, reloadOnSearch: false })
 		
-		.when('/forgot', {templateUrl: 'partials/forgot-password.html', controller: 'forgotCtrl'})
+		.when('/forgot', {templateUrl: 'partials/forgot-password.html', controller: 'forgotCtrl', reloadOnSearch: false})
 		.when('/reset/:token', {
 			controller: 'resetCtrl',
-			templateUrl:'partials/reset-password.html',
+			templateUrl:'partials/reset-password.html', reloadOnSearch: false,
 			resolve: {
 				user: function(Restangular, $route) {
 					return Restangular.one('api/reset', $route.current.params.token).get();
 				}
 			}
 		})
-		.when('/about', {templateUrl: 'partials/about.html'})
-		.when('/producer-list', {templateUrl: 'partials/producer-list.html', controller: 'producerListCtrl'})
+		.when('/about', {templateUrl: 'partials/about.html', reloadOnSearch: false})
+		.when('/calendar', {templateUrl: 'partials/calendar.html', controller:'calendarCtrl', reloadOnSearch: false})
+		.when('/producer-list', {templateUrl: 'partials/producer-list.html', controller: 'producerListCtrl', reloadOnSearch: false})
 		.when('/producer/:companyName-:userName', {
 			controller: 'producerPageCtrl',
-	 		templateUrl:'partials/producer-page.html',
+	 		templateUrl:'partials/producer-page.html', reloadOnSearch: false,
 	 		resolve: {
 	 			producer: function(Restangular, $route){
 					return Restangular.one('api/user/producer', $route.current.params.userName).get();
@@ -70,43 +72,56 @@ angular.module('co-op', [
 	 		}
 	 	})
 	
-		.when('/faq', {templateUrl: 'partials/faq.html'})
+		.when('/faq', {templateUrl: 'partials/faq.html', controller: 'faqCtrl'})
     
 		.when('/product-upload', {
 			templateUrl: 'partials/loggedIn/product-upload.html', 
 			controller: 'productUploadCtrl', 
-			loggedInOnly: true,
+			loggedInOnly: true, reloadOnSearch: false,
 			resolve: { product: function() { return {}; } }
 		})
 		.when('/product-upload/:productId', {
 			controller: 'productUploadCtrl',
 			templateUrl: 'partials/loggedIn/product-upload.html',
-			loggedInOnly: true,
+			loggedInOnly: true, reloadOnSearch: false,
 			resolve: {
 				product: function(Restangular, $route) {
 					return Restangular.one('api/product', $route.current.params.productId).get();
 				}
 			}
 		})
-		.when('/producer-profile', {templateUrl: 'partials/loggedIn/edit-producer-profile.html', controller: 'producerCtrl', loggedInOnly: true})
-		.when('/my-cart', {templateUrl: 'partials/loggedIn/my-cart.html', controller: 'cartPageCtrl', loggedInOnly: true})
+		.when('/producer-profile', {templateUrl: 'partials/loggedIn/edit-producer-profile.html', controller: 'producerCtrl', loggedInOnly: true, reloadOnSearch: false})
+		.when('/my-cart', {templateUrl: 'partials/loggedIn/my-cart.html', controller: 'cartPageCtrl', loggedInOnly: true, reloadOnSearch: false})
     	.when('/product-manager', {
 			templateUrl: 'partials/loggedIn/order-manager.html', 
 			controller: 'productOrderCtrl',
-			loggedInOnly: true,
+			loggedInOnly: true, reloadOnSearch: false,
 			resolve: {
 				products: function(Restangular, $route) {
 					return Restangular.all('api/product-list');
 				},
 				myOrders: function(Restangular, $route) {
 					return Restangular.all('api/order/me');
+				},
+				unfullfilledOrders: function(Restangular, $route) {
+					return Restangular.all('api/order/cycle');
+				}
+			}
+		})
+		.when('/my-invoices', {
+			controller: 'userInvoiceCtrl',
+			templateUrl:'partials/loggedIn/invoices.html',
+			loggedInOnly: true, reloadOnSearch: false,
+			resolve: {
+				invoices: function(Restangular){
+					//return Restangular.all('api/me/invoice').getList().$object;
 				}
 			}
 		})
 		.when('/me/:userId', {
 			controller: 'userEditCtrl',
 			templateUrl:'partials/loggedIn/edit-me.html',
-			loggedInOnly: true,
+			loggedInOnly: true, reloadOnSearch: false,
 			resolve: {
 				user: function(Restangular, $route){
 					return Restangular.one('api/user', $route.current.params.userId).get();
@@ -114,10 +129,10 @@ angular.module('co-op', [
 			}
 		})
 
-		.when('/contact', {templateUrl: 'partials/contact.html', controller: 'contactCtrl'})
+		.when('/contact', {templateUrl: 'partials/contact.html', controller: 'contactCtrl', reloadOnSearch: false})
 		.when('/contact/:userId', {
 			templateUrl: 'partials/contact.html', 
-			controller: 'producerContactCtrl',
+			controller: 'producerContactCtrl', reloadOnSearch: false,
 			resolve: {
 				member: function(Restangular, $route){
 					return Restangular.one('api/user', $route.current.params.userId).get();
@@ -125,11 +140,11 @@ angular.module('co-op', [
 			}
 		})
 	
-    .when('/login', {templateUrl: 'partials/login.html', isLogin: true})
-    .when('/must-login', {templateUrl: 'partials/must-login.html', isLogin: true})
-    .when('/login-failed', {templateUrl: 'partials/login-failed.html'})
+    .when('/login', {templateUrl: 'partials/login.html', isLogin: true, reloadOnSearch: false})
+    .when('/must-login', {templateUrl: 'partials/must-login.html', isLogin: true, reloadOnSearch: false})
+    .when('/login-failed', {templateUrl: 'partials/login-failed.html', reloadOnSearch: false})
     .when('/login-page', {templateUrl: 'partials/login-page.html', reloadOnSearch: false})
-    .when('/login-failed/attempts=:tries', {templateUrl: 'partials/login-failed.html'})
+    .when('/login-failed/attempts=:tries', {templateUrl: 'partials/login-failed.html', reloadOnSearch: false})
     
     // store routes
 	.when('/store', {templateUrl: 'partials/store/store-template.html', controller: 'storeCtrl', reloadOnSearch: false})
@@ -180,8 +195,8 @@ angular.module('co-op', [
         $rootScope.$on( '$locationChangeStart', function(event, next, current) {
 	        var nextPath = $location.path(); // return next path (not full URL);
 	        var nextRoute = $route.routes[nextPath]; // returns undefined if a route param is part of the next path
-	        	        
-	        nextRoute.loggedInOnly = nextRoute.hasOwnProperty('loggedInOnly') ? nextRoute.loggedInOnly : false;
+	        if (nextRoute) nextRoute.loggedInOnly = nextRoute.hasOwnProperty('loggedInOnly') ? nextRoute.loggedInOnly : false;
+        
 	        
 	        if (!$rootScope.currentUser && nextRoute.loggedInOnly) {
 		        event.preventDefault();

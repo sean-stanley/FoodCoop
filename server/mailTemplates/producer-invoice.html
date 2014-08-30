@@ -1,0 +1,62 @@
+<html>
+    <head>
+        <title> Products Ordered From You </title>
+    </head>
+    <body>
+        <p> Hi {{name}},</p>
+		<p>Please keep this email for your reference.</p>
+        <p> Shopping is now closed for this month so we tallied up everything ordered from you and sent you this list. We've also tallied up the cost of those products.</p>
+        <p> Assuming all your customers pay us promptly, we will transfer payment by <strong>{{dueDate}}</strong></p>
+		
+		<p>Below is the invoice we generated for us to pay you. You'll find it also contains the details of what you are required to deliver to us on delivery day which is <strong>{{dueDate}}</strong></p>
+       
+       <table border="0" cellspacing="10" cellpadding="10">
+           <thead>
+               <tr>
+                   <td>Invoice #{{code}}</td>
+				   <td colspan="5">{{name}}'s Requested Products</td>
+               </tr>
+               <tr>
+                   <td>Refrigeration</td>
+				   <td>Product</td>
+				   <td>Customer</td>
+				   <td>Unit Price</td>
+				   <td>Quantity</td>
+				   <td>Cost</td>
+               </tr>
+           </thead>
+           <tbody>
+               
+			  <% _.each(items, function(item) { %> 
+                 <tr>
+                     <td>{{item.product.refrigeration}}</td>
+					 <td>{{item.product.fullName}} </td>
+					 <td>{{item.customer.name}}</td>
+					 <td>{{item.product.price}} / {{item.product.units}}</td>
+					 <td>{{item.quantity}}</td>
+                     <td>${{item.cost}} </td>
+                 </tr>
+			<% }); %>
+           </tbody>
+           <tfooter>
+               <tr>
+                   <td colspan="5"> Total: ${{total}}</td>
+               </tr>
+           </tfooter>
+       </table>
+	   
+	   <p>You can expect payment to the account {{account}}. If this is incorrect, please contact us immediately and update your bank account details from your producer profile page on our website.</p>
+       
+	   <hr>
+        <p> A copy of this invoice and it's status is available <a href="http://foodcoop.org.nz/my-invoices">online</a>
+        
+        <p> We look forward to continueing to provide you with a great online experience.</p>
+        <p>Cheers, <br>
+        The NNFC team </p>
+        
+		<p>
+			<a href="http://foodcoop.org.nz"><img src="cid:logo@foodcoop" /></a>
+		</p>
+    </body>
+    
+</html>

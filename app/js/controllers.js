@@ -76,6 +76,15 @@ angular.module('co-op.controllers', []).
 
 		}
 	])
+.controller('faqCtrl', ['$scope', '$location', '$sce', function($scope, $location, $sce){
+	$scope.hash = $location.hash();
+	$scope.hashFunction = function(hash) {
+		$scope.hash = $scope.hash === hash ? $scope.hash = false : $scope.hash = hash;
+	};
+	
+	var mapURL = 'http://maps.google.com/?q=2+Woods+Rd+Whangarei+New+Zealand&output=embed';
+	$scope.map = $sce.trustAsResourceUrl(mapURL);
+}])
 
 .controller('logoutCtrl', ['$scope', '$location', 'LoginManager',
 	function($scope, $location, LoginManager) {
@@ -190,9 +199,17 @@ angular.module('co-op.controllers', []).
 
 .controller('invoiceCtrl', ['$scope', '$rootScope', 'Restangular', 
 	function($scope, $rootScope, Restangular){
-		$scope.now = new Date();
+		$scope.now = Date();
 		
-		$scope.soon = $scope.now.setDate($scope.now.getDate() - 7);
+		$scope.soon = function(invoice) {
+			if (invoice.status === 'un-paid') {
+				if ( Date.parse(invoice.dueDate).between( Date.today(), Date.today().addWeeks(1) ) ) {
+					return true;
+					}
+			}
+			
+			return false;
+		};
 		
 		// the array of invoices for use in the template
 		$scope.invoices = Restangular.all('api/invoice').getList().$object;
@@ -230,6 +247,31 @@ angular.module('co-op.controllers', []).
 			return match.length;
 		};
 		
+}])
+
+.controller('userInvoiceCtrl', ['$scope', 'Restangular', '$rootScope', function($scope, Restangular, $rootScope){
+	$scope.now = Date();
+	$scope.invoices = Restangular.all('api/invoice').getList({invoicee : $rootScope.currentUser._id}).$object;
+	$scope.soon = function(invoice) {
+		if (invoice.status === 'un-paid') {
+			if ( Date.parse(invoice.dueDate).between( Date.today(), Date.today().addWeeks(1) ) ) {
+				return true;
+				}
+		}
+		
+		return false;
+	};
+	$scope.unPaid = function() {
+		var match;
+		match = _.where($scope.invoices, {status: 'un-paid'});
+		return match.length;
+	};
+	
+	$scope.overdue = function() {
+		var match;
+		match = _.where($scope.invoices, {status: 'OVERDUE'});
+		return match.length;
+	};
 }])
 
 
@@ -305,9 +347,12 @@ angular.module('co-op.controllers', []).
 	}
 ])
 
-.controller('producerPageCtrl', ['$scope', 'Restangular', 'producer',
-	function($scope, Restangular, producer) {
+.controller('producerPageCtrl', ['$scope', '$sce', 'Restangular', 'producer',
+	function($scope, $sce, Restangular, producer) {
 		$scope.producer = producer.plain();
+		var mapURL = 'http://maps.google.com/?q=' + producer.address + '&output=embed';
+		$scope.map = $sce.trustAsResourceUrl(mapURL);
+		$scope.mapDirections = $sce.trustAsResourceUrl(mapURL);
 	}
 ])
 
@@ -468,54 +513,31 @@ angular.module('co-op.controllers', []).
 	}
 ])
 
-.controller('productOrderCtrl', ['$scope', 'myOrders', 'products', 'Calendar', 'ProductHistory', 
-	function($scope, myOrders, products, Calendar, ProductHistory) {
+.controller('productOrderCtrl', ['$scope', 'myOrders', 'products', 'unfullfilledOrders', 'Calendar', 'ProductHistory', 
+	function($scope, myOrders, products, unfullfilledOrders, Calendar, ProductHistory) {
 		myOrders.getList().then(function(orders) {
 			$scope.orders = orders.plain();
 			
-			Calendar.currentMonth(orders, 'datePlaced', function(result) {
+			Calendar.currentMonth($scope.orders, function(result) {
 				$scope.currentOrders = result;
 			});
 			
-			Calendar.lastMonth(orders, 'datePlaced', function(result) {
+			Calendar.lastMonth($scope.orders, function(result) {
 				$scope.recentOrders = result;
 			});
 						
 			$scope.orderTotal = function(list) {
-				var total;
+				var total = 0;
 				for (var i = 0; i < list.length; i++) {
 					total += list[i].orderPrice;
 				}
 				return total;
-			};
+			};			
 			
-			$scope.sortedOrders = [];
-			
-			var sort = function(order, idx, orders) {
-				var allOneCustomersOrders, sortedObject, key;
-				
-				allOneCustomersOrders = _.where(orders, {customer: {_id: order.customer._id}});
-				
-				sortedObject = {
-						customer: order.customer.name,
-						_id : order.customer._id,
-						orders : allOneCustomersOrders
-				};
-				
-				for (key in $scope.sortedOrders) {
-					if ($scope.sortedOrders.hasOwnProperty(key)) {
-						if (key._id !== sortedObject._id) {
-							
-						}
-					}
-				}
-				
-				$scope.sortedOrders.push(sortedObject);
-			};
-			
-			$scope.currentOrders.forEach(sort);
 			console.log($scope.sortedOrders);
 		});
+		
+		$scope.sortedOrders = unfullfilledOrders.getList().$object;
 		
 		ProductHistory.getCurrentProducts(function(products) {
 			$scope.currentProducts = products;
@@ -528,14 +550,15 @@ angular.module('co-op.controllers', []).
 		$scope.products = products.getList().$object; 
 				
 		$scope.isOrdered = function(id) {
-			var numOrdered;
-			var ordersOfProduct = _.where($scope.orders, { product : {_id: id} });
-			if (ordersOfProduct.hasOwnProperty('length') ) {
+			var numOrdered = 0;
+			var ordersOfProduct = _.where($scope.currentOrders, { product : {_id: id} });
+			if (ordersOfProduct !== [] ) {
 				for (var i = 0; i < ordersOfProduct.length; i++) {
 					numOrdered += ordersOfProduct[i].quantity;
 				}
+				return numOrdered;
 			}
-			return 0;
+			else return 0;
 		};
 		
 		$scope.lastMonth = Date.today().add(-1).months().toString('MMMM');
@@ -622,9 +645,6 @@ angular.module('co-op.controllers', []).
 				$scope.cart[idx].quantity = $scope.oldQuantities[idx];
 			}
 		};
-		
-		
-		
 		
 		// only for the store.html page use of this controller
 		
@@ -730,7 +750,6 @@ angular.module('co-op.controllers', []).
 							break;
 						default:
 							console.log("no match found for " + key);
-							
 					}
 				}
 			}
@@ -909,10 +928,55 @@ angular.module('co-op.controllers', []).
 	}
 
 ])
-.controller('calendarCtrl', ['$scope', 'Calendar',
-	function($scope, Calendar) {
-		$scope.daysLeftUntilDeliveryDay = Calendar.daysUntil(Calendar.deliveryDay());
-	}
+.controller('calendarCtrl', ['$scope', '$http', 'Calendar',
+	function($scope, $http, Calendar) {
+		$scope.countDown = [];
+		$scope.today = Date.today().toString("ddd d MMM yyyy");
+		$scope.month = Date.today().toString("MMMM");
+		$scope.monthPlusOne = Date.today().addMonths(1).toString("MMMM");
+		$scope.monthPlusTwo = Date.today().addMonths(2).toString("MMMM");
+		
+		$http.get('/api/calendar').success(function(result) {
+			$scope.significantDays = result[0];
+			$scope.nextMonth = result[1];
+			$scope.twoMonth = result[2];
+			$scope.cycle = result[3];
+			
+			var key;
+			
+			for (var i=0; i < result.length -1; i ++) {
+				$scope.countDown[i] = [];
+				for(key in result[i]) {
+					if (result[i].hasOwnProperty(key)) {
+						$scope.countDown[i][key] = {
+							string: key.replace(/(?=[A-Z])/g, " $&"),
+							date: Date.parse(result[i][key]).toString("ddd d MMM yyyy"),
+							daysUntil: Calendar.daysUntil(result[i][key]),
+							future: Date.today().compareTo(Date.parse(result[i][key])) == -1 
+						};
+					}
+				}
+			}
+			// @start, @end are objects from the $scope.countDown[i] object. i = 0 for the current month.
+			$scope.inDateRange = function(start, end) {
+				var present, future, plural;
+				plural = start.daysUntil != 1 ? 's' : '';
+				future = start.future;
+				if (future) return 'starts in '+ start.daysUntil + ' day'+ plural;
+				else {
+					present = end.future;
+					plural = Math.abs(end.daysUntil) != 1 ? 's' : '';
+					if (present) return 'is open for '+ end.daysUntil + ' more day'+ plural;
+					else return 'was '+ Math.abs(end.daysUntil) + ' day'+ plural+ " ago";
+				}
+			};
+			
+			$scope.daysBeforeOrderingStops = Calendar.daysUntil($scope.significantDays.ProductUploadStop);
+			$scope.daysBeforeDeliveryDay = Calendar.daysUntil($scope.significantDays.DeliveryDay);
+			
+			
+		});
+	}	
 ])
 
 .controller('productUICtrl', ['$scope', '$timeout',
@@ -929,12 +993,8 @@ angular.module('co-op.controllers', []).
 			}, 1000);
 		};
 
-		$scope.callCancelled = function() {
-			$timeout.cancel(timer);
-		};
+		$scope.callCancelled = function() { $timeout.cancel(timer); };
 
-		$scope.$on("$destroy", function(event) {
-			$timeout.cancel(timer);
-		});
+		$scope.$on("$destroy", function(event) { $timeout.cancel(timer); });
 	}
 ]);

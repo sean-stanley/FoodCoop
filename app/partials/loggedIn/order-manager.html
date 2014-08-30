@@ -101,10 +101,10 @@
 </accordion>
 </div>
 <div class="col-md-6">
-	<h2>Unfulfilled Orders</h2>
+	<h2>Unfulfilled Orders <small>Total: {{orderTotal(currentOrders) | currency}}</small></h2>
 	<table class="table">
 		<thead ng-repeat-start="order in sortedOrders">
-			<tr><th colspan="4"><a ng-href="#/contact/{{order._id}}">{{order.customer}}</th></tr>
+			<tr><th colspan="4"><a ng-href="#/contact/{{order._id._id}}">{{order._id.name}} <small>email customer</small></th></tr>
 			<tr><th>Product</th><th>Quantity</th><th>Unit Price</th><th>Price</th></tr>
 		</thead>
 		<tbody ng-repeat-end>
@@ -116,19 +116,17 @@
  					{{i.quantity}}
  				</td>
 		        <td data-title="'Price'">
-		            {{i.orderPrice | currency}} / {{i.product.units}}
+		            {{i.product.price | currency}} / {{i.product.units}}
 		        </td>
 				<td data-title="'times Ordered'">
-					{{i.orderPrice * i.quantity | currency}}
+					{{i.product.price * i.quantity | currency}}
 				</td>
 			</tr>
 		</tbody>
-		<tfooter colspan="4" ng-if="sortedOrders">
-			<strong>Total: {{orderTotal(currentOrders)}}</strong>
-		</tfooter>
+		
 	</table>
 	<accordion>
-		<accordion-group heading="Last Month's Orders">
+		<accordion-group heading="Last Month's Orders - Total: {{orderTotal(recentOrders) | currency}}">
 			<table class="table">
 				<thead>
 					<tr>
@@ -160,7 +158,7 @@
 				</tbody>
 			</table>
 		</accordion-group>
-		<accordion-group heading="All Orders">
+		<accordion-group heading="All Orders - Total: {{orderTotal(orders) | currency}}">
 			<table class="table">
 				<thead>
 					<tr>

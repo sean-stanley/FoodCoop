@@ -1,0 +1,59 @@
+<html>
+    <head>
+        <title> Your Shopping Bill </title>
+    </head>
+    <body>
+        <p> Hi {{name}},</p>
+        <p> Ordering is now closed for this month so we've tallied up your cart and sent you the invoice.</p>
+        <p> We would most appreciate it if you could pay this by <strong> {{dueDate}} </strong></p>
+       
+       <table border="0" cellspacing="10" cellpadding="10">
+           <thead>
+               <tr>
+                   <td>Invoice #{{code}}</td>
+				   <td colspan="5">{{name}}'s Shopping Bill</td>
+               </tr>
+               <tr>
+                   <td>Refrigeration</td>
+				   <td>Product</td>
+				   <td>Unit Price</td>
+				   <td>Quantity</td>
+				   <td>Cost</td>
+               </tr>
+           </thead>
+           <tbody>
+               
+			  <% _.each(items, function(item) { %> 
+                 <tr>
+                     <td>{{item.product.refrigeration}}</td>
+					 <td>{{item.product.fullName}}</td>
+					 <td>{{item.product.priceWithMarkup}} / {{item.product.units}}</td>
+					 <td>{{item.quantity}}</td>
+                     <td>${{item.cost}} </td>
+                 </tr>
+			<% }); %>
+           </tbody>
+           <tfooter>
+               <tr>
+                   <td colspan="5"> Total: ${{total}}</td>
+               </tr>
+           </tfooter>
+       </table>
+	   
+	   <p>Please make payment with your name as a reference and the global invoice number as a code.</p>
+	   
+	   <p>Payment can be made by internet banking to account {{account}}</p>
+       
+	   <hr>
+        <p> A copy of this invoice and it's status is available <a href="http://foodcoop.org.nz/my-invoices">online</a>
+        
+        <p> We look forward to continueing to provide you with a great online experience.</p>
+        <p>Cheers, <br>
+        The NNFC team </p>
+        
+		<p>
+			<a href="http://foodcoop.org.nz"><img src="cid:logo@foodcoop" /></a>
+		</p>
+    </body>
+    
+</html>

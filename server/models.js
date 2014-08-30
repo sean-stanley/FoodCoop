@@ -127,10 +127,7 @@ var UserSchema = new Schema({
 			phone : {type: String, required: false},
 			address : {type: String, required: true},
 			// this is for a future feature that will be a map of all our producers
-			geo : {
-				lat: Number,
-				long: Number
-			},
+			geo : {type: Array},
 			name : {type: String, required: true},
 			user_type : {
 				name: {type : String, required : true},
@@ -145,7 +142,7 @@ var UserSchema = new Schema({
 				certification : {type: String},
 				website : {type: String},
 				personalBio : {type: String},
-				bankAccount : {type: String}
+				bankAccount : {type: String, default: "NO ACCOUNT ON RECORD"}
 			},
 			//amountSpentThisYear is assigned when a user is invoiced for an order and is a
 			//record of how much a user has spent in the co-op in the past year. This is

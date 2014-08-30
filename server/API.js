@@ -16,13 +16,15 @@ var util = require('util'),
 	models = require('./models.js'), // this file stores the mongoose schema data for our MongoDB database.
 	mail = require('./staticMail.js'), // this file stores some common mail settings.
 	Emailer = require('./emailer.js'), // this is a custom class expanded upon nodemailer to allow html templates to be used for the emails.
+	
+	config = require('./coopConfig.js'), // static methods of important configuration info
+	scheduler = require('./scheduler.js'), // contains scheduled functions and their results
+	
 	passport = require('passport'), // middleware that provides authentication tools for the API.
 	LocalStrategy = require('passport-local').Strategy; // the passport strategy employed by this API.
 
 require('datejs'); // provides the best way to do date manipulation.
 var calendar = require('./calendarHelper.js');
-
-var scheduler = require('./scheduler.js');
 
 
 // sets date locality and formats to be for new zealand.
@@ -447,7 +449,6 @@ exports.configAPI = function configAPI(app) {
 				}
 			}, function(e, results) {
 				if (!e) {
-
 					// define options for replacing ID's in the order with the appropriate data from
 					// other collections. The other collections are specified with the 'ref'
 					// property in the collections' Schema object.
@@ -480,11 +481,51 @@ exports.configAPI = function configAPI(app) {
 			});
 		}
 	});
+	// get a suppliers orders for the current cycle grouped by customer
+	app.get("/api/order/cycle", function(req,res, next){
+		if (req.user) {
+			async.waterfall([
+				function(done) {
+					models.Order
+					.aggregate().match({cycle: scheduler.currentCycle, supplier: req.user._id})
+					.group({ _id: "$customer", orders: { $push : {product: "$product", quantity: "$quantity"} }})
+					.exec(function(e, customers) {
+						// customers is a plain javascript object not a special mongoose document.
+						done(e, customers)
+					})
+				},
+				function(customers, done) {
+					models.Product.populate(customers, {path: 'orders.product', select: 'fullName price units productName variety'}
+					, function(e, result){
+						_.map(result, function(producer) {
+							producer.orders = _.sortBy(producer.orders, function(order) {
+								return order.product.fullName.toLowerCase();
+							});
+							return producer
+						});
+						done(null, result)
+					});
+				},
+				function(customers, done) {
+					models.User.populate(customers, {path: '_id', select: 'name email'}
+					, function(e, result){
+						done(null, result)
+					});
+				}
+			],function(e, result){
+				if (e) {
+					console.log(e)
+					res.send(500);
+				}
+				else res.json(result);
+			});	
+		}
+	});
+	
 	app.get("/api/cart/:user/length", function(req, res, next) {
 		if (req.user && req.user._id == req.params.user) {
 			models.Order.count({customer: new ObjectId(req.params.user), cycle: scheduler.currentCycle}, function(e, count) {
 				if (!e) {
-					console.log("current cycle is %s", scheduler.currentCycle)
 					res.send(count.toString());
 				}
 				else {
@@ -600,7 +641,8 @@ exports.configAPI = function configAPI(app) {
 		else res.send(401);
 		
 	});
-	// Deletes a specific item from a users own cart.
+	// Deletes a specific item from a users own cart and increases the quantity
+	// available of that product again.
 	app.delete("/api/cart/:id", function(req, res, next) {
 		// Check if the current user is logged in and their ID in the params matches the
 		// id of their user data. If it does, delete that order from the database. Items
@@ -628,7 +670,9 @@ exports.configAPI = function configAPI(app) {
 		else res.send(401);
 	});
 	
-	// Creates a new order from the 'add to cart' buttons in the app. Returns the populated order.
+	// Creates a new order from the 'add to cart' buttons in the app. Returns the
+	// populated order. It creates the order object and subtracts the quantity from
+	// the product being purchased inventory.
 	app.post("/api/order", function(req, res, next) {
 		if (req.user) {
 			if (req.body.customer !== req.body.supplier) {
@@ -686,13 +730,14 @@ exports.configAPI = function configAPI(app) {
 	
 	// get all the invoices or a query. Called in the app from the invoices page
 	app.get("/api/invoice", function(req, res, next) {
-		models.Invoice.find(req.query, null, {sort : {_id:1} }, function(e, invoices) {
-			models.Invoice.populate(invoices, {path:'invoicee', select: 'name address phone email -_id'}, function(e, invoices) {
-				if (e) return errorHandler(e);
-				
-				res.json(invoices);
+		if (req.user) {
+			models.Invoice.find(req.query, null, {sort : {_id:1} }, function(e, invoices) {
+				models.Invoice.populate(invoices, {path:'invoicee', select: 'name address phone email -_id'}, function(e, invoices) {
+					if (e) return errorHandler(e);
+					res.json(invoices);
+				});
 			});
-		});
+		}
 	});
 	
 	// update an invoice's status
@@ -716,22 +761,6 @@ exports.configAPI = function configAPI(app) {
 			});
 		});
 	});
-	
-	// get a query of all the invoices for a specific user sorted by date
-	app.get("/api/invoice/me", function(req, res, next) {
-		if (req.user) {
-			models.Invoice.find({invoicee: req.user._id}, null, {sort : {datePlaced:1} }, function(e, invoices) {
-				models.Invoice.populate(invoices, {path:'invoicee', select: 'name address phone email -_id'}, function(e, invoices) {
-					if (e) return errorHandler(e);
-					res.json(invoices);
-				});
-			});
-		}
-		else res.send(400);
-		
-	});
-	
-	
 	
 	//Get and return users as JSON data based on a query. Only really used for the
 	//admin to look at all users.
@@ -829,6 +858,7 @@ exports.configAPI = function configAPI(app) {
 							code: invoice._id,
 							items: invoice.items,
 							cost: invoice.total,
+							account: config.bankAccount,
 							email: user.email,
 							password: req.body.password
 						};
@@ -1343,6 +1373,21 @@ exports.configAPI = function configAPI(app) {
 		}, function(e, results) {
 			res.json(results)
 		})
+	});
+	
+	app.get("/api/calendar", function(req, res, next) {
+		var calendar = [], nextMonth, twoMonth;
+		calendar.push(config.cycle);
+		
+		nextMonth = config.getCycleDates('t + 1 month');
+		twoMonth = config.getCycleDates('t + 2months');
+		calendar.push(nextMonth);
+		calendar.push(twoMonth);
+		calendar.push(scheduler.currentCycle);
+		delete calendar[0].cycleIncrementDay;
+		delete calendar[1].cycleIncrementDay;
+		delete calendar[2].cycleIncrementDay;
+		res.send(calendar);
 	});
 
 	app.use(express.static(__dirname));

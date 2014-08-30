@@ -236,16 +236,17 @@ angular.module('co-op.services', [])
 	
 	// Client side date managment. This job is shared by the client and server.
 	.factory('Calendar', ['$http', function($http) {
-		var monthStart, lastMonthStart, deliveryDay;
+		var monthStart, lastMonthStart, deliveryDay, significantDays;
+		$http.get('/api/calendar').success(function(result) {
+			console.log(result);
+			deliveryDay = result.DeliveryDay;
+			significantDays = result;
+		});
+		
 		monthStart = Date.today().moveToFirstDayOfMonth();
 		lastMonthStart = Date.today().addMonths(-1).moveToFirstDayOfMonth();
-		deliveryDay = Date.today().final().wednesday();
 						
 		return {
-			// return this month's delivery day
-			deliveryDay: function() {
-				return deliveryDay;
-			},
 			// counts how many days until @date. Returns @INTEGER or NaN
 			// a negative result means that @date is in the past
 			daysUntil: function(date) {				
@@ -262,33 +263,25 @@ angular.module('co-op.services', [])
 				return result;
 			},
 			// This method filters an array to only contain stuff from the 
-			// current month. An example is products and orders. 
-			// @group is the array to be reduced
-			// @dateProperty is a string of the key containing a date in @group
-			// example: orders is an array of all orders and has the (key, value)
-			// of (datePlaced: date) so use currentMonth(orders, 'datePlaced');
-			// to return an array of orders created in the current month.
-			currentMonth : function(group, dateProperty, callback) {
+			// current cycle. @group must be an array of objects with a property called
+			// cycle. used for orders mainly
+			currentMonth : function(group, callback) {
 				var cb = callback || angular.noop;
 				var list = _.filter(group, function(item) {
-					if ( Date.parse(item[dateProperty]).between( monthStart, Date.today().add(1).days() ) ) {
+					if (item.hasOwnProperty('cycle') && item.cycle === significantDays.currentCycle) {
 						return item;
 					}
 				});
 				cb(list);
 				return list;
 			},
-			// This method filters an array to only contain stuff from one 
-			// month ago. An example is products and orders. 
-			// @group is the array to be reduced
-			// @dateProperty is a string of the key containing a date in @group
-			// example: orders is an array of all orders and has the (key, value)
-			// of (datePlaced: date) so use currentMonth(orders, 'datePlaced');
-			// to return an array of orders created during the last month.
-			lastMonth : function(group, dateProperty, callback) {
+			// This method filters an array to only contain stuff from the 
+			// previous cycle. @group must be an array of objects with a property called
+			// cycle. used for orders mainly
+			lastMonth : function(group, callback) {
 				var cb = callback || angular.noop;
 				var list = _.filter(group, function(item) {
-					if (Date.parse(item[dateProperty]).between(lastMonthStart, monthStart)) {
+					if (item.hasOwnProperty('cycle') && item.cycle === significantDays.currentCycle - 1) {
 						return item;
 					}
 				});
@@ -338,7 +331,7 @@ angular.module('co-op.services', [])
 				var currentCart;
 				Restangular.one('api/cart', $rootScope.currentUser._id)
 				.get().then(function(cart) {
-					currentCart = Calendar.currentMonth(cart, 'datePlaced', callback);
+					currentCart = Calendar.currentMonth(cart, callback);
 					return currentCart;					
 				});
 			},

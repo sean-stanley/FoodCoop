@@ -10,10 +10,11 @@
 	<li><a href="" ng-click="sort = 'datePlaced'; reverse=!reverse ">Date Created</a></li>
 	<li><a href="" ng-click="sort = 'dateModified'; reverse=!reverse ">Date Modified</a></li>
 </ul>
-<h3>Filter By: </h3>
+<h3>Search By: </h3>
 <ul class="nav nav-pills">
-	<li><a href="" ng-click="search = {}; search.title = 'Membership'; ">Membership Invoice</a></li>
+	<li><a href="" ng-click="search = {}; search.title = 'Shopping'; search.toCoop = false; ">Shopping Invoice</a></li>
 	<li><a href="" ng-click="search = {}; search.toCoop = true ">Order Invoice</a></li>
+	<li><a href="" ng-click="search = {}; search.title = 'Membership'; ">Membership Invoice</a></li>
 	<li><a href="" ng-click="search = {}; search.status = 'OVERDUE' ">Overdue <span class="badge">{{overdue()}}</span></a></li>
 	<li><a href="" ng-click="search = {}; search.status = 'un-paid' ">Un-Paid <span class="badge">{{unPaid()}}</span></a></li>
 </ul>
@@ -25,14 +26,19 @@
 	<alert ng-if="invoice.toCoop" type="info">The Co-op must pay this Invoice</alert>
 	<ul class="unstyled">
 		<li ng-hide="invoice.toCoop">
-			To be paid to the NNFC by <span ng-show="invoice.invoicee.name">{{invoice.invoicee.name}}</span><span ng-show="invoice.exInvoicee">{{invoice.exInvoicee}}</span>
-		</li>
+			To be paid to the NNFC by <span ng-show="invoice.invoicee.name">{{invoice.invoicee.name}}</span></li>
 		<li ng-show="invoice.toCoop">
 			The NNFC must pay this invoice to {{invoice.invoicee.name}};
 		</li>
 		<li>Date Placed: {{invoice.datePlaced | shortDate}}</li>
 		<li>Due Date: {{invoice.dueDate | shortDate}}</li>
 	</ul>
+	<label type="button" class="btn btn-lg" 
+	ng-class="{ 'btn-default': invoice.status === 'un-paid' || 'To Refund' || 'Refunded' || CANCELLED,
+				'btn-success': invoice.status === 'PAID',
+				'btn-danger' : invoice.status === 'OVERDUE'}">
+		{{invoice.status}}
+	</label>
 <table class="table">
 	<thead>
 		<tr><th colspan='2'>Invoice #{{invoice._id}} {{invoice.title}}</th></tr>
@@ -50,15 +56,6 @@
 	</tbody>
 </table>
 <p ng-show="invoice.toCoop">Payment is to be sent to <strong>{{invoice.bankAccount}}</strong></p>
-<div class="btn-group">
-	<button type='button' class="btn btn-default" ng-model="invoice.status" btn-radio=" 'un-paid' ">Un-paid</button>
-	<button type='button' class="btn btn-success" ng-model="invoice.status" btn-radio=" 'PAID' ">PAID</button>
-	<button type='button' class="btn btn-danger"  ng-model="invoice.status" btn-radio=" 'OVERDUE' ">OVERDUE</button>
-	<button type='button' class="btn btn-default" ng-model="invoice.status" btn-radio=" 'To Refund' ">To Refund</button>
-	<button type='button' class="btn btn-default" ng-model="invoice.status" btn-radio=" 'Refunded' ">Refunded</button>
-	<button type='button' class="btn btn-default" ng-model="invoice.status" btn-radio=" 'CANCELLED' ">CANCELLED</button>
-</div>
-<button type='button' class="btn btn-primary" ng-click="invoiceSave(invoice)"> Update Status</button>
 <hr>
 </section>
 

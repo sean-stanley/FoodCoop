@@ -38,7 +38,16 @@ angular.module('co-op.filters', []).
   })
   .filter('shortDate', function() {
 	return function(shortDate) {
-		return Date.parse(shortDate).toString('d/M/yyyy');  
+		if (shortDate) {
+			return Date.parse(shortDate).toString('d/M/yyyy');  
+		}
 	};
+  })
+  .filter('longDate', function() {
+	  return function(longDate) {
+		  if (longDate) {
+		  	return Date.parse(longDate).toString('ddd d MMM yyyy');
+		  }
+	  };
   })
   ;

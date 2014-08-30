@@ -52,7 +52,9 @@ function checkConfig() {
 					break;
 				case 'ShoppingStop':
 					// checkout everyone's purchases
-					checkout();	
+					//checkout();
+					// send order requests to producers
+					//orderGoods();
 					break;
 				case 'PaymentDueDay':
 					
@@ -61,7 +63,7 @@ function checkConfig() {
 					// send reminder emails
 					break;
 				case 'testDay':
-					console.log('Now what do I do on test day?');
+					console.log('testing checkout() function');
 					break;
 				default:
 					// no functions to execute for this day
@@ -89,26 +91,44 @@ function checkConfig() {
 
 // looks for all the orders of the cycle and groups them by customer
 function checkout() {
-	models.Order
-	.aggregate().match({cycle: exports.currentCycle})
-	.group({ _id: "$customer", orders: { $push : {product: "$product", quantity: "$quantity"} }})
-	.exec(function(e, customers) {
-		if (!e) {
-			console.log(customers);
-			// for each customer who has orders this cycle...
-			customers.forEach(function(customer) {
-				customer.orders.forEach(function(i) {
-					console.log(i);
-				})
-				//invoiceCustomer(customer);
+	async.waterfall([
+		function(done) {
+			models.Order
+			.aggregate().match({cycle: exports.currentCycle})
+			.group({ _id: "$customer", orders: { $push : {product: "$product", quantity: "$quantity"} }})
+			.exec(function(e, customers) {
+				// customers is a plain javascript object not a special mongoose document.
+				done(e, customers)
+			})
+		},
+		function(customers, done) {
+			models.Product.populate(customers, {path: 'orders.product', select: 'fullName variety productName priceWithMarkup price units refrigeration -_id'}
+			, function(e, result){
+				done(null, result)
+			});
+		},
+		function(customers, done) {
+			models.User.populate(customers, {path: '_id', select: 'name email'}
+			, function(e, result){
+				done(null, result)
 			});
 		}
-		
-		console.log(e);
-	})
+	],function(e, result){
+		console.log(result);
+		if (e) {
+			console.log(e)
+		}
+		else {
+			for (var i = 0; i < result.length; i++) {
+				//invoiceCustomer(result[i]);
+				console.log(result[i].orders);
+			}
+		}
+	});
 };
 
-// called by checkout(). Creates 
+// called by checkout() for each customer. Creates invoices for customers to pay
+// and emails them a copy
 function invoiceCustomer(customer) {
 	async.waterfall([
 		function(done) {
@@ -117,36 +137,155 @@ function invoiceCustomer(customer) {
 			});
 		},
 		function(count, done) {
-			customer.orders.forEach(function(order, idx) {
-				models.Product.findById(order.product, 'fullName variety productName priceWithMarkup price units refrigeration -_id', function(e, product) {
-					if (e) done(e);
-					customer.orders[idx].product = product;
-					customer.orders[idx].name = product.fullName;
-					customer.orders[idx].cost = customer.orders[idx].product.priceWithMarkup * customer.orders[idx].quantity;
-					done(null, count);
-				});
-			})
-			
-		},
-		
-		// look up customer name and email and save it to the @customer param
-		
-		function(count, done) {
 			models.Invoice.create({
 				_id: count +1,
 				dueDate: config.cycle.PaymentDueDay,
-				invoicee: customer._id,
+				invoicee: customer._id.name,
 				title: "Shopping Order for " + Date.today().toString("MMMM"),
 				items: customer.orders,
 				cycle: exports.currentCycle,
 			}, 
 			function(e, invoice) {
 				if (e) done(e);
-					
+				done(null, invoice)	
 			})
 		},
+		function(invoice, done) {
+			var mailOptions, mailData, mail;
+			mailOptions = {
+				template: 'shopping-invoice',
+				subject: Date.today().toString("MMM") + ' Shopping Bill for' + customer._id.name,
+				to: {
+					email: customer._id.email,
+					name: customer._id.name
+				}
+			};
+
+			mailData = {
+				name: customer._id.name,
+				dueDate: invoice.dueDate,
+				code: invoice._id,
+				items: invoice.items,
+				total: invoice.total,
+				account: config.bankAccount
+			};
+			
+			mail = new Emailer(mailOptions, mailData);
+
+			mail.send(function(err, result) {
+				if (err) done(err);
+				// a response is sent so the client request doesn't timeout and get an error.
+				console.log("Message sent to new member");
+				
+				done(null, user);
+			});
+		}
 		
-		// email the customer their invoice
+	],function(error) {
+		console.log(error);
+	});
+};
+
+function orderGoods() {
+	async.waterfall([
+		function(done) {
+			models.Order
+			.aggregate().match({cycle: exports.currentCycle})
+			.group({ _id: "$supplier", orders: { $push : {product: "$product", customer: '$customer', quantity: "$quantity"} }})
+			
+			.exec(function(e, producers) {
+				// customers is a plain javascript document not a special mongoose document.
+				done(e, producers)
+			})
+		},
+		function(producers, done) {
+			models.Product.populate(producers, {path: 'orders.product', select: 'fullName variety productName price units refrigeration -_id'}
+			, function(e, result){
+				
+				_.map(result, function(producer) {
+					producer.orders = _.sortBy(producer.orders, function(order) {
+						return order.product.fullName.toLowerCase();
+					});
+					return producer
+				});
+				done(null, result)
+			});
+		},
+		function(producers, done) {
+			models.User.populate(producers, [{path: '_id', select: 'name email producerData.bankAccount'}, {path: 'orders.customer', select: 'name email'}]
+			, function(e, result){
+				done(null, result)
+			});
+		}
+	],function(e, result){
+		console.log(result);
+		if (e) {
+			console.log(e)
+		}
+		else {
+			for (var i = 0; i < result.length; i++) {
+				//invoiceFromProducer(result[i]);
+				console.log(result[i].orders);
+			}
+		}
+	});
+};
+
+// called by orderGoods() for each customer. Creates invoices for producers to
+// be paid. Creates invoices for producers to know what to deliver and emails
+// them a copy of the invoice. This function is for the producer's 
+// convenience and is as a way of invoicing the co-op for orders requested.
+function invoiceFromProducer(producer) {
+	async.waterfall([
+		function(done) {
+			models.Invoice.count(function(e, count) {
+				done(e, count);
+			});
+		},
+		function(count, done) {
+			models.Invoice.create({
+				_id: count +1,
+				dueDate: config.cycle.DeliveryDay,
+				invoicee: config.coopName,
+				title: "Products Requested for " + Date.today().toString("MMMM"),
+				items: producer.orders,
+				cycle: exports.currentCycle,
+				toCoop: true
+			}, 
+			function(e, invoice) {
+				if (e) done(e);
+				done(null, invoice)	
+			})
+		},
+		function(invoice, done) {
+			var mailOptions, mailData, mail;
+			mailOptions = {
+				template: 'producer-invoice',
+				subject: Date.today().toString("MMMM") + ' Products Requested for ' + config.coopName,
+				to: {
+					email: producer._id.email,
+					name: producer._id.name
+				}
+			};
+
+			mailData = {
+				name: producer._id.name,
+				dueDate: invoice.dueDate,
+				code: invoice._id,
+				items: invoice.items,
+				total: invoice.total,
+				account: producer._id.producerData.bankAccount
+			};
+			
+			mail = new Emailer(mailOptions, mailData);
+
+			mail.send(function(err, result) {
+				if (err) done(err);
+				console.log("Message sent to new member");
+				
+				done(null, user);
+			});
+		}
 		
 	],function(error) {
 		console.log(error);
@@ -163,6 +302,7 @@ function incrementCycle() {
 			models.Cycle.create({_id: count ++ || 0}, function(err, cycle){
 				console.log(cycle);
 				if (!err) {
+					config.cycleReset('today');
 					exports.currentCycle = cycle._id;
 				}
 				else console.log(err);
@@ -175,7 +315,7 @@ function incrementCycle() {
 
 models.Cycle.count(function(e, count) {
 	exports.currentCycle = count;
-	checkout();
+	orderGoods();
 	console.log(exports.currentCycle);
 	if (e) console.log(e);
 });

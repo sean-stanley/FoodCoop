@@ -86,10 +86,12 @@
 				
 				<div id="calendar">
 					<div id="calendar-container" ng-controller="calendarCtrl">
-						<h2>Co-op Calendar</h2>
-						<p>
-							Ordering closes in <span class="highlight">5</span> days<br>
-							Delivery Day is in <span class="highlight">{{daysLeftUntilDeliveryDay}}</span> days
+						<h2><a href="#/calendar">Co-op Calendar</a></h2>
+						<p class="lead">
+							Product Uploading {{inDateRange(countDown[0].ProductUploadStart, countDown[0].ProductUploadStop)}}.<br>
+							Shopping {{inDateRange(countDown[0].ShoppingStart, countDown[0].ShoppingStop)}}.<br>
+							Delivery Day is in <span class="badge">{{daysBeforeDeliveryDay}}</span> days<br>
+							<span ng-if="daysBeforeDeliveryDay < 1">Next delivery day in {{countDown[1].DeliveryDay.daysUntil}} days</span>
 						</p>
 					</div>
 				</div>
@@ -152,6 +154,7 @@
 						<li ng-class="{active:isActive('/producer-profile')}" 
 						ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
 						><a href="#/producer-profile">Edit Producer Profile</a></li>
+						<li ng-class="{active:isActive('/my-invoices')}" ng-show="currentUser"><a ng-href="#/my-invoices">My Invoices</a></li>
 						<li ng-class="{active:isActive('/me/{{currentUser._id}}')}" ng-show="currentUser"><a ng-href="#/me/{{currentUser._id}}">My Settings</a></li>
                     
 				</ul>
