@@ -4,5 +4,7 @@
 
 <p>Thank you for signing up. We've emailed you an invoice to become a member of the NNFC.</p>
 
-<p>Until your payment has been received you will not be able to buy or sell products. We will notify you when your account has been made active.</p>
+<p ng-if="currentUser.user_type.name == 'producer' ">Unfortunately you cannot sell products until your producer application has finished being processed. However, we'll be sure to notify you quickly. You can still create your Producer Profile for now though.</p>
+
+<p>You can still shop at the NNFC</p>
 				

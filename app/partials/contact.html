@@ -1,16 +1,18 @@
 <div class="page-header">
-	<h1>Contact Form</h1>
+	<h1>How to Contact us</h1>
 </div>
-<article ng-if="!member">
+	
+
+<article ng-if="!member" class="col-md-4">
 	<p>Please feel free to contact us about any questions you have.</p>
 	<p>Also feel free to phone or text us your questions at <strong><span class="glyphicon glyphicon-earphone"></span> 021 040 9066</strong>.</p>
+	<p ng-if="member" class="lead" >Use this form to contact <strong>{{member.name}}</strong> at the email address of {{member.email}}</p>
 </article>
-<p ng-if="member">Use this form to contact <strong>{{member.name}}</strong> at the email address of {{member.email}}</p>
 
-<form name="contactUs" ng-submit="submitForm(mail);">
+<form name="contactUs" ng-submit="submitForm(mail);" class="col-md-4">
 	<fieldset>
 		
-		<legend>Contact Us</legend>
+		<legend>Email us</legend>
 	
 		<div class="form-group">
 	    	<label for="senderName">Full Name</label>
@@ -48,3 +50,12 @@
 		
 	</fieldset>	
 </form>
+
+<article class="col-md-4 well">
+	 <h3>Technical Stuff</h3>
+	 <ul>
+		 <li><a href="https://github.com/StrategicDevelopment/FoodCoop/issues/new">Features Request</a></li>
+		 <li><a href="https://github.com/StrategicDevelopment/FoodCoop/issues">Issues</a></li>
+		 <li><a href="https://github.com/StrategicDevelopment/FoodCoop">Repository Homepage</a></li>
+	</ul>
+</article>

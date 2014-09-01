@@ -167,12 +167,13 @@ var UserSchema = new Schema({
 				isAdmin: Boolean
 			},
 			producerData : {
-				companyName : {type: String},
+				companyName : String,
 				logo : {},
-				description : {type: String},
-				certification : {type: String},
-				website : {type: String},
-				personalBio : {type: String},
+				description : String,
+				certification : String,
+				website : String,
+				personalBio : String,
+				chemicalDisclaimer: String,
 				bankAccount : {type: String, default: "NO ACCOUNT ON RECORD"}
 			},
 			//amountSpentThisYear is assigned when a user is invoiced for an order and is a

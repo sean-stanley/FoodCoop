@@ -118,6 +118,15 @@ img.certification-img {
 	right:15px;	
 }
 
+/*	---- Producer Application Page ----	*/
+.step {
+	display: inline-block;
+padding: 0.5em 0.82em 0.63em;
+background: #642c4a;
+color: white;
+border-radius: 200px;
+}
+
 
 /*Modals*/
 ul {list-style: none; list-style-type: none; margin: 0; padding: 0;}

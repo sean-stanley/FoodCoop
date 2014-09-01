@@ -13,7 +13,6 @@ var config = require('./coopConfig.js'),
 	calHelp = require('./calendarHelper');
 	
 	require('datejs');
-
 	
 var dailyRule = new schedule.RecurrenceRule();
 dailyRule.minute = 0;
@@ -91,7 +90,6 @@ function checkConfig() {
 				exports.canShop = true;
 				exports.canUpload = false;
 			}
-			
 		}
 	}
 };

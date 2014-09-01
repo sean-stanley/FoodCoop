@@ -313,20 +313,15 @@ angular.module('co-op.controllers', []).
 	}
 ])
 
-.controller('signupInvoiceCtrl', ['$scope', '$rootScope',
-	function ($scope, $rootScope) {
-		if ($rootScope.currentUser !== null && $rootScope.currentUser.user_type.name === 'Customer') {
-			$scope.cost = '$60';
-			$scope.membership = 'ONE CUSTOMER MEMBERSHIP SHARE';
-		}
-		else if ($rootScope.currentUser !== null && $rootScope.currentUser.user_type.name === 'Producer') {
-			$scope.cost = '$120';
-			$scope.membership = 'ONE PRODUCER MEMBERSHIP SHARE';
-		}
-		else {
-			$scope.cost = '';
-			$scope.membership = 'Oops Sorry! Something went wrong and you are not signed in.';
-		}
+.controller('producerApplicationCtrl', ['$scope', 'certifications', 'Restangular',
+	function ($scope, certifications, Restangular) {
+		certifications.getList().then(function(result) {
+			$scope.certifications = result;
+			$scope.producerApplication = {
+				certification : $scope.certifications[0]._id // none
+			};
+		});
+		
 	}
 ])
 
@@ -416,11 +411,8 @@ angular.module('co-op.controllers', []).
 		// make ProductManager methods available in the template
 		$scope.productData = product;
 		$scope.productData.refrigeration = product.refrigeration || 'none';
-		
 		$scope.selectedImg = $scope.productData.img || null;
-		
 		$scope.productManager = ProductManager;
-		
 		$scope.ingredients = false;
 		
 		// pass product to $scope.productData for editing in the main form

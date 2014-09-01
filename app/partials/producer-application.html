@@ -1,0 +1,57 @@
+<div class="page-header">
+	<h1>Become an NNFC Producer in 3 Steps</h1>
+</div>
+
+<div class="col-md-2"></div>
+<article class="col-md-8">
+	
+	<article>
+		<p>Please feel free to contact us about any questions you have.</p>
+		<p>Also feel free to phone or text us your questions at <strong><span class="glyphicon glyphicon-earphone"></span> 021 040 9066</strong>.</p>
+		<hr>
+	</article>
+	
+<h1><span class="step">1</span> Read and sign agreement here</h1>
+<article>Producer rules here</article>
+<input type="checkbox" name="rules" ng-model="producerApplication.agreed">
+<hr>
+<br>
+<h1><span class="step">2</span> Tell us about yourself</h1>
+
+<form name="producerApplication" ng-submit="submitForm(producerApplication);" id="applicationForm">
+	<fieldset>
+	    <div class="form-group">
+			<label for="certification">I am organically certified with: </label>
+			<select ng-model="producerApplication.certification" 
+			ng-options="c._id as c.name for c in certifications" 
+			ng-selected="producerApplication.certification || certifications[0].name"
+			name="certification" class="form-control">
+			</select>
+	    </div>
+		<div class="form-group">
+	    	<label for="chemicals">I use the following chemicals in my production practice</label>
+			<textarea ng-model="producerApplication.chemicals" 
+			name="chemcials" type="text" class="form-control" rows="5" 
+			placeholder="List the chemicals with a comma. Feel free to use either exact chemical names or brand names." required></textarea>
+			<alert type="danger" ng-show="producerApplication.senderMessage.$dirty && producerApplication.senderMessage.$invalid">Sorry:
+				<span ng-show="producerApplication.senderMessage.$error.required">An answer is required.</span>
+			</alert>
+		</div>
+		<div class="form-group">
+	    	<label for="products">I plan to sell the following products</label>
+			<textarea ng-model="producerApplication.products" 
+			name="products" type="text" class="form-control" rows="5" 
+			placeholder="Please list all products you intend to sell. If many products are related, a general category is sufficient such as citrus, beef, or pork." required></textarea>
+			<alert type="danger" ng-show="producerApplication.senderMessage.$dirty && producerApplication.senderMessage.$invalid">Sorry:
+				<span ng-show="producerApplication.senderMessage.$error.required">An answer is required.</span>
+			</alert>
+		</div>
+		<button type="reset" class="btn btn-default">Reset</button>
+	</fieldset>	
+</form>
+<hr>
+<br>
+<h1><span class="step">3</span> <button type="submit" form="applicationForm" class="btn btn-default btn-lg" ng-disabled="producerApplication.$invalid && !producerApplication.agreed"><h1 style="margin: 0">Apply Now</h1></button></h1>
+
+</article>
+<article class="col-md-2"></article>

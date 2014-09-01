@@ -820,7 +820,7 @@ exports.configAPI = function configAPI(app) {
 					invoicee: user._id,
 					title: 'Membership',
 					items: [{name:itemName, cost:req.body.cost}],
-					dueDate: Date.today().addDays(30);
+					dueDate: Date.today().addDays(30)
 				});
 					
 				memberEmailOptions = {

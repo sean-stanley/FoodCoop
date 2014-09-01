@@ -24,7 +24,18 @@ angular.module('co-op', [
 		.when('/', {templateUrl: 'partials/index-content.html', controller: 'MyCtrl1', reloadOnSearch: false})
 		.when('/calendar', {templateUrl: 'partials/calendar.html', controller: 'calendarCtrl', reloadOnSearch: false})
 		.when('/signup', {templateUrl: 'partials/signup.html', controller: 'userCtrl', reloadOnSearch: false})
-		.when('/welcome', {templateUrl: 'partials/thankyou.html', controller: 'signupInvoiceCtrl', reloadOnSearch: false})
+		.when('/welcome', {templateUrl: 'partials/thankyou.html', loggedInOnly: true, reloadOnSearch: false})
+		.when('/apply', {
+			templateUrl: 'partials/producer-application.html', 
+			controller: 'producerApplicationCtrl', 
+			reloadOnSearch: false,
+			loggedInOnly: true,
+			resolve: {
+				certifications: function(Restangular, $route) {
+					return Restangular.all('api/certification');
+				}
+			}
+		})
 		.when('/terms-cons', {templateUrl: 'partials/legal/terms-cons.html', reloadOnSearch: false})
 		.when('/priv-pol', {templateUrl: 'partials/legal/priv-pol.html', reloadOnSearch: false})
 		.when('/users-rights', {
@@ -36,7 +47,7 @@ angular.module('co-op', [
 					return Restangular.all('api/user');
 				}
 			}
-			})
+		})
 		.when('/user/:userId', {
 			controller: 'userEditCtrl', 
 			templateUrl:'partials/admin/details.html',
@@ -111,12 +122,7 @@ angular.module('co-op', [
 		.when('/my-invoices', {
 			controller: 'userInvoiceCtrl',
 			templateUrl:'partials/loggedIn/invoices.html',
-			loggedInOnly: true, reloadOnSearch: false,
-			resolve: {
-				invoices: function(Restangular){
-					//return Restangular.all('api/me/invoice').getList().$object;
-				}
-			}
+			loggedInOnly: true, reloadOnSearch: false
 		})
 		.when('/me/:userId', {
 			controller: 'userEditCtrl',
