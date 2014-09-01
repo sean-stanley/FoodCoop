@@ -21,7 +21,7 @@
 <tbody>
 	<tr ng-repeat="i in currentProducts | orderBy:predicate:reverse " >
         <td data-title="'Product'" >
-            {{i.fullName}}
+             <a ng-href="#/product-upload/{{i._id}}">{{i.fullName}}</a>
         </td>
 
         <td data-title="'Price'">
@@ -31,7 +31,7 @@
 			{{i.quantity}}
 		</td>
 		<td data-title="'times Ordered'">
-			{{isOrdered(i._id)}}
+			{{isOrdered(i._id, currentOrders)}}
 		</td>
     </tr>
 </tbody>
@@ -45,24 +45,20 @@
 				<tr>
 					<th><a href="" ng-click="predicate = 'productName'; reverse=!reverse ">Product</a></th>
 					<th><a href="" ng-click="predicate = 'price'; reverse=!reverse ">Price</a></th>
-					<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Inventory</a></th>
 					<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Ordered Amount</a></th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr ng-repeat="i in recentProducts | orderBy:predicate:reverse " >
 			        <td data-title="'Product'" >
-			            {{i.fullName}}
+			             <a ng-href="#/product-upload/{{i._id}}">{{i.fullName}}</a>
 			        </td>
 	       
 			        <td data-title="'Price'">
 			            {{i.price | currency}} / {{i.units}}
 			        </td>
-					<td data-title="'Quantity'">
-						{{i.quantity}}
-					</td>
 					<td data-title="'times Ordered'">
-						{{isOrdered(i._id)}}
+						{{isOrdered(i._id, recentOrders)}}
 					</td>
 			    </tr>
 			</tbody>
@@ -75,24 +71,20 @@
 				<tr>
 					<th><a href="" ng-click="predicate = 'productName'; reverse=!reverse ">Product</a></th>
 					<th><a href="" ng-click="predicate = 'price'; reverse=!reverse ">Price</a></th>
-					<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Inventory</a></th>
 					<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Ordered Amount</a></th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr ng-repeat="i in products | orderBy:predicate:reverse " >
 			        <td data-title="'Product'" >
-			            {{i.fullName}}
+			            <a ng-href="#/product-upload/{{i._id}}">{{i.fullName}}</a>
 			        </td>
 	       
 			        <td data-title="'Price'">
 			            {{i.price | currency}} / {{i.units}}
 			        </td>
-					<td data-title="'Quantity'">
-						{{i.quantity}}
-					</td>
 					<td data-title="'times Ordered'">
-						{{isOrdered(i._id)}}
+						{{isOrdered(i._id, orders)}}
 					</td>
 			    </tr>
 			</tbody>
@@ -104,13 +96,13 @@
 	<h2>Unfulfilled Orders <small>Total: {{orderTotal(currentOrders) | currency}}</small></h2>
 	<table class="table">
 		<thead ng-repeat-start="order in sortedOrders">
-			<tr><th colspan="4"><a ng-href="#/contact/{{order._id._id}}">{{order._id.name}} <small>email customer</small></th></tr>
+			<tr><th colspan="4"><a ng-href="#/contact/{{order._id._id}}">{{order._id.name}} <small>email customer</small></a></th></tr>
 			<tr><th>Product</th><th>Quantity</th><th>Unit Price</th><th>Price</th></tr>
 		</thead>
 		<tbody ng-repeat-end>
 			<tr ng-repeat="i in order.orders">
 		        <td data-title="'Product'" >
-		            {{i.product.fullName}}
+		            <a ng-href="#/product-upload/{{i._id}}">{{i.product.fullName}}</a>
 		        </td>
  				<td data-title="'Quantity'">
  					{{i.quantity}}
@@ -140,10 +132,10 @@
 				<tbody>
 					<tr ng-repeat="i in recentOrders | orderBy:predicate:reverse " >
 				        <td data-title="'Customer'">
-							{{i.customer.name}}
+							<a ng-href="#/contact/{{i.customer._id}}">{{i.customer.name}}</a>
 						</td>
 						<td data-title="'Product'" >
-				            {{i.product.fullName}}
+				            <a ng-href="#/product-upload/{{i._id}}">{{i.product.fullName}}</a>
 				        </td>
 				        <td data-title="'Price'">
 				            {{i.unitPrice | currency}} / {{i.product.units}}
@@ -176,10 +168,10 @@
 							{{i.datePlaced | shortDate}}
 						</td>
 						<td data-title="'Customer'">
-							{{i.customer.name}}
+							<a ng-href="#/contact/{{i.customer._id}}">{{i.customer.name}}</a>
 						</td>
 						<td data-title="'Product'" >
-				            {{i.product.fullName}}
+				            <a ng-href="#/product-upload/{{i._id}}">{{i.product.fullName}}</a>
 				        </td>
 				        <td data-title="'Price'">
 				            {{i.unitPrice | currency}} / {{i.product.units}}

@@ -42,47 +42,54 @@ function checkConfig() {
 					incrementCycle();
 					// current cycle equals +1 and that total
 				case 'ProductUploadStart':
-					config.cycle.canUpload = true;	
+					exports.canUpload = true;
+					// schedule email reminder to producers here.
+					// and another reminder in 5 days saying there are only two days left
 					break;
 				case 'ProductUploadStop':
-					config.cycle.canUpload = false;	
+					exports.canUpload = false;
+					// schedule email reminders to producer	here
 					break;
 				case 'ShoppingStart':
-					config.cycle.canShop = true;	
+					exports.canShop = true;
+					// schedule email reminders to all members here and another in 5 days saying
+					// there are only two days left	
 					break;
 				case 'ShoppingStop':
+					exports.canShop = false;
 					// checkout everyone's purchases
-					//checkout();
+					checkout();
 					// send order requests to producers
-					//orderGoods();
+					orderGoods();
+					break;
+				case 'volunteerRecruitment':
+					// send messages asking for sorters and drivers.
 					break;
 				case 'PaymentDueDay':
-					
+					// send reminders to those with unpaid invoices
 					break;
 				case 'DeliveryDay':
 					// send reminder emails
 					break;
 				case 'testDay':
-					console.log('testing checkout() function');
 					break;
 				default:
 					// no functions to execute for this day
 					null
 				}
-			
 			}
 			// if the date is between the productUploadStart date and the productUpoad Stop date
 			// double check that canShop is false and canUpload is true;
 			else if ( today.between(cycle.ProductUploadStart, cycle.ProductUploadStop) ) {
-				config.cycle.canUpload = true;
-				config.cycle.canShop = false;
+				exports.canShop = false;
+				exports.canUpload = true;
 			}
 		
 			// if the date is between the ShoppingStart date and the ShoppingStop Stop date
 			// double check that canShop is true and canUpload is false;
 			else if ( today.between(cycle.ShoppingStart, cycle.ShoppingStop) ) {
-				config.cycle.canShop = true;
-				config.cycle.canUpload = false;
+				exports.canShop = true;
+				exports.canUpload = false;
 			}
 			
 		}
@@ -94,7 +101,8 @@ function checkout() {
 	async.waterfall([
 		function(done) {
 			models.Order
-			.aggregate().match({cycle: exports.currentCycle})
+			.aggregate()
+			//.match({cycle: exports.currentCycle})
 			.group({ _id: "$customer", orders: { $push : {product: "$product", quantity: "$quantity"} }})
 			.exec(function(e, customers) {
 				// customers is a plain javascript object not a special mongoose document.
@@ -114,14 +122,12 @@ function checkout() {
 			});
 		}
 	],function(e, result){
-		console.log(result);
 		if (e) {
 			console.log(e)
 		}
 		else {
 			for (var i = 0; i < result.length; i++) {
-				//invoiceCustomer(result[i]);
-				console.log(result[i].orders);
+				invoiceCustomer(result[i]);
 			}
 		}
 	});
@@ -131,30 +137,29 @@ function checkout() {
 // and emails them a copy
 function invoiceCustomer(customer) {
 	async.waterfall([
-		function(done) {
-			models.Invoice.count(function(e, count) {
-				done(e, count);
-			});
-		},
-		function(count, done) {
-			models.Invoice.create({
-				_id: count +1,
-				dueDate: config.cycle.PaymentDueDay,
-				invoicee: customer._id.name,
+		function (done) {
+			customer
+			
+			var invoice = new models.Invoice({
+				dueDate: config.cycle.PaymentDueDay.toString(),
+				invoicee: customer._id._id,
 				title: "Shopping Order for " + Date.today().toString("MMMM"),
 				items: customer.orders,
-				cycle: exports.currentCycle,
-			}, 
-			function(e, invoice) {
-				if (e) done(e);
-				done(null, invoice)	
+				cycle: exports.currentCycle
 			})
+			
+			.save(function(e, invoice){
+				console.log(invoice.total);
+				if (e) done(e);
+				else done(null, invoice)
+			});
+			
 		},
 		function(invoice, done) {
 			var mailOptions, mailData, mail;
 			mailOptions = {
 				template: 'shopping-invoice',
-				subject: Date.today().toString("MMM") + ' Shopping Bill for' + customer._id.name,
+				subject: Date.today().toString("MMM") + ' Shopping Bill for ' + customer._id.name,
 				to: {
 					email: customer._id.email,
 					name: customer._id.name
@@ -175,13 +180,13 @@ function invoiceCustomer(customer) {
 			mail.send(function(err, result) {
 				if (err) done(err);
 				// a response is sent so the client request doesn't timeout and get an error.
-				console.log("Message sent to new member");
+				console.log("Message sent to customer " + customer._id.name);
 				
-				done(null, user);
+				done(null, result);
 			});
 		}
 		
-	],function(error) {
+	], function(error) {
 		console.log(error);
 	});
 };
@@ -190,7 +195,8 @@ function orderGoods() {
 	async.waterfall([
 		function(done) {
 			models.Order
-			.aggregate().match({cycle: exports.currentCycle})
+			.aggregate()
+			//.match({cycle: exports.currentCycle})
 			.group({ _id: "$supplier", orders: { $push : {product: "$product", customer: '$customer', quantity: "$quantity"} }})
 			
 			.exec(function(e, producers) {
@@ -218,14 +224,12 @@ function orderGoods() {
 			});
 		}
 	],function(e, result){
-		console.log(result);
 		if (e) {
 			console.log(e)
 		}
 		else {
 			for (var i = 0; i < result.length; i++) {
-				//invoiceFromProducer(result[i]);
-				console.log(result[i].orders);
+				invoiceFromProducer(result[i]);
 			}
 		}
 	});
@@ -238,24 +242,20 @@ function orderGoods() {
 function invoiceFromProducer(producer) {
 	async.waterfall([
 		function(done) {
-			models.Invoice.count(function(e, count) {
-				done(e, count);
-			});
-		},
-		function(count, done) {
-			models.Invoice.create({
-				_id: count +1,
-				dueDate: config.cycle.DeliveryDay,
-				invoicee: config.coopName,
+			var invoice = new models.Invoice({
+				dueDate: config.cycle.DeliveryDay.toString(),
 				title: "Products Requested for " + Date.today().toString("MMMM"),
 				items: producer.orders,
 				cycle: exports.currentCycle,
 				toCoop: true
-			}, 
-			function(e, invoice) {
-				if (e) done(e);
-				done(null, invoice)	
 			})
+			
+			.save(function(e, invoice) {
+							console.log(invoice.total)
+							if (e) done(e);
+							else done(null, invoice);
+						});
+			
 		},
 		function(invoice, done) {
 			var mailOptions, mailData, mail;
@@ -281,9 +281,10 @@ function invoiceFromProducer(producer) {
 
 			mail.send(function(err, result) {
 				if (err) done(err);
-				console.log("Message sent to new member");
-				
-				done(null, user);
+				else {
+					console.log("Message sent to producer " + producer._id.name);
+					done(null, result);
+				}
 			});
 		}
 		
@@ -293,31 +294,37 @@ function invoiceFromProducer(producer) {
 };
 
 
+
 // increment the number of cycles by 1 and set the ID to the total +1 (just like with invoices);
 // use Cycle number 0 for testing stuff
 function incrementCycle() {
-	models.Cycle.count(function(e, count){
-		if (!e) {
-			console.log(count);
-			models.Cycle.create({_id: count ++ || 0}, function(err, cycle){
-				console.log(cycle);
-				if (!err) {
-					config.cycleReset('today');
-					exports.currentCycle = cycle._id;
-				}
-				else console.log(err);
-			});
+	models.Cycle.findById("orderCycle").exec(function(e, cycle) {
+		if (e) console.log(e) 
+		else {
+			if ( cycle && Date.equals(Date.today(), Date.parse(cycle.dateModified).clearTime()) ) console.log("cycle already incremented today")
+			else {
+				models.Cycle.findByIdAndModify({_id: 'orderCycle'},{ dateModified: Date.now(), $inc: {seq: 1} }, function(err, cycle){
+					console.log(cycle);
+					if (!err) {
+						config.cycleReset('today');
+						exports.currentCycle = cycle.seq;
+					}
+					else console.log(err);
+				});	
+			}
 		}
-		else console.log(e);
-		
-	});	
+	})
+	
 };
 
-models.Cycle.count(function(e, count) {
-	exports.currentCycle = count;
-	orderGoods();
-	console.log(exports.currentCycle);
-	if (e) console.log(e);
-});
+function findCycle() {
+	models.Cycle.findById('orderCycle', function(e, cycle) {
+		exports.currentCycle = cycle.seq;
+		console.log("the current cycle is #" + exports.currentCycle);
+		if (e) console.log(e);
+	});
+};
+
+findCycle();
 
 

@@ -13,16 +13,16 @@
        <table border="0" cellspacing="10" cellpadding="10">
            <thead>
                <tr>
-                   <td>Invoice #{{code}}</td>
-				   <td colspan="5">{{name}}'s Requested Products</td>
+                   <th><strong>Invoice #{{code}}</strong></th>
+				   <th colspan="5"></td><strong>{{name}}'s Requested Products</strong></th>
                </tr>
                <tr>
-                   <td>Refrigeration</td>
-				   <td>Product</td>
-				   <td>Customer</td>
-				   <td>Unit Price</td>
-				   <td>Quantity</td>
-				   <td>Cost</td>
+                   <th><strong>Refrigeration</strong></th>
+				   <th><strong>Product</strong></th>
+				   <th><strong>Customer</strong></th>
+				   <th><strong>Unit Price</strong></th>
+				   <th><strong>Quantity</strong></th>
+				   <th><strong>Cost</strong></th>
                </tr>
            </thead>
            <tbody>
@@ -34,7 +34,7 @@
 					 <td>{{item.customer.name}}</td>
 					 <td>{{item.product.price}} / {{item.product.units}}</td>
 					 <td>{{item.quantity}}</td>
-                     <td>${{item.cost}} </td>
+                     <td>${{item.product.price * item.quantity}}</td>
                  </tr>
 			<% }); %>
            </tbody>
@@ -48,7 +48,7 @@
 	   <p>You can expect payment to the account {{account}}. If this is incorrect, please contact us immediately and update your bank account details from your producer profile page on our website.</p>
        
 	   <hr>
-        <p> A copy of this invoice and it's status is available <a href="http://foodcoop.org.nz/my-invoices">online</a>
+        <p> A copy of this invoice and its status is available <a href="http://foodcoop.org.nz/my-invoices">online</a>
         
         <p> We look forward to continueing to provide you with a great online experience.</p>
         <p>Cheers, <br>

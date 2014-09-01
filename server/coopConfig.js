@@ -51,7 +51,8 @@ exports.cycle = {
 	ProductUploadStop 	: Date.today().second().monday(),
 	ShoppingStart 		: Date.today().second().monday(),
 	ShoppingStop		: Date.today().third().monday(),
-	PaymentDueDay		: Date.today().final().monday(),
+	volunteerRecruitment: Date.today().third().wednesday(),
+	PaymentDueDay		: Date.today().fourth().monday(),
 	DeliveryDay			: Date.today().final().wednesday(),
 };
 
@@ -67,11 +68,10 @@ exports.cycleReset = function(date) {
 		ProductUploadStop 	: Date.parse(date).second().monday(),
 		ShoppingStart 		: Date.parse(date).second().monday(),
 		ShoppingStop		: Date.parse(date).third().monday(),
-		PaymentDueDay		: Date.parse(date).final().monday(),
+		volunteerRecruitment: Date.parse(date).third().wednesday(),
+		PaymentDueDay		: Date.parse(date).fourth().monday(),
 		DeliveryDay			: Date.parse(date).final().wednesday(),
 	};
-	console.log(exports.oldCycle);
-	console.log(exports.cycle);
 	return exports.cycle;
 };
 
@@ -88,7 +88,8 @@ exports.getCycleDates = function(date) {
 			ProductUploadStop 	: Date.parse(date).second().monday(),
 			ShoppingStart 		: Date.parse(date).second().monday(),
 			ShoppingStop		: Date.parse(date).third().monday(),
-			PaymentDueDay		: Date.parse(date).final().monday(),
+			volunteerRecruitment: Date.parse(date).third().wednesday(),
+			PaymentDueDay		: Date.parse(date).fourth().monday(),
 			DeliveryDay			: Date.parse(date).final().wednesday(),
 		};
 		return cycle;

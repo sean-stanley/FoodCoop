@@ -235,13 +235,8 @@ angular.module('co-op.services', [])
 	}])
 	
 	// Client side date managment. This job is shared by the client and server.
-	.factory('Calendar', ['$http', function($http) {
-		var monthStart, lastMonthStart, deliveryDay, significantDays;
-		$http.get('/api/calendar').success(function(result) {
-			console.log(result);
-			deliveryDay = result.DeliveryDay;
-			significantDays = result;
-		});
+	.factory('Calendar', ['$rootScope', function($rootScope) {
+		var monthStart, lastMonthStart;
 		
 		monthStart = Date.today().moveToFirstDayOfMonth();
 		lastMonthStart = Date.today().addMonths(-1).moveToFirstDayOfMonth();
@@ -268,7 +263,7 @@ angular.module('co-op.services', [])
 			currentMonth : function(group, callback) {
 				var cb = callback || angular.noop;
 				var list = _.filter(group, function(item) {
-					if (item.hasOwnProperty('cycle') && item.cycle === significantDays.currentCycle) {
+					if (item.hasOwnProperty('cycle') && item.cycle === $rootScope.cycle) {
 						return item;
 					}
 				});
@@ -281,7 +276,7 @@ angular.module('co-op.services', [])
 			lastMonth : function(group, callback) {
 				var cb = callback || angular.noop;
 				var list = _.filter(group, function(item) {
-					if (item.hasOwnProperty('cycle') && item.cycle === significantDays.currentCycle - 1) {
+					if (item.hasOwnProperty('cycle') && item.cycle === $rootScope.cycle - 1) {
 						return item;
 					}
 				});

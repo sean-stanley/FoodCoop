@@ -3,6 +3,7 @@ var util = require('util'),
 	fs = require('fs'), // file system
 	url = require('url'),
 	async = require('async'),
+	_ = require('underscore'),
 	crypto = require('crypto'),
 	events = require('events'),
 	express = require('express'); // handles routing and such
@@ -55,21 +56,18 @@ exports.configAPI = function configAPI(app) {
 	// this contains the common ways the app sends emails and is accessed in the app from the contact forms.
 	app.post("/api/mail", function(req, res, next) {
 		var toMeoptions, toMedata, toClientOptions, toClientData, toMe, toClient, toProducerOtpions, toProducerData;
-		// So far no form validation has been done on the request as the client side
+		// So far form validation has been done client side
 		// form validation is extensive and sufficient. However, more validation could
 		// be done at a later point just to be safe.
-
+		
+		// if no 'to' the data must be for the co-op to recieve as opposed to another member.
 		if (!req.body.hasOwnProperty('to')) {
 
-			// the message originated in the `contact us` page and thus has no 'to' in the req.body then...
-			// the options objects are for selecting an html template from the mailTemplates
-			// directory, defining a subject (which could be just a string) and defining
-			// the recipient. At the moment only one recipient is allowed and must be an
-			// object with a structure like
-			// {name: 'Jo Frank', address: jo@example.com}. Support for multiple
-			// recipients will be coming soon as it is needed for messages sent to all
-			// members.
-
+			// the options objects are for Emailer options like template, subject and recipient.
+			// At the moment only one recipient is allowed and must be an object with a 
+			// structure {name: 'Jo Frank', address: jo@example.com}. Support for multiple
+			// recipients is done with MailChimp API
+			
 			// The data objects here correspond to whatever template was chosen in a options
 			// object. Different templates require different data. Each property of the data
 			// object evaluates to a variable name in the template.
@@ -108,27 +106,24 @@ exports.configAPI = function configAPI(app) {
 			toMe.send(function(err, result) {
 				if (err) {
 					return console.log(err);
+					res.send(500);
 				}
 				// a response is sent so the client request doesn't timeout and get an error.
-				console.log("Message sent to me");
 				res.send("text/plain", "Message sent to the NNFC");
 			});
 
 			toClient.send(function(err, result) {
 				if (err) {
-					return console.log(err);
+					console.log(err);
+					res.send(500);
 				}
 				// a response is sent so the client request doesn't timeout and get an error.
-				console.log("Message sent to client");
-				res.send("text/plain", "Message sent to client");
+				res.send(200, "Message sent to client");
 			});
 		} else if (req.body.hasOwnProperty('to')) {
 			// this case is for when a client is trying to send a message to one of our producer members.
 			// the data and objects data are very similar to other cases but here the 'to'
 			// property of the options object is populated with data from the client. 
-
-			var
-
 			toProducerOptions = {
 				template: "contact-form",
 				subject: req.body.subject,
@@ -148,20 +143,17 @@ exports.configAPI = function configAPI(app) {
 
 			toProducer.send(function(err, result) {
 				if (err) {
-					return console.log(err);
+					console.log(err);
+					res.send(500);
 				}
 				// a response is sent so the client request doesn't timeout and get an error.
-				console.log("Message sent to producer");
-				res.send("text/plain", "Message sent to producer");
+				res.send(200, "Message sent to producer");
 			});
-
 		} else {
 			// here if no message data was received in the request, a response is sent
 			// detailing what happened.
-			res.send("text/plain", "No messages sent");
+			res.send(403, "No messages sent");
 		}
-
-
 	});
 
 	// this route looks up products and sends an array of results back to the client.
@@ -208,12 +200,12 @@ exports.configAPI = function configAPI(app) {
 					if (product) {
 						var productObject = product.toObject();
 						// if truthy then the product being requested is to be sold this month so pass the _id as well.
-						if (Date.parse(productObject.dateUploaded).between(calendar.ProductUploadStart, calendar.ProductUploadStop) ) {
+						if (productObject.cycle == scheduler.currentCycle) {
 							res.send(productObject);
 						}
 						
 						else {
-							delete _id;
+							delete productObject._id;
 							res.send(productObject);
 						}
 					}
@@ -239,67 +231,73 @@ exports.configAPI = function configAPI(app) {
 		// this tests if a user is authenticated.
 		if (req.user && req.user.user_type.canSell) {
 			
-			// convert ingredients string to an array
-			if (typeof req.body.ingredients === "string" && req.body.ingredients.length > 0) {
-				req.body.ingredients = req.body.ingredients.split(/,\s*/);
+			if (scheduler.canUpload) {
+				// convert ingredients string to an array
+				if (typeof req.body.ingredients === "string" && req.body.ingredients.length > 0) {
+					req.body.ingredients = req.body.ingredients.split(/,\s*/);
+				}
+			
+				else if (req.body.ingredients instanceof Array) {
+					req.body.ingredients = req.body.ingredients.join();
+					req.body.ingredients = req.body.ingredients.split(/,\s*/);
+				}
+						
+				// If the body for a product contains an ID, it must already exist so we will
+				// update it. Only an admin or the user who
+				// created a product can update it. The original product is looked up by id.
+				if (req.body._id) {
+					models.Product.findById(req.body._id, function(e, product) { // first find the right product by it's ID
+						if (!e) {
+							productObject = product.toObject();
+							needsSave = false;
+							for (key in req.body) {
+								if (productObject[key] !== req.body[key]) {
+									// compare the values of the database object to the values of the request object.
+									product[key] = req.body[key]; // update the product's properties
+									needsSave = true;
+								}
+							}
+							if (needsSave) {
+								product.save();
+								res.json(product); // send back the changed product to the app as JSON.
+							} // save the changes
+							else {
+								res.send(200, 'No changes detected');
+							}
+
+						} else {
+							console.log(e)
+							// log the error to the console.
+						}
+					});
+				} else {
+					models.Product.create({
+						dateUploaded: Date.today(),
+						img: req.body.img,
+						category: req.body.category,
+						productName: req.body.productName,
+						variety: req.body.variety,
+						price: req.body.price,
+						quantity: req.body.quantity,
+						units: req.body.units,
+						refrigeration: req.body.refrigeration,
+						ingredients: req.body.ingredients,
+						description: req.body.description,
+						certification: req.body.certification,
+						producer_ID: req.user._id,
+						cycle: scheduler.currentCycle
+					}, function(e, product) {
+						if (!e) {
+							res.send(200);
+						}
+						else console.log(e)
+					});
+				}
 			}
 			
-			else if (req.body.ingredients instanceof Array) {
-				req.body.ingredients = req.body.ingredients.join();
-				req.body.ingredients = req.body.ingredients.split(/,\s*/);
-			}
-						
-			// If the body for a product contains an ID, it must already exist so we will
-			// update it. Only an admin or the user who
-			// created a product can update it. The original product is looked up by id.
-			if (req.body._id) {
-				models.Product.findById(req.body._id, function(e, product) { // first find the right product by it's ID
-					if (!e) {
-						productObject = product.toObject();
-						needsSave = false;
-						for (key in req.body) {
-							if (productObject[key] !== req.body[key]) {
-								// compare the values of the database object to the values of the request object.
-								product[key] = req.body[key]; // update the product's properties
-								needsSave = true;
-							}
-						}
-						if (needsSave) {
-							product.save();
-							res.json(product); // send back the changed product to the app as JSON.
-						} // save the changes
-						else {
-							res.send(200, 'No changes detected');
-						}
-
-					} else {
-						console.log(e)
-						// log the error to the console.
-					}
-				});
-			} else {
-				newProduct = new models.Product({
-					dateUploaded: new Date.today(),
-					img: req.body.img,
-					category: req.body.category,
-					productName: req.body.productName,
-					variety: req.body.variety,
-					price: req.body.price,
-					quantity: req.body.quantity,
-					units: req.body.units,
-					refrigeration: req.body.refrigeration,
-					ingredients: req.body.ingredients,
-					description: req.body.description,
-					certification: req.body.certification,
-					producer_ID: req.user._id,
-					cycle: scheduler.currentCycle
-				}).save(function(e) {
-					if (!e) {
-						res.send(200);
-					}
-					else console.log(e)
-				});
-			}
+			else res.send(403, "It's not the right time of the month to upload products")
+			
+			
 		} else {
 			res.send(401, 'Producer not signed in');
 		}
@@ -317,7 +315,7 @@ exports.configAPI = function configAPI(app) {
 			models.Product.findByIdAndRemove(req.body._id, function(e, results) {
 				if (!e) { // if no errors
 					console.log(results);
-					res.send('text/plain', 'product deleted');
+					res.send(200, 'product deleted');
 				} else {
 					console.log(e) // log the error
 				}
@@ -354,7 +352,6 @@ exports.configAPI = function configAPI(app) {
 				cycle: scheduler.currentCycle || 0
 			}, 'productName variety dateUploaded price quantity units', { sort: {datePlaced: 1} }, function(e, products) {
 				if (!e) {
-					console.log('current products are: ' + products);
 					res.json(products);
 				}
 				else {
@@ -369,11 +366,10 @@ exports.configAPI = function configAPI(app) {
 		if (req.user) {
 			models.Product.find({
 				producer_ID : new ObjectId(req.user._id),
-				cycle: scheduler.currentCycle -1 || 0
+				cycle: scheduler.currentCycle - 1 || 0
 			}, 'productName variety dateUploaded price quantity units', { sort: {datePlaced: 1} },
 				function(e, products) {
 				if (!e) {
-					console.log('recent products are: ' + products);
 					res.json(products);
 				}
 				else {
@@ -415,10 +411,7 @@ exports.configAPI = function configAPI(app) {
 					}];
 
 					// replace the ID's in an order with proper values before sending to the app.
-					// @results is the results returned from the Order Query
-					// @opts is the array of options for the populate method to use.
-					// @e is the error
-					// @orders is the returned array or object of order data
+					// see mongoose API docs for more info.
 					models.Order.populate(results, opts, function(e, orders) {
 						console.log(orders);
 						// send the results to the app if no error occurred.
@@ -590,7 +583,7 @@ exports.configAPI = function configAPI(app) {
 	});
 	// update an order from a user's perspective. Only allowed to change quantity
 	app.post("/api/cart", function(req, res, next) {
-		if (req.user) {
+		if (req.user && scheduler.canShop) {
 
 			async.waterfall([
 				function(callback) {
@@ -607,7 +600,7 @@ exports.configAPI = function configAPI(app) {
 				function(oldQuantity, newQuantity, order, callback) {
 					models.Product.findById(order.product, function(e, product) {
 						if (!e) {
-							// will return an error if scheduler.currentCycle is undefined
+							// make sure we are changing an order for the current cycle and a current product
 							if (order.cycle === product.cycle && product.cycle === scheduler.currentCycle) {
 								if (product.quantity + (oldQuantity - newQuantity) >= 0) {
 									product.quantity = product.quantity + (oldQuantity - newQuantity);
@@ -624,8 +617,6 @@ exports.configAPI = function configAPI(app) {
 							else {
 								res.send("Sorry! That product cannot be changed at this time. Contact technical support for assistance");
 							}
-							
-							
 						}
 						else {
 							callback(e);
@@ -638,7 +629,7 @@ exports.configAPI = function configAPI(app) {
 					res.send(500);
 			});
 		}
-		else res.send(401);
+		else res.send(403);
 		
 	});
 	// Deletes a specific item from a users own cart and increases the quantity
@@ -674,7 +665,7 @@ exports.configAPI = function configAPI(app) {
 	// populated order. It creates the order object and subtracts the quantity from
 	// the product being purchased inventory.
 	app.post("/api/order", function(req, res, next) {
-		if (req.user) {
+		if (req.user && scheduler.canShop) {
 			if (req.body.customer !== req.body.supplier) {
 				async.waterfall([
 					function(callback) {
@@ -725,7 +716,7 @@ exports.configAPI = function configAPI(app) {
 			}
 			else res.send("Sorry, you can't try to buy your own products");
 		}
-		else res.send(401);
+		else res.send(403);
 	});
 	
 	// get all the invoices or a query. Called in the app from the invoices page
@@ -789,109 +780,90 @@ exports.configAPI = function configAPI(app) {
 	// This registers a new user and if no error occurs the user is logged in 
 	// A new email is sent to them as well.
 	app.post("/api/user", function(req, res, next) {
-		var memberEmailOptions, memberEmailData, memberEmail, dueDate, invoice, invoiceTotal;
+		var memberEmailOptions, memberEmailData, memberEmail, dueDate, invoice;
 		async.waterfall([
 			// create the new user and pass the user to the next function
 			function(done) {
+				// disable unapproved producers from uploading immediately.
+				if (req.body.user_type.canSell) req.body.user_type.canSell = false;
 				models.User.register(new models.User({
-						dateJoined: Date.today(),
-						name: req.body.name,
-						email: req.body.email,
-						phone: req.body.phone,
-						address: req.body.address,
-						user_type: req.body.user_type
-					}),
-					req.body.password,
-					function(e, account) {
-						if (!e) {
-							done(e, account);
-						} else {
-							console.log(e);
-							console.log('This is the account created');
-							console.log(account);
-							res.send(500, 'Server error occured. Check the log for details');
-						}
+					dateJoined: Date.today(),
+					name: req.body.name,
+					email: req.body.email,
+					phone: req.body.phone,
+					address: req.body.address,
+					user_type: req.body.user_type
+				}),
+				req.body.password,
+				function(e, account) {
+					if (!e) {
+						done(e, account);
+					} else {
+						console.log(e);
+						done(e, null);
 					}
-				);
-				
+				});
 			},
 			
 			// Count the total number of invoices and create a new one with an _id equal to
 			// the total++. The invoice is used in the email and also available to the app
 			// because it's saved to the database.
 			function(user, done) {
-				if (user) {
-					models.Invoice.count(function(e, count) {
-						var itemName;
-						dueDate = Date.today().addDays(30);
-					
-						if (user.user_type.name === 'Producer') {
-						
-							itemName = 'Producer Membership';
-						}
-						else itemName = 'Customer Membership';
-					
-						//create a promise of a new invoice
-						invoice = new models.Invoice({
-							_id: count + 1,
-							datePlaced: Date.today(),
-							invoicee: user._id,
-							title: 'Membership',
-							items: [{name:itemName, cost:req.body.cost}],
-							dueDate: dueDate
-						});
-						
-						memberEmailOptions = {
-							template: "new-member",
-							subject: 'Welcome to the NNFC online Store',
-							to: {
-								email: user.email,
-								name: user.name
-							}
-						};
-						
-						console.log('The total on the invoice is: ' + invoice.items.total)
-						//send an email invoice
-						memberEmailData = {
-							name: user.name,
-							dueDate: invoice.dueDate,
-							code: invoice._id,
-							items: invoice.items,
-							cost: invoice.total,
-							account: config.bankAccount,
-							email: user.email,
-							password: req.body.password
-						};
-
-						memberEmail = new Emailer(memberEmailOptions, memberEmailData);
-
-						memberEmail.send(function(err, result) {
-							if (err) {
-								return console.log(err);
-							}
-							// a response is sent so the client request doesn't timeout and get an error.
-							console.log("Message sent to new member");
-							
-							done(null, user);
-						});
-						
-					});
+				var itemName;
+				if (user.user_type.name === 'Producer') {
+					itemName = 'Producer Membership';
 				}
-				else {
-					console.log("No invoice created as User is " + User);
+				else itemName = 'Customer Membership';
+				//create a promise of a new invoice
+				invoice = new models.Invoice({
+					datePlaced: Date.today(),
+					invoicee: user._id,
+					title: 'Membership',
+					items: [{name:itemName, cost:req.body.cost}],
+					dueDate: Date.today().addDays(30);
+				});
+					
+				memberEmailOptions = {
+					template: "new-member",
+					subject: 'Welcome to the NNFC online Store',
+					to: {
+						email: user.email,
+						name: user.name
+					}
+				};
+				//send an email invoice
+				memberEmailData = {
+					name: user.name,
+					dueDate: invoice.dueDate,
+					code: invoice._id,
+					items: invoice.items,
+					cost: invoice.total,
+					account: config.bankAccount,
+					email: user.email,
+					password: req.body.password
+				};
+
+				memberEmail = new Emailer(memberEmailOptions, memberEmailData);
+
+				memberEmail.send(function(err, result) {
+					if (err) {
+						done(err, null);
+					}
+					// a response is sent so the client request doesn't timeout and get an error.
+					console.log("Message sent to new member");
+					
 					done(null, user);
-				}
+				});
 			}
 			//send the user-data to the app
 			],
 			function(err, user){
 				var userObject;
-				if (!err && user) {
+				if (user) {
 					// save the invoice made for the user;
 					invoice.save(function(err) {
 						if (err) return errorHandler(err);
 						console.log('Invoice saved');
-						
 					});
 					// authenticate the newly created user
 					passport.authenticate('local', function(err, user, info){
@@ -1192,7 +1164,6 @@ exports.configAPI = function configAPI(app) {
 			} else {
 				res.send('text/plain', 'Not logged in');
 			}
-
 		})
 		// attempt to log the user in
 		.post(function(req, res, next) {
@@ -1200,6 +1171,7 @@ exports.configAPI = function configAPI(app) {
 				if (err) { return next(err); }
 				if (!user) {
 					req.session.messages =  [info.message];
+					console.log(req.session.messages);
 					return res.send('Failed to authenticate user');
 				}
 				req.logIn(user, function(err) {

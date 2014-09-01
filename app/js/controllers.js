@@ -15,6 +15,11 @@ angular.module('co-op.controllers', []).
 			// init
 			$scope.predictiveSearch = [];
 			
+			// Date info for use in the app
+			$scope.today = Date.today().toString("ddd d MMM yyyy");
+			$scope.month = Date.today().toString("MMMM");
+			$scope.monthPlusOne = Date.today().addMonths(1).toString("MMMM");
+			$scope.monthPlusTwo = Date.today().addMonths(2).toString("MMMM");
 			
 			// methods
 			
@@ -548,10 +553,11 @@ angular.module('co-op.controllers', []).
 		});
 		
 		$scope.products = products.getList().$object; 
-				
-		$scope.isOrdered = function(id) {
+		
+		// @id is _id of product and @list is which month list to search for purchases		
+		$scope.isOrdered = function(id, list) {
 			var numOrdered = 0;
-			var ordersOfProduct = _.where($scope.currentOrders, { product : {_id: id} });
+			var ordersOfProduct = _.where(list, { product : {_id: id} });
 			if (ordersOfProduct !== [] ) {
 				for (var i = 0; i < ordersOfProduct.length; i++) {
 					numOrdered += ordersOfProduct[i].quantity;
@@ -770,7 +776,7 @@ angular.module('co-op.controllers', []).
 		// initiate the real-time message container
 		$scope.message = {type: 'danger', closeMessage: function() {if (this.message) this.message = null;} };
 		
-		Restangular.all('api/product').getList().then(function(products){
+		Restangular.all('api/product').getList({cycle: $rootScope.cycle}).then(function(products){
 			$scope.products = products.plain();
 			
 			// deal with all hash and search on product successful load;
@@ -928,19 +934,16 @@ angular.module('co-op.controllers', []).
 	}
 
 ])
-.controller('calendarCtrl', ['$scope', '$http', 'Calendar',
-	function($scope, $http, Calendar) {
+.controller('calendarCtrl', ['$scope', '$rootScope', '$http', 'Calendar',
+	function($scope, $rootScope, $http, Calendar) {
 		$scope.countDown = [];
-		$scope.today = Date.today().toString("ddd d MMM yyyy");
-		$scope.month = Date.today().toString("MMMM");
-		$scope.monthPlusOne = Date.today().addMonths(1).toString("MMMM");
-		$scope.monthPlusTwo = Date.today().addMonths(2).toString("MMMM");
+		
 		
 		$http.get('/api/calendar').success(function(result) {
 			$scope.significantDays = result[0];
 			$scope.nextMonth = result[1];
 			$scope.twoMonth = result[2];
-			$scope.cycle = result[3];
+			$rootScope.cycle = result[3];
 			
 			var key;
 			
