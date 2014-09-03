@@ -87,10 +87,10 @@
 				<div id="calendar">
 					<div id="calendar-container" ng-controller="calendarCtrl">
 						<h2><a href="#/calendar">Co-op Calendar</a></h2>
-						<p class="lead">
+						<p>
 							Product Uploading {{inDateRange(countDown[0].ProductUploadStart, countDown[0].ProductUploadStop)}}.<br>
 							Shopping {{inDateRange(countDown[0].ShoppingStart, countDown[0].ShoppingStop)}}.<br>
-							Delivery Day is in <span class="badge">{{daysBeforeDeliveryDay}}</span> days<br>
+							Delivery Day is in <span class="label label-default">{{daysBeforeDeliveryDay}}</span> days<br>
 							<span ng-if="daysBeforeDeliveryDay < 1">Next delivery day in {{countDown[1].DeliveryDay.daysUntil}} days</span>
 						</p>
 					</div>
@@ -106,7 +106,7 @@
 								<table class="table">
 									<thead>
 										<tr>
-											<th><a href="" ng-click="predicate = '_id'; reverse=!reverse" tooltip-placement="right" tooltip="'Remove Items'">&times;</a></th>
+											<th><a href="" ng-click="predicate = '_id'; reverse=!reverse" tooltip-placement="right" tooltip="Remove Items">&times;</a></th>
 											<th><a href="" ng-click="predicate = 'product.productName'; reverse=!reverse">Product</a></th>
 											<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse">Quantity</a></th>
 											<th><a href="" ng-click="predicate = 'orderPriceWithMarkup'; reverse=!reverse">Price</a></th>
@@ -127,7 +127,12 @@
 									            <a href="" ng-click="open(c)">{{c.product.fullName}}</a>
 									        </td>
 									        <td data-title="'Quantity'">
-									           <input type="number" class="form-control" ng-change="quantityChange($index)" ng-model="c.quantity">
+												<div class="input-group">
+													<div class="input-group-btn">
+														<button class="btn btn-default" ng-click="quantityChange($index)" ng-show="quantity.$dirty">Save</button>
+													</div>
+													 <input name="quantity" type="number" class="form-control" ng-model="c.quantity">
+												</div>
 									        </td>
 									        <td data-title="'Price'">
 									            {{c.unitPriceWithMarkup * c.quantity | currency}}
@@ -152,11 +157,10 @@
 						ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
 						><a href="#/product-upload">Upload a Product</a></li>
 						<li ng-class="{active:isActive('/producer-profile')}" 
-						ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
+						ng-show="currentUser && currentUser.user_type.name === 'Producer'"
 						><a href="#/producer-profile">Edit Producer Profile</a></li>
 						<li ng-class="{active:isActive('/my-invoices')}" ng-show="currentUser"><a ng-href="#/my-invoices">My Invoices</a></li>
 						<li ng-class="{active:isActive('/me/{{currentUser._id}}')}" ng-show="currentUser"><a ng-href="#/me/{{currentUser._id}}">My Settings</a></li>
-                    
 				</ul>
 			</div>
 		</div>
@@ -197,9 +201,10 @@
 			</nav>
 			<div class="row">
 				<div class="col-md-12">
-					<alert type="{{flash.getType()}}" ng-show="flash.getMessage()" close="flash.closeMessage()" role="alert">
-						{{flash.getMessage()}}
+					<alert type="{{alert.type}}" ng-repeat="alert in queue" close="flash.closeMessage($index)" role="alert">
+						{{alert.message}}
 					</alert>
+					
 					
 				<!--  This is where the partials go for the forms and information pages. /-->    
 										
@@ -227,6 +232,7 @@
 							<ul class="nav">
 								<li><a href="#/about">About Us</a></li>
 								<li><a href="#/contact">Contact Us</a></li>
+								<li><a href="#/policy">Co-op Policy</a></li>
 								<li><a href="#/terms-cons">Terms and Conditions</a></li>
 								<li><a href="#/priv-pol">Privacy Policy</a></li>
 							</ul>
@@ -235,9 +241,6 @@
 				</div>
 			</div>
 		</div>
-    
-
-
 
 		<script>
 		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

@@ -1,8 +1,11 @@
 <div class="page-header">
 	<h1>NNFC FAQ</h1>
 </div>
-{{hash}}
 
+<div ng-class="{ 'col-sm-4' : !panelDisplay, 'col-sm-2' : panelDisplay}">
+	<img src="../img/Funny-Goat.jpg" width="600" height="450" alt="Funny Goat" class="img-responsive">
+</div>
+<div ng-class="{ 'col-sm-8' : !panelDisplay, 'col-sm-10' : panelDisplay}">
 <accordion close-others="true">
     <accordion-group heading="How do I join?">
 		<p>You can sign up as a Producer or Customer member by clicking the link on our website and paying the invoiced amount.</p>
@@ -49,8 +52,11 @@
 		<p>If you live in Whangarei, or want to collect your food while you’re in town, you can pick up your order from The Woods, our facility in central Whangarei. Orders are avaible for collection from 3:00 p.m. onwards on Delivery Day. You can find out when the next Delivery Day is by checking the calendar on our wesite.</p>
 
 		<p>If Whangarei is too far for you to travel, you can pick up your goods from a collection point closer to home. To find out times and places for community collection points, you’ll need to get in touch with your local Route Manager. Contact details for our Route Managers in communities all over Northland can be found <a href="#/route-managers-directory">here.</a></p>
-
-		<iframe src="{{map}}" width="800" height="600" frameborder="0" style="border:0"></iframe>
+		<br> <span class="glyphicon glyphicon-question-sign"></span>
+		<div class="btn-group">
+			<a target="_blank" class="btn btn-default" ng-href="https://www.google.com/maps/place/2+Woods+Rd,+Whangarei,+0110,+New+Zealand/"><span class="glyphicion glyphicon-map-marker"></span> See Map</a>
+			<a target="_blank" class="btn btn-default" ng-if="currentUser" ng-href="https://www.google.com/maps/dir/{{currentUser.address}}/2+Woods+Rd,+Whangarei,+0110,+New+Zealand/"><span class="glyphicon glyphicon-question-sign"></span> Get Directions</a>
+		</div>
 	</accordion-group>
 	<accordion-group heading="Where do I take the products I’ve sold?">
 		<a href="http://9kidfitness.com/wp-content/uploads/2014/05/bikeo-HEALTHY-FOOD-facebook.jpg">
@@ -61,3 +67,5 @@
 
 		<p>All goods need to be dropped off at The Woods by 3:00 p.m. on Delivery Day. You can find out when the next Delivery day is by checking the calendar on our wesite.</p>
 	</accordion-group>
+</accordion>
+</div>

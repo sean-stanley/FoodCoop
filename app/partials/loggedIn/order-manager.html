@@ -12,6 +12,7 @@
 <table class="table">
 <thead>
 	<tr>
+		<th><a href="" ng-click="predicate = '_id'; reverse=!reverse" tooltip-placement="right" tooltip="Remove Items">&times;</a></th>
 		<th><a href="" ng-click="predicate = 'productName'; reverse=!reverse ">Product</a></th>
 		<th><a href="" ng-click="predicate = 'price'; reverse=!reverse ">Price</a></th>
 		<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Inventory</a></th>
@@ -20,7 +21,10 @@
 </thead>
 <tbody>
 	<tr ng-repeat="i in currentProducts | orderBy:predicate:reverse " >
-        <td data-title="'Product'" >
+        <td data-title="'remove'">
+			<button type="button" class="close" aria-hidden="true" ng-click="delete($index, i._id)">&times;</button>
+		</td>
+		<td data-title="'Product'" >
              <a ng-href="#/product-upload/{{i._id}}">{{i.fullName}}</a>
         </td>
 

@@ -8,7 +8,7 @@ var config = require('./coopConfig.js'),
 	ObjectId = require('mongoose').Types.ObjectId, 
 	models = require('./models.js'),
 	fs = require("fs"),
-	_ = require("underscore"),
+	_ = require('lodash'),
 	schedule = require("node-schedule"),
 	calHelp = require('./calendarHelper');
 	
@@ -35,7 +35,6 @@ function checkConfig() {
 				console.log('Woohoo! Today is %s day', key);
 				// find what day it is
 				var cycleDay = key;
-				// the bools won't work as they just edit a copy of config not config itself as referenced by the rest of the server
 				switch (cycleDay) {
 				case 'cycleIncrementDay':
 					incrementCycle();

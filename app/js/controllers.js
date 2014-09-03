@@ -10,10 +10,11 @@ angular.module('co-op.controllers', []).
     	}
     ])
 	
-	.controller('navCtrl', ['$scope', '$location', '$position',
-		function($scope, $location, $position) {
-			// init
+	.controller('navCtrl', ['$scope', '$location', 'flash',
+		function($scope, $location, flash) {
+			// init			
 			$scope.predictiveSearch = [];
+			$scope.flash = flash;
 			
 			// Date info for use in the app
 			$scope.today = Date.today().toString("ddd d MMM yyyy");
@@ -202,8 +203,8 @@ angular.module('co-op.controllers', []).
 		};
 }])
 
-.controller('invoiceCtrl', ['$scope', '$rootScope', 'Restangular', 
-	function($scope, $rootScope, Restangular){
+.controller('invoiceCtrl', ['$scope', '$rootScope', 'Restangular', 'flash',
+	function($scope, $rootScope, Restangular, flash){
 		$scope.now = Date();
 		
 		$scope.soon = function(invoice) {
@@ -221,22 +222,20 @@ angular.module('co-op.controllers', []).
 		
 		// update the invoice
 		$scope.invoiceSave = function (invoice) {
-			invoice.put().then(function(result) {
-				if (result === "Accepted") {
-					invoice.alert = {
-						message: "Invoice Successfully updated",
-						type: "success"
-					};
-					$scope.unPaid();
-					$scope.overdue();
-				}
-				else {
-					invoice.alert = {
-						message: "Sorry! Failed to update the invoice for some reason",
-						type: "danger"
-					};
-				}
-				
+			invoice.put().then(
+			function(result) {
+				flash.setMessage({
+					message: "Invoice Successfully updated",
+					type: "success"
+				});
+				$scope.unPaid();
+				$scope.overdue();
+				}, 
+			function(error) {
+				flash.setMessage({
+					message: "Sorry! Failed to update the invoice for some reason",
+					type: "danger"
+				});
 			});
 		};
 		
@@ -284,7 +283,6 @@ angular.module('co-op.controllers', []).
 	function($scope, Restangular, UserManager, $location) {
 
 		$scope.userData = {
-			cost: 60,
 			password: '',
 			email: '',
 			name: '',
@@ -295,44 +293,40 @@ angular.module('co-op.controllers', []).
 				canSell	: false
 			}
 		};
-
-		$scope.$watch('userData.user_type.canSell', function(newValue) {
-			if ($scope.userData.user_type.canSell) {
-				$scope.userData.user_type.name = "Producer";
-				$scope.userData.cost = 120;
-			} else {
-				$scope.userData.user_type.name = "Customer";
-				$scope.userData.cost = 60;
-			}
-		});
-
-
+		
 		$scope.submitForm = function() {
 			UserManager.createUser($scope.userData);
 		};
 	}
 ])
-
-.controller('producerApplicationCtrl', ['$scope', 'certifications', 'Restangular',
-	function ($scope, certifications, Restangular) {
-		certifications.getList().then(function(result) {
-			$scope.certifications = result;
-			$scope.producerApplication = {
-				certification : $scope.certifications[0]._id // none
-			};
-		});
-		
-	}
-])
-
+// used on the sign up page for address finding.
 .controller('geoCtrl', ['$scope',
 	function($scope) {
-
 		$scope.addressOptions = {
 			country: 'nz',
 		};
 		$scope.details = {};
+	}
+])
 
+.controller('producerApplicationCtrl', ['$scope', '$rootScope','certifications', '$http', "$location",
+	function ($scope, $rootScope, certifications, $http, $location) {
+		certifications.getList().then(function(result) {
+			$scope.certifications = result;
+			$scope.producerApplication = {
+				certification : $scope.certifications[0].name, // none
+			};
+		});
+		
+		$scope.submitForm = function(form) {
+			$http.post('/api/producer-applicaiton', $scope.producerApplication).success(function(result) {
+				$rootScope.flash.setMessage({type: 'success', message: 'Thank you for your application. We\'ll be in touch shortly.'});
+				$location.path("#/welcome");
+			}).error(function(result) {
+				$rootScope.flash.setMessage({type: 'danger', message: '"Oops! Something went wrong. Error Code: " + result.status + " " + result.statusText;'});
+			});
+		};
+		
 	}
 ])
 
@@ -341,9 +335,7 @@ angular.module('co-op.controllers', []).
 		ProducerList.getData(function(result) {
 			$scope.producerList = result;
 		});
-
 		$scope.predicate = 'dateJoined';
-
 	}
 ])
 
@@ -360,6 +352,12 @@ angular.module('co-op.controllers', []).
 .controller('modalInstanceCtrl', ['$scope', '$location', '$modalInstance', 'data',
 	function($scope, $location, $modalInstance, data) {
 		
+		var twitterRenderedAttribute = function(bool){
+			document.body.dataset.twttrRendered = bool;
+		};
+		
+		twitterRenderedAttribute(true);
+		
 		$scope.data = data;
 		
 		function producer() {
@@ -369,18 +367,20 @@ angular.module('co-op.controllers', []).
 		$location.hash(data.fullName + "+" + producer()+ "&id=" + data._id);
 		
 		$scope.addToCart = function(product) {
+			twitterRenderedAttribute(false);
 			$modalInstance.close($scope.data);
 			
 		};
 
 		$scope.cancel = function() {
+			twitterRenderedAttribute(false);
 			$modalInstance.dismiss('cancel');
 		};
 	}
 ])
-
-.controller('productHistoryCtrl', ['$scope', '$http', 'ProductHistory',
-	function($scope, $http, ProductHistory) {
+// left-column of product-upload page
+.controller('productHistoryCtrl', ['$scope', '$http', 'ProductHistory', 'ProductManager',
+	function($scope, $http, ProductHistory, ProductManager) {
 
 		ProductHistory.getCurrentProducts(function(result) {
 			$scope.currentProducts = result;
@@ -396,19 +396,18 @@ angular.module('co-op.controllers', []).
 
 		$scope.predicate = 'dateUploaded';
 
-		$scope.delete = function(idx) {
+		$scope.delete = function(idx, id) {
 			var itemToDelete = $scope.currentProducts[idx];
 			$scope.currentProducts.splice(idx, 1);
-			$http({method: 'DELETE', url: 'api/product/', data: itemToDelete}).then(function(status) {
-				console.log(status);
-			});
+			ProductManager.deleteProduct(id);
 		};
 	}
 ])
 
+// main controller for product upload page
 .controller('productUploadCtrl', ['$scope', '$rootScope', '$modal', '$sce', 'ProductManager', 'Restangular', 'product',
 	function($scope, $rootScope, $modal, $sce, ProductManager, Restangular, product) {
-		// make ProductManager methods available in the template
+		// init
 		$scope.productData = product;
 		$scope.productData.refrigeration = product.refrigeration || 'none';
 		$scope.selectedImg = $scope.productData.img || null;
@@ -510,8 +509,8 @@ angular.module('co-op.controllers', []).
 	}
 ])
 
-.controller('productOrderCtrl', ['$scope', 'myOrders', 'products', 'unfullfilledOrders', 'Calendar', 'ProductHistory', 
-	function($scope, myOrders, products, unfullfilledOrders, Calendar, ProductHistory) {
+.controller('productOrderCtrl', ['$scope', 'myOrders', 'products', 'unfullfilledOrders', 'Calendar', 'ProductHistory', 'ProductManager', 
+	function($scope, myOrders, products, unfullfilledOrders, Calendar, ProductHistory, ProductManager) {
 		myOrders.getList().then(function(orders) {
 			$scope.orders = orders.plain();
 			
@@ -530,8 +529,6 @@ angular.module('co-op.controllers', []).
 				}
 				return total;
 			};			
-			
-			console.log($scope.sortedOrders);
 		});
 		
 		$scope.sortedOrders = unfullfilledOrders.getList().$object;
@@ -545,6 +542,12 @@ angular.module('co-op.controllers', []).
 		});
 		
 		$scope.products = products.getList().$object; 
+		
+		$scope.delete = function(idx, id) {
+			var itemToDelete = $scope.currentProducts[idx];
+			$scope.currentProducts.splice(idx, 1);
+			ProductManager.deleteProduct(id);
+		};
 		
 		// @id is _id of product and @list is which month list to search for purchases		
 		$scope.isOrdered = function(id, list) {
@@ -572,8 +575,6 @@ angular.module('co-op.controllers', []).
 			$scope.cartProduct_ids = [];
 			$scope.cart = cart;
 			getIds();
-			
-			
 		});
 		
 		$scope.cartTotal = function(cart) {
@@ -590,14 +591,19 @@ angular.module('co-op.controllers', []).
 			var itemToDelete = $scope.cart[idx];
 			Cart.deleteItem($scope.cart[idx]._id);
 			$scope.cart.splice(idx, 1);
-			$scope.cartTotal();
+			var index = $scope.cartProduct_ids.indexOf(itemToDelete.product._id);
+			if (index > -1) $scope.cartProduct_ids.splice(index, 1);
+			
+/*
 			for (var i = 0; i < $scope.cartProduct_ids.length; i++) {
 				if ($scope.cartProduct_ids[i] === itemToDelete.product._id) {
 					$scope.cartProduct_ids.splice(i, 1);
 				}
-			}
+			}*/
+
 			// for the store page:
 			$rootScope.$broadcast('CART_IDS', $scope.cartProduct_ids);
+			$scope.cartTotal();
 		};
 		
 		// update the cart on valid quantity changes and reset it on invalid ones;
@@ -614,7 +620,7 @@ angular.module('co-op.controllers', []).
 		
 		function watchQuantity () {
 			if ($scope.cart) {
-				return $scope.cart.map(function(item, idx) {
+				return $scope.cart.map(function(item) {
 					return item.quantity;
 				});
 			}

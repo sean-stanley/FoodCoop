@@ -17,36 +17,48 @@ angular.module('co-op.services', [])
 // it's generally not seen until the next route change. Primarily used for login
 // attempts and successful writes to the database.	
 	.factory("flash", function($rootScope) {
-		var queue = [];
-		var currentMessage ={message: '', type: ''};
+		// next page message for logging out
+		// current page message for server requests
+		$rootScope.queue = [];
+		var temp;
+		var currentMessage = {message: '', type: ''};
 
-		$rootScope.$on("$routeChangeSuccess", function() {
-			currentMessage = queue.shift() || {message: '', type: ''};
+		$rootScope.$on("$routeChangeStart", function() {
+			temp = _.filter($rootScope.queue, 'next' );
+			$rootScope.queue = [];
+			$rootScope.queue = _.map(temp, function(m) {delete m.next; return m;});
 		});
 
 		return {
 			setMessage: function(message) {
 				if (message.hasOwnProperty('type') ) {
-					queue.push(message);
+					$rootScope.queue.push(message);
 				}
 			},
-			getMessage: function() {
-				return currentMessage.message;
+			setNextMessage: function(message) {
+				if (message.hasOwnProperty('type') ) {
+					message.next = true;
+					$rootScope.queue.push(message);
+				}
 			},
-			getType: function() {
-				return currentMessage.type;
-				},
-			closeMessage: function() {
-				currentMessage = queue.shift() || "";
-			},
+			closeMessage: function(idx) {
+				$rootScope.queue.splice(idx, 1);
+			}
 			
 		};
 	})
 
 // Is a collection of methods for logging a user in, checking if a user is
 // logged in and logging out.	
-	.factory('LoginManager', function ($location, $rootScope, $q, Session, Restangular, Cart){
+	.factory('LoginManager', function ($location, $rootScope, $q, Session, Restangular, flash){
 		$rootScope.failedAttempts = 0;
+		
+		function getTally() {
+			Restangular.one('api/cart', $rootScope.currentUser._id)
+			.customGET('length').then(function(count) {
+				$rootScope.cartTally = count;
+			});
+		}
 		
 		return {
 			login : function(provider, form, callback) {
@@ -65,7 +77,9 @@ angular.module('co-op.services', [])
 						}
 										
 						$rootScope.currentUser = user;
-						Cart.getTally();
+						getTally();
+						$location.path($rootScope.savedLocation);
+						$rootScope.savedLocation = "";
 					}
 					// incorrect login attempt
 					else {
@@ -79,16 +93,18 @@ angular.module('co-op.services', [])
 							}
 						};
 						var remaining = remainingAttempts(9);
-						$rootScope.flash.setMessage({
-							type: 'danger',
+						var type = remaining > 5 ? 'warning' : 'danger';
+						flash.setNextMessage({
+							type: type,
 							message: 'Login failed! Please check your username and password and try again. You have ' + remaining +' remaining attempts left'
 						});
 						$location.path('/login-failed'+'/attempts='+$rootScope.failedAttempts);						
 					}
+					flash.setNextMessage({type: 'success', message: 'Welcome back! Check out the member-only links in the sidebar.'});
 					return cb();
 				}, 
 					function(err) {
-						console.log(err.data);
+						// error interceptor prints error alert on screen
 						return cb();
 					}
 				
@@ -109,21 +125,14 @@ angular.module('co-op.services', [])
 				else {
 					
 					Session.customGET().then(function(user) {
-						if (user === 'Not logged in') {
-							console.log(user);
-							isLoggedIn = false;
-							result.resolve(isLoggedIn);
-						}
-						else if (typeof user === 'object' && user.hasOwnProperty('email')) {
-							console.log(user.plain());
-							// if the user is already authenticated, save the data for the app to use.
-							$rootScope.currentUser = user.plain();
-							isLoggedIn = true;
-							Cart.getTally();
-							result.resolve(isLoggedIn);
-						}
-						else result.reject(user);
-						
+						$rootScope.currentUser = user.plain();
+						isLoggedIn = true;
+						getTally();
+						result.resolve(isLoggedIn);
+					}, function(error) {
+						console.log(error);
+						isLoggedIn = false;
+						result.reject("Session is expired");
 					});
 					
 				}
@@ -133,7 +142,7 @@ angular.module('co-op.services', [])
 			logout : function() {
 				Session.remove();
 				$rootScope.currentUser = null;
-				$rootScope.flash.setMessage({type: 'success', message: 'Successfully logged out!'});
+				flash.setNextMessage({type: 'success', message: 'Successfully logged out!'});
 				$location.path('/home');
 			}
 		};
@@ -141,16 +150,18 @@ angular.module('co-op.services', [])
 
 	// called for creating new users as well as has a promise for getting all the users. Editing a
 	// user though is handled by the userEditCtrl Controller. 
-	.factory('UserManager', function($rootScope, Restangular, $location) {
+	.factory('UserManager', function($rootScope, Restangular, $location, flash) {
 		return {
 			createUser: function(userinfo, callback) {
 				var cb = callback || angular.noop;
 				Restangular.all('api/user').post(userinfo).then(function(user){
-					console.log(user);
 					$rootScope.currentUser = user;
-					$location.path('/welcome');
+					if ($rootScope.currentUser.user_type == "Producer") {
+						$location.path("#/apply");
+					}
+					else $location.path('#/welcome');
 					cb();
-				});
+				}, function(error){flash.setMessage({type: 'danger', message: 'Drat! Failed to create a new user. '+error.data.name + ': ' + error.data.message});});
 			},
 			// this is a promise. Call users.getList() to get the array of users. 
 			users: Restangular.all('api/user')
@@ -159,7 +170,7 @@ angular.module('co-op.services', [])
 	})
 	
 	// collects and maps category id's with their names. 
-	.factory('ProductManager', ['$http', 'Restangular', '$rootScope', '$route', function($http, Restangular, $rootScope, $route) {
+	.factory('ProductManager', ['$http', 'Restangular', '$rootScope', 'flash', function($http, Restangular, $rootScope, flash) {
         var module, productCategoryPromise, categoryIdMapping = {}, categoryNameMapping = {}, unitSuggestions = [];
         
         productCategoryPromise = Restangular.all("api/category");
@@ -186,12 +197,17 @@ angular.module('co-op.services', [])
         
 		module = {
 			registerProduct : function(productData) {
-				//$http.post("api/product", productData);
 				Restangular.all('api/product').post(productData).then(function() {
-					$rootScope.flash.setMessage({type: 'success', 
+					flash.setMessage({type: 'success', 
 					message: 'Congratulations ' + $rootScope.currentUser.name + '! Your product ' + productData.variety + " " + productData.productName + ' was successfully added to the store.'
 					});
-					$route.reload();
+				});
+			},
+			deleteProduct : function(id) {
+				Restangular.one('api/product', id).remove().then(function() {
+					flash.setMessage({type: 'success', message: 'Poof! Product successfully deleted'});
+				}, function() {
+					flash.setMessage({type: 'danger', message: 'Drat! Could not delete that product.'});
 				});
 			},
 			
@@ -219,17 +235,14 @@ angular.module('co-op.services', [])
         return module;
 	}])
 	
-	.factory('ProducerManager', ['$http', 'Restangular', '$rootScope', '$route', function($http, Restangular, $rootScope, $route) {
+	.factory('ProducerManager', ['Restangular', '$rootScope', 'flash', function(Restangular, $rootScope, flash) {
 		return {
 			saveProducer : function(callback) {
 				var cb = callback || angular.noop;				
 				console.log($rootScope.currentUser);
-				Restangular.one('api/user', $rootScope.currentUser._id).customPOST($rootScope.currentUser, 'producer/edit').then(function(result) {
-					if (result.hasOwnProperty('_id')) {
-						$rootScope.flash.setMessage('Profile Updated Successfully');
-						$route.reload();
-					}
-				});
+				Restangular.one('api/user', $rootScope.currentUser._id).customPOST($rootScope.currentUser, 'producer/edit')
+				.then(function(result) {flash.setMessage({type: 'success', message: 'Profile Updated Successfully.'});},
+					function(){flash.setMessage({type: 'danger', message: 'Drat! Failed to update your profile.'});});
 			}
 		};
 	}])
@@ -286,7 +299,7 @@ angular.module('co-op.services', [])
 		};
 	}])
 	
-	.factory('MailManager', ['$rootScope', '$http', function($rootScope, $http) {
+	.factory('MailManager', ['flash', '$http', function(flash, $http) {
 		return {
 			mail : function(mail, callback) {
 				var cb = callback || angular.noop, recipient;
@@ -296,7 +309,7 @@ angular.module('co-op.services', [])
 				else recipient = "the NNFC";
 				
 				$http.post('/api/mail', mail).success(function(response) {
-					$rootScope.setMessage({
+					flash.setMessage({
 						type: 'success', 
 						message: 'message sent successfully to ' + recipient
 					});
@@ -306,51 +319,51 @@ angular.module('co-op.services', [])
 		};
 	}])
 	
-.factory('Cart', ['$rootScope','Restangular', 'Calendar', 
-	function($rootScope, Restangular, Calendar){
+.factory('Cart', ['$rootScope','Restangular', 'LoginManager', 'Calendar', 'flash',
+	function($rootScope, Restangular, LoginManager, Calendar, flash){
 				
 		return {
-			getTally : function() {
-				Restangular.one('api/cart', $rootScope.currentUser._id)
-				.customGET('length').then(function(count) {
-					$rootScope.cartTally = count;
-				});
-			},
+			
 			getAllItems : function(callback) {
-				Restangular.one('api/cart', $rootScope.currentUser._id)
-				.get().then(callback);
+				LoginManager.isLoggedIn().then(function() {
+					Restangular.one('api/cart', $rootScope.currentUser._id)
+					.get().then(callback);
+				});
 			},
 			// optional @callback function will have @list which holds the cart items of
 			// the current month
 			getCurrentCart : function(callback) {
 				var currentCart;
-				Restangular.one('api/cart', $rootScope.currentUser._id)
-				.get().then(function(cart) {
-					currentCart = Calendar.currentMonth(cart, callback);
-					return currentCart;					
+				
+				LoginManager.isLoggedIn().then(function() {
+					Restangular.one('api/cart', $rootScope.currentUser._id)
+					.get().then(function(cart) {
+						currentCart = Calendar.currentMonth(cart, callback);
+						return currentCart;
+					});
 				});
 			},
 			addToCart : function(order, callback) {
-				Restangular.all("api/order").post(order).then(callback);
+				Restangular.all("api/order").post(order).then(function(result){
+					flash.setMessage({type: 'success', message: 'Poof! Successfully added to order'});
+					callback(result);
+				}, function(error){console.log(error);flash.setMessage({type: 'danger', message: 'Drat! Failed to add that to your cart. ' + error.data});});
 			},
 			
 			updateItem : function(item, callback) {
 				var cb = callback || angular.noop;
 				Restangular.all('api/cart').post(item).then(function(result) {
-					console.log(result);
-					if (result === "OK") {
-						$rootScope.flash.setMessage({
-							type: 'success',
-							message: "You're cart was successfully updated"
-						});
-					}
-					else {
-						$rootScope.flash.setMessage({
-							type: 'danger',
-							message: result
-						});
-					}
+					flash.setMessage({
+						type: 'success',
+						message: "You're cart was successfully updated"
+					});
 					cb(result);
+				}, function(error) {
+					flash.setMessage({
+						type: 'danger',
+						message: error.data
+					});
+					cb(error);
 				});
 			},
 			deleteItem : function(id) {
@@ -358,6 +371,15 @@ angular.module('co-op.services', [])
 				.customDELETE(id)
 				.then(function() {
 					$rootScope.cartTally --;
+					flash.setMessage({
+						type: 'success',
+						message: "Successfully got rid of that cart item for you."
+					});
+				}, function(error) {
+					flash.setMessage({
+						type: 'danger',
+						message: error
+					});
 				});
 			}
 		};
@@ -374,7 +396,7 @@ angular.module('co-op.services', [])
 				this.recentProducts = $http.get("/api/product-list").success(callback);
 			},
 			getRecentProducts : function(callback) {
-				this.allProducts = $http.get("/api/product-list/recent").success(callback);								
+				this.allProducts = $http.get("/api/product-list/recent").success(callback);
 			}
 		};
 		return module;
@@ -387,31 +409,7 @@ angular.module('co-op.services', [])
 	            $http.get("/api/user?user_type.name=Producer").success(callback);
 	        },
 			
-			addProducer : function(newData) {
-				module.data.push(newData);
-				return module.data;
-
-			},
-			
 		};
 		
 		return module;
 	}]);
-
-	
-	/*
-	.service('LocationService',  ['$http', function($http) {
-	        var data;
-			
-	        this.getLocations = function(callback) {
-				$http.get("/api/location").success(callback);
-		    };
-	
-	        this.addLocation = function(locationData) {
-	            data.push(locationData);
-				$http.post("/api/location", locationData);
-	        };
-			
-	
-	    }]);   ------- Waiting to be deleted as no longer needed ---------*/ 
-	

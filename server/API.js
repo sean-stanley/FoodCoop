@@ -3,7 +3,7 @@ var util = require('util'),
 	fs = require('fs'), // file system
 	url = require('url'),
 	async = require('async'),
-	_ = require('underscore'),
+	_ = require('lodash'),
 	crypto = require('crypto'),
 	events = require('events'),
 	express = require('express'); // handles routing and such
@@ -12,6 +12,7 @@ var util = require('util'),
 	cookieParser = require('cookie-parser'), // an express module for reading, writing and parsing cookies. In the app it is used for session cookies.
 	session = require('express-session'), // an express module for creating browser sessions.
 	errorHandler = require('express-error-handler'), // an express module for handling errors in the app.
+	geocoder = require('geocoder'), // for geocoding user addresses.
 	mongoose = require('mongoose'), // used to connect to MongoDB and perform common CRUD operations with the API.
 	ObjectId = require('mongoose').Types.ObjectId,
 	models = require('./models.js'), // this file stores the mongoose schema data for our MongoDB database.
@@ -108,8 +109,10 @@ exports.configAPI = function configAPI(app) {
 					return console.log(err);
 					res.send(500);
 				}
+				/*
 				// a response is sent so the client request doesn't timeout and get an error.
-				res.send("text/plain", "Message sent to the NNFC");
+								res.send("text/plain", "Message sent to the NNFC");*/
+				
 			});
 
 			toClient.send(function(err, result) {
@@ -118,7 +121,7 @@ exports.configAPI = function configAPI(app) {
 					res.send(500);
 				}
 				// a response is sent so the client request doesn't timeout and get an error.
-				res.send(200, "Message sent to client");
+				res.send("text/plain", "Message sent to client");
 			});
 		} else if (req.body.hasOwnProperty('to')) {
 			// this case is for when a client is trying to send a message to one of our producer members.
@@ -306,22 +309,23 @@ exports.configAPI = function configAPI(app) {
 
 	// this request will delete a product from the database. First we find the
 	// requested product.
-	app.delete("/api/product", function(req, res, next) {
+	app.delete("/api/product/:id", function(req, res, next) {
 
 		// ensure user is logged in to perform this request.		
 		if (req.user) {
 			// delete the product based on it's id and send a request confirming the deletion
 			// if it goes off without a hitch.
-			models.Product.findByIdAndRemove(req.body._id, function(e, results) {
-				if (!e) { // if no errors
+			models.Product.findByIdAndRemove(new ObjectId(req.params.id), function(e, results) {
+				if (!e && results) { // if no errors
 					console.log(results);
 					res.send(200, 'product deleted');
 				} else {
 					console.log(e) // log the error
+					res.send(500);
 				}
 			});
 		} else {
-			res.send(400, 'Not logged in');
+			res.send(401, 'Not logged in');
 		}
 	});
 
@@ -345,7 +349,6 @@ exports.configAPI = function configAPI(app) {
 	});
 	// return a compact list of all the current user's products for the current month.
 	app.get("/api/product-list/current", function(req, res, next) {
-		console.log(new Date( calendar.startOfMonth.toString("yyyy-MM-dd HH:mm:ssZ") ))
 		if (req.user) {
 			models.Product.find({
 				producer_ID : new ObjectId(req.user._id),
@@ -426,6 +429,7 @@ exports.configAPI = function configAPI(app) {
 				}
 			})
 		}
+		else res.send(401);
 
 	});
 	// get the orders made to the currently authenticated producer/supplier
@@ -473,6 +477,7 @@ exports.configAPI = function configAPI(app) {
 				} else console.log(e);
 			});
 		}
+		else res.send(401);
 	});
 	// get a suppliers orders for the current cycle grouped by customer
 	app.get("/api/order/cycle", function(req,res, next){
@@ -513,6 +518,7 @@ exports.configAPI = function configAPI(app) {
 				else res.json(result);
 			});	
 		}
+		else res.send(401);
 	});
 	
 	app.get("/api/cart/:user/length", function(req, res, next) {
@@ -715,8 +721,10 @@ exports.configAPI = function configAPI(app) {
 				});
 			}
 			else res.send("Sorry, you can't try to buy your own products");
+		} else { // error handling 
+			if (!scheduler.canShop) res.send(403, "It's not shopping time yet");
+			else res.send(401, "Not logged in");
 		}
-		else res.send(403);
 	});
 	
 	// get all the invoices or a query. Called in the app from the invoices page
@@ -753,6 +761,40 @@ exports.configAPI = function configAPI(app) {
 		});
 	});
 	
+	//Forward producer application to standards committee.
+	app.post("/api/producer-applicaiton", function(req, res, next) {
+		var application, mailData, mailOptions, email;
+		if (req.user && !req.user.user_type.canSell) {
+			application = req.body;
+			mailOptions = {template: 'producer-application-form', subject: 'Application form for member '+ req.user.name, to: {name: 'Standards Committee', email: config.standardsEmail}};
+			mailData = {
+				name: req.user.name,
+				email: req.user.email,
+				phone: req.user.phone,
+				address: req.user.address,
+				certification: application.certification,
+				chemicals: application.chemicals,
+				products: application.products
+			}
+			
+			req.user.producerData.certification = application.certification;
+			req.user.producerData.chemicalDisclaimer = application.chemicals;
+			req.user.save();
+			
+			
+			email = new Emailer(mailOptions, mailData);
+			email.send(function(err, result) {
+				if (err) {
+					console.log(err);
+					res.send(500, "form failed to be sent to standards commitee. Reason: " + err);
+				}
+				else res.send(200, result);
+			});
+		}
+		else if (req.user.user_type.canSell) res.send(403);
+		else res.send(401);
+	});
+	
 	//Get and return users as JSON data based on a query. Only really used for the
 	//admin to look at all users.
 	app.get("/api/user", function(req, res, next) {
@@ -784,6 +826,22 @@ exports.configAPI = function configAPI(app) {
 		async.waterfall([
 			// create the new user and pass the user to the next function
 			function(done) {
+				var lat, lng;
+				if (req.body.address) {
+					geocoder.geocode(req.body.address, function ( err, data ) {
+						if (data.status === "OK") {
+							lat = data.results[0].geometry.location.lat;
+							lng = data.results[0].geometry.location.lng;
+							done(null, lat, lng)
+						} else {
+							done(data.status);
+						}
+					
+					});
+				}
+				else done(null, 0, 0)
+			},
+			function(lat, lng, done) {
 				// disable unapproved producers from uploading immediately.
 				if (req.body.user_type.canSell) req.body.user_type.canSell = false;
 				models.User.register(new models.User({
@@ -792,28 +850,28 @@ exports.configAPI = function configAPI(app) {
 					email: req.body.email,
 					phone: req.body.phone,
 					address: req.body.address,
-					user_type: req.body.user_type
+					user_type: req.body.user_type,
+					lat: lat,
+					lng: lng
 				}),
 				req.body.password,
 				function(e, account) {
 					if (!e) {
 						done(e, account);
 					} else {
-						console.log(e);
-						done(e, null);
+						done(e);
 					}
 				});
 			},
 			
-			// Count the total number of invoices and create a new one with an _id equal to
-			// the total++. The invoice is used in the email and also available to the app
+			// Create an invoice to be used in the email and also available to the app
 			// because it's saved to the database.
 			function(user, done) {
-				var itemName;
+				var itemName = 'Customer Membership', cost = config.customerMembership;
 				if (user.user_type.name === 'Producer') {
 					itemName = 'Producer Membership';
+					cost = config.producerMembership;
 				}
-				else itemName = 'Customer Membership';
 				//create a promise of a new invoice
 				invoice = new models.Invoice({
 					datePlaced: Date.today(),
@@ -887,7 +945,7 @@ exports.configAPI = function configAPI(app) {
 				}
 				else {
 					console.log(err)
-					res.send(500);
+					res.send(500, err);
 				}
 			}
 		);
@@ -895,69 +953,74 @@ exports.configAPI = function configAPI(app) {
 
 	// edit changes to a user including updates their password if they submitted a change.
 	app.post("/api/user/:id", function(req, res, next) {
-		models.User.findById(req.params.id, function(e, user) {
-			if (!e && req.user) {
-				var userObject = user.toObject();
-				for (key in req.body) {
-					if (user[key] !== req.body[key] && key !== 'password' && key !== 'oldPassword') {
-						console.log("we are now replacing the old user's " + key + " which evaluates to: " + user[key] + " with the new value of: " + req.body[key]);
-						user[key] = req.body[key];
+		var mailOptions, mailData, mail, changeOptions, changeData, changeEmail, canSell;
+		if (req.user) {
+			models.User.findById(req.params.id, function(e, user) {
+				if (!e) {
+					// email the user that their account details were changed
+					if (req.body.user_type !== user.user_type) {
+						canSell = (req.body.user_type.canSell) ? "can sell products through the co-op website" : "can no longer sell products through the co-op website";
+						mailOptions = {template: "user-rights-change", subject: "Your NNFC membership has changed", to: {name: user.name, email: req.body.email}};
+						mailData = {name: user.name, message: canSell}
+						mail = new Emailer(mailOptions, mailData);
+						mail.send(function(err, result) {
+							if (err) console.log(err);
+						});
 					}
-				}
-
-				// if the user is attempting to change their password, this checks if the user
-				// remembers their old password and if they do will change it to their requested
-				// new password. Admins reset passwords by sending the user a password reset
-				// email.
-				if (req.body.password && req.body.oldPassword) {
-					user.authenticate(req.body.oldPassword, function(e, checksOut) {
-						if (checksOut) {
-							user.setPassword(req.body.password, function() {
-								var changeOptions, changeData, changeEmail;
-								user.save(function(e) {
-									if (!e) {
-										changeOptions = {
-											template: "password-change",
-											subject: 'Food Co-op Password Changed',
-											to: {
-												email: user.email,
-												name: user.name
-											}
-										};
-				
-										changeData = {name: user.name};
-
-										changeEmail = new Emailer(changeOptions, changeData);
-
-										changeEmail.send(function(err, result) {
-											if (err) {
-												return console.log(err);
-											}
-											// a response is sent so the client request doesn't timeout and get an error.
-											console.log("Message sent to user confirming password change");
-										});
-									}
-								});
-							});
-						} else {
-							console.log('Old password does not match current password.')
-							res.send(400, 'Old password does not match current password.')
+					for (key in req.body) {
+						if (user[key] !== req.body[key] && key !== 'password' && key !== 'oldPassword') {
+							console.log("we are now replacing the old user's " + key + " which evaluates to: " + user[key] + " with the new value of: " + req.body[key]);
+							user[key] = req.body[key];
 						}
-						
-						delete user.password;
-						delete user.oldPassword;
-						
-					});
-				}
+					}
 
-				// save changes to the user and send the user back to the app.
-				user.save();
-				res.json(user);
-			} else {
-				console.log(e);
-				res.send(401, "You must be logged in to change data about a user")
-			}
-		});
+					// if the user is attempting to change their password, this checks if the user
+					// remembers their old password and if they do will change it to their requested
+					// new password. Admins reset passwords by sending the user a password reset
+					// email.
+					if (req.body.password && req.body.oldPassword) {
+						user.authenticate(req.body.oldPassword, function(e, checksOut) {
+							if (checksOut) {
+								user.setPassword(req.body.password, function() {
+									user.save(function(e) {
+										if (!e) {
+											changeOptions = { template: "password-change", subject: 'Food Co-op Password Changed', to: { email: user.email, name: user.name }};
+											changeData = {name: user.name};
+											changeEmail = new Emailer(changeOptions, changeData);
+											changeEmail.send(function(err, result) {
+												if (err) {
+													return console.log(err);
+												}
+												// a response is sent so the client request doesn't timeout and get an error.
+												console.log("Message sent to user confirming password change");
+											});
+										}
+									});
+								});
+							} else {
+								console.log('Old password does not match current password.')
+								res.send(400, 'Old password does not match current password.')
+							}
+						
+							delete user.password;
+							delete user.oldPassword;
+						
+						});
+					}
+					
+
+					// save changes to the user and send the user back to the app.
+					user.save();
+					res.json(user);
+				} else {
+					console.log(e);
+					res.send(401, "You must be logged in to change data about a user")
+				}
+				
+			});
+		}
+		else res.send(401);
+		
 	});
 
 	// return a specific user by ID. This call is made by the admin generally when
@@ -1162,7 +1225,7 @@ exports.configAPI = function configAPI(app) {
 				delete userObject.hash;
 				res.send(userObject);
 			} else {
-				res.send('text/plain', 'Not logged in');
+				res.send(401, 'Not logged in');
 			}
 		})
 		// attempt to log the user in
@@ -1189,7 +1252,7 @@ exports.configAPI = function configAPI(app) {
 				req.logout();
 				res.send(200, "Successfully Logged out");
 			} else {
-				res.send(400, "You are not logged in");
+				res.send(401, "You are not logged in");
 			}
 		});
 	

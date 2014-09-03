@@ -2,48 +2,71 @@
 	<h1>Become an NNFC Producer in 3 Steps</h1>
 </div>
 
+  <h1 class="text-center big-icons">
+	  <span class="glyphicon glyphicon-th-list"></span> <span class="glyphicon glyphicon-arrow-right"></span> 
+	  <span class="glyphicon glyphicon-user"></span> <span class="glyphicon glyphicon-arrow-right"></span> 
+	  <span class="glyphicon glyphicon-ok"></span>
+  </h1>
+
 <div class="col-md-2"></div>
 <article class="col-md-8">
 	
 	<article>
-		<p>Please feel free to contact us about any questions you have.</p>
-		<p>Also feel free to phone or text us your questions at <strong><span class="glyphicon glyphicon-earphone"></span> 021 040 9066</strong>.</p>
+		<p>Questions? Please <a href="#/contact">contact us</a>.</p>
+		<p><a href="#/policy#food-standards-policy">Learn more</a> about our producer application policy.</p>
 		<hr>
 	</article>
 	
-<h1><span class="step">1</span> Read and sign agreement here</h1>
-<article>Producer rules here</article>
-<input type="checkbox" name="rules" ng-model="producerApplication.agreed">
+<h1><span class="step">1</span> Agree</h1>
+<article class="application-list">
+	<ul> 
+		<li style="list-style:none">I agree:</li>
+		<li>To sell only products produced in Northland by me or my household or business </li>
+		<li>To sell only GE free products </li>
+		<li>Not to sell products which result from <strong>confined animal feeding operations (CAFO)</strong></li>
+		<li>To comply with all applicable NZ legislation, including GST and tax requirements</li>
+		<li>To comply with all NNFC rules, policies, and guidelines</li>
+		<li>That all information I have provided is true and correct to the best of my knowledge and ability</li>
+		<li style="list-style:none">
+			<div class="checkbox">
+				<label> I agree
+					<input type="checkbox" name="rules" ng-model="producerApplication.agreed">
+				</label>
+			</div>
+		</li>
+	</ul>
+</article>
+
 <hr>
 <br>
-<h1><span class="step">2</span> Tell us about yourself</h1>
+<h1><span class="step">2</span> About You</h1>
 
-<form name="producerApplication" ng-submit="submitForm(producerApplication);" id="applicationForm">
+<form name="producerForm" ng-submit="submitForm(producerApplication);" id="applicationForm" class="application-list">
 	<fieldset>
 	    <div class="form-group">
 			<label for="certification">I am organically certified with: </label>
 			<select ng-model="producerApplication.certification" 
-			ng-options="c._id as c.name for c in certifications" 
+			ng-options="c.name as c.name for c in certifications" 
 			ng-selected="producerApplication.certification || certifications[0].name"
 			name="certification" class="form-control">
 			</select>
 	    </div>
 		<div class="form-group">
-	    	<label for="chemicals">I use the following chemicals in my production practice</label>
+	    	<label for="chemicals">I use the following agrochemicals: </label>
 			<textarea ng-model="producerApplication.chemicals" 
 			name="chemcials" type="text" class="form-control" rows="5" 
-			placeholder="List the chemicals with a comma. Feel free to use either exact chemical names or brand names." required></textarea>
-			<alert type="danger" ng-show="producerApplication.senderMessage.$dirty && producerApplication.senderMessage.$invalid">Sorry:
-				<span ng-show="producerApplication.senderMessage.$error.required">An answer is required.</span>
+			placeholder="Please list all chemical pesticides, fertilisers, herbicides and other chemical products you use. Seperate each item with a comma. Feel free to use either product brand names or scientific names." required></textarea>
+			<alert type="danger" ng-show="producerForm.chemcials.$dirty && producerForm.chemcials.$invalid">Sorry:
+				<span ng-show="producerForm.chemcials.$error.required">An answer is required.</span>
 			</alert>
 		</div>
 		<div class="form-group">
-	    	<label for="products">I plan to sell the following products</label>
+	    	<label for="products">I plan to sell:</label>
 			<textarea ng-model="producerApplication.products" 
 			name="products" type="text" class="form-control" rows="5" 
-			placeholder="Please list all products you intend to sell. If many products are related, a general category is sufficient such as citrus, beef, or pork." required></textarea>
-			<alert type="danger" ng-show="producerApplication.senderMessage.$dirty && producerApplication.senderMessage.$invalid">Sorry:
-				<span ng-show="producerApplication.senderMessage.$error.required">An answer is required.</span>
+			placeholder="Please give examples of the type of products you intend to sell. E.g. veggies, citrus, pork, dairy. " required></textarea>
+			<alert type="danger" ng-show="producerForm.products.$dirty && producerForm.products.$invalid">Sorry:
+				<span ng-show="producerForm.products.$error.required">An answer is required.</span>
 			</alert>
 		</div>
 		<button type="reset" class="btn btn-default">Reset</button>
@@ -51,7 +74,7 @@
 </form>
 <hr>
 <br>
-<h1><span class="step">3</span> <button type="submit" form="applicationForm" class="btn btn-default btn-lg" ng-disabled="producerApplication.$invalid && !producerApplication.agreed"><h1 style="margin: 0">Apply Now</h1></button></h1>
+<h1><span class="step">3</span> <button type="submit" form="applicationForm" class="btn btn-default btn-lg big-button" ng-disabled="producerForm.$invalid && producerApplication.hasOwnProperty('agreed')">Apply</button></h1>
 
 </article>
 <article class="col-md-2"></article>

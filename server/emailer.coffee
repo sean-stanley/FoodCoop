@@ -2,7 +2,7 @@
 
 emailer = require("nodemailer")
 fs      = require("fs")
-_       = require("underscore")
+_       = require('lodash')
 
 class Emailer
 

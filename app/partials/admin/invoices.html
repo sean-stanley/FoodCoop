@@ -23,7 +23,7 @@
 	<alert ng-if="invoice.dueDate &gt; now" type="danger">This invoice is OVERDUE</alert>
 	<alert ng-if="soon(invoice)" type="warning">This invoice is due soon</alert>
 	<alert ng-if="invoice.toCoop" type="info">The Co-op must pay this Invoice</alert>
-	<ul class="unstyled">
+	<ul class="list-unstyled">
 		<li ng-hide="invoice.toCoop">
 			To be paid to the NNFC by <span ng-show="invoice.invoicee.name">{{invoice.invoicee.name}}</span><span ng-show="invoice.exInvoicee">{{invoice.exInvoicee}}</span>
 		</li>

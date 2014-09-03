@@ -44,6 +44,8 @@
     "express": "~4.6.1",
     "express-error-handler": "^0.5.4",
     "express-session": "^1.7.0",
+    "geocoder": "^0.2.0",
+    "lodash": "^2.4.1",
     "method-override": "^2.1.2",
     "mongodb": "~1.4.8",
     "mongojs": "~0.12.1",
@@ -54,7 +56,6 @@
     "passport": "~0.2.0",
     "passport-local": "~1.0.0",
     "passport-local-mongoose": "~0.3.0",
-    "password-reset": "~0.1.4",
-    "underscore": "^1.6.0"
+    "password-reset": "~0.1.4"
   }
 }

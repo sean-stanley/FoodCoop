@@ -11,7 +11,7 @@
 					 ng-src="img/certification/{{certificationImg(productData.certification)}}" class="certification-img">
 					<img ng-src="{{selectedImg}}" class="img-responsive">
 					<figcaption>
-						<button class="btn btn-primary pull-right" ng-click="addToCart()">Add to Cart</button>
+						<button class="btn btn-primary pull-right" disabled>Add to Cart</button>
 						<h5>{{productData.variety}} {{productData.productName}}</h5>
 						<p>{{1.2 * productData.price|currency}} / {{productData.units}}</p>
 					</figcaption>
@@ -37,9 +37,9 @@
 		<div ng-controller="productHistoryCtrl">
 			<accordion id="product-history-list" close-others="false">
 				<accordion-group heading="This Month's Products">
-					<ul>
+					<ul class="list-unstyled">
 						<li ng-repeat="i in currentProducts">
-							<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
+							<button type="button" class="close" aria-hidden="true" ng-click="delete($index, i._id)">&times;</button>
 							<a ng-href="#/product-upload/{{i._id}}">{{i.fullName}}</a>
 						</li>
 					</ul>
@@ -124,7 +124,7 @@
 					<div class="row form-group">	
 						<div class="form-group col-md-4">
 							<label for="inputVariety">Price</label>
-							<input ng-disabled="!productData.hasOwnProperty('category')"
+							<span class="input-group-addon">$</span><input ng-disabled="!productData.hasOwnProperty('category')"
 							ng-model="productData.price" name="price" type="number" class="form-control" id="inputPrice" min="0" placeholder="e.g. $2.50" required>
 						</div>
 						

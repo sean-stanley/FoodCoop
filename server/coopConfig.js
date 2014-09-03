@@ -27,6 +27,9 @@ exports.markup = 20;
 // set the co-op's milage rate (for later features). Units are dollars/km one way.
 exports.mileage = 0.8;
 
+// CONTACT DETAILS
+exports.standardsEmail = "sean@maplekiwi.com";
+exports.adminEmail = "sean@maplekiwi.com";
 
 // CALENDAR CYCLE
 

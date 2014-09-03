@@ -1,7 +1,7 @@
 var mongoose = require('mongoose'); // middleware for connecting to the mongodb database
 var Schema = mongoose.Schema; // mongoose schema object for defining collections.
 var passportLocalMongoose = require('passport-local-mongoose');
-var _ = require('underscore'); // this creates salted and hashed passwords
+var _ = require('lodash'); // this creates salted and hashed passwords
 var config = require('./coopConfig.js')
 
 var markup = config.markup;
@@ -158,7 +158,8 @@ var UserSchema = new Schema({
 			phone : {type: String, required: false},
 			address : {type: String, required: true},
 			// this is for a future feature that will be a map of all our producers
-			geo : {type: Array},
+			lat : Number,
+			lng : Number,
 			name : {type: String, required: true},
 			user_type : {
 				name: {type : String, required : true},
@@ -176,11 +177,7 @@ var UserSchema = new Schema({
 				chemicalDisclaimer: String,
 				bankAccount : {type: String, default: "NO ACCOUNT ON RECORD"}
 			},
-			//amountSpentThisYear is assigned when a user is invoiced for an order and is a
-			//record of how much a user has spent in the co-op in the past year. This is
-			//used to figure out how much dividend the user should receive. This amount is
-			//to be reset every August.
-			amountSpentThisYear: Number,
+			RouteManager: Boolean,
 			resetPasswordToken: String,
 			resetPasswordExpires: Date
 });
