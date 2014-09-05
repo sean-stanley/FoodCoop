@@ -18,7 +18,7 @@ var util = require('util'),
 	models = require('./models.js'), // this file stores the mongoose schema data for our MongoDB database.
 	mail = require('./staticMail.js'), // this file stores some common mail settings.
 	Emailer = require('./emailer.js'), // this is a custom class expanded upon nodemailer to allow html templates to be used for the emails.
-	
+	mailChimp = require('./mailChimp.js'),
 	config = require('./coopConfig.js'), // static methods of important configuration info
 	scheduler = require('./scheduler.js'), // contains scheduled functions and their results
 	
@@ -26,7 +26,6 @@ var util = require('util'),
 	LocalStrategy = require('passport-local').Strategy; // the passport strategy employed by this API.
 
 require('datejs'); // provides the best way to do date manipulation.
-var calendar = require('./calendarHelper.js');
 
 
 // sets date locality and formats to be for new zealand.
@@ -312,21 +311,24 @@ exports.configAPI = function configAPI(app) {
 	app.delete("/api/product/:id", function(req, res, next) {
 
 		// ensure user is logged in to perform this request.		
-		if (req.user) {
+		if (req.user && scheduler.canUpload) {
 			// delete the product based on it's id and send a request confirming the deletion
 			// if it goes off without a hitch.
-			models.Product.findByIdAndRemove(new ObjectId(req.params.id), function(e, results) {
+			models.Product.findById(new ObjectId(req.params.id), function(e, result) {
 				if (!e && results) { // if no errors
-					console.log(results);
-					res.send(200, 'product deleted');
+					if (result.producer_ID == req.user._id || req.user.user_type.isAdmin) {
+						result.remove();
+						res.send(200, 'product deleted');
+					}
+					else res.send(403, 'You aren\'t authorized to delete that product');
 				} else {
 					console.log(e) // log the error
-					res.send(500);
+					res.send(404);
 				}
 			});
-		} else {
-			res.send(401, 'Not logged in');
-		}
+		} 
+		else if (!scheduler.canUpload) res.send(403, "Drat! Wrong time of the ordering cycle to delete products.");
+		else res.send(401, 'Not logged in');
 	});
 
 	// return a compact list of all the current user's products.
@@ -840,8 +842,7 @@ exports.configAPI = function configAPI(app) {
 					});
 				}
 				else done(null, 0, 0)
-			},
-			function(lat, lng, done) {
+			}, function(lat, lng, done) {
 				// disable unapproved producers from uploading immediately.
 				if (req.body.user_type.canSell) req.body.user_type.canSell = false;
 				models.User.register(new models.User({
@@ -863,7 +864,6 @@ exports.configAPI = function configAPI(app) {
 					}
 				});
 			},
-			
 			// Create an invoice to be used in the email and also available to the app
 			// because it's saved to the database.
 			function(user, done) {
@@ -913,7 +913,6 @@ exports.configAPI = function configAPI(app) {
 					done(null, user);
 				});
 			}
-			//send the user-data to the app
 			],
 			function(err, user){
 				var userObject;
@@ -957,6 +956,7 @@ exports.configAPI = function configAPI(app) {
 		if (req.user) {
 			models.User.findById(req.params.id, function(e, user) {
 				if (!e) {
+					
 					// email the user that their account details were changed
 					if (req.body.user_type !== user.user_type) {
 						canSell = (req.body.user_type.canSell) ? "can sell products through the co-op website" : "can no longer sell products through the co-op website";
@@ -967,12 +967,15 @@ exports.configAPI = function configAPI(app) {
 							if (err) console.log(err);
 						});
 					}
+					
+					// update the database with the user's changes
 					for (key in req.body) {
 						if (user[key] !== req.body[key] && key !== 'password' && key !== 'oldPassword') {
-							console.log("we are now replacing the old user's " + key + " which evaluates to: " + user[key] + " with the new value of: " + req.body[key]);
 							user[key] = req.body[key];
 						}
 					}
+					
+					
 
 					// if the user is attempting to change their password, this checks if the user
 					// remembers their old password and if they do will change it to their requested
@@ -1180,6 +1183,21 @@ exports.configAPI = function configAPI(app) {
 						done(null, user);
 					}
 					else done(null, user);
+				}, function(user, done) { // add the user to mailing lists
+					var params = {
+						id: 'e481a3338d',
+						email: {email: user.email},
+					};
+					mc.lists.unsubscribe(params, function(data) {console.log(data); done(null, user)}, done(e));
+				}, function (user, done) {
+					if (user.user_type.name === 'Producer') {
+						// add user to producer list as well;
+						params.id = 'f379285252'
+						mc.lists.unsubscribe(params, function(data) {console.log(data); done(null, user)}, done(e));
+					}
+					else {
+						done(null, user);
+					}
 				},
 				// delete the user from the database
 				function(user, done) {
@@ -1203,7 +1221,7 @@ exports.configAPI = function configAPI(app) {
 				// if the email sent successfully, delete the user's data
 				function(e, result) {
 					if (!e && result === 'done') {
-						res.send(202);
+						res.send(200);
 					}
 					else {
 						console.log(results);

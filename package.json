@@ -46,6 +46,7 @@
     "express-session": "^1.7.0",
     "geocoder": "^0.2.0",
     "lodash": "^2.4.1",
+    "mailchimp-api": "^2.0.6",
     "method-override": "^2.1.2",
     "mongodb": "~1.4.8",
     "mongojs": "~0.12.1",

@@ -13,17 +13,26 @@ Working Features include:
 * producers can create a public profile about their operation and upload products to sell
 * a store lists all the products and provides more details for working out the items
 * a contact form for contacting the administrators or another producer about their products.
+* allow producers to manage previously uploaded products.
+* shopping carts creation, restriction, modification and manipulation
+* invoices for producers that list all the products ordered from them by all producers in a set time period.
+* A general cycle counter that resets carts and products each ordering cycle.
+* schedule mass email reminders about important co-op dates with MailChimp.
 
 Features that are currently a work in progress:
 -----------------------------------------------
 
-* allow producers to manage previously uploaded products.
-* shopping carts (currently the carts are populated with mock data)
-* invoices for producers that list all the products ordered from them by all producers in a set time period.
-* event scheduling for resetting carts and order processing at the end of order week.
-* schedule mass email reminders about important co-op dates.
 * improve UX for mobile and tablet users.
+* General design improvements for home page, about us page, faq page, sign up page and some others
+* move the site to a live server.
 
+Future Feature Ideas:
+-----------------------------------------------
+
+* have a live map showing markers where producers live on producer list page. Currently lat long data is already stored for users.
+* Promote subscription sales for things like milk or vege boxes
+* for Co-op presentations and promotional/educational events have a place for those to be promoted on the website
+* move the farmer's market map from the blog to the main website
 
 Setting Up
 ==========

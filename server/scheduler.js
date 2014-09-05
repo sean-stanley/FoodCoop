@@ -10,7 +10,7 @@ var config = require('./coopConfig.js'),
 	fs = require("fs"),
 	_ = require('lodash'),
 	schedule = require("node-schedule"),
-	calHelp = require('./calendarHelper');
+	mailChimp = require("./mailChimp.js");
 	
 	require('datejs');
 	
@@ -38,7 +38,7 @@ function checkConfig() {
 				switch (cycleDay) {
 				case 'cycleIncrementDay':
 					incrementCycle();
-					// current cycle equals +1 and that total
+					mailChimp.mailSchedule();
 				case 'ProductUploadStart':
 					exports.canUpload = true;
 					// schedule email reminder to producers here.
@@ -46,7 +46,6 @@ function checkConfig() {
 					break;
 				case 'ProductUploadStop':
 					exports.canUpload = false;
-					// schedule email reminders to producer	here
 					break;
 				case 'ShoppingStart':
 					exports.canShop = true;
@@ -289,8 +288,6 @@ function invoiceFromProducer(producer) {
 		console.log(error);
 	});
 };
-
-
 
 // increment the number of cycles by 1 and set the ID to the total +1 (just like with invoices);
 // use Cycle number 0 for testing stuff

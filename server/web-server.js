@@ -11,10 +11,14 @@ var util = require('util'),
 	models = require('./models.js'),
 	API = require('./API.js'),
 	passport = require('passport'),
-	LocalStrategy = require('passport-local').Strategy;
+	LocalStrategy = require('passport-local').Strategy,
+	mcapi = require('mailchimp-api');
 
 mongoose.connect('mongodb://localhost/mydb');
 var db = mongoose.connection;
+
+// set MailChimp API key here
+mc = new mcapi.Mailchimp('106c008a4dda3fa2fe00cae070e178b9-us9');
 
 var app = API.configAPI(express());
 

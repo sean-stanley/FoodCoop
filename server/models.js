@@ -155,7 +155,7 @@ InvoiceSchema.pre('save', function(next) {
 var UserSchema = new Schema({
 			dateJoined : {type: Date, default: Date.now()},
 			email : {type: String, required: true, set: toLower},
-			phone : {type: String, required: false},
+			phone : {type: String, required: true},
 			address : {type: String, required: true},
 			// this is for a future feature that will be a map of all our producers
 			lat : Number,
@@ -165,7 +165,8 @@ var UserSchema = new Schema({
 				name: {type : String, required : true},
 				canBuy: {type : Boolean, required : true},
 				canSell: {type : Boolean, required : true},
-				isAdmin: Boolean
+				isAdmin: Boolean,
+				isRouteManager: Boolean
 			},
 			producerData : {
 				companyName : String,
@@ -177,7 +178,10 @@ var UserSchema = new Schema({
 				chemicalDisclaimer: String,
 				bankAccount : {type: String, default: "NO ACCOUNT ON RECORD"}
 			},
-			RouteManager: Boolean,
+			routeManager: {
+				townsOnRoute: Array,
+				centralLocation: String
+			},
 			resetPasswordToken: String,
 			resetPasswordExpires: Date
 });
@@ -187,6 +191,34 @@ UserSchema.options.toObject.transform = function (doc, ret, options) {
 	delete ret.salt;
 	delete ret.hash;
 };
+
+UserSchema.virtual('firstName').get(function() {
+	return this.name.substr(0, this.name.indexOf(' '))
+});
+UserSchema.virtual('lastName').get(function() {
+	return this.name.substr(this.name.indexOf(' ')+1)
+});
+
+// occurs just before an invoice is saved. should work with Model.create() shortcut
+UserSchema.pre('save', function(next) {
+	var user = this;
+	// params for updating MailChimp
+	var params = {
+		id: 'e481a3338d',
+		email: {email: user.email},
+		merge_vars : {
+			FNAME : user.name.substr(0, req.body.name.indexOf(" ")),
+			LNAME : user.name.substr(req.body.name.indexOf(" ")+1),
+			USER_TYPE : user.user_type.name,
+			ADDRESS : user.address,
+			PHONE : user.phone
+		}
+	};
+	if (user.isNew) {
+		mc.lists.subscribe(params, next() );
+	}
+	else mc.lists.updateMember(params, next() );
+});
 
 // Produce, Meat, Processed Goods, Dairy, Baked Goods all have properties that
 // modify the UI of product uploading. For example, the ingredients boolean
