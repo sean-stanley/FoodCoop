@@ -19,7 +19,7 @@ dailyRule.minute = 0;
 dailyRule.hour = 0;
 	
 // check for events in the order cycle every day at 1am
-var orderCycleChecker = schedule.scheduleJob({second: [0, 20, 40]}, checkConfig);
+var orderCycleChecker = schedule.scheduleJob({hour:0, minute: 0}, checkConfig);
 
 // schedule emails to send alerting members that it is delivery day.
 // To be executed at 9:15am Wednesday;
