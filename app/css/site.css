@@ -32,25 +32,50 @@ a:hover {
 }
 .big-icons span {margin: 0 10px;}
 
+.map-frame {border:none; margin: 20px 0;}
+
 /*	-------------
 	-- Sidebar --
 	-------------	*/
 
 #sidebar {
-	width: 35%;
-	min-width: 320px;
 	position: fixed;
 	z-index: 999;
 	height: 100%;
-	padding: 0 10px;
-	background: #fff;
-	border-right: 1px solid #dddddd;
+	background: #303030;
 	overflow: scroll;
+	color: #aaa;
 }
 
-#sidebar button{padding: 10px;}
+#sidebar button{padding: 20px;}
 
+#sidebar > div {
+	padding: 10px;
+}
 
+#calendar-container, #sidebar li {cursor: pointer; border-left: solid 10px #642c4a;}
+#sidebar .nav-stacked > li + li {margin-top: 0;}
+#sidebar li > a {border-radius:0; color: #aaa;}
+#sidebar .nav > li > a:hover, .nav > li > a:focus {background-color:#642c4a; color: white;}
+#close-sidebar-button {padding: 20px;}
+#close-sidebar-button:hover {color:white;}
+
+.sidebar-bottom {margin-top: 30px; position: absolute; bottom: 0; width: 100%; border:none;}
+
+#calendar-container:hover, #sidebar .panel-heading:hover, #sidebar li:hover {border-color: #ddd; background: #642c4a; color: white;}
+
+/*	------------------
+	-- Sidebar Cart --
+	------------------	*/
+#sidebar .panel-heading {color: #aaa; background-color: #303030; border: none; border-left: solid 10px #642c4a; border-radius: 0;}
+#sidebar .panel-heading a:hover {text-decoration: none;}
+#sidebar .panel-group {margin-bottom: 0;}
+#sidebar .panel-body {border-left: solid 10px #642c4a; border-top: none;}
+
+#sidebar .panel {background: transparent; border: none;}
+
+#sidebar .panel-open-sidebar .panel-heading {border-color: #ddd; background: #642c4a; color: white;}
+#sidebar th a {color: #aaa; font-weight: 300;}
 
 .image-drop {
 	display: block;

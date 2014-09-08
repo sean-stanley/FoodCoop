@@ -1,39 +1,43 @@
-<div class="page-header">
-	<h1>Producer List</h1>
-</div>
+<div class="col-md-3"></div>
+<div class="col-md-6">	
+	<div class="page-header">
+		<h1>Producer List</h1>
+	</div>
 
-<div class="form-group">
-	<label for="search">Search:</label>
-	<input ng-model="search" name="search" class="form-control" type="search" placeholder="what are you looking for?"/>
-</div>
+	<div class="form-group">
+		<label for="search">Search:</label>
+		<input ng-model="search" name="search" class="form-control" type="search" placeholder="Whom are you looking for?"/>
+	</div>
 
- <div class="btn-group" dropdown>
-      <button type="button" class="btn btn-primary dropdown-toggle" ng-disabled="disabled">
-        Sort By <span class="caret"></span>
-      </button>
-      <ul class="dropdown-menu" role="menu">
-		<li><a ng-click="predicate= 'dateJoined'; reverse=!reverse">Date Joined</a></li>
-		<li><a ng-click="predicate= 'producerData.companyName'; reverse=!reverse">Company Name</a></li>
-		<li><a ng-click="predicate= 'name'; reverse=!reverse">Producer Name</a></li>
-      </ul>
-    </div>
+	 <div class="btn-group" dropdown>
+	      <button type="button" class="btn btn-primary dropdown-toggle" ng-disabled="disabled">
+	        Sort By <span class="caret"></span>
+	      </button>
+	      <ul class="dropdown-menu" role="menu">
+			<li><a ng-click="predicate= 'dateJoined'; reverse=!reverse">Date Joined</a></li>
+			<li><a ng-click="predicate= 'producerData.companyName'; reverse=!reverse">Company Name</a></li>
+			<li><a ng-click="predicate= 'name'; reverse=!reverse">Producer Name</a></li>
+	      </ul>
+	    </div>
 
-<div class="media producer-box" ng-repeat="i in producerList | orderBy:predicate:reverse | filter:search">
-	<img ng-show="i.producerData.logo" class="producer-img-small pull-left" ng-src="{{i.producerData.logo}}" height="150px"/>
+	<div class="media producer-box" ng-repeat="i in producerList | orderBy:predicate:reverse | filter:search">
+		<img ng-show="i.producerData.logo" class="producer-img-small pull-left" ng-src="{{i.producerData.logo}}" height="150px"/>
 
-	<div class="media-body">
+		<div class="media-body">
 		
-		<h3>{{i.producerData.companyName}} <small>{{i.name}}</small></h3>
+			<h3>{{i.producerData.companyName}} <small>{{i.name}}</small></h3>
 		
-        <ul class="list-unstyled">
-			<li><span class="glyphicon glyphicon-map-marker"></span> 
-				<a ng-href="//mapof.it/{{currentUser.address | forURL}}/{{i.address | forURL}}">{{i.address}}</a>
-			</li>
-        </ul>
-		<hr>
+	        <ul class="list-unstyled">
+				<li><span class="glyphicon glyphicon-map-marker"></span> 
+					<a ng-href="//mapof.it/{{currentUser.address | forURL}}/{{i.address | forURL}}">{{i.address}}</a>
+				</li>
+	        </ul>
+			<hr>
 		
-		<article>{{i.producerData.description | blurb}}</article>
-		<a class="pull-right" ng-href="#/producer/{{i.producerData.companyName | forURL}}-{{i.name}}"><button class="btn btn-default">More Details</button></a>
+			<article>{{i.producerData.description | blurb}}</article>
+			<a class="pull-right" ng-href="#/producer/{{i.producerData.companyName | forURL}}-{{i.name | forURL}}"><button class="btn btn-default">More Details</button></a>
 		
+		</div>
 	</div>
 </div>
+<div class="col-md-3"></div>

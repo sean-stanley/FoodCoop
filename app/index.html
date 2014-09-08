@@ -67,105 +67,104 @@
 </head>
 
 <body>
-	<div id="wrap" ng-controller="navCtrl"><!--Sticky footer hack: wrap all page content-->
+	<div id="wrap" ng-controller="navCtrl" ng-init="cart = {open: false}"><!--Sticky footer hack: wrap all page content-->
 		
-		<div id="sidebar" class="sidebar" ng-show="panelDisplay">
-			<div style="width:100%">
-				<a href="" class="panel-btn panel-btn-lg" ng-click="panelDisplay = false">&times;</a>
-				<div class="form-group" ng-show="storePage()">
-					<div class="input-group">
-						<label class="sr-only" for="storeSearch">Search the store</label>
-						<div class="input-group-addon"><span class="glyphicon glyphicon-search"></span></div>
-						<input ng-model="search" class="form-control" 
-						typeahead="keyword for keyword in predictiveSearch | filter:$viewValue | limitTo:8"
-						name="storeSearch" type="search" placeholder="Search"/>
-					</div>
+		<div id="sidebar" class="sidebar" ng-show="panelDisplay" ng-class="{'wide-sidebar':cart.open, 'narrow-sidebar':!cart.open}" >
+			<a href="" id="close-sidebar-button" class="panel-btn panel-btn-lg" ng-click="panelDisplay = false">&times;</a>
+			<div class="form-group" ng-show="storePage()">
+				<div class="input-group">
+					<label class="sr-only" for="storeSearch">Search the store</label>
+					<div class="input-group-addon"><span class="glyphicon glyphicon-search"></span></div>
+					<input ng-model="search" class="form-control" 
+					typeahead="keyword for keyword in predictiveSearch | filter:$viewValue | limitTo:8"
+					name="storeSearch" type="search" placeholder="Search"/>
 				</div>
-				
-				<br>
-				
-				<div id="calendar">
-					<div id="calendar-container" ng-controller="calendarCtrl">
-						<h2><a href="#/calendar">Co-op Calendar</a></h2>
-						<p>
-							Product Uploading {{inDateRange(countDown[0].ProductUploadStart, countDown[0].ProductUploadStop)}}.<br>
-							Shopping {{inDateRange(countDown[0].ShoppingStart, countDown[0].ShoppingStop)}}.<br>
-							Delivery Day is in <span class="label label-default">{{daysBeforeDeliveryDay}}</span> days<br>
-							<span ng-if="daysBeforeDeliveryDay < 1">Next delivery day in {{countDown[1].DeliveryDay.daysUntil}} days</span>
-						</p>
-					</div>
-				</div>
-				
-				<accordion close-others="false" ng-if="currentUser">
-					<accordion-group is-open="isopen2" ng-init="isopen2 = true">
-						<accordion-heading>
-						{{currentUser.name}} Cart <span class="badge">{{cartTally}}</span><i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isopen2, 'glyphicon-chevron-right': !isopen2}"></i>
-						</accordion-heading>
-							<div ng-controller="cartPageCtrl">
-								[ <a href="" ng-click="predicate=''">unsorted</a> ]
-								<table class="table">
-									<thead>
-										<tr>
-											<th><a href="" ng-click="predicate = '_id'; reverse=!reverse" tooltip-placement="right" tooltip="Remove Items">&times;</a></th>
-											<th><a href="" ng-click="predicate = 'product.productName'; reverse=!reverse">Product</a></th>
-											<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse">Quantity</a></th>
-											<th><a href="" ng-click="predicate = 'orderPriceWithMarkup'; reverse=!reverse">Price</a></th>
-											<th><a href="" ng-click="predicate = 'supplier.producerData.companyName' || 'supplier.name'; reverse=!reverse">Producer</a></th>
-										</tr>
-									</thead>
-									<tfoot>
-										<tr>
-											<td colspan="5"><strong>Total: {{cartTotal(cart)|currency}}</strong></td>
-										</tr>
-									</tfoot>
-									<tbody>
-										<tr ng-repeat="c in cart | orderBy:predicate:reverse" >
-									        <td data-title=" 'remove' ">
-									        	<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
-											</td>
-									        <td data-title="'Product'" >
-									            <a href="" ng-click="open(c)">{{c.product.fullName}}</a>
-									        </td>
-									        <td data-title="'Quantity'">
-												<div class="input-group">
-													<div class="input-group-btn">
-														<button class="btn btn-default" ng-click="quantityChange($index)" ng-show="quantity.$dirty">Save</button>
-													</div>
-													 <input name="quantity" type="number" class="form-control" ng-model="c.quantity">
-												</div>
-									        </td>
-									        <td data-title="'Price'">
-									            {{c.unitPriceWithMarkup * c.quantity | currency}}
-									        </td>
-									        <td data-title="'Customer'">
-									            {{c.supplier.producerData.companyName || c.supplier.name}}
-									        </td>
-									    </tr>
-									</tbody>
-								</table>
-							</div>
-					</accordion-group>
-				</accordion>
-				<ul class="nav nav-pills nav-stacked">
-						<li ng-class="{active:isActive('/producer-list')}"><a href="#/producer-list">Producer List</a></li>
-						<li ng-class="{active:isActive('/faq')}"><a href="#/faq">User FAQ</a></li>
-						<li ng-class="{active:isActive('/my-cart')}" ng-show="currentUser"><a href="#/my-cart">My Cart <span class="badge">{{cartTally}}</span></a></li>
-						<li ng-class="{active:isActive('/order-manager')}" 
-						ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
-						><a href="#/product-manager">My Products</a></li>
-						<li ng-class="{active:isActive('/product-upload')}" 
-						ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
-						><a href="#/product-upload">Upload a Product</a></li>
-						<li ng-class="{active:isActive('/producer-profile')}" 
-						ng-show="currentUser && currentUser.user_type.name === 'Producer'"
-						><a href="#/producer-profile">Edit Producer Profile</a></li>
-						<li ng-class="{active:isActive('/my-invoices')}" ng-show="currentUser"><a ng-href="#/my-invoices">My Invoices</a></li>
-						<li ng-class="{active:isActive('/me/{{currentUser._id}}')}" ng-show="currentUser"><a ng-href="#/me/{{currentUser._id}}">My Settings</a></li>
-				</ul>
 			</div>
+			
+			<br>
+			
+			<div id="calendar-container" ng-controller="calendarCtrl" ng-click="href('/calendar')">
+				<h1 class="text-center"><span class="glyphicon glyphicon-calendar"></span></h1>
+				<p>
+					Product Uploading {{inDateRange(countDown[0].ProductUploadStart, countDown[0].ProductUploadStop)}}.<br>
+					Shopping {{inDateRange(countDown[0].ShoppingStart, countDown[0].ShoppingStop)}}.<br>
+					Delivery Day is in <span class="label label-default">{{daysBeforeDeliveryDay}}</span> days<br>
+					<span ng-if="daysBeforeDeliveryDay < 1">Next delivery day in {{countDown[1].DeliveryDay.daysUntil}} days</span>
+				</p>
+			</div>
+			
+			<accordion close-others="false" ng-if="currentUser" >
+				<accordion-group is-open="cart.open" ng-class="{'panel-open-sidebar':cart.open}">
+					<accordion-heading>
+					<h1 class="text-center"><span class="glyphicon glyphicon-shopping-cart"></span> <span class="badge">{{cartTally}}</span></h1>
+					</accordion-heading>
+						<div ng-controller="cartPageCtrl">
+							[ <a href="" ng-click="predicate=''" class="close-sidebar-button">unsorted</a> ]
+							<table class="table">
+								<thead>
+									<tr>
+										<th><a href="" ng-click="predicate = '_id'; reverse=!reverse" tooltip-placement="right" tooltip="Remove Items">&times;</a></th>
+										<th><a href="" ng-click="predicate = 'product.productName'; reverse=!reverse">Product</a></th>
+										<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse">Quantity</a></th>
+										<th><a href="" ng-click="predicate = 'orderPriceWithMarkup'; reverse=!reverse">Price</a></th>
+										<th><a href="" ng-click="predicate = 'supplier.producerData.companyName' || 'supplier.name'; reverse=!reverse">Producer</a></th>
+									</tr>
+								</thead>
+								<tfoot>
+									<tr>
+										<td colspan="5"><strong>Total: {{cartTotal(cart)|currency}}</strong></td>
+									</tr>
+								</tfoot>
+								<tbody>
+									<tr ng-repeat="c in cart | orderBy:predicate:reverse" >
+								        <td data-title=" 'remove' ">
+								        	<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
+										</td>
+								        <td data-title="'Product'" >
+								            <a href="" ng-click="open(c)">{{c.product.fullName}}</a>
+								        </td>
+								        <td data-title="'Quantity'">
+											<div class="input-group">
+												<div class="input-group-btn">
+													<button class="btn btn-default" ng-click="quantityChange($index)" ng-show="quantity.$dirty">Save</button>
+												</div>
+												 <input name="quantity" type="number" class="form-control" ng-model="c.quantity">
+											</div>
+								        </td>
+								        <td data-title="'Price'">
+								            {{c.unitPriceWithMarkup * c.quantity | currency}}
+								        </td>
+								        <td data-title="'Customer'">
+								            {{c.supplier.producerData.companyName || c.supplier.name}}
+								        </td>
+								    </tr>
+								</tbody>
+							</table>
+						</div>
+				</accordion-group>
+			</accordion>
+			<ul class="nav nav-pills nav-stacked">
+					<li ng-class="{active:isActive('/producer-list')}"><a href="#/producer-list">Producer List</a></li>
+					<li ng-class="{active:isActive('/faq')}"><a href="#/faq">User FAQ</a></li>
+					<li ng-class="{active:isActive('/my-cart')}" ng-show="currentUser"><a href="#/my-cart">Cart Page</a></li>
+					<li ng-class="{active:isActive('/order-manager')}" 
+					ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
+					><a href="#/product-manager">My Products</a></li>
+					<li ng-class="{active:isActive('/product-upload')}" 
+					ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
+					><a href="#/product-upload">Upload a Product</a></li>
+					<li ng-class="{active:isActive('/producer-profile')}" 
+					ng-show="currentUser && currentUser.user_type.name === 'Producer'"
+					><a href="#/producer-profile">Edit Producer Profile</a></li>
+					<li ng-class="{active:isActive('/my-invoices')}" ng-show="currentUser"><a ng-href="#/my-invoices">Invoices</a></li>
+					<li ng-class="{active:isActive('/me/{{currentUser._id}}')}" ng-show="currentUser"><a ng-href="#/me/{{currentUser._id}}">Settings</a></li>
+			</ul>
+			<ul class="nav nav-pills nav-stacked sidebar-bottom" ng-controller="logoutCtrl">
+				<li ng-show="currentUser != null"><a ng-click="logOut()" class="text-center"><h1><span class="glyphicon glyphicon-lock"></span></h1><p>Log Out</p></a></li>
+			</ul>
 		</div>
 
-		<header id="banner">
+		<header id="banner" scroll>
 			<div ng-if="currentUser == null">
 				<ng-include src=" 'partials/login.html' "></ng-include>
 			</div>
@@ -182,13 +181,13 @@
 		
     
 
-		<div class="container-fluid app-body" id="app" ng-class="{menuOpen : panelDisplay}">
+		<div class="container-fluid app-body" id="app" ng-class="{'menu-open-narrow' : panelDisplay && !cart.open, 'menu-open-wide': panelDisplay && cart.open}">
 			<nav class="horizontal-nav">
 				<ul class="nav nav-pills pull-left">
 					<li class="pull-left" ng-click="panelDisplay = !panelDisplay"><a class="panel-btn panel-btn-sml">&#9776; Sidebar</a></li>
 				</ul>
 
-				<ul class="nav nav-pills pull-right" ng-controller="logoutCtrl">
+				<ul class="nav nav-pills pull-right">
 					<li ng-class="{active:isActive('/store')}"><a href="#/store"><span class="glyphicon glyphicon-shopping-cart"></span> Store</a></li>
 					<li ng-class="{active:isActive('/home')}"><a href="#home">Home</a></li>
 					<li ng-class="{active:isActive('/about')}"><a href="#/about">About Us</a></li>
@@ -196,7 +195,7 @@
 					
 					<li ng-class="{active:isActive('/contact')}"><a href="#contact">Contact Us</a></li>
 					<li><a href="http://foodcoop.org.nz" target="_blank">Blog</a></li>
-					<li ng-show="currentUser != null"><a ng-click="logOut()">Log Out</a>
+					
 				</ul>
 			</nav>
 			<div class="row">

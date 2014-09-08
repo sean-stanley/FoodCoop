@@ -63,4 +63,5 @@ h2.slogan {
 	padding: 50px 0;
 	margin-bottom: 0px;
 	border-bottom: 5px solid #652c4a;
+	overflow: hidden;
 }

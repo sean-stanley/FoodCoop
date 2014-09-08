@@ -33,6 +33,9 @@ Future Feature Ideas:
 * Promote subscription sales for things like milk or vege boxes
 * for Co-op presentations and promotional/educational events have a place for those to be promoted on the website
 * move the farmer's market map from the blog to the main website
+* list other sources for local food in Northland
+* when a member buys an animal that must be butchered, have the website provide a form for filling out butchery instructions.
+* make a note that whole beast sales are not handled on delivery day but upon arrangement with the producer.
 
 Setting Up
 ==========

@@ -91,15 +91,18 @@
 	margin-left: 0%;
 }
 
-.menuOpen {
+.menu-open-wide {
 	margin-left: 35%;
 }
 
+.menu-open-narrow {margin-left: 20%;}
+
 .sidebar {
-	transition: 5s cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+	transition: 400ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
 	display: block;
 }
-
+.wide-sidebar {width:35%; min-width: 320px;}
+.narrow-sidebar {width: 20%; min-width: 270px;}
 .sidebar.ng-hide-add, .sidebar.ng-hide-remove {
   /* this is required as of 1.3x to properly
      apply all styling in a show/hide animation */
@@ -119,5 +122,8 @@
 .sidebar.ng-hide-remove { left:-30%; }
 .sidebar.ng-hide-remove.ng-hide-remove-active { left: 0; }
 .sidebar.ng-hide-add.ng-hide-add-active { left:-30%; }
+
+.sidebar > div.ng-hide-add, .sidebar > div.ng-hide-active {opacity: 0;}
+.sidebar > div.ng-hide-remove, .sidebar > div.ng-hide-remove-active {opacity: 1;}
 
 

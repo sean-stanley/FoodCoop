@@ -111,7 +111,7 @@ angular.module('co-op.services', [])
 				);
 			},
 			// a promise that resolves true if the user is logged in, or false if not.
-			isLoggedIn : function() {
+			isLoggedIn : function(params) {
 				var result = $q.defer();
 				var isLoggedIn;
 				// check if the user is logged in with the app.
@@ -124,11 +124,14 @@ angular.module('co-op.services', [])
 				// attempt to get the user from the app
 				else {
 					
-					Session.customGET().then(function(user) {
-						$rootScope.currentUser = user.plain();
-						isLoggedIn = true;
-						getTally();
-						result.resolve(isLoggedIn);
+					Session.get(params).then(function(user) {
+						if (user !== "No session saved") {
+							$rootScope.currentUser = user.plain();
+							isLoggedIn = true;
+							getTally();
+							result.resolve(isLoggedIn);
+						}
+						
 					}, function(error) {
 						console.log(error);
 						isLoggedIn = false;
@@ -141,7 +144,7 @@ angular.module('co-op.services', [])
 			
 			logout : function() {
 				Session.remove();
-				$rootScope.currentUser = null;
+				delete $rootScope.currentUser;
 				flash.setNextMessage({type: 'success', message: 'Successfully logged out!'});
 				$location.path('/home');
 			}

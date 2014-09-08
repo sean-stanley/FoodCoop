@@ -107,74 +107,36 @@ angular.module('co-op.directives', []).
     })
   
   
-  .directive('checkStrength', function () {
+	.directive("scroll", function ($window) {
+	    return function(scope, element, attrs) {
+        
+	         var pageOffset = function(offset) {
+	             var num = 389 - offset;
+	             return (num > 0) ? num + 'px': 0;
+	        };
+        
+	        angular.element($window).bind("scroll", function() {
+	            element.css({'height' : pageOffset(this.pageYOffset)});
+	            scope.$apply();
+	        });
+	    };
+	})
 
-    return {
-        replace: false,
-        restrict: 'EACM',
-        link: function (scope, iElement, iAttrs) {
+	.directive('setNgAnimate', ['$animate', function ($animate) {
+	    return {
+	        link: function ($scope, $element, $attrs) { 
+          
+	            $scope.$watch( function() { 
+	                    return $scope.$eval($attrs.setNgAnimate, $scope); 
+	                }, function(valnew, valold){
+	                    $animate.enabled(!!valnew, $element);
+	            });  
+            
+            
+	        }
+	    };
+	}])
 
-            var strength = {
-                colors: ['#F00', '#F90', '#FF0', '#9F0', '#0F0'],
-                mesureStrength: function (p) {
-
-                    var _force = 0;                    
-                    var _regex = /[$-/:-?{-~!/"^_`\[\]]/;
-                                          
-                    var _lowerLetters = /[a-z]+/.test(p);                    
-                    var _upperLetters = /[A-Z]+/.test(p);
-                    var _numbers = /[0-9]+/.test(p);
-                    var _symbols = _regex.test(p);
-                                          
-                    var _flags = [_lowerLetters, _upperLetters, _numbers, _symbols];                    
-                    var _passedMatches = $.grep(_flags, function (el) { return el === true; }).length;                                          
-                    
-                    _force += 2 * p.length + ((p.length >= 10) ? 1 : 0);
-                    _force += _passedMatches * 10;
-                        
-                    // penalty (short password)
-                    _force = (p.length <= 6) ? Math.min(_force, 10) : _force;                                      
-                    
-                    // penalty (poor variety of characters)
-                    _force = (_passedMatches == 1) ? Math.min(_force, 10) : _force;
-                    _force = (_passedMatches == 2) ? Math.min(_force, 20) : _force;
-                    _force = (_passedMatches == 3) ? Math.min(_force, 40) : _force;
-                    
-                    return _force;
-
-                },
-                getColor: function (s) {
-
-                    var idx = 0;
-                    if (s <= 10) { idx = 0; }
-                    else if (s <= 20) { idx = 1; }
-                    else if (s <= 30) { idx = 2; }
-                    else if (s <= 40) { idx = 3; }
-                    else { idx = 4; }
-
-                    return { idx: idx + 1, col: this.colors[idx] };
-
-                }
-            };
-
-            scope.$watch(iAttrs.checkStrength, function () {
-                if (scope.userData.password === '') {
-                    iElement.css({ "display": "none"  });
-                } else {
-                    var c = strength.getColor(strength.mesureStrength(scope.userData.password));
-                    iElement.css({ "display": "inline" });
-                    iElement.children('li')
-                        .css({ "background": "#DDD" })
-                        .slice(0, c.idx)
-                        .css({ "background": c.col });
-                }
-            });
-
-        },
-        template: '<li class="point"></li><li class="point"></li><li class="point"></li><li class="point"></li><li class="point"></li>'
-    };
-
-})
   
 .directive("fileread", [function () {
     return {

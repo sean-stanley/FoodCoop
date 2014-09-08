@@ -1049,8 +1049,13 @@ exports.configAPI = function configAPI(app) {
 
 	// returns a user by name. This call is designed to return only a producer.
 	app.get("/api/user/producer/:producerName", function(req, res, next) {
+		if (req.params.producerName) {
+			var name = req.params.producerName.split("+");
+			name = name.join(' ');
+		}
+		
 		models.User.findOne({
-			name: req.params.producerName
+			name: name
 		}, null, {
 			sort: {
 				_id: 1
@@ -1236,43 +1241,53 @@ exports.configAPI = function configAPI(app) {
 	
 	app.route('/auth/session')
 	// check to see if the user is logged in
-		.get(function(req, res, next) {
-			if (req.user) {
+	.get(function(req, res, next) {
+		if (req.user) {
+			var userObject = req.user.toObject();
+			delete userObject.salt;
+			delete userObject.hash;
+			res.send(userObject);
+		} else {
+			res.send(401, 'Not logged in');
+		}
+	})
+	// attempt to log the user in
+	.post(function(req, res, next) {
+		passport.authenticate('local', function(err, user, info) {
+			if (err) { return next(err); }
+			if (!user) {
+				req.session.messages =  [info.message];
+				console.log(req.session.messages);
+				return res.send('Failed to authenticate user');
+			}
+			req.logIn(user, function(err) {
+				if (err) { console.log(err); }
 				var userObject = req.user.toObject();
 				delete userObject.salt;
 				delete userObject.hash;
 				res.send(userObject);
-			} else {
-				res.send(401, 'Not logged in');
-			}
-		})
-		// attempt to log the user in
-		.post(function(req, res, next) {
-			passport.authenticate('local', function(err, user, info) {
-				if (err) { return next(err); }
-				if (!user) {
-					req.session.messages =  [info.message];
-					console.log(req.session.messages);
-					return res.send('Failed to authenticate user');
-				}
-				req.logIn(user, function(err) {
-					if (err) { console.log(err); }
-					var userObject = req.user.toObject();
-					delete userObject.salt;
-					delete userObject.hash;
-					res.send(userObject);
-				});
-			})(req, res, next);
-		})
-		// log the user out and delete their session	
-		.delete(function(req, res) {
-			if (req.user) {
-				req.logout();
-				res.send(200, "Successfully Logged out");
-			} else {
-				res.send(401, "You are not logged in");
-			}
-		});
+			});
+		})(req, res, next);
+	})
+	// log the user out and delete their session	
+	.delete(function(req, res) {
+		if (req.user) {
+			req.logout();
+			res.send(200, "Successfully Logged out");
+		} else {
+			res.send(401, "You are not logged in");
+		}
+	});
+	// look for browser sessions when the page refreshes
+	app.get('/auth/session/initial', function(req, res, next) {
+		if (req.user) {
+			var userObject = req.user.toObject();
+			delete userObject.salt;
+			delete userObject.hash;
+			res.send(userObject);
+		}
+		else res.send("No session saved");	
+	});
 	
 	// Sends an email for resetting a user's password. Token will expires in 1 hour.
 	app.post('/api/forgot', function(req, res) {

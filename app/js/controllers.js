@@ -35,6 +35,8 @@ angular.module('co-op.controllers', []).
 				else return false;
 			};
 			
+			$scope.href = function(path) {$location.path(path);};
+			
 			// location logic
 			
 			$scope.searchObject = $location.search();
@@ -722,8 +724,8 @@ angular.module('co-op.controllers', []).
 	}
 ])
 
-.controller('storeCtrl', ['$scope', '$rootScope', '$location', '$routeParams', '$modal', 'Restangular', 'Cart',
-	function($scope, $rootScope, $location, $routeParams, $modal, Restangular, Cart) {
+.controller('storeCtrl', ['$scope', '$rootScope', '$location', '$routeParams', '$modal', 'LoginManager', 'Restangular', 'Cart',
+	function($scope, $rootScope, $location, $routeParams, $modal, LoginManager, Restangular, Cart) {
 		$scope.searchObject = $location.search();
 		console.log($routeParams);
 		console.log($location.path());
@@ -880,7 +882,7 @@ angular.module('co-op.controllers', []).
 					}
 					else {
 						$rootScope.$broadcast('UPDATE_CART', cartOrder);
-						Cart.getTally();
+						LoginManager.getTally();
 						$scope.panelDisplay = true;
 					}
 				});

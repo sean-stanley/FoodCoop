@@ -171,7 +171,7 @@ angular.module('co-op', [
 		// without a callback this function simply checks if the user is authenticated
 		// and if he is, saves his data to the rootScope. Handy for getting the data
 		// when a session hasn't expired yet. It runs once when the app starts.
-		
+		LoginManager.isLoggedIn('initial');
 		
 		Restangular.setErrorInterceptor(function(response, deferred, responseHandler) {
 		    console.log(response);
