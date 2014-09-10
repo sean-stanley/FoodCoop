@@ -6,7 +6,8 @@ var util = require('util'),
 	_ = require('lodash'),
 	crypto = require('crypto'),
 	events = require('events'),
-	express = require('express'); // handles routing and such
+	compression = require('compression'),
+	express = require('express'), // handles routing and such
 	bodyParser = require('body-parser'), // creates a req.body object to allow easy access of request data in the api.
 	methodOverride = require('method-override'), // an express module for overriding default http methods
 	cookieParser = require('cookie-parser'), // an express module for reading, writing and parsing cookies. In the app it is used for session cookies.
@@ -37,6 +38,8 @@ exports.configAPI = function configAPI(app) {
 	
 	// Middleware
 	// ==========
+	app.use(compression({threshold: 512}));
+	
 	// here we load the bodyParser and tell it to parse the requests received as json data.
 	app.use(bodyParser.json({limit: '50mb'})); 
 	// here we initilize the methodOverride middleware for use in the API.
@@ -48,6 +51,8 @@ exports.configAPI = function configAPI(app) {
 	// here we initilize passport's sessions which expand on the express sessions
 	// the ability to have our session confirm if a user is already logged in.
 	app.use(passport.session()); 
+	
+	
 
 
 	// Routes

@@ -32,6 +32,10 @@ a:hover {
 }
 .big-icons span {margin: 0 10px;}
 
+.carousel-caption {padding-bottom: 90px;}
+.carousel-indicators .active {margin: 2px 4px;}
+.carousel-indicators li {margin:3px;}
+
 .map-frame {border:none; margin: 20px 0;}
 
 /*	-------------
