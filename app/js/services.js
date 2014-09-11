@@ -371,7 +371,11 @@ angular.module('co-op.services', [])
 				Restangular.all("api/order").post(order).then(function(result){
 					flash.setMessage({type: 'success', message: 'Poof! Successfully added to order'});
 					callback(result);
-				}, function(error){console.log(error);flash.setMessage({type: 'danger', message: 'Drat! Failed to add that to your cart. ' + error.data});});
+				}, function(error){
+					console.log(error);
+					flash.setMessage({type: 'danger', message: 'Drat! Failed to add that to your cart. ' + error.data});
+					callback();
+				});
 			},
 			
 			updateItem : function(item, callback) {

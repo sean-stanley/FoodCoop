@@ -320,5 +320,6 @@ function findCycle() {
 };
 
 findCycle();
+checkConfig()
 
 

@@ -730,8 +730,8 @@ angular.module('co-op.controllers', []).
 	}
 ])
 
-.controller('storeCtrl', ['$scope', '$rootScope', '$location', '$routeParams', '$modal', 'LoginManager', 'Restangular', 'Cart',
-	function($scope, $rootScope, $location, $routeParams, $modal, LoginManager, Restangular, Cart) {
+.controller('storeCtrl', ['$scope', '$rootScope', '$location', '$routeParams', '$modal', 'LoginManager', 'flash', 'Restangular', 'Cart',
+	function($scope, $rootScope, $location, $routeParams, $modal, LoginManager, flash, Restangular, Cart) {
 		$scope.searchObject = $location.search();
 		console.log($routeParams);
 		console.log($location.path());
@@ -882,11 +882,9 @@ angular.module('co-op.controllers', []).
 				quantity: 1
 				};
 				// This is where the magic really happens
+				// an error returns an empty callback
 				Cart.addToCart(order, function(cartOrder){
-					if (cartOrder === "Sorry, you can't try to buy your own products") {
-						$scope.message.message = cartOrder;
-					}
-					else {
+					if (cartOrder) {
 						$rootScope.$broadcast('UPDATE_CART', cartOrder);
 						LoginManager.getTally();
 						$scope.panelDisplay = true;

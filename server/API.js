@@ -544,12 +544,13 @@ exports.configAPI = function configAPI(app) {
 	// get a customer's cart items by using their customer ID as a request parameter.
 	app.get("/api/cart/:user", function(req, res, next) {
 		var opts, cartObject;
-		// check if the cuurent user is logged in and is requesting his or her own cart.
+		// check if the current user is logged in and is requesting his or her own cart.
 		// Server-side validation.
 		if (req.user && req.user._id == req.params.user) {
 			// get the cart orders for the current user.
 			models.Order.find({
-				customer: new ObjectId(req.params.user)
+				customer: new ObjectId(req.params.user),
+				cycle: scheduler.currentCycle
 			}, null, {
 				sort: {
 					datePlaced: 1
@@ -727,7 +728,7 @@ exports.configAPI = function configAPI(app) {
 					return errorHandler(error);
 				});
 			}
-			else res.send("Sorry, you can't try to buy your own products");
+			else res.send(403, "Sorry, you can't try to buy your own products");
 		} else { // error handling 
 			if (!scheduler.canShop) res.send(403, "It's not shopping time yet");
 			else res.send(401, "Not logged in");
