@@ -1,0 +1,46 @@
+<div class="col-md-4 well">
+	<h2>Want to be a route manager?</h2>
+</div>
+<div class="col-md-8">	
+	<div class="page-header">
+		<h1>List of Route Managers</h1>
+	</div>
+
+	<div class="input-group form-group">
+		<span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+		<input ng-model="search" class="form-control" name="routeManagerSearch" type="search" placeholder="Search"/>
+	</div>
+
+	 <div class="btn-group" dropdown>
+	      <button type="button" class="btn btn-primary dropdown-toggle" ng-disabled="disabled">
+	        Sort By <span class="caret"></span>
+	      </button>
+	      <ul class="dropdown-menu" role="menu" ng-init="predicate = 'routeManager.title'">
+			<li><a ng-click="predicate= 'routeManager.title'; reverse=!reverse">Title</a></li>
+			<li><a ng-click="predicate= 'routeManager.townsOnRoute'; reverse=!reverse">Place on Route</a></li>
+			<li><a ng-click="predicate= 'name'; reverse=!reverse">Pick-up Location</a></li>
+	      </ul>
+	    </div>
+
+	<div class="" ng-repeat="i in routeManagerList | orderBy:predicate:reverse | filter:search">
+		<div class="page-header"><h1>{{i.routeManager.title}}</h1></div>
+		<div class="col-lg-4">
+			<h2 class="text-center">The Manager</h2>
+			<p>Name: {{i.name}}<br>
+				email: <a ng-href="#/contact/{{i._id}}">{{i.email}}</a><br>
+				phont: {{i.phone}}
+			</p>
+		</div>
+		<div class="col-lg-4">
+			<h2 class="text-center">Towns on Route</h2>
+			<ul>
+				<li ng-repeat="town in i.routeManager.townsOnRoute">{{town}}</li>
+			</ul>
+		</div>
+		<div class="col-lg-4">
+			<h2 class="text-center">Pick-up Location</h2>
+			<p>{{i.routeManager.pickupLocation}}</p>
+			
+		</div>
+	</div>
+</div>

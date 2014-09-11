@@ -11,6 +11,22 @@ var markup = config.markup;
 function toLower (v) {
   return v.toLowerCase();
 }
+
+function toArray (listString) {
+	if (typeof listString === "string" && listString.length > 0) {
+		return listString.split(/,\s*/);
+	}
+}
+/*
+
+function toString (listArray) {
+	if (listArray instanceof Array) {
+		listArray = listArray.join(", ")
+		return listArray;
+	}
+}*/
+
+
 // These are the most common properties that a product will have in our co-op.
 // The img property is to be filled with a base64 encoded png or jpeg from the
 // app.
@@ -179,8 +195,9 @@ var UserSchema = new Schema({
 				bankAccount : {type: String, default: "NO ACCOUNT ON RECORD"}
 			},
 			routeManager: {
-				townsOnRoute: Array,
-				centralLocation: String
+				title: String,
+				townsOnRoute: {type: Array, set: toArray, get: toString},
+				pickupLocation: String
 			},
 			resetPasswordToken: String,
 			resetPasswordExpires: Date
@@ -207,8 +224,8 @@ UserSchema.pre('save', function(next) {
 		id: 'e481a3338d',
 		email: {email: user.email},
 		merge_vars : {
-			FNAME : user.name.substr(0, req.body.name.indexOf(" ")),
-			LNAME : user.name.substr(req.body.name.indexOf(" ")+1),
+			FNAME : user.name.substr(0, user.name.indexOf(" ")),
+			LNAME : user.name.substr(user.name.indexOf(" ")+1),
 			USER_TYPE : user.user_type.name,
 			ADDRESS : user.address,
 			PHONE : user.phone

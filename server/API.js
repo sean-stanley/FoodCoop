@@ -245,7 +245,7 @@ exports.configAPI = function configAPI(app) {
 				}
 			
 				else if (req.body.ingredients instanceof Array) {
-					req.body.ingredients = req.body.ingredients.join();
+					req.body.ingredients = req.body.ingredients.join(', ');
 					req.body.ingredients = req.body.ingredients.split(/,\s*/);
 				}
 						

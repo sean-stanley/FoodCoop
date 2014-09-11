@@ -138,8 +138,8 @@ angular.module('co-op.controllers', []).
 	}
 ])
 
-.controller('userEditCtrl', ['$scope', '$rootScope', 'LoginManager', 'Restangular', '$route', 'user',
-	function($scope, $rootScope, LoginManager, Restangular, $route, user) {
+.controller('userEditCtrl', ['$scope', '$rootScope', 'LoginManager', 'flash', 'Restangular', '$route', 'user',
+	function($scope, $rootScope, LoginManager, flash, Restangular, $route, user) {
 		
 		var original = user;
 		
@@ -164,7 +164,7 @@ angular.module('co-op.controllers', []).
 					LoginManager.logout();
 				}
 				original.customDELETE(original._id).then(function() {
-					$rootScope.flash.setMessage('User successfully Deleted');
+					flash.setMessage('User successfully Deleted');
 					$route.reload();
 				});
 			}
@@ -179,7 +179,7 @@ angular.module('co-op.controllers', []).
 			if (!$scope.isClean()) {
 				$scope.user.post($scope.user._id).then(function(response) {
 					// success!
-					$rootScope.flash.setMessage('Details saved successfully');
+					flash.setMessage('Details saved successfully');
 				});
 			}
 			else {
@@ -347,6 +347,12 @@ angular.module('co-op.controllers', []).
 		var mapURL = 'http://maps.google.com/?q=' + producer.address + '&output=embed';
 		$scope.map = $sce.trustAsResourceUrl(mapURL);
 		$scope.mapDirections = $sce.trustAsResourceUrl(mapURL);
+	}
+])
+
+.controller('routeManagerListCtrl', ['$scope', '$filter', 'routeManagerList',
+	function($scope, $filter, routeManagerList) {
+		$scope.routeManagerList = routeManagerList;
 	}
 ])
 

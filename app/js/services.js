@@ -60,6 +60,17 @@ angular.module('co-op.services', [])
 			});
 		}
 		
+		function noSession(error) {
+			console.log(error);
+			return false;
+		}
+		
+		function authenticate(user) {
+			$rootScope.currentUser = user.plain();
+			getTally();
+			return true;
+		}
+		
 		return {
 			login : function(provider, form, callback) {
 				var cb = callback || angular.noop;
@@ -114,8 +125,8 @@ angular.module('co-op.services', [])
 			isLoggedIn : function(params) {
 				var result = $q.defer();
 				var isLoggedIn;
-				// check if the user is logged in with the app.
 				
+				// check if the user is logged in with the app.
 				if ($rootScope.currentUser && $rootScope.currentUser.hasOwnProperty('email')) {
 					isLoggedIn = true;
 					result.resolve(isLoggedIn);
@@ -123,20 +134,30 @@ angular.module('co-op.services', [])
 				
 				// attempt to get the user from the app
 				else {
-					
-					Session.get(params).then(function(user) {
-						if (user !== "No session saved") {
-							$rootScope.currentUser = user.plain();
-							isLoggedIn = true;
-							getTally();
-							result.resolve(isLoggedIn);
+					if (!params) {
+						Session.customGET().then(function(user) {
+							isLoggedIn = authenticate(user);
+							result.resolve( isLoggedIn );
+						}, function(error) {
+							noSession(error);
+							result.reject("Session is expired");
 						}
+					);
+					}
+					else {
+						Session.get(params).then(function(user) {
+							if (user !== "No session saved") {
+								isLoggedIn = authenticate(user);
+								result.resolve(isLoggedIn);
+							}
+							else result.reject(user);
 						
-					}, function(error) {
-						console.log(error);
-						isLoggedIn = false;
-						result.reject("Session is expired");
-					});
+						}, function(error) {
+							noSession(error);
+							result.reject("Session is expired");
+						});
+					}
+					
 					
 				}
 				return result.promise;

@@ -2,109 +2,136 @@
 	<h1>{{user.name}} <small>{{user.user_type.name}}</small></h1>
 </div>
 
-<form name="userEdit">
-	<div class="form-group">
-		<label for="email">Email address</label>
-		<input ng-model="user.email" name="email" type="email" class="form-control" placeholder="Enter email" autofocus required>
-		<div class="custom-error" ng-show="userEdit.email.$dirty && userEdit.email.$invalid">Sorry:
-			<span ng-show="userEdit.email.$error.required">email is required.</span>
-			<span ng-show="userEdit.email.$error.email">Please, write a valid email address.</span>
+<form name="userEdit" id="userEditForm">
+	<div class="col-md-4">
+		<h1>Basic Info</h1>
+		<div class="form-group">
+			<label for="email">Email address</label>
+			<input ng-model="user.email" name="email" type="email" class="form-control" placeholder="Enter email" autofocus required>
+			<div class="custom-error" ng-show="userEdit.email.$dirty && userEdit.email.$invalid">Sorry:
+				<span ng-show="userEdit.email.$error.required">email is required.</span>
+				<span ng-show="userEdit.email.$error.email">Please, write a valid email address.</span>
+			</div>
 		</div>
-	</div>
 	
-	<div class="form-group">
-		<button type="button" class="btn btn-danger" ng-click="passwordReset()">Reset Password</a>
-	</div>
-	
-	<div class="form-group">
-		<label for="userFullName">Full Name</label>
-		<input ng-model="user.name" name="userFullName" type="text" class="form-control" placeholder="Full Name" required>
-		<div class="custom-error" ng-show="userEdit.userFullName.$dirty && userEdit.userFullName.$invalid">		Sorry:
-			<span ng-show="userEdit.userFullName.$error.required">Full name is required.</span>
+		<div class="form-group">
+			<button type="button" class="btn btn-danger" ng-click="passwordReset()">Reset Password</a>
 		</div>
-	</div>
+	
+		<div class="form-group">
+			<label for="userFullName">Full Name</label>
+			<input ng-model="user.name" name="userFullName" type="text" class="form-control" placeholder="Full Name" required>
+			<div class="custom-error" ng-show="userEdit.userFullName.$dirty && userEdit.userFullName.$invalid">		Sorry:
+				<span ng-show="userEdit.userFullName.$error.required">Full name is required.</span>
+			</div>
+		</div>
 	
 	
-	<div class="form-group" ng-controller="geoCtrl">
-		<label for="address">Address</label>
-		<input name="userAddress" type="text" class="form-control" ng-model="user.address"/>
+		<div class="form-group" ng-controller="geoCtrl">
+			<label for="address">Address</label>
+			<input name="userAddress" type="text" class="form-control" ng-model="user.address"/>
 		
-		<div class="custom-error" ng-show="userEdit.address.$dirty && userEdit.address.$invalid">		Sorry:
-			<span ng-show="userEdit.userFullName.$error.required">A NZ address is required.</span>
+			<div class="custom-error" ng-show="userEdit.address.$dirty && userEdit.address.$invalid">		Sorry:
+				<span ng-show="userEdit.userFullName.$error.required">A NZ address is required.</span>
+			</div>
+		</div>
+	
+		<div class="form-group">
+			<label for="phone">Phone</label>
+			<input type="tel" class="form-control" ng-model="user.phone" name="phone" placeholder="Enter your preferred phone number" required>
+			<div class="custom-error" ng-show="userEdit.phone.$dirty && userEdit.phone.$invalid">		Sorry:
+				<span ng-show="userEdit.userFullName.$error.required">A valid phone number is needed to quickly sort out issues.</span>
+			</div>
+		</div>
+	
+		<div class="checkbox">
+			<label>Can Sell Products</label>
+			<input type="checkbox" ng-model="user.user_type.canSell">
+		</div>
+		<div class="checkbox">
+			<label>Can Buy Products</label>
+			<input type="checkbox" ng-model="user.user_type.canBuy">
 		</div>
 	</div>
-	
-	<div class="form-group">
-		<label for="phone">Phone</label>
-		<input type="tel" class="form-control" ng-model="user.phone" name="phone" placeholder="Enter your preferred phone number" required>
-		<div class="custom-error" ng-show="userEdit.phone.$dirty && userEdit.phone.$invalid">		Sorry:
-			<span ng-show="userEdit.userFullName.$error.required">A valid phone number is needed to quickly sort out issues.</span>
+	<div class="col-md-4">
+		<h1>Route Manager Info</h1>
+		<div class="checkbox">
+			<label>Is a route Manager</label>
+			<input type="checkbox" ng-model="user.user_type.isRouteManager">
 		</div>
-	</div>
-	
-	<div class="checkbox">
-		<label>Can Sell Products</label>
-		<input type="checkbox" ng-model="user.user_type.canSell">
-	</div>
-	<div class="checkbox">
-		<label>Can Buy Products</label>
-		<input type="checkbox" ng-model="user.user_type.canBuy">
-	</div>
-	
-	<section ng-show="user.user_type.name === 'Producer' ">
+		<div class="form-group">
+			<label for="routeTitle">Route Title</label>
+			<input ng-model="user.routeManager.title" name="routeTitle" type="text" class="form-control" placeholder="e.g. South to Waipu" required>
+			<div class="custom-error" ng-show="userEdit.routeTitle.$dirty && userEdit.routeTitle.$invalid">	Sorry:
+				<span ng-show="userEdit.routeTitle.$error.required">A title is required.</span>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="pickupLocation">Pickup Location</label>
+			<input ng-model="user.routeManager.pickupLocation" name="pickupLocation" type="text" class="form-control" placeholder="e.g. member's home address or local hall" required>
+			<div class="custom-error" ng-show="userEdit.pickupLocation.$dirty && userEdit.pickupLocation.$invalid">	Sorry:
+				<span ng-show="userEdit.pickupLocation.$error.required">A pickup location is definately required.</span>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="towns">Towns on Route</label>
+			<textarea ng-model="user.routeManager.townsOnRoute"
+			maxlength="6000" rows="3" style="width: 100%;"
+			placeholder="make a comma seperated list of towns serviced on the route."
+			name="towns" class="form-control"></textarea>
+		</div>
 		
+		
+	</div>
+	<div class="col-md-4">
+		<h1>Producer Info</h1>
+
 		<img ng-if="user.producerData.hasOwnProperty('logo')" ng-src="{{user.producerData.logo}}" alt=" logo placeholder " class="img-responsive" style="width:100%; height: auto;">
 			
-		<div class="row">
-			
-			<div class="form-group">	
-				<div file-dropzone="[image/png, image/jpeg, image/gif]" file="user.producerData.logo" data-max-file-size="3" id="file-dropzone" class="image-drop form-group">
-					<div>
-						<p class="text-muted" ng-if="user.producerData.logo">Drop a new photo here</p>
-						<p class="text-muted" ng-if="!user.producerData.logo">Drop a photo here</p>
-							<h1 class="text-muted"><span class="glyphicon glyphicon-cloud-upload"></span></h1>
-						<button type="button" class="btn btn-default btn-sm upload">
-							<span class="text-muted">Or click to upload</span>
-							<input type="file" class="opacity" 
-							fileread="user.producerData.logo" 
-							accept="image/*" 
-							data-max-file-size="3">
-						</button>
-					</div>
-					
+		<div class="form-group">	
+			<div file-dropzone="[image/png, image/jpeg, image/gif]" file="user.producerData.logo" data-max-file-size="3" id="file-dropzone" class="image-drop form-group">
+				<div>
+					<p class="text-muted" ng-if="user.producerData.logo">Drop a new photo here</p>
+					<p class="text-muted" ng-if="!user.producerData.logo">Drop a photo here</p>
+						<h1 class="text-muted"><span class="glyphicon glyphicon-cloud-upload"></span></h1>
+					<button type="button" class="btn btn-default btn-sm upload">
+						<span class="text-muted">Or click to upload</span>
+						<input type="file" class="opacity" 
+						fileread="user.producerData.logo" 
+						accept="image/*" 
+						data-max-file-size="3">
+					</button>
 				</div>
-				<hr>
+				
 			</div>
-			
-			
+			<hr>
 		</div>
-		<div class="row">
-			<div class="form-group">
-				<label for="inputCompany">Company Name</label>
-				<input ng-model="user.producerData.companyName" name="inputCompany" type="text" class="form-control" id="inputName" placeholder="e.g. {{user.name}} Farms" autofocus required>
-			</div>
-			<div class="form-group">
-				<label for="companyWebsite">Company Website <small>If you have one</small></label>
-				<input ng-model="user.producerData.website" name="companyWebsite" type="text" class="form-control" id="inputName" placeholder="e.g. www.{{user.name | forURL}}.com" autofocus required>
-			</div>
-			<div class="form-group">
-				<label for="bankAccount">Bank Account <small>To receive payment to</small></label>
-				<input ng-model="user.producerData.bankAccount" name="bankAccount" type="text" class="form-control" id="inputName" placeholder="e.g. 01-2345-6789-012-00" autofocus required>
-				<alert type="danger" 
-				ng-show="producerEdit.bankAccount.$dirty && producerEdit.bankAccount.$invalid">
-					<span>We need to know how to send you money online.</span>
-				</alert>
-			</div>
-			<div class="form-group">
-				<label for="description">Company Description</label> 
-				<textarea class="form-control" ng-model="user.producerData.description" id="description" maxlength="6000" placeholder="Write a few paragraphs for customers to see about your business and methadologies" rows="9" style="width: 100%;" required></textarea>  
-			</div>
-			<div class="form-group">
-				<label for="description">Personal Bio <small>(Optional)</small></label> 
-				<textarea class="form-control" ng-model="user.producerData.personalBio" id="description" maxlength="6000" placeholder="Write a few paragraphs about yourself for people to see." rows="9" style="width: 100%;" required></textarea>  
-			</div>
+		
+		<div class="form-group">
+			<label for="inputCompany">Company Name</label>
+			<input ng-model="user.producerData.companyName" name="inputCompany" type="text" class="form-control" id="inputName" placeholder="e.g. {{user.name}} Farms" autofocus required>
 		</div>
-	</section>
+		<div class="form-group">
+			<label for="companyWebsite">Company Website <small>If you have one</small></label>
+			<input ng-model="user.producerData.website" name="companyWebsite" type="text" class="form-control" id="inputName" placeholder="e.g. www.{{user.name | forURL}}.com" autofocus required>
+		</div>
+		<div class="form-group">
+			<label for="bankAccount">Bank Account <small>To receive payment to</small></label>
+			<input ng-model="user.producerData.bankAccount" name="bankAccount" type="text" class="form-control" id="inputName" placeholder="e.g. 01-2345-6789-012-00" autofocus required>
+			<alert type="danger" 
+			ng-show="producerEdit.bankAccount.$dirty && producerEdit.bankAccount.$invalid">
+				<span>We need to know how to send you money online.</span>
+			</alert>
+		</div>
+		<div class="form-group">
+			<label for="description">Company Description</label> 
+			<textarea class="form-control" ng-model="user.producerData.description" id="description" maxlength="6000" placeholder="Write a few paragraphs for customers to see about your business and methadologies" rows="9" style="width: 100%;" required></textarea>  
+		</div>
+		<div class="form-group">
+			<label for="description">Personal Bio <small>(Optional)</small></label> 
+			<textarea class="form-control" ng-model="user.producerData.personalBio" id="description" maxlength="6000" placeholder="Write a few paragraphs about yourself for people to see." rows="9" style="width: 100%;" required></textarea>  
+		</div>
+	</div>
 	
         <br>
         <a href="#/users-rights" class="btn">Cancel</a>

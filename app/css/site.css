@@ -1,8 +1,24 @@
+@font-face {
+	font-family: Nevis;
+	/* src: local("nevis"), 
+		url(/css/fonts/nevis.woff),
+		url(/css/fonts/nevis.ttf),
+		url(/css/fonts/nevis.svg)
+		url(/css/fonts/nevis.otf);
+	*/
+	src: 
+		url(/css/fonts/nevis.woff),
+		url(/css/fonts/nevis.ttf),
+		url(/css/fonts/nevis.svg)
+		url(/css/fonts/nevis.otf);
+}
+
+
 body {
 	font-family: 'Raleway', sans-serif;
 	font-weight: 500;
 }
-h1 {font-weight: 700;}
+h1 {font-family: 'Raleway', sans-serif; font-weight: 700;}
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
 
 a:hover {
@@ -32,9 +48,13 @@ a:hover {
 }
 .big-icons span {margin: 0 10px;}
 
-.carousel-caption {padding-bottom: 90px;}
+.carousel {margin-bottom: 30px;}
+.carousel-caption {padding: 30px; background-color: rgba(0,0,0,0.5); top: 3em; bottom: inherit;}
+.carousel-caption h1 {font-size: 3.5em;}
 .carousel-indicators .active {margin: 2px 4px;}
 .carousel-indicators li {margin:3px;}
+
+.jumbotron {text-align: center;}
 
 .map-frame {border:none; margin: 20px 0;}
 

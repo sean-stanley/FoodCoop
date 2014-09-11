@@ -23,8 +23,7 @@
     "url": "https://github.com/StrategicDevelopment/FoodCoop/issues"
   },
   "devDependencies": {
-    "karma": "~0.12.12",
-    
+    "karma": "~0.12.12"
   },
   "dependencies": {
     "async": "^0.9.0",

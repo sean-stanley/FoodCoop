@@ -85,6 +85,15 @@ angular.module('co-op', [
 	 	})
 	
 		.when('/faq', {templateUrl: 'partials/faq.html', controller: 'faqCtrl'})
+		.when('/route-manager-directory', {
+			templateUrl: 'partials/route-managers.html',
+			controller: 'routeManagerListCtrl',
+			resolve: {
+				routeManagerList : function(Restangular) {
+					return Restangular.all('api/user').getList({'user_type.isRouteManager': true}).$object;
+				}
+			}	
+		})
     
 		.when('/product-upload', {
 			templateUrl: 'partials/loggedIn/product-upload.html', 
@@ -171,7 +180,9 @@ angular.module('co-op', [
 		// without a callback this function simply checks if the user is authenticated
 		// and if he is, saves his data to the rootScope. Handy for getting the data
 		// when a session hasn't expired yet. It runs once when the app starts.
-		LoginManager.isLoggedIn('initial');
+		LoginManager.isLoggedIn('initial').catch(function(reason) {
+			$location.path('/');
+		});
 		
 		Restangular.setErrorInterceptor(function(response, deferred, responseHandler) {
 		    console.log(response);
