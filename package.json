@@ -50,7 +50,7 @@
     "mailchimp-api": "^2.0.6",
     "method-override": "^2.1.2",
     "mongodb": "~1.4.8",
-    "grunt-rsync": "~0.6.2"
+    "grunt-rsync": "~0.6.2",
     "mongojs": "~0.12.1",
     "mongoose": "~3.8.8",
     "node-schedule": "^0.1.13",
