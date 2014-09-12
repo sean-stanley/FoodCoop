@@ -4,6 +4,7 @@
 var fs = require('fs');
 var os = require('os'); 
 var path = require('path');
+var config = require('./server/config').Config;
 
 module.exports = function(grunt) {
         
@@ -63,6 +64,12 @@ module.exports = function(grunt) {
                             cwd: path.join(__dirname, 'server')
                         }
                     }
+                },
+                updateServer: {
+                    command: 'ssh ' + config.deploy.username + '@' + config.deploy.server + ' ' + path.join(config.deploy.path, 'update.sh'),
+                    options: {
+                        stdout: true
+                    }
                 }
             },
             watch: {
@@ -110,6 +117,22 @@ module.exports = function(grunt) {
             },
             'node-inspector': {
               dev: {}
+            },
+            rsync: {
+                options: {
+                    args: ["--verbose"],
+                    recursive: true
+                },
+                linode: {
+                    options: {
+                        src: ["app", "server", "package.json"],
+                        dest: "Deploy/foodcoop.org.nz",
+                        syncDest: true,
+                        args: "-z",
+                        host: config.deploy.username + '@' + config.deploy.server,
+                        exclude: ["Bones-Data"]
+                    }
+                }
             }
     });
 
@@ -121,10 +144,12 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-nodemon');
     grunt.loadNpmTasks('grunt-shell');
     grunt.loadNpmTasks('grunt-node-inspector');
+    grunt.loadNpmTasks('grunt-rsync');
     
     // Default task(s).
     grunt.registerTask('dev', ['concurrent:dev']);
     grunt.registerTask('debug', ['concurrent:debug']);
+    grunt.registerTask('deploy', ['rsync:linode', 'shell:updateServer']);
     grunt.registerTask('decrypt-config', ['shell:decryptConfig']);
     grunt.registerTask('encrypt-config', ['shell:encryptConfig']);
     

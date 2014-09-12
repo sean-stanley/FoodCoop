@@ -13,6 +13,13 @@ var util = require('util'),
 	passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy,
 	mcapi = require('mailchimp-api');
+    config = require('./config').Config;
+
+var forgot = require('password-reset')({
+    uri : 'http://localhost:8080/password_reset',
+    from : 'password-robot@localhost',
+    host : 'localhost', port : 25,
+});
 
 mongoose.connect('mongodb://localhost/mydb');
 var db = mongoose.connection;
@@ -36,6 +43,5 @@ function loggedIn(req, res, next) {
   }
 }
 
-
-app.listen(8081);
+app.listen(config.port || 8081);
 

@@ -38,7 +38,7 @@
     "express-session": "^1.7.0",
     "geocoder": "^0.2.0",
     "grunt": "~0.4.4",
-    "grunt-shell": "~0.7.0",
+    "grunt-shell": "~1.1.1",
     "grunt-nodemon": "~0.2.1",
     "grunt-contrib-copy": "~0.5.0",
     "grunt-karma": "~0.8.3",
@@ -50,6 +50,7 @@
     "mailchimp-api": "^2.0.6",
     "method-override": "^2.1.2",
     "mongodb": "~1.4.8",
+    "grunt-rsync": "~0.6.2"
     "mongojs": "~0.12.1",
     "mongoose": "~3.8.8",
     "node-schedule": "^0.1.13",
