@@ -73,11 +73,6 @@ app.use(require('prerender-node').set('prerenderToken', 'AyY6GHZSR0aiwAuXqDzm'))
 var server_port = config.deploy.port || 8081,
 	server_ip_address = 'localhost';
 
-/*
-app.listen(server_port, server_ip_address, function() {
-	console.log("Listening on " + server_ip_address + ", " + server_port);
-});*/
-
 app.listen(server_port, server_ip_address, function() {
 	log.info("Listening on " + server_ip_address + ", " + server_port);
 });
