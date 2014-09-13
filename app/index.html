@@ -63,6 +63,10 @@
 	 document.body.appendChild(e); 
 	} 
 	</script>
+	
+	<script type="text/javascript">
+	alert("This website is in beta and only in a testing state. No products or members or financial transaction are yet allowed to proceed. Thank you for your patience.")
+	</script>
 
 </head>
 
@@ -192,11 +196,9 @@
 					<li ng-class="{active:isActive('/store')}"><a href="#/store"><span class="glyphicon glyphicon-shopping-cart"></span> Store</a></li>
 					<li ng-class="{active:isActive('/home')}"><a href="#home">Home</a></li>
 					<li ng-class="{active:isActive('/about')}"><a href="#/about">About Us</a></li>
-					<li ng-class="{active:isActive('/signup')}" ng-hide="currentUser != null"><a href="#signup">Join Us</a></li>
-					
+					<li ng-class="{active:isActive('/signup')}" ng-hide="currentUser != null"><a href="#signup">Sign Up</a></li>
 					<li ng-class="{active:isActive('/contact')}"><a href="#contact">Contact Us</a></li>
-					<li><a href="http://foodcoop.org.nz" target="_blank">Blog</a></li>
-					
+					<li><a href="http://blog.foodcoop.org.nz" target="_blank">Blog</a></li>
 				</ul>
 			</nav>
 			<div class="row">
@@ -216,7 +218,6 @@
 
 			</div> <!-- End of "row" /--> 
 		</div> <!-- End of "container" /--> 
-    
 			<div id="push"></div>
 		</div><!--End hack-->
 
