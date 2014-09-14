@@ -12,7 +12,7 @@ var util = require('util'),
 	API = require('./API.js'),
 	passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy,
-	mcapi = require('mailchimp-api');
+	mcapi = require('mailchimp-api'),
     config = require('./config').Config;
 
 var forgot = require('password-reset')({
@@ -21,7 +21,9 @@ var forgot = require('password-reset')({
     host : 'localhost', port : 25,
 });
 
-mongoose.connect('mongodb://localhost/mydb');
+options.server.socketOptions = options.replset.socketOptions = { keepAlive: 1 };
+
+mongoose.connect('mongodb://localhost/mydb', options);
 var db = mongoose.connection;
 
 // set MailChimp API key here
