@@ -3,7 +3,7 @@ var config = require('./coopConfig.js'),
 	async = require('async'),
 	nodemail = require('nodemailer'),
 	smtpTransport = require('nodemailer-smtp-transport'),
-	mail = require('./emailer.js'),
+	Emailer = require('./emailer.js'),
 	mongoose = require('mongoose'),
 	ObjectId = require('mongoose').Types.ObjectId, 
 	models = require('./models.js'),
@@ -24,7 +24,7 @@ var orderCycleChecker = schedule.scheduleJob({hour:0, minute: 0}, checkConfig);
 // schedule emails to send alerting members that it is delivery day.
 // To be executed at 9:15am Wednesday;
 function checkConfig() {
-	console.log("checking if today is a significant day")
+	console.log(Date.now() + " checking if today is a significant day")
 	var today = Date.today(), cycle = config.cycle, key;
 
 	// test for an exact day match and run reminder email functions if it is.
@@ -98,7 +98,7 @@ function checkout() {
 		function(done) {
 			models.Order
 			.aggregate()
-			//.match({cycle: exports.currentCycle})
+			.match({cycle: exports.currentCycle})
 			.group({ _id: "$customer", orders: { $push : {product: "$product", quantity: "$quantity"} }})
 			.exec(function(e, customers) {
 				// customers is a plain javascript object not a special mongoose document.
@@ -192,7 +192,7 @@ function orderGoods() {
 		function(done) {
 			models.Order
 			.aggregate()
-			//.match({cycle: exports.currentCycle})
+			.match({cycle: exports.currentCycle})
 			.group({ _id: "$supplier", orders: { $push : {product: "$product", customer: '$customer', quantity: "$quantity"} }})
 			
 			.exec(function(e, producers) {
@@ -313,9 +313,12 @@ function incrementCycle() {
 
 function findCycle() {
 	models.Cycle.findById('orderCycle', function(e, cycle) {
-		exports.currentCycle = cycle.seq;
-		console.log("the current cycle is #" + exports.currentCycle);
 		if (e) console.log(e);
+		else {
+			exports.currentCycle = cycle.seq;
+			console.log("the current cycle is #" + exports.currentCycle);
+		}
+		
 	});
 };
 

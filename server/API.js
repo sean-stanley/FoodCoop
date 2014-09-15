@@ -51,8 +51,6 @@ exports.configAPI = function configAPI(app) {
 	// here we initilize passport's sessions which expand on the express sessions
 	// the ability to have our session confirm if a user is already logged in.
 	app.use(passport.session()); 
-	
-	
 
 
 	// Routes

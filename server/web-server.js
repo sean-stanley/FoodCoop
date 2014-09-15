@@ -21,6 +21,7 @@ var forgot = require('password-reset')({
     host : 'localhost', port : 25,
 });
 
+var options = {server: {}, replset: {}};
 options.server.socketOptions = options.replset.socketOptions = { keepAlive: 1 };
 
 mongoose.connect('mongodb://localhost/mydb', options);
@@ -45,5 +46,16 @@ function loggedIn(req, res, next) {
   }
 }
 
-app.listen(config.port || 8081);
+// SEO
+
+app.use(require('prerender-node').set('prerenderToken', 'AyY6GHZSR0aiwAuXqDzm'));
+
+// for deployment
+
+var server_port = config.deploy.port || 8081
+var server_ip_address = config.deploy.ip || 'localhost'
+
+app.listen(server_port, server_ip_address, function() {
+	console.log("Listening on " + server_ip_address + ", " + server_port);
+});
 
