@@ -1,9 +1,9 @@
 {
   "name": "lib",
   "version": "1.1.0",
-  "homepage": "https://github.com/StrategicDevelopment/FoodCoop",
+  "homepage": "http://foodcoop.org.nz",
   "authors": [
-    "Sean Stanley <sean@foodcoop.org.nz>"
+    "Sean Stanley <sean@maplekiwi.com>"
   ],
   "description": "co-op app project library",
   "keywords": [
@@ -14,12 +14,18 @@
   "license": "MIT",
   "dependencies": {
     "momentjs": "~2.4.0",
-    "angular": "~1.2.20",
+    "angular": "1.3.0-beta.7",
+    "angular-animate": "1.3.0-beta.7",
     "angular-bootstrap": "latest",
-    "jquery": "latest",
-    "restangular": "~1.4.0",
-    "angular-cropme": "~0.1.11",
-    "datejs": "~1.0.0-rc1"
+    "angular-cropme": "latest",
+    "angular-loading-bar": "latest",
+    "angular-route": "1.3.0-beta.7",
+    "angular-sanitize": "1.3.0-beta.7",
+    "angular-superswipe": "latest",
+    "angular-touch": "1.3.0-beta.7",
+    "datejs": "~1.0.0-rc1",
+    "lodash": "latest",
+    "restangular": "~1.4.0"
   },
   "moduleType": [
     "globals",
@@ -35,6 +41,6 @@
     "tests"
   ],
   "resolutions": {
-    "angular": "1.3.0-beta.5"
+    "angular": "1.3.0-beta.7"
   }
 }

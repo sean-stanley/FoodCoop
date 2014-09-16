@@ -4,8 +4,6 @@
 // Declare app level module which depends on filters, and services
 angular.module('co-op', [ 
 	'ngRoute', 
-	'ngResource', 
-	'ngCookies', 
 	'ngSanitize',
 	'ngTouch',
 	'superswipe',
@@ -19,30 +17,32 @@ angular.module('co-op', [
 	'cropme',
 	'restangular'])
 
-  .config(['$routeProvider', 'RestangularProvider', function($routeProvider, RestangularProvider) {
+  .config(['$routeProvider', '$locationProvider', 'RestangularProvider', function($routeProvider, $locationProvider, RestangularProvider) {
     $routeProvider
 		.when('/', {templateUrl: 'partials/index-content.html', controller: 'MyCtrl1', reloadOnSearch: false})
-		.when('/calendar', {templateUrl: 'partials/calendar.html', controller: 'calendarCtrl', reloadOnSearch: false})
-		.when('/signup', {templateUrl: 'partials/signup.html', controller: 'userCtrl', reloadOnSearch: false})
-		.when('/welcome', {templateUrl: 'partials/thankyou.html', loggedInOnly: true, reloadOnSearch: false})
+		.when('/signup', {templateUrl: 'partials/signup.html', controller: 'userCtrl', reloadOnSearch: false, title: 'Signup',
+		description: 'Signup to be a member of the NNFC. Northland\'s first food co-op.'
+		})
+		.when('/welcome', {templateUrl: 'partials/thankyou.html', loggedInOnly: true, reloadOnSearch: false, title: 'Welcome New Member'})
 		.when('/apply', {
 			templateUrl: 'partials/producer-application.html', 
 			controller: 'producerApplicationCtrl', 
 			reloadOnSearch: false,
-			loggedInOnly: true,
+			loggedInOnly: true, title: 'Apply to Sell',
+			description: 'Application to be a producer member of our local food coop the northland natural food coop requires only a short amount of time and a larger membership fee.',
 			resolve: {
 				certifications: function(Restangular, $route) {
 					return Restangular.all('api/certification');
 				}
 			}
 		})
-		.when('/terms-cons', {templateUrl: 'partials/legal/terms-cons.html', reloadOnSearch: false})
-		.when('/priv-pol', {templateUrl: 'partials/legal/priv-pol.html', reloadOnSearch: false})
-		.when('/policy', {templateUrl: 'partials/legal/policy.html', reloadOnSearch: false})
+		.when('/terms-cons', {templateUrl: 'partials/legal/terms-cons.html', reloadOnSearch: false, title: 'Terms and Conditions'})
+		.when('/priv-pol', {templateUrl: 'partials/legal/priv-pol.html', reloadOnSearch: false, title: 'Privacy Policy'})
+		.when('/policy', {templateUrl: 'partials/legal/policy.html', reloadOnSearch: false, title: 'Policies Handbook'})
 		.when('/users-rights', {
 			templateUrl: 'partials/admin/users-rights.html', 
 			controller: 'userAdminCtrl', 
-			adminOnly: true, reloadOnSearch: false,
+			adminOnly: true, reloadOnSearch: false, title: 'Admin',
 			resolve: {
 				users: function(Restangular) {
 					return Restangular.all('api/user');
@@ -52,6 +52,7 @@ angular.module('co-op', [
 		.when('/user/:userId', {
 			controller: 'userEditCtrl', 
 			templateUrl:'partials/admin/details.html',
+			title: 'Admin',
 			adminOnly: true, reloadOnSearch: false,
 			resolve: {
 				user: function(Restangular, $route){
@@ -59,9 +60,9 @@ angular.module('co-op', [
 				}
 			}
 		})
-		.when('/admin/invoices', { controller: 'invoiceCtrl', templateUrl: 'partials/admin/invoices.html', adminOnly: true, reloadOnSearch: false })
+		.when('/admin/invoices', { controller: 'invoiceCtrl', templateUrl: 'partials/admin/invoices.html', adminOnly: true, reloadOnSearch: false, title: 'Admin' })
 		
-		.when('/forgot', {templateUrl: 'partials/forgot-password.html', controller: 'forgotCtrl', reloadOnSearch: false})
+		.when('/forgot', {templateUrl: 'partials/forgot-password.html', controller: 'forgotCtrl', reloadOnSearch: false, title: 'Forgotten Password'})
 		.when('/reset/:token', {
 			controller: 'resetCtrl',
 			templateUrl:'partials/reset-password.html', reloadOnSearch: false,
@@ -71,12 +72,22 @@ angular.module('co-op', [
 				}
 			}
 		})
-		.when('/about', {templateUrl: 'partials/about.html', reloadOnSearch: false})
-		.when('/calendar', {templateUrl: 'partials/calendar.html', controller:'calendarCtrl', reloadOnSearch: false})
-		.when('/producer-list', {templateUrl: 'partials/producer-list.html', controller: 'producerListCtrl', reloadOnSearch: false})
+		.when('/about', {templateUrl: 'partials/about.html', reloadOnSearch: false, title: "About",
+		description: "The Northland Natural Food Co-op was founded by Sean Stanley in 2014. The food coop is based on the Oklahoma Food Coop system. We seek to make food local, affordable and sustainable."
+	})
+		.when('/calendar', {templateUrl: 'partials/calendar.html', controller:'calendarCtrl', reloadOnSearch: false, 
+			title: 'Co-op Calendar', 
+			description: 'Ordering with our local food co-op follows a cycle to help reduce travel and shipping costs of local food. First fresh products are uploaded, then members shop, finally, orders are brought to Whangarei and distributed to all members.'
+		})
+		.when('/producer-list', {templateUrl: 'partials/producer-list.html', controller: 'producerListCtrl', reloadOnSearch: false,
+			title: 'Local Producer Directory',
+			description: 'Members of the northland natural food co-op have a profile about their practices and operation. Contact details for the producer is also found here.'
+		})
 		.when('/producer/:companyName-:userName', {
 			controller: 'producerPageCtrl',
 	 		templateUrl:'partials/producer-page.html', reloadOnSearch: false,
+			title : 'Producer',
+			description: 'Members of the northland natural food co-op have a profile about their practices and operation. Contact details for the producer is also found here.',
 	 		resolve: {
 	 			producer: function(Restangular, $route){
 					return Restangular.one('api/user/producer', $route.current.params.userName).get();
@@ -88,6 +99,8 @@ angular.module('co-op', [
 		.when('/route-manager-directory', {
 			templateUrl: 'partials/route-managers.html',
 			controller: 'routeManagerListCtrl',
+			title : 'Help FAQ',
+			description: 'The FAQ has answers to common questions about being a member of our local food co-op.',
 			resolve: {
 				routeManagerList : function(Restangular) {
 					return Restangular.all('api/user').getList({'user_type.isRouteManager': true}).$object;
@@ -99,12 +112,14 @@ angular.module('co-op', [
 			templateUrl: 'partials/loggedIn/product-upload.html', 
 			controller: 'productUploadCtrl', 
 			loggedInOnly: true, reloadOnSearch: false,
+			title : 'Upload Products to Sell',
 			resolve: { product: function() { return {}; } }
 		})
 		.when('/product-upload/:productId', {
 			controller: 'productUploadCtrl',
 			templateUrl: 'partials/loggedIn/product-upload.html',
 			loggedInOnly: true, reloadOnSearch: false,
+			title : 'Edit Product',
 			resolve: {
 				product: function(Restangular, $route) {
 					return Restangular.one('api/product', $route.current.params.productId).get();
@@ -117,6 +132,7 @@ angular.module('co-op', [
 			templateUrl: 'partials/loggedIn/order-manager.html', 
 			controller: 'productOrderCtrl',
 			loggedInOnly: true, reloadOnSearch: false,
+			title : 'Manage Products',
 			resolve: {
 				products: function(Restangular, $route) {
 					return Restangular.all('api/product-list');
@@ -133,12 +149,15 @@ angular.module('co-op', [
 		.when('/my-invoices', {
 			controller: 'userInvoiceCtrl',
 			templateUrl:'partials/loggedIn/invoices.html',
-			loggedInOnly: true, reloadOnSearch: false
+			loggedInOnly: true, reloadOnSearch: false,
+			title : 'My Invoices',
+			description: 'Use the contact form to contact another northland natural food co-op member.',
 		})
 		.when('/me/:userId', {
 			controller: 'userEditCtrl',
 			templateUrl:'partials/loggedIn/edit-me.html',
 			loggedInOnly: true, reloadOnSearch: false,
+			title : 'My Settings',
 			resolve: {
 				user: function(Restangular, $route){
 					return Restangular.one('api/user', $route.current.params.userId).get();
@@ -150,6 +169,8 @@ angular.module('co-op', [
 		.when('/contact/:userId', {
 			templateUrl: 'partials/contact.html', 
 			controller: 'producerContactCtrl', reloadOnSearch: false,
+			title : 'contact member',
+			description: 'Use the contact form to contact another northland natural food co-op member.',
 			resolve: {
 				member: function(Restangular, $route){
 					return Restangular.one('api/user', $route.current.params.userId).get();
@@ -158,13 +179,13 @@ angular.module('co-op', [
 		})
 	
     .when('/login', {templateUrl: 'partials/login.html', isLogin: true, reloadOnSearch: false})
-    .when('/must-login', {templateUrl: 'partials/must-login.html', isLogin: true, reloadOnSearch: false})
-    .when('/login-failed', {templateUrl: 'partials/login-failed.html', reloadOnSearch: false})
-    .when('/login-page', {templateUrl: 'partials/login-page.html', reloadOnSearch: false})
+    .when('/must-login', {templateUrl: 'partials/must-login.html', isLogin: true, reloadOnSearch: false, title: 'Must Login'})
+    .when('/login-failed', {templateUrl: 'partials/login-failed.html', reloadOnSearch: false, title: 'Login Failed'})
+    .when('/login-page', {templateUrl: 'partials/login-page.html', reloadOnSearch: false, title: 'Login'})
     .when('/login-failed/attempts=:tries', {templateUrl: 'partials/login-failed.html', reloadOnSearch: false})
     
     // store routes
-	.when('/store', {templateUrl: 'partials/store/store-template.html', controller: 'storeCtrl', reloadOnSearch: false})
+	.when('/store', {templateUrl: 'partials/store/store-template.html', controller: 'storeCtrl', reloadOnSearch: false, title: 'Store'})
 
     .otherwise({redirectTo: '/'});
     
@@ -174,12 +195,28 @@ angular.module('co-op', [
 		id: '_id.$oid'
 	});
 	
+	$locationProvider
+	.html5Mode(true)
+	.hashPrefix('!');
+	
 	
   }])
 	.run(function($rootScope, $route, $location, LoginManager, flash, Session, Restangular) {
-		// without a callback this function simply checks if the user is authenticated
-		// and if he is, saves his data to the rootScope. Handy for getting the data
-		// when a session hasn't expired yet. It runs once when the app starts.
+		$rootScope.page_title = 'NNFC';
+		$rootScope.page_description = "We help Northland buy and sell local food through our co-op store. We are a food co-op dedicated to helping our community buy local food. Our member's supply produce, meat, dairy, milk, bread, and home-made goods.";
+		var originalDescription = $rootScope.page_description;
+		
+		
+		$rootScope.$on('$routeChangeSuccess', function(event, next, current) {
+			$rootScope.page_title = (next.$$route.hasOwnProperty('title')) ? next.title : 'NNFC';
+			$rootScope.page_description = (next.$$route.hasOwnProperty('description')) ? next.description : originalDescription;
+		});
+		
+		
+		
+		// when the app starts, check if the user is logged in. This does not return a
+		// 401 error but a custom error to avoid the regular errorInterceptor the app
+		// uses. 
 		LoginManager.isLoggedIn('initial').catch(function(reason) {
 			$location.path('/');
 		});
@@ -218,11 +255,12 @@ angular.module('co-op', [
 					else {
 						$rootScope.savedLocation = $location.url();
 						flash.setNextMessage({type: 'warning', message: 'Not logged in'});
-						$location.path('/must-login');
+						$location.path('must-login');
 					}
 
 				});
 			}
+			else return;
 			
 			
         });

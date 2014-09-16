@@ -2,9 +2,13 @@
 <html lang="en" ng-app="co-op">
 <head>
 	<meta charset="utf-8">
-	<title>NNFC -- Northland Natural Food Co-op</title>
+	<title ng-bind="$root.page_title + ' - Northland Natural Food Co-op' ">NNFC - Northland Natural Food Co-op</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="fragment" content="!">
+	
+	<meta name="description" content="{{page_description}}">
+	
+	<base href="/index.html">
     
 	<!-- Google Font -->
 	<link href='http://fonts.googleapis.com/css?family=Raleway:700,500' rel='stylesheet' type='text/css'>
@@ -20,7 +24,6 @@
 	<!-- DateJS -->
 	<script src="lib/bower_components/datejs/date-en-NZ.min.js" type="text/javascript" charset="utf-8"></script>
 		
-	<script src="lib/bower_components/jquery/dist/jquery.min.js"></script>
 	<!-- Include all compiled plugins (below), or include individual files as needed -->
 	<!-- universal angular data here -->
 	
@@ -29,8 +32,6 @@
 	<!-- project-specific angular data here -->
 	<script src="lib/bower_components/angular-animate/angular-animate.js"></script>
 	<script src="lib/bower_components/angular-route/angular-route.js" ></script>
-	<script src="lib/bower_components/angular-resource/angular-resource.js"></script>
-	<script src="lib/bower_components/angular-cookies/angular-cookies.js"></script>
 	<script src="js/app.js"></script>
 	<script src="js/services.js"></script>
 	<script src="js/controllers.js"></script>
@@ -65,11 +66,15 @@
 	} 
 	</script>
 	
-	<script type="text/javascript">
-	(function() {
-		alert("This website is in beta and only in a testing state. No products or members or financial transaction are yet allowed to proceed. Thank you for your patience.")
-	}());
-	</script>
+<script type="text/javascript">
+/*
+(function(callback) {
+	callback()
+}(function() {
+	alert("This website is in beta and only in a testing state. No products or members or financial transaction are yet allowed to proceed. Thank you for your patience.")
+}));*/
+
+</script>
 
 </head>
 
@@ -151,21 +156,21 @@
 				</accordion-group>
 			</accordion>
 			<ul class="nav nav-pills nav-stacked">
-					<li ng-class="{active:isActive('/producer-list')}"><a href="#/producer-list">Producer List</a></li>
-					<li ng-class="{active:isActive('/producer-list')}"><a href="#/route-manager-directory">Route Manager List</a></li>
-					<li ng-class="{active:isActive('/faq')}"><a href="#/faq">User FAQ</a></li>
-					<li ng-class="{active:isActive('/my-cart')}" ng-show="currentUser"><a href="#/my-cart">Cart Page</a></li>
+					<li ng-class="{active:isActive('/producer-list')}"><a href="producer-list">Producer List</a></li>
+					<li ng-class="{active:isActive('/route-manager-directory')}"><a href="route-manager-directory">Route Manager List</a></li>
+					<li ng-class="{active:isActive('/faq')}"><a href="faq">User FAQ</a></li>
+					<li ng-class="{active:isActive('/my-cart')}" ng-show="currentUser"><a href="my-cart">Cart Page</a></li>
 					<li ng-class="{active:isActive('/order-manager')}" 
 					ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
-					><a href="#/product-manager">My Products</a></li>
+					><a href="product-manager">My Products</a></li>
 					<li ng-class="{active:isActive('/product-upload')}" 
 					ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
-					><a href="#/product-upload">Upload a Product</a></li>
+					><a href="product-upload">Upload a Product</a></li>
 					<li ng-class="{active:isActive('/producer-profile')}" 
 					ng-show="currentUser && currentUser.user_type.name === 'Producer'"
-					><a href="#/producer-profile">Edit Producer Profile</a></li>
-					<li ng-class="{active:isActive('/my-invoices')}" ng-show="currentUser"><a ng-href="#/my-invoices">Invoices</a></li>
-					<li ng-class="{active:isActive('/me/{{currentUser._id}}')}" ng-show="currentUser"><a ng-href="#/me/{{currentUser._id}}">Settings</a></li>
+					><a href="producer-profile">Edit Producer Profile</a></li>
+					<li ng-class="{active:isActive('/my-invoices')}" ng-show="currentUser"><a ng-href="my-invoices">Invoices</a></li>
+					<li ng-class="{active:isActive('/me/{{currentUser._id}}')}" ng-show="currentUser"><a ng-href="me/{{currentUser._id}}">Settings</a></li>
 			</ul>
 			<ul class="nav nav-pills nav-stacked sidebar-bottom" ng-controller="logoutCtrl">
 				<li ng-show="currentUser != null"><a ng-click="logOut()" class="text-center"><h1><span class="glyphicon glyphicon-lock"></span></h1><p>Log Out</p></a></li>
@@ -196,11 +201,11 @@
 				</ul>
 
 				<ul class="nav nav-pills pull-right">
-					<li ng-class="{active:isActive('/store')}"><a href="#/store"><span class="glyphicon glyphicon-shopping-cart"></span> Store</a></li>
-					<li ng-class="{active:isActive('/home')}"><a href="#home">Home</a></li>
-					<li ng-class="{active:isActive('/about')}"><a href="#/about">About Us</a></li>
-					<li ng-class="{active:isActive('/signup')}" ng-hide="currentUser != null"><a href="#signup">Sign Up</a></li>
-					<li ng-class="{active:isActive('/contact')}"><a href="#contact">Contact Us</a></li>
+					<li ng-class="{active:isActive('/store')}"><a href="store"><span class="glyphicon glyphicon-shopping-cart"></span> Store</a></li>
+					<li ng-class="{active:isActive('/home')}"><a href="home">Home</a></li>
+					<li ng-class="{active:isActive('/about')}"><a href="/about">About Us</a></li>
+					<li ng-class="{active:isActive('/signup')}" ng-hide="currentUser != null"><a href="signup">Sign Up</a></li>
+					<li ng-class="{active:isActive('/contact')}"><a href="contact">Contact Us</a></li>
 					<li><a href="http://blog.foodcoop.org.nz" target="_blank">Blog</a></li>
 				</ul>
 			</nav>

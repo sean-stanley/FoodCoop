@@ -16,41 +16,46 @@ angular.module('co-op.services', [])
 // Allows flash messages to be displayed on a page. Once a message is set though
 // it's generally not seen until the next route change. Primarily used for login
 // attempts and successful writes to the database.	
-	.factory("flash", function($rootScope) {
+	.factory("flash", ['$rootScope', function($rootScope) {
 		// next page message for logging out
 		// current page message for server requests
-		$rootScope.queue = [];
+		var queue = [];
 		var temp;
 		var currentMessage = {message: '', type: ''};
 
 		$rootScope.$on("$routeChangeStart", function() {
-			temp = _.filter($rootScope.queue, 'next' );
-			$rootScope.queue = [];
-			$rootScope.queue = _.map(temp, function(m) {delete m.next; return m;});
+			// get only the messages that are meant to persist to a new view
+			temp = _.filter(queue, 'next' );
+			//empty the queue
+			queue = [];
+			// make the new queue of the next messages but remove their 'next' properties they won't persist forever.
+			// if it was necessary to show more methods a simple counter could be implemented.
+			queue = _.map(temp, function(m) {delete m.next; return m;});
 		});
 
 		return {
 			setMessage: function(message) {
 				if (message.hasOwnProperty('type') ) {
-					$rootScope.queue.push(message);
+					queue.push(message);
 				}
 			},
 			setNextMessage: function(message) {
 				if (message.hasOwnProperty('type') ) {
 					message.next = true;
-					$rootScope.queue.push(message);
+					queue.push(message);
 				}
 			},
 			closeMessage: function(idx) {
-				$rootScope.queue.splice(idx, 1);
+				queue.splice(idx, 1);
 			}
 			
 		};
-	})
+	}])
 
 // Is a collection of methods for logging a user in, checking if a user is
 // logged in and logging out.	
-	.factory('LoginManager', function ($location, $rootScope, $q, Session, Restangular, flash){
+	.factory('LoginManager', ['$location', '$rootScope', '$q', 'Session', 'Restangular', 'flash',
+	 function ($location, $rootScope, $q, Session, Restangular, flash){
 		$rootScope.failedAttempts = 0;
 		
 		function getTally() {
@@ -154,7 +159,7 @@ angular.module('co-op.services', [])
 						
 						}, function(error) {
 							noSession(error);
-							result.reject("Session is expired");
+							result.reject("No Session Data");
 						});
 					}
 					
@@ -170,20 +175,20 @@ angular.module('co-op.services', [])
 				$location.path('/home');
 			}
 		};
-	})
+	}])
 
 	// called for creating new users as well as has a promise for getting all the users. Editing a
 	// user though is handled by the userEditCtrl Controller. 
-	.factory('UserManager', function($rootScope, Restangular, $location, flash) {
+	.factory('UserManager', ['$rootScope', 'Restangular', '$location', 'flash', function($rootScope, Restangular, $location, flash) {
 		return {
 			createUser: function(userinfo, callback) {
 				var cb = callback || angular.noop;
 				Restangular.all('api/user').post(userinfo).then(function(user){
 					$rootScope.currentUser = user;
 					if ($rootScope.currentUser.user_type == "Producer") {
-						$location.path("#/apply");
+						$location.path("apply");
 					}
-					else $location.path('#/welcome');
+					else $location.path('welcome');
 					cb();
 				}, function(error){flash.setMessage({type: 'danger', message: 'Drat! Failed to create a new user. '+error.data.name + ': ' + error.data.message});});
 			},
@@ -191,7 +196,7 @@ angular.module('co-op.services', [])
 			users: Restangular.all('api/user')
 			  
 		};
-	})
+	}])
 	
 	// collects and maps category id's with their names. 
 	.factory('ProductManager', ['$http', 'Restangular', '$rootScope', 'flash', function($http, Restangular, $rootScope, flash) {
@@ -361,8 +366,8 @@ angular.module('co-op.services', [])
 				
 				LoginManager.isLoggedIn().then(function() {
 					Restangular.one('api/cart', $rootScope.currentUser._id)
-					.get().then(function(cart) {
-						currentCart = Calendar.currentMonth(cart, callback);
+					.get({cycle: $rootScope.cycle}).then(function(cart) {
+					//	currentCart = Calendar.currentMonth(cart, callback);
 						return currentCart;
 					});
 				});

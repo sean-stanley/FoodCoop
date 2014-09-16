@@ -442,14 +442,9 @@ exports.configAPI = function configAPI(app) {
 		var opts, orderObject;
 		// check if the current user is authenticated
 		if (req.user) {
-			// get the cart orders for the current user.
-			models.Order.find({
-				supplier: req.user._id
-			}, null, {
-				sort: {
-					datePlaced: 1
-				}
-			}, function(e, results) {
+			// get all cart orders for the current user.
+			// optional query params will select a cycle to sort from
+			models.Order.find(req.query).find({supplier: req.user._id}).sort({datePlaced: 1}).exec( function(e, results) {
 				if (!e) {
 					// define options for replacing ID's in the order with the appropriate data from
 					// other collections. The other collections are specified with the 'ref'
@@ -528,7 +523,7 @@ exports.configAPI = function configAPI(app) {
 	
 	app.get("/api/cart/:user/length", function(req, res, next) {
 		if (req.user && req.user._id == req.params.user) {
-			models.Order.count({customer: new ObjectId(req.params.user), cycle: scheduler.currentCycle}, function(e, count) {
+			models.Order.count({customer: req.user._id, cycle: scheduler.currentCycle}, function(e, count) {
 				if (!e) {
 					res.send(count.toString());
 				}
@@ -546,14 +541,8 @@ exports.configAPI = function configAPI(app) {
 		// Server-side validation.
 		if (req.user && req.user._id == req.params.user) {
 			// get the cart orders for the current user.
-			models.Order.find({
-				customer: new ObjectId(req.params.user),
-				cycle: scheduler.currentCycle
-			}, null, {
-				sort: {
-					datePlaced: 1
-				}
-			}, function(e, results) {
+			// req.query is used for finding orders from a specific cycle
+			models.Order.find(req.query).find({customer: req.user._id}).sort({datePlaced: 1}).exec( function(e, results) {
 				if (!e) {
 					// define options for replacing ID's in the order with the appropriate data from
 					// other collections. The other collections are specified with the 'ref'

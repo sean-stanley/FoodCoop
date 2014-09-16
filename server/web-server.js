@@ -50,6 +50,13 @@ function loggedIn(req, res, next) {
 
 app.use(require('prerender-node').set('prerenderToken', 'AyY6GHZSR0aiwAuXqDzm'));
 
+
+// ensure redirects work with tidy and hashBangless URL's
+app.use(function(req, res){
+	res.sendfile(path.normalize(path.join(__dirname, '../app/index.html')));
+});
+
+
 // for deployment
 
 var server_port = config.deploy.port || 8081

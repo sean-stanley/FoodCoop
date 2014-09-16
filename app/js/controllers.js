@@ -323,7 +323,7 @@ angular.module('co-op.controllers', []).
 		$scope.submitForm = function(form) {
 			$http.post('/api/producer-applicaiton', $scope.producerApplication).success(function(result) {
 				$rootScope.flash.setMessage({type: 'success', message: 'Thank you for your application. We\'ll be in touch shortly.'});
-				$location.path("#/welcome");
+				$location.path("welcome");
 			}).error(function(result) {
 				$rootScope.flash.setMessage({type: 'danger', message: '"Oops! Something went wrong. Error Code: " + result.status + " " + result.statusText;'});
 			});

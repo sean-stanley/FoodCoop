@@ -30,6 +30,6 @@
     "commit": "a1b79ce737d101e9f155089c1344e8eba02bb29d"
   },
   "_source": "git://github.com/standup75/cropme.git",
-  "_target": "~0.1.11",
+  "_target": "*",
   "_originalSource": "angular-cropme"
 }

@@ -100,7 +100,7 @@ exports.getCycleDates = function(date) {
 	
 };
 
-exports.cycle.testDay = Date.today();
+//exports.cycle.testDay = Date.today();
 
 // SENSITIVE //
 exports.bankAccount = "01-0000-0000000-0000-000";
