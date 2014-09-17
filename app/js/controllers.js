@@ -280,24 +280,61 @@ angular.module('co-op.controllers', []).
 	};
 }])
 
+.controller('userCtrl', ['$scope', '$modal', '$location', 
+	function($scope, $modal, $location) {
+		$scope.open = function(application_type) {
+			var modalInstance = $modal.open({
+				templateUrl: 'partials/signup-form.html',
+				controller: 'userModalCtrl',
+				size: 'md',
+				resolve: {
+					data: function() {
+						return application_type;
+					}
+				}
+			});
+			
+			modalInstance.result.then(function (nextRoute) {
+				$location.path('nextRoute');		
+				
+			}, function () {
+				console.log('Modal dismissed at: ' + new Date());
+			});
+		};
+	}
+])
 
-.controller('userCtrl', ['$scope', 'Restangular', 'UserManager', '$location',
-	function($scope, Restangular, UserManager, $location) {
-
+// signup form control
+.controller('userModalCtrl', ['$scope', 'UserManager', '$modalInstance', 'data',
+	function($scope, UserManager, $modalInstance, data) {
+		
+		$scope.data = data;
+		
 		$scope.userData = {
 			password: '',
 			email: '',
 			name: '',
 			address: '',
 			user_type: {
-				name 	: "Customer", 
+				name 	: $scope.data, 
 				canBuy	: true, 
 				canSell	: false
 			}
 		};
 		
+		$scope.next_route = (data === "Producer") ? "/apply" : "/welcome";
+		
 		$scope.submitForm = function() {
-			UserManager.createUser($scope.userData);
+			UserManager.createUser($scope.userData).then(function() {
+				$modalInstance.close($scope.next_route);
+			}, function(error) {
+				$scope.message = error;
+			});
+			
+		};
+		
+		$scope.cancel = function() {
+			$modalInstance.dismiss('cancel');
 		};
 	}
 ])

@@ -54,9 +54,13 @@ a:hover {
 .carousel-indicators .active {margin: 2px 4px;}
 .carousel-indicators li {margin:3px;}
 
-.jumbotron {text-align: center;}
+.jumbotron {clear: both;
+overflow: hidden;}
+
 
 .map-frame {border:none; margin: 20px 0;}
+
+
 
 /*	-------------
 	-- Sidebar --
@@ -161,6 +165,35 @@ Content Pages
      -khtml-opacity: 0;
      opacity: 0;
     }
+/*	---- Signup Page ----	*/
+.membership {border: solid 1px #ddd; background: #eeeeee;}
+.membership-head {background-color: #8d4b73; color: white;}
+.membership-price {color: #8d4b73;}
+.membership-summary {padding: 0 1em;}
+.membership-summary > h3 {margin-top: 0; margin-bottom: 1em;}
+.membership-percs ul {margin-bottom: 0;}
+.membership-percs li { 
+	padding: 0.5em 1em; 
+	border-color: #aaa; 
+	border-style: solid; 
+	border-width: 0; 
+	border-bottom-width: 1px; 
+	background: #dddddd;
+	background: -moz-linear-gradient(top,  #dddddd 0%, #eeeeee 50%, #dddddd 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#dddddd), color-stop(50%,#eeeeee), color-stop(100%,#dddddd));
+	background: -webkit-linear-gradient(top,  #dddddd 0%,#eeeeee 50%,#dddddd 100%);
+	background: -o-linear-gradient(top,  #dddddd 0%,#eeeeee 50%,#dddddd 100%);
+	background: -ms-linear-gradient(top,  #dddddd 0%,#eeeeee 50%,#dddddd 100%);
+	background: linear-gradient(to bottom,  #dddddd 0%,#eeeeee 50%,#dddddd 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#dddddd', endColorstr='#dddddd',GradientType=0 );
+}
+.membership-percs li:first-child {border-top-width: 1px;}
+.membership-percs li > span {margin-right: 0.5em;}
+.membership-button button {font-size: 1.5em;}
+
+/* For Google Places API Autocomplete */
+.pac-container {z-index:2000!important;}
+
 
 
 /*	---- Product Upload Page ----	*/

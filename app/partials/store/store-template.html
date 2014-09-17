@@ -43,7 +43,7 @@
 			<figure class="first-layer" ng-mouseover="callDelayed()" ng-mouseleave="callCancelled()">
 				<img ng-if="product.certification.name !== 'none' && product.img && product.certification.img"
 				 ng-src="img/certification/{{product.certification.img}}" class="certification-img" alt="organic certification">
-				<img ng-src="{{product.img}}" class="img-responsive" alt="product image">
+				<img ng-src="{{product.img}}" class="img-responsive" alt="product image" ng-click="open(product)">
 				<figcaption>
 					<div class="btn-group pull-right">
 						<button class="btn btn-primary pull-right" 

@@ -919,7 +919,7 @@ exports.configAPI = function configAPI(app) {
 					passport.authenticate('local', function(err, user, info){
 						if (!user) {
 							console.log(err);
-							res.send(500);
+							res.send(500, err);
 						}
 						else {
 							req.logIn(user, function(err){

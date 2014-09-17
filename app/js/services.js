@@ -179,19 +179,21 @@ angular.module('co-op.services', [])
 
 	// called for creating new users as well as has a promise for getting all the users. Editing a
 	// user though is handled by the userEditCtrl Controller. 
-	.factory('UserManager', ['$rootScope', 'Restangular', '$location', 'flash', function($rootScope, Restangular, $location, flash) {
+	.factory('UserManager', ['$rootScope', 'Restangular', '$q', function($rootScope, Restangular, $q) {
 		return {
-			createUser: function(userinfo, callback) {
-				var cb = callback || angular.noop;
+			createUser: function(userinfo) {
+				var result = $q.defer();
 				Restangular.all('api/user').post(userinfo).then(function(user){
 					$rootScope.currentUser = user;
-					if ($rootScope.currentUser.user_type == "Producer") {
-						$location.path("apply");
-					}
-					else $location.path('welcome');
-					cb();
-				}, function(error){flash.setMessage({type: 'danger', message: 'Drat! Failed to create a new user. '+error.data.name + ': ' + error.data.message});});
+					result.resolve();
+				}, function(error){
+					var message = {type: 'danger', message: 'Drat! Failed to create a new user. '+error.data.name + ': ' + error.data.message};
+					console.log(error);
+					result.reject(message);
+				});
+			return result.promise;
 			},
+			
 			// this is a promise. Call users.getList() to get the array of users. 
 			users: Restangular.all('api/user')
 			  

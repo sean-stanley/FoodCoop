@@ -38,7 +38,7 @@ angular.module('co-op', [
 		})
 		.when('/terms-cons', {templateUrl: 'partials/legal/terms-cons.html', reloadOnSearch: false, title: 'Terms and Conditions'})
 		.when('/priv-pol', {templateUrl: 'partials/legal/priv-pol.html', reloadOnSearch: false, title: 'Privacy Policy'})
-		.when('/policy', {templateUrl: 'partials/legal/policy.html', reloadOnSearch: false, title: 'Policies Handbook'})
+		.when('/policy', {templateUrl: 'partials/legal/policy.html', reloadOnSearch: false, title: 'Policy Handbook'})
 		.when('/users-rights', {
 			templateUrl: 'partials/admin/users-rights.html', 
 			controller: 'userAdminCtrl', 
@@ -218,7 +218,7 @@ angular.module('co-op', [
 		// 401 error but a custom error to avoid the regular errorInterceptor the app
 		// uses. 
 		LoginManager.isLoggedIn('initial').catch(function(reason) {
-			$location.path('/');
+			//$location.path('/');
 		});
 		
 		Restangular.setErrorInterceptor(function(response, deferred, responseHandler) {

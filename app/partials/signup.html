@@ -1,90 +1,100 @@
-<div class="page-header">
-	<h1>Join the Northland Natural Food Co-op</h1>
-</div>
-<div class="col-md-6">
-	<table class="table">
-		<thead>
-			<td>MEMBERSHIP</td>
-			<td>COST</td>
-		</thead>
-		<tbody>
-			<tr>
-				<td>Customer</td>
-				<td>$60</td>
-			</tr>
-			<tr>
-				<td>Producer</td>
-				<td>$120</td>
-			</tr>
-		</tbody>
-	</table>
-	<p>Members all own one share of the Northland Natural Food Co-op</p>
-	<p>This share entitles the holder to vote at the AGM and any other shareholder meetings of the NNFC as outlined in the constitution. It also entitles the shareholder’s household to participate in services run and organised by the NNFC for member’s benifit.</p>
+<div class="row">
 	
-	<p>As we are a grassroots movement attempting to keep costs down, we do not have any systems for handling payments through our website at this time. Should you wish to be a member, we will send you an invoice via email. We would appreciate you paying for this as soon as possible as the money goes to support our services and costs of business.</p>
-	
-	<p>Please note that membership is 100% refundable should you no longer wish to be a member.</p>
+	<div class="col-sm-10 col-sm-offset-1">
+		<div class="page-header">
+			<h1>Sign Up</h1>
+		</div>
 		
-</div>
-
-<form name="signUp" autocomplete="on" ng-submit="submitForm()" novalidate class="col-md-6">		
-	<legend>Fill out this form to become a member</legend>
-	<div class="form-group">
-		<label for="email">Email address</label>
-		<input ng-model="userData.email" name="email" type="email" class="form-control" placeholder="Enter email" required>
-		<div class="custom-error" ng-show="signUp.email.$dirty && signUp.email.$invalid">Sorry:
-			<span ng-show="signUp.email.$error.required">email is required.</span>
-			<span ng-show="signUp.email.$error.email">Please, write a valid email address.</span>
-		</div>
-	</div>
-	
-	<div class="form-group">
-		<label for="pw">Create a Password</label>
-		<input type="password" class="form-control" ng-model="userData.password" name="pw" placeholder="Enter a Password" required>
-	</div>
-	
-	<div class="form-group">
-		<label for="userFullName">Full Name</label>
-		<input ng-model="userData.name" name="userFullName" type="text" class="form-control" placeholder="Full Name" required>
-		<div class="custom-error" ng-show="signUp.userFullName.$dirty && signUp.userFullName.$invalid">		Sorry:
-			<span ng-show="signUp.userFullName.$error.required">Full name is required.</span>
-		</div>
-	</div>
-	
-	
-	<div class="form-group" ng-controller="geoCtrl">
-		<label for="address">Address</label>
-		<input type="text" id="Autocomplete" class="form-control" ng-autocomplete="userData.address" details="addressDetails" options="addressOptions" ng-model="userData.address"/>
 		
-		<div class="custom-error" ng-show="signUp.address.$dirty && signUp.address.$invalid">		Sorry:
-			<span ng-show="signUp.userFullName.$error.required">Your NZ address is required.</span>
+		<div class="membership col-md-4 col-md-offset-1 col-sm-6">
+			<div class="row membership-head"><h1 class="text-center">Customer</h1></div>
+			<div class="row membership-price"><h1 class="text-center" >$60</h1></div>
+			<div class="row membership-summary"><h3 class="text-center">BUY LOCAL FOOD</h3></div>
+			<div class="row membership-percs">
+				<ul class="list-unstyled">
+					<li><span class="glyphicon glyphicon-ok"></span> 100% refundable</li>
+					<li><span class="glyphicon glyphicon-ok"></span> Know who produced your food</li>
+					<li><span class="glyphicon glyphicon-ok"></span> Know how your food was produced</li>
+					<li><span class="glyphicon glyphicon-ok"></span> Know exactly where your food comes from</li>
+				</ul>
+			</div>
+			<div class="row membership-button"><button class="btn btn-primary btn-block" ng-click="open('Customer')">JOIN</button></div>
+		</div>
+		<div class="membership col-md-4 col-md-offset-1 col-sm-6">
+			<div class="row membership-head"><h1 class="text-center">Producer</h1></div>
+			<div class="row membership-price"><h1 class="text-center">$120</h1></div>
+			<div class="row membership-summary"><h3 class="text-center">BUY &amp; SELL LOCAL FOOD</h3></div>
+			<div class="row membership-percs">
+				<ul class="list-unstyled">
+					<li><span class="glyphicon glyphicon-ok"></span> 100% refundable</li>
+					<li><span class="glyphicon glyphicon-ok"></span> Upload your products to sell</li>
+					<li><span class="glyphicon glyphicon-ok"></span> Make new business connections</li>
+					<li><span class="glyphicon glyphicon-ok"></span> You set the prices!</li>
+				</ul>
+			</div>
+			<div class="row membership-button"><button class="btn btn-primary btn-block" ng-click="open('Producer')">JOIN</button></div>
 		</div>
 	</div>
-	
-	<div class="form-group">
-		<label for="phone">Phone</label>
-		<input type="tel" class="form-control" ng-model="userData.phone" name="phone" placeholder="Enter your preferred phone number" required>
-		<div class="custom-error" ng-show="signUp.phone.$dirty && signUp.phone.$invalid">		Sorry:
-			<span ng-show="signUp.userFullName.$error.required">Please give us a valid phone number to use to quickly sort out issues.</span>
-		</div>
-	</div>
-	
-	<div class="checkbox">
-		<label>
-		<input type="checkbox" ng-model="userData.user_type.name" value="Producer"> I want to sell products too!
-		</label>
-	</div>
-	
-	<div class="form-group">
-		<small>By clicking 'Join' you agree to pay your membership fee and also agree to the <a href="#terms-cons">Terms and Conditions</a> as well as our <a href="#priv-pol">Privacy Policy</a></small>
-	</div>
-
-	<div class="form-group">
-		<button type="submit" class="btn btn-default" ng-disabled="signUp.$invalid">Join</button>
-	</div>
-</form>
-
-	
-	
+</div>
 <br>
 <br>
+<div class="row">
+	<article class="col-lg-10 col-lg-offset-1">
+		<div class="jumbotron">
+			<h1>
+				Want an easy way to buy &amp; sell local food?
+			</h1>
+			<p>As a member of the Northland Natural Food Coop, you can <strong>buy</strong> and <strong>sell</strong> local food through our online store. Simply upload your products or place your order <strong>online.</strong> The food is then delivered to our offices, and <strong>distributed</strong> to pick-up sites all over Northland for customers to <strong>collect.</strong></p>
+			<div class="col-sm-3"><button class="btn btn-primary btn-lg" ng-click="open('Customer')">Join as a Customer</button></div>
+			<div class="col-sm-3"><button class="btn btn-primary btn-lg" ng-click="open('Producer')">Join as a Producer</button></div>
+		</div>
+		<div class="jumbotron">
+			<h1>
+				Want assurance your food is fresh, healthy and local?
+			</h1>
+			<p>As a customer, you will know exactly <strong>who</strong> produced your food, as well as <strong>where</strong> and <strong>how</strong> it was grown or raised. This gives you a unique opportunity to support the producers and <strong>production practices</strong> of your choice.</p>
+			<div class="col-sm-3"><button class="btn btn-primary btn-lg" ng-click="open('Customer')">Join as a Customer</button></div>
+		</div>		
+		<div class="jumbotron">
+			<h1>
+				Want a fair price for your products?
+			</h1>
+			<p>As a producer, you will have complete <strong>control</strong> over the sale of your products. You set the <strong>prices</strong>; you decide what to sell, when to sell, and how much to sell. Regardless of your <strong>scale</strong> of operation, you will be connected with consumers who value quality products, healthy local economies, and a <strong>fair income</strong> for your work.</p>
+			<div class="col-sm-3"><button class="btn btn-primary btn-lg" ng-click="open('Producer')">Join as a Producer</button></div>
+		</div>
+		
+		
+		<div class="jumbotron">
+			<h1>
+				We are a 100% member owned social enterprise
+				
+			</h1>
+			<div class="col-sm-6">
+				<p>The NNFC is 100% member owned and operated, so by signing up, you also become a <strong>shareholder</strong>. You will receive a percentage of the co-op’s <strong>profits</strong> each year, and have the right to <strong>vote</strong> on all major decisions.</p>
+			</div>
+			<div class="col-sm-6">
+				<p>For details, see our <a href="/policy">policy handbook</a></p>
+				<button class="btn btn-primary btn-lg" ng-click="open('Customer')">Join as a Customer</button>
+				<button class="btn btn-primary btn-lg" ng-click="open('Producer')">Join as a Producer</button>
+			</div>
+		</div>
+		<div class="jumbotron">
+			<h1>
+				Pay just once. No yearly fee or subscription
+			</h1>
+			<div class="col-lg-6">
+				<p>The <strong>one time cost</strong> of joining gives you and your household <strong>lifetime</strong> membership in the NNFC. You will gain access to our <strong>exclusive online store</strong>, have the right to <strong>vote</strong> on all major decisions about the co-op, and receive a percentage of the co-op’s <strong>profits</strong> each year.</p>
+			</div>
+			<div class="col-lg-6">
+				<p>Current fees are as follows:<br>
+					Customer Membership costs $60.00<br>
+					Producer Membership costs $120.00
+				</p>
+				
+				<button class="btn btn-primary btn-lg" ng-click="open('Customer')">Join as a Customer</button>
+				<button class="btn btn-primary btn-lg" ng-click="open('Producer')">Join as a Producer</button><br>
+				<small>All prices are in NZD</small>
+			</div>
+		</div>
+	</article>
+</div>
