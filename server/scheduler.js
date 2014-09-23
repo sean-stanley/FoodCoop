@@ -24,7 +24,7 @@ var orderCycleChecker = schedule.scheduleJob({hour:0, minute: 0}, checkConfig);
 // schedule emails to send alerting members that it is delivery day.
 // To be executed at 9:15am Wednesday;
 function checkConfig() {
-	console.log(Date.now() + " checking if today is a significant day")
+	console.log(Date.now().toString() + ". Checking if today is a significant day")
 	var today = Date.today(), cycle = config.cycle, key;
 
 	// test for an exact day match and run reminder email functions if it is.
