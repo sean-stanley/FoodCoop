@@ -4,9 +4,10 @@
 /* Controllers */
 
 angular.module('co-op.controllers', []).
-    controller('MyCtrl1', [
-    	function() {
-
+    controller('MyCtrl1', ['$scope', 'flash',
+    	function($scope, flash) {
+			$scope.flash = flash;
+			console.log('Flash service initialized');
     	}
     ])
 	
@@ -14,7 +15,7 @@ angular.module('co-op.controllers', []).
 		function($scope, $location, flash) {
 			// init			
 			$scope.predictiveSearch = [];
-			$scope.flash = flash;
+			
 			
 			// Date info for use in the app
 			$scope.today = Date.today().toString("ddd d MMM yyyy");
@@ -726,14 +727,16 @@ angular.module('co-op.controllers', []).
 }])
 
 
-.controller('contactCtrl', ['$scope', 'MailManager', '$route',
-	function($scope, MailManager, $route) {		
+.controller('contactCtrl', ['$scope', 'MailManager', '$route', '$location',
+	function($scope, MailManager, $route, $location) {		
 		$scope.mail = {
 			name: '',
 			email: '',
-			subject: '',
 			message: ''
 		};
+		var search = $location.search();
+		
+		$scope.mail.subject = search.hasOwnProperty('subject') ? search.subject : '';
 		
 		$scope.submitForm = function(mail) {
 			MailManager.mail(mail, function() {
@@ -975,6 +978,27 @@ angular.module('co-op.controllers', []).
 	}
 
 ])
+
+.controller('productUICtrl', ['$scope', '$timeout',
+	function($scope, $timeout) {
+		var timer;
+
+		$scope.callDelayed= function () {
+			if(timer){
+				$timeout.cancel(timer);
+			}
+			timer = $timeout(function(){
+				$scope.detailsVisible = true;// run code
+                timer = undefined;
+			}, 1000);
+		};
+
+		$scope.callCancelled = function() { $timeout.cancel(timer); };
+
+		$scope.$on("$destroy", function(event) { $timeout.cancel(timer); });
+	}
+])
+
 .controller('calendarCtrl', ['$scope', '$rootScope', '$http', 'Calendar',
 	function($scope, $rootScope, $http, Calendar) {
 		$scope.countDown = [];
@@ -1007,11 +1031,12 @@ angular.module('co-op.controllers', []).
 				plural = start.daysUntil != 1 ? 's' : '';
 				future = start.future;
 				if (future) return 'starts in '+ start.daysUntil + ' day'+ plural;
+				
 				else {
 					present = end.future;
 					plural = Math.abs(end.daysUntil) != 1 ? 's' : '';
 					if (present) return 'is open for '+ end.daysUntil + ' more day'+ plural;
-					else return 'was '+ Math.abs(end.daysUntil) + ' day'+ plural+ " ago";
+					else return "is over for this month.";//return 'was '+ Math.abs(end.daysUntil) + ' day'+ plural+ " ago";
 				}
 			};
 			
@@ -1021,24 +1046,4 @@ angular.module('co-op.controllers', []).
 			
 		});
 	}	
-])
-
-.controller('productUICtrl', ['$scope', '$timeout',
-	function($scope, $timeout) {
-		var timer;
-
-		$scope.callDelayed= function () {
-			if(timer){
-				$timeout.cancel(timer);
-			}
-			timer = $timeout(function(){
-				$scope.detailsVisible = true;// run code
-                timer = undefined;
-			}, 1000);
-		};
-
-		$scope.callCancelled = function() { $timeout.cancel(timer); };
-
-		$scope.$on("$destroy", function(event) { $timeout.cancel(timer); });
-	}
 ]);

@@ -1,21 +1,16 @@
-
-
-#login-button {
-	position: absolute;
-	top: 10px;
-	right: 10px;
+#slide1 {background: url('/img/cheese-wine-meat-sm.jpg') no-repeat; background-position: top center;}
+#slide2 {background: url('/img/cow-nosey-sm.jpg') no-repeat; background-position: top center;}
+#slide3 {background: url('/img/farm_wallpaper-sm.jpg') no-repeat; background-position: top center;}
+#slide4 {background: url('/img/crowd2-sm.jpg') no-repeat; background-position: top center;}
+#slide5 {background: url('/img/directory-books-sm.jpg') no-repeat; background-position: top center;}
+@media (min-width: 769px) {
+	#slide1 {background: url('/img/originals/cheese-wine-meat.jpg') no-repeat; background-position: top center;}
+	#slide2 {background: url('/img/originals/cow-nosey.jpg') no-repeat; background-position: top center;}
+	#slide3 {background: url('/img/originals/farm_wallpaper.jpg') no-repeat; background-position: top center;}
+	#slide4 {background: url('/img/originals/crowd2.jpg') no-repeat; background-position: top center;}
+	#slide5 {background: url('/img/originals/directory-books.jpg') no-repeat; background-position: top center;}
 }
 
-.login-button {
-	position: relative;
-
-}
-
-.login button.close {
-	position: absolute;
-	right: 15px;
-	top: 5px;
-}
 
 .feature-box {
 	margin: auto;

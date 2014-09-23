@@ -1,46 +1,53 @@
 
-<carousel interval="6000">
-		<slide>
-			<img src="/img/farm-banner.jpg" style="margin:auto;">
+<carousel interval="interval"  ng-init="interval=-5000">
+		<slide id="slide1" full-hero>
+			<!--<img src="/img/originals/cheese-wine-meat.jpg" style="margin:auto;">-->
+			<div class="carousel-caption" ng-mouseenter="interval = -1" ng-mouseleave="interval = 3000">
+				<h1>Produce • Meat • Dairy • Baked Goods</h1>
+				<p><a class="btn btn-primary btn-lg" role="button" href="/store">All in our Store</a></p>
+			</div>
+		</slide>
+		<slide id="slide2" full-hero>
+			<!--<img src="/img/originals/cow-nosey.jpg" style="margin:auto;">-->
 			<div class="carousel-caption">
-				<h1>Become a member in three simple steps</h1>
-				<p><a class="btn btn-primary btn-lg" role="button" href="#/signup">Sign Up</a></p>
+				<h1>Got local food? Sell through us</h1>
+				<p><a class="btn btn-primary btn-lg" role="button" href="/signup">Sign up</a></p>
+			</div>
+		</slide>
+		<slide id="slide3" full-hero>
+			<!--<img src="/img/originals/farm_wallpaper.jpg" style="margin:auto;">-->
+			<div class="carousel-caption">
+				<h1 class="text-center">Sign Up</h1>
+				<h1 class="text-center big-icons">
+					<span class="glyphicon glyphicon-pencil"></span><span class="glyphicon glyphicon-arrow-right"></span>
+					<span class="glyphicon glyphicon-envelope"></span><span class="glyphicon glyphicon-arrow-right"></span>
+					<span class="glyphicon glyphicon-user"></span>
+				</h1>
+				<h2 class="text-center">send details • pay invoice • login</h2>
+				<p><a class="btn btn-primary btn-lg" role="button" href="/signup">Sign Up</a></p>
+			</div>
+		</slide>
+		<slide id="slide4" full-hero>
+			<!--<img src="/img/originals/crowd2.jpg" style="margin:auto;">-->
+			<div class="carousel-caption">
+				<h1>We are 100% Member Owned</h1>
+				<p><a class="btn btn-primary btn-lg" role="button" href="/about">Read More</a></p>
 			</div>
 		</slide>
 		
-		<slide>
-			<img src="/img/cow-nosey-banner.jpg" style="margin:auto;">
-			<div class="carousel-caption">
-				<h1>Got local food? Sell through us</h1>
-				<p><a class="btn btn-primary btn-lg" role="button" href="#/signup">Apply Now</a></p>
-			</div>
-		</slide>
-		<slide>
-			<img src="/img/crowd-banner.jpg" style="margin:auto;">
-			<div class="carousel-caption">
-				<h1>We are 100% Member Owned</h1>
-				<p><a class="btn btn-primary btn-lg" role="button" href="#/about">Read More</a></p>
-			</div>
-		</slide>
-		<slide>
-			<img src="/img/cheese-wine-meat-fruit-buns-banner.jpg" style="margin:auto;">
-			<div class="carousel-caption">
-				<h1>Produce • Meat • Dairy • Baked Goods</h1>
-				<h3>All in our store</h3>
-				<p><a class="btn btn-primary btn-lg" role="button" href="#/about">Read More</a></p>
-			</div>
-		</slide>
-		<slide>
-			<img src="/img/directory-banner.jpg" style="margin:auto;">
+		<slide id="slide5" full-hero>
+			<!--<img src="/img/originals/directory-books.jpg" style="margin:auto;">-->
 			<div class="carousel-caption">
 		    	<h1>Producer Directory</h1>
 		    	<h3>We have a directory of all our producers conveniently available online</h3>
-		    	<p><a class="btn btn-primary btn-lg" role="button" href="#/producer-list">See Directory</a></p>
+		    	<p><a class="btn btn-primary btn-lg" role="button" href="/producer-list">See Directory</a></p>
 			</div>
 		</slide>
 </carousel>
+
+<!--
 <div class="jumbotron">
-	<h1 class="text-center">Join in three steps</h1>
+	<div class="container"><h1 class="text-center">Join in three steps</h1>
 	<h1 class="text-center big-icons">
 		<span class="glyphicon glyphicon-pencil"></span><span class="glyphicon glyphicon-arrow-right"></span>
 		<span class="glyphicon glyphicon-envelope"></span><span class="glyphicon glyphicon-arrow-right"></span>
@@ -48,15 +55,17 @@
 	</h1>
 	<h2 class="text-center">fill out your details • pay the invoice • login</h2>
 	<br>
-	<p class="text-center"><a class="btn btn-primary btn-lg" role="button" href="#/about">Join Now</a></p>
+	<p class="text-center"><a class="btn btn-primary btn-lg" role="button" href="/signup">Sign Up Now</a></p></div>
 	
 </div>
+
 <div class="jumbotron">
 	<h2 class="text-center">The NNFC's job is to:</h2> <h1 class="text-center">support and strengthen our local food economy</h1>
 	<br>
-	<p><a class="btn btn-primary btn-lg" role="button" href="#/about">Read More</a></p>
+	<p><a class="btn btn-primary btn-lg" role="button" href="/about">Read More</a></p>
 	
 </div>
+
                     
 <div class="row">
 	<div class="col-md-1"></div>
@@ -69,8 +78,10 @@
 		<ol>
 			<li>Each month, our producer members post fresh products on our website</li>
 			<li>Members then orders from the various producers</li>
-			<li>On <a href="#/faq#delivery-day">Delivery Day</a> orders get collected from Whangarei or a central location in their community</li>
+			<li>On <a href="/faq#delivery-day">Delivery Day</a> orders get collected from Whangarei or a central location in their community</li>
 		</ol>
-		<p>For more details about the co-op please check our <a href="#/faq">FAQ page</a>.</p>
+		<p>For more details about the co-op please check our <a href="/faq">FAQ page</a>.</p>
 	</div>
 	<div class="col-md-1"></div>
+
+-->

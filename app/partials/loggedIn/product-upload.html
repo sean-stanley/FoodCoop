@@ -40,7 +40,7 @@
 					<ul class="list-unstyled">
 						<li ng-repeat="i in currentProducts">
 							<button type="button" class="close" aria-hidden="true" ng-click="delete($index, i._id)">&times;</button>
-							<a ng-href="#/product-upload/{{i._id}}">{{i.fullName}}</a>
+							<a ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a>
 						</li>
 					</ul>
 				</accordion-group>
@@ -54,7 +54,7 @@
 						</thead>
 						<tbody>
 							<tr ng-repeat="i in lastMonthProducts | orderBy:predicate:reverse ">
-								<td><a ng-href="#/product-upload/{{i._id}}">{{i.fullName}}</a></td>
+								<td><a ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a></td>
 								<td>{{i.dateUploaded|shortDate}}</td>
 							</tr>
 						</tbody>
@@ -70,7 +70,7 @@
 						</thead>
 						<tbody>
 							<tr ng-repeat="i in allProducts | orderBy:predicate:reverse ">
-								<td><a ng-href="#/product-upload/{{i._id}}">{{i.fullName}}</a></td>
+								<td><a ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a></td>
 								<td>{{i.dateUploaded|shortDate}}</td>
 							</tr>
 						</tbody>

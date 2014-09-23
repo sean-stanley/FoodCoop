@@ -8,7 +8,6 @@
 <div class="col-md-6">
 
 <h2>{{month}} Products</h2>
-[ <a href="" ng-click="predicate=''">unsorted</a> ]
 <table class="table">
 <thead>
 	<tr>
@@ -25,7 +24,7 @@
 			<button type="button" class="close" aria-hidden="true" ng-click="delete($index, i._id)">&times;</button>
 		</td>
 		<td data-title="'Product'" >
-             <a ng-href="#/product-upload/{{i._id}}">{{i.fullName}}</a>
+             <a ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a>
         </td>
 
         <td data-title="'Price'">
@@ -55,7 +54,7 @@
 			<tbody>
 				<tr ng-repeat="i in recentProducts | orderBy:predicate:reverse " >
 			        <td data-title="'Product'" >
-			             <a ng-href="#/product-upload/{{i._id}}">{{i.fullName}}</a>
+			             <a ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a>
 			        </td>
 	       
 			        <td data-title="'Price'">
@@ -81,7 +80,7 @@
 			<tbody>
 				<tr ng-repeat="i in products | orderBy:predicate:reverse " >
 			        <td data-title="'Product'" >
-			            <a ng-href="#/product-upload/{{i._id}}">{{i.fullName}}</a>
+			            <a ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a>
 			        </td>
 	       
 			        <td data-title="'Price'">
@@ -100,13 +99,13 @@
 	<h2>Unfulfilled Orders <small>Total: {{orderTotal(currentOrders) | currency}}</small></h2>
 	<table class="table">
 		<thead ng-repeat-start="order in sortedOrders">
-			<tr><th colspan="4"><a ng-href="#/contact/{{order._id._id}}">{{order._id.name}} <small>email customer</small></a></th></tr>
+			<tr><th colspan="4"><a ng-href="/contact/{{order._id._id}}">{{order._id.name}} <small>email customer</small></a></th></tr>
 			<tr><th>Product</th><th>Quantity</th><th>Unit Price</th><th>Price</th></tr>
 		</thead>
 		<tbody ng-repeat-end>
 			<tr ng-repeat="i in order.orders">
 		        <td data-title="'Product'" >
-		            <a ng-href="#/product-upload/{{i._id}}">{{i.product.fullName}}</a>
+		            <a ng-href="/product-upload/{{i._id}}">{{i.product.fullName}}</a>
 		        </td>
  				<td data-title="'Quantity'">
  					{{i.quantity}}
@@ -136,10 +135,10 @@
 				<tbody>
 					<tr ng-repeat="i in recentOrders | orderBy:predicate:reverse " >
 				        <td data-title="'Customer'">
-							<a ng-href="#/contact/{{i.customer._id}}">{{i.customer.name}}</a>
+							<a ng-href="/contact/{{i.customer._id}}">{{i.customer.name}}</a>
 						</td>
 						<td data-title="'Product'" >
-				            <a ng-href="#/product-upload/{{i._id}}">{{i.product.fullName}}</a>
+				            <a ng-href="/product-upload/{{i._id}}">{{i.product.fullName}}</a>
 				        </td>
 				        <td data-title="'Price'">
 				            {{i.unitPrice | currency}} / {{i.product.units}}
@@ -172,10 +171,10 @@
 							{{i.datePlaced | shortDate}}
 						</td>
 						<td data-title="'Customer'">
-							<a ng-href="#/contact/{{i.customer._id}}">{{i.customer.name}}</a>
+							<a ng-href="/contact/{{i.customer._id}}">{{i.customer.name}}</a>
 						</td>
 						<td data-title="'Product'" >
-				            <a ng-href="#/product-upload/{{i._id}}">{{i.product.fullName}}</a>
+				            <a ng-href="/product-upload/{{i._id}}">{{i.product.fullName}}</a>
 				        </td>
 				        <td data-title="'Price'">
 				            {{i.unitPrice | currency}} / {{i.product.units}}

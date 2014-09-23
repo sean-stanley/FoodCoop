@@ -35,7 +35,7 @@
 	transform: translateX(-130%);
 }
 
-.login {
+.login, .alert {
 	-ms-transform-origin:center top;
 	-webkit-transform-origin:center top;
 	transform-origin:center top;
@@ -125,5 +125,27 @@
 
 .sidebar > div.ng-hide-add, .sidebar > div.ng-hide-active {opacity: 0;}
 .sidebar > div.ng-hide-remove, .sidebar > div.ng-hide-remove-active {opacity: 1;}
+
+/* ALERTS */
+.alert.ng-hide-add-active,
+.alert.ng-hide-remove-active {transition: 400ms linear all;}
+
+.alert.ng-enter, .alert.ng-leave-active {
+	-moz-transform: scale(0);
+	-webkit-transform: scale(0);
+	-o-transform: scale(0);
+	-ms-transform: scale(0);
+	transform: scale(0);
+}
+
+.alert.ng-enter-active, .alert.ng-leave {
+	-moz-transform: scale(1);
+	-webkit-transform: scale(1);
+	-o-transform: scale(1);
+	-ms-transform: scale(1);
+	transform: scale(1);
+}
+
+
 
 

@@ -1,11 +1,5 @@
 @font-face {
 	font-family: Nevis;
-	/* src: local("nevis"), 
-		url(/css/fonts/nevis.woff),
-		url(/css/fonts/nevis.ttf),
-		url(/css/fonts/nevis.svg)
-		url(/css/fonts/nevis.otf);
-	*/
 	src: 
 		url(/css/fonts/nevis.woff),
 		url(/css/fonts/nevis.ttf),
@@ -25,42 +19,88 @@ a:hover {
 	cursor: pointer;
 }
 
-#wrap {
-	margin: auto;
-	max-width: 1600px;
+/* WRAP */
+html, body {
+  height: 100%;
+}
+.page-wrap {
+  min-height: 100%;
+  /* equal to footer height */
+  margin-bottom: -144px; 
+}
+.page-wrap:after {
+  content: "";
+  display: block;
+}
+.site-footer, .page-wrap:after {
+  /* .push must be the same height as footer */
+  height: 144px; 
+}
+.site-footer {
+	background-color: #652c4a;
+	color: white;
 }
 
-.nav-pills > li > a {
-	-webkit-border-radius: 0 0 2px 2px;
-	border-radius: 0 0 2px 2px;
+
+
+
+
+#view {clear: both;overflow: hidden;}
+
+.alerts-open {margin-top:0;}
+
+.alerts-closed {margin-top: 51px;}
+
+/* Navigation */
+
+.login button.close {
+	position: absolute;
+	right: 15px;
+	top: 5px;
 }
 
-.horizontal-nav {
-	clear: both;
-	overflow: auto;
-	padding-bottom: 3px;
-	border-bottom: #eee 1px solid;
-	
+#login {color: #999; padding: 10px 15px; line-height: 20px; display: block;}
+#login:hover {color: #fff; text-decoration: none; background: #060606;}
+
+@media (min-width: 768px) {
+	#login {padding-top: 15px; padding-bottom: 15px;}
 }
+
+.navbar-toggle {border-color: #333;}
+.navbar-toggle .icon-bar {background-color: white;}
+
 
 .big-icons {
 	font-size: 7em;
 }
 .big-icons span {margin: 0 10px;}
 
-.carousel {margin-bottom: 30px;}
-.carousel-caption {padding: 30px; background-color: rgba(0,0,0,0.5); top: 3em; bottom: inherit;}
+.carousel {margin-bottom: 0px;}
+.carousel-caption {padding: 20px; top: 25%; font-size: 0.6em;}
+@media (min-width: 768px) {
+	.carousel-caption {padding: 30px; font-size: 1em;}
+}
 .carousel-caption h1 {font-size: 3.5em;}
 .carousel-indicators .active {margin: 2px 4px;}
 .carousel-indicators li {margin:3px;}
+.carousel img {
+	-moz-filter: brightness(80%);
+	-ms-filter: brightness(80%);
+	-o-filter: brightness(80%);
+	-webkit-filter: brightness(80%);
+	filter: brightness(80%);
+}
 
-.jumbotron {clear: both;
-overflow: hidden;}
 
+.img-content {clear: both; overflow: hidden; padding: 0; width:100%; background-color: #eeeeee; position: relative;}
+.jumbotron > h2 {font-size: 3em;}
+.img-content > .img-column {height: 650px; float:left; margin-right: 30px;}
+.img-column > img {height: 100%; width: auto;}
+.img-column.img-right {margin-right:0!important; margin-left: 30px;}
+
+.sheep {background: #DDD url('img/agricultural_landscape.jpg') no-repeat fixed top center;}
 
 .map-frame {border:none; margin: 20px 0;}
-
-
 
 /*	-------------
 	-- Sidebar --
@@ -70,7 +110,7 @@ overflow: hidden;}
 	position: fixed;
 	z-index: 999;
 	height: 100%;
-	background: #303030;
+	background: #222222;
 	overflow: scroll;
 	color: #aaa;
 }
@@ -82,13 +122,17 @@ overflow: hidden;}
 }
 
 #calendar-container, #sidebar li {cursor: pointer; border-left: solid 10px #642c4a;}
+#calendar-container > p {padding: 10px 15px}
 #sidebar .nav-stacked > li + li {margin-top: 0;}
 #sidebar li > a {border-radius:0; color: #aaa;}
 #sidebar .nav > li > a:hover, .nav > li > a:focus {background-color:#642c4a; color: white;}
-#close-sidebar-button {padding: 20px;}
+#close-sidebar-button {padding: 0 20px; display:block; margin-top: 51px;}
 #close-sidebar-button:hover {color:white;}
 
-.sidebar-bottom {margin-top: 30px; position: absolute; bottom: 0; width: 100%; border:none;}
+.sidebar-main {margin-bottom: -102px; height:100%;}
+.sidebar-main:after {content:"";display:block;}
+.sidebar-bottom, .sidebar-main:after {height: 122px;}
+.sidebar-bottom {width: 100%; border:none;}*/
 
 #calendar-container:hover, #sidebar .panel-heading:hover, #sidebar li:hover {border-color: #ddd; background: #642c4a; color: white;}
 
@@ -118,6 +162,10 @@ overflow: hidden;}
 .image-drop div {margin-top:2.3em;}
 .image-drop div p{margin-bottom:-10px;}
 
+/*	------------------
+	-- Alerts --
+	------------------	*/
+.alerts:first-child {margin-top:66px;}
 
 /*
 ProducerList Page
@@ -135,8 +183,6 @@ ProducerList Page
 	background: white;
 	margin-right: 30px;
 }
-
-
 
 /*
 Content Pages
@@ -193,8 +239,6 @@ Content Pages
 
 /* For Google Places API Autocomplete */
 .pac-container {z-index:2000!important;}
-
-
 
 /*	---- Product Upload Page ----	*/
 img.certification-img {
@@ -317,49 +361,14 @@ a.panel-btn-sml {
 /* Store Modal */
 figure.store-modal {width: 400px; position: relative;}
 
-
-
-
-
-
-
-/* www.\befundoo.com/university/tutorials/angularjs-directives-tutorial/ */
-
-/*
-.rating{
-  color: #a9a9a9;
-  margin: 0;
-  padding: 0;
-}
-
-ul.rating {
-  display: inline-block;
-}
-
-.rating li {
-  list-style-type: none;
-  display: inline-block;
-  padding: 1px;
-  text-align: center;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.rating .filled {
-  color: #21568b;
-}*/
-
-#footer {
-	background-color: #652c4a;
-	color: white;
-	margin-top: 4em;
-}
-
 #footer-nav ul.nav > li > a {
 	color: white;
-	font-size: 0.7em;
+	font-size: 0.9em;
 }
 
 #footer-nav ul.nav > li > a:hover {
 	color: #652c4a;
 }
+
+.site-footer .row small > a {color: white;}
+.site-footer .row small > a:hover {color: #ddd; text-decoration: none;}

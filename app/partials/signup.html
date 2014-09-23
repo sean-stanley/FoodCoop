@@ -13,9 +13,9 @@
 			<div class="row membership-percs">
 				<ul class="list-unstyled">
 					<li><span class="glyphicon glyphicon-ok"></span> 100% refundable</li>
-					<li><span class="glyphicon glyphicon-ok"></span> Know who produced your food</li>
-					<li><span class="glyphicon glyphicon-ok"></span> Know how your food was produced</li>
-					<li><span class="glyphicon glyphicon-ok"></span> Know exactly where your food comes from</li>
+					<li><span class="glyphicon glyphicon-ok"></span> Support sustainability!</li>
+					<li><span class="glyphicon glyphicon-ok"></span> Know your food</li>
+					<li><span class="glyphicon glyphicon-ok"></span> Eat Well</li>
 				</ul>
 			</div>
 			<div class="row membership-button"><button class="btn btn-primary btn-block" ng-click="open('Customer')">JOIN</button></div>
@@ -39,53 +39,87 @@
 <br>
 <br>
 <div class="row">
-	<article class="col-lg-10 col-lg-offset-1">
+	<div class="img-content jumbotron">
+		<div class="img-column hidden-sm hidden-xs">
+			<img src="../img/happy-customer-producer.jpg" alt="Agricultural Landscape">
+		</div>
 		<div class="jumbotron">
-			<h1>
-				Want an easy way to buy &amp; sell local food?
-			</h1>
+				<h2 class="text-center">
+					Want an easy way to
+				</h2>
+			<h1 class="text-center">buy &amp; sell local food?</h1>
+			<br>
+			<p>Producers: <a href="">upload</a> your product and pricing information. Consumers: place your monthly order. The food is then delivered to our central site, and distributed to pick-up sites all over Northland for customers to collect.</p>
 			<p>As a member of the Northland Natural Food Coop, you can <strong>buy</strong> and <strong>sell</strong> local food through our online store. Simply upload your products or place your order <strong>online.</strong> The food is then delivered to our offices, and <strong>distributed</strong> to pick-up sites all over Northland for customers to <strong>collect.</strong></p>
-			<div class="col-sm-3"><button class="btn btn-primary btn-lg" ng-click="open('Customer')">Join as a Customer</button></div>
-			<div class="col-sm-3"><button class="btn btn-primary btn-lg" ng-click="open('Producer')">Join as a Producer</button></div>
+			<div class="text-center" style="width=388px">
+				<button class="btn btn-primary btn-lg" ng-click="open('Customer')">Join as a Customer</button>
+				<button class="btn btn-primary btn-lg" ng-click="open('Producer')">Join as a Producer</button>
+			</div>
 		</div>
-		<div class="jumbotron">
-			<h1>
-				Want assurance your food is fresh, healthy and local?
-			</h1>
-			<p>As a customer, you will know exactly <strong>who</strong> produced your food, as well as <strong>where</strong> and <strong>how</strong> it was grown or raised. This gives you a unique opportunity to support the producers and <strong>production practices</strong> of your choice.</p>
-			<div class="col-sm-3"><button class="btn btn-primary btn-lg" ng-click="open('Customer')">Join as a Customer</button></div>
+	</div>
+		<div class="jumbotron img-content">
+			<div class="img-column hidden-sm hidden-xs pull-right img-right" style="height: 450px">
+				<img src="../img/mum_healthy_food.jpg" width="320" height="450" alt="Mum Healthy Food">
+			</div>
+			<div class="jumbotron">
+				<h2 class="text-center">
+					Want assurance your food is
+				</h2>
+				<h1 class="text-center"> fresh, healthy and local?</h1>
+				<br>
+				<p>As a customer, you will know exactly <strong>who</strong> produced your food, as well as <strong>where</strong> and <strong>how</strong> it was grown or raised. This gives you a unique opportunity to support the producers and <strong>production practices</strong> of your choice.</p>
+				<div class="text-center">
+					<button class="btn btn-primary btn-lg" ng-click="open('Customer')">Join as a Customer</button>
+				</div>
+			</div>
+			
 		</div>		
-		<div class="jumbotron">
-			<h1>
-				Want a fair price for your products?
-			</h1>
-			<p>As a producer, you will have complete <strong>control</strong> over the sale of your products. You set the <strong>prices</strong>; you decide what to sell, when to sell, and how much to sell. Regardless of your <strong>scale</strong> of operation, you will be connected with consumers who value quality products, healthy local economies, and a <strong>fair income</strong> for your work.</p>
-			<div class="col-sm-3"><button class="btn btn-primary btn-lg" ng-click="open('Producer')">Join as a Producer</button></div>
+		<div class="jumbotron img-content">
+			<div class="img-column hidden-sm hidden-xs">
+				<img src="../img/happy-grower.jpg" alt="Happy Beetroot Grower Member">
+			</div>
+			<div class="jumbotron">
+				<h1 class="text-center">
+					Want a fair price for your products?
+				</h1>
+				<br>
+				<p>As a producer, you will have complete <strong>control</strong> over the sale of your products. You set the <strong>prices</strong>; you decide what to sell, when to sell, and how much to sell. Regardless of your <strong>scale</strong> of operation, you will be connected with consumers who value quality products, healthy local economies, and a <strong>fair income</strong> for your work.</p>
+				<br>
+				<div class="text-center">
+					<button class="btn btn-primary btn-lg" ng-click="open('Producer')">Join as a Producer</button>
+				</div>
+			</div>
 		</div>
 		
 		
-		<div class="jumbotron">
-			<h1>
-				We are a 100% member owned social enterprise
-				
+		<div class="jumbotron clearfix">
+			<h1 class="text-center">
+				100% member owned
 			</h1>
-			<div class="col-sm-6">
+			<br>
+			<div class="col-sm-4">
+				<img src="../img/manyhandstogether.jpg" alt="Agricultural Landscape" class="img-responsive">
+			</div>
+			<div class="col-sm-4">
 				<p>The NNFC is 100% member owned and operated, so by signing up, you also become a <strong>shareholder</strong>. You will receive a percentage of the co-op’s <strong>profits</strong> each year, and have the right to <strong>vote</strong> on all major decisions.</p>
 			</div>
-			<div class="col-sm-6">
+			<div class="col-sm-4">
 				<p>For details, see our <a href="/policy">policy handbook</a></p>
 				<button class="btn btn-primary btn-lg" ng-click="open('Customer')">Join as a Customer</button>
 				<button class="btn btn-primary btn-lg" ng-click="open('Producer')">Join as a Producer</button>
 			</div>
 		</div>
-		<div class="jumbotron">
-			<h1>
-				Pay just once. No yearly fee or subscription
+		<div class="jumbotron clearfix">
+			<h1 class="text-center">
+				Pay just once. <br>No yearly fee or subscription
 			</h1>
-			<div class="col-lg-6">
+			<div class="col-sm-4">
 				<p>The <strong>one time cost</strong> of joining gives you and your household <strong>lifetime</strong> membership in the NNFC. You will gain access to our <strong>exclusive online store</strong>, have the right to <strong>vote</strong> on all major decisions about the co-op, and receive a percentage of the co-op’s <strong>profits</strong> each year.</p>
 			</div>
-			<div class="col-lg-6">
+			<div class="col-sm-4">
+				<img src="../img/farmers-market.jpg" alt="online farmer's market" class="img-responsive">
+			</div>
+			<div class="col-sm-4">
 				<p>Current fees are as follows:<br>
 					Customer Membership costs $60.00<br>
 					Producer Membership costs $120.00
@@ -96,5 +130,4 @@
 				<small>All prices are in NZD</small>
 			</div>
 		</div>
-	</article>
 </div>

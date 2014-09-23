@@ -198,7 +198,6 @@ exports.configAPI = function configAPI(app) {
 	
 	// return just one product for editing or use as a template for another product
 	app.get("/api/product/:id", function(req, res, next) {
-		console.log(req.params.id);
 		if (req.user) {
 			models.Product.findById(req.params.id, function(e, product) {
 				if (!e) {
@@ -421,7 +420,6 @@ exports.configAPI = function configAPI(app) {
 					// replace the ID's in an order with proper values before sending to the app.
 					// see mongoose API docs for more info.
 					models.Order.populate(results, opts, function(e, orders) {
-						console.log(orders);
 						// send the results to the app if no error occurred.
 						if (!e) {
 							res.json(orders);
@@ -693,7 +691,6 @@ exports.configAPI = function configAPI(app) {
 					function(newOrder, callback) {
 						models.Product.findByIdAndUpdate(newOrder.product, { $inc: {quantity : newOrder.quantity * -1}}, function(e, product) {
 							if (!e) {
-								console.log(product.quantity);
 								callback(null, newOrder);
 							}
 							else callback(e);
@@ -1160,7 +1157,6 @@ exports.configAPI = function configAPI(app) {
 					if (invoice) {
 						
 						invoice.exInvoicee = 'ex-member ' + user.name;
-						console.log(invoice)
 						invoice.save()
 						
 						switch (invoice.status) {
@@ -1177,7 +1173,6 @@ exports.configAPI = function configAPI(app) {
 						default:
 						}
 						
-						console.log(invoice.status);
 						done(null, user);
 					}
 					else done(null, user);
@@ -1250,8 +1245,7 @@ exports.configAPI = function configAPI(app) {
 			if (err) { return next(err); }
 			if (!user) {
 				req.session.messages =  [info.message];
-				console.log(req.session.messages);
-				return res.send('Failed to authenticate user');
+				return res.send(403, 'Failed to authenticate user');
 			}
 			req.logIn(user, function(err) {
 				if (err) { console.log(err); }

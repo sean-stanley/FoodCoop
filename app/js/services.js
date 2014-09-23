@@ -19,34 +19,34 @@ angular.module('co-op.services', [])
 	.factory("flash", ['$rootScope', function($rootScope) {
 		// next page message for logging out
 		// current page message for server requests
-		var queue = [];
+		$rootScope.queue = [];
 		var temp;
 		var currentMessage = {message: '', type: ''};
 
 		$rootScope.$on("$routeChangeStart", function() {
 			// get only the messages that are meant to persist to a new view
-			temp = _.filter(queue, 'next' );
+			temp = _.filter($rootScope.queue, 'next' );
 			//empty the queue
-			queue = [];
+			$rootScope.queue = [];
 			// make the new queue of the next messages but remove their 'next' properties they won't persist forever.
 			// if it was necessary to show more methods a simple counter could be implemented.
-			queue = _.map(temp, function(m) {delete m.next; return m;});
+			$rootScope.queue = _.map(temp, function(m) {delete m.next; return m;});
 		});
 
 		return {
 			setMessage: function(message) {
 				if (message.hasOwnProperty('type') ) {
-					queue.push(message);
+					$rootScope.queue.push(message);
 				}
 			},
 			setNextMessage: function(message) {
 				if (message.hasOwnProperty('type') ) {
 					message.next = true;
-					queue.push(message);
+					$rootScope.queue.push(message);
 				}
 			},
 			closeMessage: function(idx) {
-				queue.splice(idx, 1);
+				$rootScope.queue.splice(idx, 1);
 			}
 			
 		};
@@ -79,26 +79,22 @@ angular.module('co-op.services', [])
 		return {
 			login : function(provider, form, callback) {
 				var cb = callback || angular.noop;
-				Session.post({
-					provider: 'local',
-					email: form.email,
-					password: form.password,
-					rememberMe: form.rememberMe
-					})
-				.then(function (user) {
-					var remainingAttempts;
-					if (typeof user === 'object') {
-						if (user.hasOwnProperty('plain') ){
-							user = user.plain();
-						}
-										
-						$rootScope.currentUser = user;
+				if ($rootScope.failedAttempts <= 10) {
+					Session.post({
+						provider: 'local',
+						email: form.email,
+						password: form.password,
+						rememberMe: form.rememberMe
+						})
+					.then(function(user) {
+						$rootScope.currentUser = user.plain();
 						getTally();
 						$location.path($rootScope.savedLocation);
 						$rootScope.savedLocation = "";
-					}
-					// incorrect login attempt
-					else {
+						flash.setNextMessage({type: 'success', message: 'Welcome back ' + $rootScope.currentUser.name + '. Check out the member tools sidebar!'});
+					}, function(error) {
+						// incorrect login attempt
+						var remainingAttempts;
 						$rootScope.failedAttempts++;
 						remainingAttempts = function(maxAttempts) {
 							if (maxAttempts > 0 && maxAttempts - $rootScope.failedAttempts > 0) {
@@ -108,23 +104,17 @@ angular.module('co-op.services', [])
 								return 0;
 							}
 						};
+					
 						var remaining = remainingAttempts(9);
 						var type = remaining > 5 ? 'warning' : 'danger';
 						flash.setNextMessage({
 							type: type,
-							message: 'Login failed! Please check your username and password and try again. You have ' + remaining +' remaining attempts left'
+							message: 'Login failed! Please check your username and password and try again. You have ' + remaining +' attempts remaining'
 						});
 						$location.path('/login-failed'+'/attempts='+$rootScope.failedAttempts);						
-					}
-					flash.setNextMessage({type: 'success', message: 'Welcome back! Check out the member-only links in the sidebar.'});
-					return cb();
-				}, 
-					function(err) {
-						// error interceptor prints error alert on screen
-						return cb();
-					}
+					});
+				}
 				
-				);
 			},
 			// a promise that resolves true if the user is logged in, or false if not.
 			isLoggedIn : function(params) {
@@ -171,7 +161,6 @@ angular.module('co-op.services', [])
 			logout : function() {
 				Session.remove();
 				delete $rootScope.currentUser;
-				flash.setNextMessage({type: 'success', message: 'Successfully logged out!'});
 				$location.path('/home');
 			}
 		};

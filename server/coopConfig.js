@@ -83,7 +83,6 @@ exports.cycleReset = function(date) {
 // common format is 't + 1 month'
 exports.getCycleDates = function(date) {
 	var start = Date.parse(date);
-	console.log(start);
 	if (typeof start.moveToFirstDayOfMonth === 'function') {
 		var cycle = {
 			cycleIncrementDay	: Date.parse(date).moveToFirstDayOfMonth(), 
@@ -103,4 +102,4 @@ exports.getCycleDates = function(date) {
 //exports.cycle.testDay = Date.today();
 
 // SENSITIVE //
-exports.bankAccount = "01-0000-0000000-0000-000";
+exports.bankAccount = "02-1248-0425752-001";

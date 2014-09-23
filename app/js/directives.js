@@ -107,17 +107,66 @@ angular.module('co-op.directives', []).
     })
   
   
-	.directive("scroll", function ($window) {
+	.directive("fullHero", function ($window, $document, $timeout) {
 	    return function(scope, element, attrs) {
         
 	         var pageOffset = function(offset) {
-	             var num = 389 - offset;
+	             var num = element[0].offsetHeight - offset;
+				 console.log(num);
 	             return (num > 0) ? num + 'px': 0;
 	        };
-        
-	        angular.element($window).bind("scroll", function() {
-	            element.css({'height' : pageOffset(this.pageYOffset)});
-	            scope.$apply();
+			var timer;
+			
+			var resizeBG = function () {
+			            var bgwidth = element[0].offsetWidth;
+			            var bgheight = element[0].offsetHeight;
+
+			            var winwidth = $window.innerWidth;
+			            var winheight = $window.innerHeight;
+
+			            var widthratio = winwidth / bgwidth;
+			            var heightratio = winheight / bgheight;
+
+			            var widthdiff = heightratio * bgwidth;
+			            var heightdiff = widthratio * bgheight;
+
+			            if (heightdiff > winheight) {
+			                element.css({
+			                    width: winwidth + 'px',
+			                    height: heightdiff + 'px'
+			                });
+			            } else {
+			                element.css({
+			                    width: widthdiff + 'px',
+			                    height: winheight + 'px'
+			                });
+			            }
+						scope.$apply();
+			        };
+						
+			function fullSize() {
+				
+				/*
+				if (timer) $timeout.cancel(timer);
+								else {
+									timer = $timeout(function(){
+										timer = undefined;
+										element.css({'height' : $window.innerHeight + 'px'});
+										rect = element[0].getBoundingClientRect();
+										scope.$apply();
+									}, 100);
+								}*/
+				
+				element.css({'height' : $window.innerHeight + 'px'});
+				scope.$apply();
+				
+			}
+			
+			var rect = element[0].getBoundingClientRect();
+			
+	        angular.element($document).ready(function() {
+	        	fullSize();
+				angular.element($window).bind("resize", fullSize);
 	        });
 	    };
 	})
@@ -136,6 +185,7 @@ angular.module('co-op.directives', []).
 	        }
 	    };
 	}])
+	
 
   
 .directive("fileread", [function () {

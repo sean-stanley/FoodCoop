@@ -95,7 +95,7 @@ angular.module('co-op', [
 	 		}
 	 	})
 	
-		.when('/faq', {templateUrl: 'partials/faq.html', controller: 'faqCtrl'})
+		.when('/faq', {templateUrl: 'partials/faq.html', controller: 'faqCtrl', reloadOnSearch: false})
 		.when('/route-manager-directory', {
 			templateUrl: 'partials/route-managers.html',
 			controller: 'routeManagerListCtrl',
@@ -106,6 +106,9 @@ angular.module('co-op', [
 					return Restangular.all('api/user').getList({'user_type.isRouteManager': true}).$object;
 				}
 			}	
+		})
+		.when('/volunteer', {templateUrl: 'partials/volunteers.html', reloadOnSearch: false, title: "Volunteer Jobs", 
+			description: 'The NNFC, Northland\'s local food coop, needs volunteers to help maintain the service. Volunteers are usually members and have jobs such as sorting orders, delivering orders and managing a delivery route.'
 		})
     
 		.when('/product-upload', {
@@ -208,8 +211,11 @@ angular.module('co-op', [
 		
 		
 		$rootScope.$on('$routeChangeSuccess', function(event, next, current) {
-			$rootScope.page_title = (next.$$route.hasOwnProperty('title')) ? next.title : 'NNFC';
-			$rootScope.page_description = (next.$$route.hasOwnProperty('description')) ? next.description : originalDescription;
+			if (next.$$route) {
+				$rootScope.page_title = (next.$$route.hasOwnProperty('title')) ? next.title : 'NNFC';
+				$rootScope.page_description = (next.$$route.hasOwnProperty('description')) ? next.description : originalDescription;
+			}
+			
 		});
 		
 		
@@ -222,11 +228,7 @@ angular.module('co-op', [
 		});
 		
 		Restangular.setErrorInterceptor(function(response, deferred, responseHandler) {
-		    console.log(response);
-			console.log(deferred);
-			console.log(responseHandler);
 			if(response.status === 401) {
-				// try to login with the session cookie again. If successful, reload the route
 				if ($rootScope.currentUser) {
 					return false; // error handled
 				}
