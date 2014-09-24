@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 
 var mongoose = require('mongoose');
-var models = require('../app/models.js');
+var models = require('../server/models.js');
 mongoose.connect('mongodb://localhost/mydb');
 var db = mongoose.connection;
 passport = require('passport'),
 LocalStrategy = require('passport-local').Strategy;
+/*
 var sample_users = [
 
 	{
@@ -79,10 +80,12 @@ var sample_users = [
 		}
 
 	}
-]
+]*/
 
 
 
+
+/*
 var sample_certifications = [
 	{
 		name: 'none',
@@ -108,7 +111,8 @@ var sample_certifications = [
 		name: 'In Transition',
 		img: ''
 	}
-]
+]*/
+
 
 var sample_categories = [
 	{
@@ -116,39 +120,41 @@ var sample_categories = [
 	placeholderName: 'Apples',
 	placeholderVariety: 'Granny Smith',
 	availableUnits: ['kg', 'g', '10kg', 'bag', 'punnet', 'bucket', 'bunch', 'crate', 'pallet', 'unit'],
-	ingredients: false
-	},
+},
 	{
 		name:'Processed-Goods',
 		placeholderName: 'Jam',
 		placeholderVariety: 'Strawberry',
 		availableUnits: ['kg', 'g', '10kg', 'L', '750ml', 'jar', 'bottle', 'unit'],
-		ingredients: true
 	},
 	{
 		name:'Baked Goods',
 		placeholderName: 'Bread',
 		placeholderVariety: 'Gluten-Free',
 		availableUnits: ['kg', 'loaf', 'dozen', 'baker\'s dozen', 'package', 'unit'],
-		ingredients: true
 	},
 	{
 		name:'Meat',
 		placeholderName: 'Sausages',
 		placeholderVariety: 'Beef',
 		availableUnits: ['kg', 'loaf', 'dozen', 'whole beast', 'half beast', 'package', 'unit'],
-		ingredients: true
 	},
 	{
-		name:'Dairy',
-		placeholderName: 'Cheese',
-		placeholderVariety: 'Cottage',
-		availableUnits: ['L', '500ml', 'litres per week', 'litres biweekly'],
-		ingredients: true
+		name:'Milk',
+		placeholderName: 'Goat Milk',
+		placeholderVariety: 'Raw',
+		availableUnits: ['L', '500ml'],
+	},
+	{
+		name:'Dairy & Eggs',
+		placeholderName: 'Yoghurt',
+		placeholderVariety: 'Manuka Honey',
+		availableUnits: ['L', '500ml', 'litres per week', 'litres biweekly', '250ml jar', 'dozen', '1/2 dozen', 'tray', 'pound', 'kg'],
 	}
 ]
 
 
+/*
 var sample_products = [
 {
 	dateUploaded: Date('24/9/14'),
@@ -219,7 +225,9 @@ var sample_products = [
 	description: 'Raw Goats Milk certified Organic Farm NZ. Goats raised naturally in Tutukaka.',
 	img : 'milk.jpg'
 }];
+*/
 
+/*
 for (i = 0; i < sample_users.length; i++) {
 	models.User.register(new models.User(sample_users[i]), "asdf", function(err, account) {
 		passport.authenticate('local')
@@ -239,6 +247,7 @@ for (i = 0; i < sample_certifications.length; i++) {
 		console.dir("Certification saved")
 	});
 };
+*/
 
 for (i = 0; i < sample_categories.length; i++) {
 	new models.Category(sample_categories[i]).save(function(err) {

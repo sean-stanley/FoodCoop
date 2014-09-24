@@ -8,10 +8,10 @@ angular.module('co-op.services', [])
 	
 // Creates a Session Object that is a promise for connecting to the server and
 // for Authentication
-	.factory('Session', function (Restangular) {
+	.factory('Session', [ 'Restangular', function (Restangular) {
 		return Restangular.all('auth/session');
 		
-	})
+	}])
 	
 // Allows flash messages to be displayed on a page. Once a message is set though
 // it's generally not seen until the next route change. Primarily used for login
@@ -217,9 +217,14 @@ angular.module('co-op.services', [])
         
 		module = {
 			registerProduct : function(productData) {
-				Restangular.all('api/product').post(productData).then(function() {
+				Restangular.all('api/product').post(productData).then(function(result) {
 					flash.setMessage({type: 'success', 
 					message: 'Congratulations ' + $rootScope.currentUser.name + '! Your product ' + productData.variety + " " + productData.productName + ' was successfully added to the store.'
+					});
+				}, function(error) {
+					console.log(error);
+					flash.setMessage({type: 'danger', 
+					message: 'Oops! Sorry ' + $rootScope.currentUser.name + ', your product didn\'t get uploaded. Reason: ' + error.data 
 					});
 				});
 			},

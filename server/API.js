@@ -109,7 +109,7 @@ exports.configAPI = function configAPI(app) {
 			toMe.send(function(err, result) {
 				if (err) {
 					return console.log(err);
-					res.send(500);
+					res.status(500).end();
 				}
 				/*
 				// a response is sent so the client request doesn't timeout and get an error.
@@ -120,7 +120,7 @@ exports.configAPI = function configAPI(app) {
 			toClient.send(function(err, result) {
 				if (err) {
 					console.log(err);
-					res.send(500);
+					res.status(500).end();
 				}
 				// a response is sent so the client request doesn't timeout and get an error.
 				res.send("text/plain", "Message sent to client");
@@ -149,15 +149,15 @@ exports.configAPI = function configAPI(app) {
 			toProducer.send(function(err, result) {
 				if (err) {
 					console.log(err);
-					res.send(500);
+					res.status(500).end();
 				}
 				// a response is sent so the client request doesn't timeout and get an error.
-				res.send(200, "Message sent to producer");
+				res.status(200).send("Message sent to producer");
 			});
 		} else {
 			// here if no message data was received in the request, a response is sent
 			// detailing what happened.
-			res.send(403, "No messages sent");
+			res.staus(403).send(403, "No messages sent");
 		}
 	});
 
@@ -214,7 +214,7 @@ exports.configAPI = function configAPI(app) {
 						}
 					}
 					else {
-						res.send(404);
+						res.status(404).send();
 					}
 				
 				} else {
@@ -222,7 +222,7 @@ exports.configAPI = function configAPI(app) {
 				}
 			});
 		}
-		else res.send(401);
+		else res.status(401).send();
 		
 	});
 	
@@ -266,7 +266,7 @@ exports.configAPI = function configAPI(app) {
 								res.json(product); // send back the changed product to the app as JSON.
 							} // save the changes
 							else {
-								res.send(200, 'No changes detected');
+								res.status(200).send('No changes detected');
 							}
 
 						} else {
@@ -292,18 +292,18 @@ exports.configAPI = function configAPI(app) {
 						cycle: scheduler.currentCycle
 					}, function(e, product) {
 						if (!e) {
-							res.send(200);
+							res.status(200).send();
 						}
 						else console.log(e)
 					});
 				}
 			}
 			
-			else res.send(403, "It's not the right time of the month to upload products")
+			else res.status(403).send("It's not the right time of the month to upload products")
 			
 			
 		} else {
-			res.send(401, 'Producer not signed in');
+			res.status(401).send('Producer not signed in');
 		}
 
 	});
@@ -320,17 +320,17 @@ exports.configAPI = function configAPI(app) {
 				if (!e && results) { // if no errors
 					if (result.producer_ID == req.user._id || req.user.user_type.isAdmin) {
 						result.remove();
-						res.send(200, 'product deleted');
+						res.status(200).send('product deleted');
 					}
-					else res.send(403, 'You aren\'t authorized to delete that product');
+					else res.status(403).send('You aren\'t authorized to delete that product');
 				} else {
 					console.log(e) // log the error
-					res.send(404);
+					res.status(404).send();
 				}
 			});
 		} 
-		else if (!scheduler.canUpload) res.send(403, "Drat! Wrong time of the ordering cycle to delete products.");
-		else res.send(401, 'Not logged in');
+		else if (!scheduler.canUpload) res.status(403).send("Drat! Wrong time of the ordering cycle to delete products.");
+		else res.status(401).send('Not logged in');
 	});
 
 	// return a compact list of all the current user's products.
@@ -345,11 +345,11 @@ exports.configAPI = function configAPI(app) {
 					res.json(products);
 				} else {
 					console.log(e);
-					res.send(500);
+					res.status(500).send();
 				}
 			});
 		}
-		else res.send(401);
+		else res.status(401).send();
 	});
 	// return a compact list of all the current user's products for the current month.
 	app.get("/api/product-list/current", function(req, res, next) {
@@ -366,7 +366,7 @@ exports.configAPI = function configAPI(app) {
 				}
 			});
 		}
-		else res.send(401);
+		else res.status(401).send();
 	});
 	// return a compact list of all the current user's products for the last month.
 	app.get("/api/product-list/recent", function(req, res, next) {
@@ -384,7 +384,7 @@ exports.configAPI = function configAPI(app) {
 				}
 			});
 		}
-		else res.send(401);
+		else res.status(401).send();
 	});
 
 	// this request will return orders based on a query. Generally this is used to
@@ -432,7 +432,7 @@ exports.configAPI = function configAPI(app) {
 				}
 			})
 		}
-		else res.send(401);
+		else res.status(401).send();
 
 	});
 	// get the orders made to the currently authenticated producer/supplier
@@ -469,13 +469,13 @@ exports.configAPI = function configAPI(app) {
 							res.json(orders);
 						} else {
 							console.log(e);
-							res.send(500);
+							res.status(500).send();
 						}
 					});
 				} else console.log(e);
 			});
 		}
-		else res.send(401);
+		else res.status(401).send();
 	});
 	// get a suppliers orders for the current cycle grouped by customer
 	app.get("/api/order/cycle", function(req,res, next){
@@ -511,12 +511,12 @@ exports.configAPI = function configAPI(app) {
 			],function(e, result){
 				if (e) {
 					console.log(e)
-					res.send(500);
+					res.status(500).send();
 				}
 				else res.json(result);
 			});	
 		}
-		else res.send(401);
+		else res.status(401).send();
 	});
 	
 	app.get("/api/cart/:user/length", function(req, res, next) {
@@ -527,7 +527,7 @@ exports.configAPI = function configAPI(app) {
 				}
 				else {
 					console.log(e);
-					res.send(500);
+					res.status(500).send();
 				}
 			})
 		}
@@ -578,7 +578,7 @@ exports.configAPI = function configAPI(app) {
 				} else console.log(e);
 			});
 		}
-		else res.send(401);
+		else res.status(401).send();
 	});
 	// update an order from a user's perspective. Only allowed to change quantity
 	app.post("/api/cart", function(req, res, next) {
@@ -607,7 +607,7 @@ exports.configAPI = function configAPI(app) {
 									order.quantity = newQuantity;
 									order.save();
 								
-									res.send(200);
+									res.status(200).send();
 								}
 								else {
 									res.send("Sorry! Insufficient inventory to add more than " + product.quantity + " to your cart" );
@@ -625,10 +625,10 @@ exports.configAPI = function configAPI(app) {
 				], 
 				function(err) {
 					console.log(err);
-					res.send(500);
+					res.status(500).send();
 			});
 		}
-		else res.send(403);
+		else res.status(403).send();
 		
 	});
 	// Deletes a specific item from a users own cart and increases the quantity
@@ -652,12 +652,12 @@ exports.configAPI = function configAPI(app) {
 						}
 					});
 					// respond with a basic HTML message
-					res.send(204, 'Product removed from cart');
+					res.status(204).send('Product removed from cart');
 				}
 
 			})
 		}
-		else res.send(401);
+		else res.status(401).send();
 	});
 	
 	// Creates a new order from the 'add to cart' buttons in the app. Returns the
@@ -682,7 +682,7 @@ exports.configAPI = function configAPI(app) {
 							}
 							else {
 								console.log(e);
-								res.send(500);
+								res.status(500).send();
 								callback(e);
 							}
 						});
@@ -708,14 +708,14 @@ exports.configAPI = function configAPI(app) {
 					}
 				], function(error) { 
 					console.log(error); 
-					res.send(500); 
+					res.status(500).send(); 
 					return errorHandler(error);
 				});
 			}
-			else res.send(403, "Sorry, you can't try to buy your own products");
+			else res.status(403).send("Sorry, you can't try to buy your own products");
 		} else { // error handling 
-			if (!scheduler.canShop) res.send(403, "It's not shopping time yet");
-			else res.send(401, "Not logged in");
+			if (!scheduler.canShop) res.status(403).send("It's not shopping time yet");
+			else res.status(401).send("Not logged in");
 		}
 	});
 	
@@ -739,7 +739,7 @@ exports.configAPI = function configAPI(app) {
 			// Save the time the invoice was modified
 			invoice.dateModified = Date();
 			invoice.save();
-			res.send(202);
+			res.status(202).send();
 		});
 	});
 	
@@ -778,13 +778,13 @@ exports.configAPI = function configAPI(app) {
 			email.send(function(err, result) {
 				if (err) {
 					console.log(err);
-					res.send(500, "form failed to be sent to standards commitee. Reason: " + err);
+					res.status(500).send("form failed to be sent to standards commitee. Reason: " + err);
 				}
-				else res.send(200, result);
+				else res.status(200).send(result);
 			});
 		}
-		else if (req.user.user_type.canSell) res.send(403);
-		else res.send(401);
+		else if (req.user.user_type.canSell) res.status(403).send();
+		else res.status(401).send();
 	});
 	
 	//Get and return users as JSON data based on a query. Only really used for the
@@ -916,7 +916,7 @@ exports.configAPI = function configAPI(app) {
 					passport.authenticate('local', function(err, user, info){
 						if (!user) {
 							console.log(err);
-							res.send(500, err);
+							res.status(500).send(err);
 						}
 						else {
 							req.logIn(user, function(err){
@@ -934,7 +934,7 @@ exports.configAPI = function configAPI(app) {
 				}
 				else {
 					console.log(err)
-					res.send(500, err);
+					res.status(500).send(err);
 				}
 			}
 		);
@@ -992,7 +992,7 @@ exports.configAPI = function configAPI(app) {
 								});
 							} else {
 								console.log('Old password does not match current password.')
-								res.send(400, 'Old password does not match current password.')
+								res.status(400).send('Old password does not match current password.')
 							}
 						
 							delete user.password;
@@ -1007,12 +1007,12 @@ exports.configAPI = function configAPI(app) {
 					res.json(user);
 				} else {
 					console.log(e);
-					res.send(401, "You must be logged in to change data about a user")
+					res.status(401).send("You must be logged in to change data about a user")
 				}
 				
 			});
 		}
-		else res.send(401);
+		else res.status(401).send();
 		
 	});
 
@@ -1028,7 +1028,7 @@ exports.configAPI = function configAPI(app) {
 					res.send(results);
 				}
 				else {
-					res.send(404);
+					res.status(404).send();
 				}
 				
 			} else {
@@ -1054,7 +1054,7 @@ exports.configAPI = function configAPI(app) {
 			if (!e && results.user_type.name === 'Producer') {
 				res.send(results);
 			} else if (results.user_type.name !== 'Producer') {
-				res.send(400, results.name + " is not a producer");
+				res.status(400).send(results.name + " is not a producer");
 			} else {
 				console.log(e);
 			}
@@ -1075,7 +1075,7 @@ exports.configAPI = function configAPI(app) {
 				}
 			});
 		} else {
-			res.send(401);
+			res.status(401).send();
 		}
 	});
 	
@@ -1214,16 +1214,16 @@ exports.configAPI = function configAPI(app) {
 				// if the email sent successfully, delete the user's data
 				function(e, result) {
 					if (!e && result === 'done') {
-						res.send(200);
+						res.status(200).send();
 					}
 					else {
 						console.log(results);
-						res.send(500);
+						res.status(500).send();
 					}
 				});
 		}
 		else {
-			res.send(401, "You are not authorized to remove that user");
+			res.status(401).send("You are not authorized to remove that user");
 		}
 	});
 	
@@ -1236,7 +1236,7 @@ exports.configAPI = function configAPI(app) {
 			delete userObject.hash;
 			res.send(userObject);
 		} else {
-			res.send(401, 'Not logged in');
+			res.status(401).send('Not logged in');
 		}
 	})
 	// attempt to log the user in
@@ -1245,7 +1245,7 @@ exports.configAPI = function configAPI(app) {
 			if (err) { return next(err); }
 			if (!user) {
 				req.session.messages =  [info.message];
-				return res.send(403, 'Failed to authenticate user');
+				return res.status(403).send('Failed to authenticate user');
 			}
 			req.logIn(user, function(err) {
 				if (err) { console.log(err); }
@@ -1260,9 +1260,9 @@ exports.configAPI = function configAPI(app) {
 	.delete(function(req, res) {
 		if (req.user) {
 			req.logout();
-			res.send(200, "Successfully Logged out");
+			res.status(200).send("Successfully Logged out");
 		} else {
-			res.send(401, "You are not logged in");
+			res.status(401).send("You are not logged in");
 		}
 	});
 	// look for browser sessions when the page refreshes
@@ -1343,7 +1343,7 @@ exports.configAPI = function configAPI(app) {
 				res.json(user);
 			}
 			else {
-				res.send(403, 'Password reset token is invalid or has expired.');
+				res.status(403).send('Password reset token is invalid or has expired.');
 			}
 			
 		});
@@ -1356,7 +1356,7 @@ exports.configAPI = function configAPI(app) {
 			function(done) {
 				models.User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
 					if (!user) {
-						return res.send(401, 'Password reset token is invalid or has expired');
+						return res.status(401).send('Password reset token is invalid or has expired');
 					}
 					user.setPassword(req.body.password, function() {
 						user.set(resetPasswordToken, undefined);

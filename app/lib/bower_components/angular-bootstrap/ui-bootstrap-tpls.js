@@ -455,8 +455,12 @@ angular.module('ui.bootstrap.carousel', ['ui.bootstrap.transition'])
         //We have to create new pointers inside a closure since next & current will change
         (function(next,current) {
           $scope.$currentTransition.then(
-            function(){ transitionDone(next, current); },
-            function(){ transitionDone(next, current); }
+            function(){ 
+				transitionDone(next, current); 
+			},
+            function(){ 
+				transitionDone(next, current); 
+			}
           );
         }(nextSlide, self.currentSlide));
       } else {
@@ -484,6 +488,7 @@ angular.module('ui.bootstrap.carousel', ['ui.bootstrap.transition'])
 
   $scope.next = function() {
     var newIndex = (currentIndex + 1) % slides.length;
+	if (currentIndex === 0) $scope.$currentTransition = null;
 
     //Prevent this user-triggered transition from occurring if there is already one in progress
     if (!$scope.$currentTransition) {
@@ -493,7 +498,7 @@ angular.module('ui.bootstrap.carousel', ['ui.bootstrap.transition'])
 
   $scope.prev = function() {
     var newIndex = currentIndex - 1 < 0 ? slides.length - 1 : currentIndex - 1;
-
+	if (currentIndex === 0) $scope.$currentTransition = null;
     //Prevent this user-triggered transition from occurring if there is already one in progress
     if (!$scope.$currentTransition) {
       return self.select(slides[newIndex], 'prev');

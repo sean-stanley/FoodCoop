@@ -7,12 +7,12 @@
 			<img ng-if="currentUser.producerData.hasOwnProperty('logo')" ng-src="{{currentUser.producerData.logo}}" alt=" logo placeholder " class="img-responsive" style="width:100%; height: auto;">	
 			<h5>{{currentUser.producerData.companyName}} <small>{{currentUser.name}}</small></h5>
 			<p>{{currentUser.producerData.description}}</p>
-			<a ng-href="/producer/{{currentUser.producerData.companyName | forURL}}-{{currentUser.name}}"><h1 class="text-center"><span class="glyphicon glyphicon-user"></span></h1>
+			<a ng-href="/producer/{{currentUser.producerData.companyName | forURL}}-{{currentUser.name}}"><h1 class="text-center"><span class="glyphicon glyphicon-user"></span></h1></a>
 			<p class="text-center">See your producer profile page</p>
 		</div>
 	</div>
 
-<div id="product-upload-form-container" class="col-md-8" >
+<div id="producer-form-container" class="col-md-8" >
 	<form name="producerEdit" autocomplete="off" ng-submit="submitForm();" novalidate>
 		<fieldset>
 			<legend>Edit Your Producer Information {{currentUser.name}}</legend>

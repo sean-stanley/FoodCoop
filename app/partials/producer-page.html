@@ -1,13 +1,14 @@
 <div class="page-header">
-	<h1>{{producer.producerData.companyName}}</h1>
+	<h1 class="text-center">{{producer.producerData.companyName}}</h1>
 </div>
-<div class="col-lg-1"></div>
-<iframe ng-src="{{map}}" class="col-lg-10 map-frame" height="500px"></iframe>
-<div class="col-lg-1"></div>
-<img ng-src="{{producer.producerData.logo}}" width="200px" class="center-block"/>
+
+<iframe ng-src="{{map}}" class="col-md-10 map-frame col-md-offset-1" height="500px"></iframe>
+
 <div class="row">
-	<div class="col-lg-1"></div>
-	<div class="col-md-2 well">
+
+	<div class="col-md-3 well col-md-offset-1">
+		<img ng-src="{{producer.producerData.logo}}" class="img-responsive"/>
+		<hr ng-if="producer.producerData.logo">
 		<h5>Contact Details</h5>
 		<ul class="list-unstyled" id="contact-details">
 			<li><span class="glyphicon glyphicon-earphone"></span> {{producer.phone}}</li>
@@ -16,19 +17,13 @@
 			<li><img src="../img/glyphicons/Globe.png" width="18" alt="Globe"> <a href="http://{{producer.producerData.website}}" target="_blank">{{producer.producerData.website}}</a></li>
 		</ul>
 	</div>
-	
-	<article class="col-md-5">
-		<h4>Company Description</h4>
-		<p>{{producer.producerData.companyName}}</p>
-		{{producer.producerData.description}}
-		
+
+	<article class="col-md-4" ta-bind ng-model="producer.producerData.description">
+		<p>No description available yet</p>
 	</article>
-	
-	<div class="col-md-3 well">
-		<h4>{{producer.name}}</h4>
-		{{producer.producerData.personalBio}}
+
+	<div class="col-md-3 well" ta-bind ng-model="producer.producerData.personalBio">
 	</div>
-	<div class="col-lg-1"></div>
 </div>
 				
 

@@ -105,16 +105,46 @@ angular.module('co-op.directives', []).
         }
       };
     })
-  
+	/*
+	.directive("nnfcScroll", function ($window, $document) {
+		    return function(scope, element, attrs) {
+		        var originalHeight = element[0].offsetHeight;
+				
+				var pageOffset = function(offset) {
+					var num;
+					console.log(offset);
+						if (offset < 0) num = element[0].offsetHeight - 2* (offset + 51);
+						num = element[0].offsetHeight - offset + 51;				 
+		   	            return (num < originalHeight) ? num + 'px': originalHeight + 'px';
+						//else return originalHeight + 'px';
+					
+		        };
+				
+				angular.element($window).bind("scroll", function() {
+					element.css({'height' : pageOffset(this.pageYOffset)});
+					scope.$apply();
+				});
+			};
+		})*/
+	/*
+	FOR SAFE KEEPING
+		angular.module("template/carousel/carousel.html", []).run(["$templateCache", function($templateCache) {
+		  $templateCache.put("template/carousel/carousel.html", //ng-mouseenter=\"pause()\" ng-mouseleave=\"play()\" was removed from template
+		    "<div class=\"carousel\" ng-swipe-right=\"prev()\" ng-swipe-left=\"next()\">\n" +
+		    "    <ol class=\"carousel-indicators\" ng-show=\"slides.length > 1\">\n" +
+		    "        <li ng-repeat=\"slide in slides track by $index\" ng-class=\"{active: isActive(slide)}\" ng-click=\"select(slide)\"></li>\n" +
+		    "    </ol>\n" +
+		    "    <div class=\"carousel-inner\" ng-transclude set-ng-animate='false'></div>\n" +
+		    "    <a class=\"left carousel-control\" ng-click=\"prev()\" ng-show=\"slides.length > 1\"><span class=\"glyphicon glyphicon-chevron-left\"></span></a>\n" +
+		    "    <a class=\"right carousel-control\" ng-click=\"next()\" ng-show=\"slides.length > 1\"><span class=\"glyphicon glyphicon-chevron-right\"></span></a>\n" +
+		    "</div>\n" +
+		    "");
+		}]);*/
+	
   
 	.directive("fullHero", function ($window, $document, $timeout) {
 	    return function(scope, element, attrs) {
         
-	         var pageOffset = function(offset) {
-	             var num = element[0].offsetHeight - offset;
-				 console.log(num);
-	             return (num > 0) ? num + 'px': 0;
-	        };
 			var timer;
 			
 			var resizeBG = function () {
@@ -286,54 +316,5 @@ angular.module('co-op.directives', []).
               });
           }
       };
-  })  
-  
-  .directive('categoryChooser', ['ProductManager', function(ProductManager) {
-      return {
-          restrict: 'E',
-          replace: true,
-          scope: {
-              modelVar: '='
-          },
-          template: '<select ng-model="selectValue" ng-options="name for name in categoryNames"></select>',
-		  //template: '<div class="btn-group center-block"><label ng-repeat="category in categories" class="btn btn-primary" ng-model="productData.category" btn-radio="category._id">{{category.name}}</label></div>',
-          link: function(scope, element, attrs, ctrl) {
-              var categoryIdToNameMapping = {}, categoryNameToIdMapping = {};
-              
-              scope.test = '';
-			  scope.placeholderName = '';
-			  scope.placeholderVariety = '';
-			  scope.availableUnits = [];
-              
-              scope.categories = ProductManager.productCategories;
-              
-			  scope.$watch('categories', function (newValue) {
-                  scope.categoryNames = ['--- Select a Category ---'];
-                  categoryIdToNameMapping = {};
-                  categoryNameToIdMapping = {};
-                  newValue.forEach(function (category) {
-                      if (category.name) {
-                          scope.categoryNames.push(category.name);
-                          categoryIdToNameMapping[category.name] = category._id;
-                          categoryNameToIdMapping[category._id] = category.name;
-						  scope.placeholderName = category.placeholderName;
-						  scope.placeholderVariety = category.placeholderVariety;
-                      }
-                  });
-              }, true);
-              
-              scope.$watch('modelVar', function (newValue) {
-                  if (!newValue) {
-                      scope.selectValue = '--- Select a Category ---';
-                  } else {
-                      scope.selectValue = categoryNameToIdMapping[newValue];
-                  }
-              });
-              
-              scope.$watch('selectValue', function (newValue) {
-                  scope.modelVar = categoryIdToNameMapping[newValue];
-              });
-          }
-      };
-  }]);  
+  });  
 

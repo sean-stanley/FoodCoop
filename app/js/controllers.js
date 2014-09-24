@@ -3,19 +3,13 @@
 
 /* Controllers */
 
-angular.module('co-op.controllers', []).
-    controller('MyCtrl1', ['$scope', 'flash',
-    	function($scope, flash) {
-			$scope.flash = flash;
-			console.log('Flash service initialized');
-    	}
-    ])
+angular.module('co-op.controllers', [])
 	
 	.controller('navCtrl', ['$scope', '$location', 'flash',
 		function($scope, $location, flash) {
 			// init			
 			$scope.predictiveSearch = [];
-			
+			$scope.flash = flash;
 			
 			// Date info for use in the app
 			$scope.today = Date.today().toString("ddd d MMM yyyy");
@@ -111,7 +105,6 @@ angular.module('co-op.controllers', []).
 		$scope.loginData = {
 			email: '',
 			password: '',
-			rememberMe: false
 		};
 
 		$scope.submitForm = function(message) {
@@ -207,7 +200,7 @@ angular.module('co-op.controllers', []).
 }])
 
 .controller('invoiceCtrl', ['$scope', '$rootScope', 'Restangular', 'flash',
-	function($scope, $rootScope, Restangular, flash){
+	function($scope, $rootScope, Restangular, flash) {
 		$scope.now = Date();
 		
 		$scope.soon = function(invoice) {
@@ -773,8 +766,6 @@ angular.module('co-op.controllers', []).
 .controller('storeCtrl', ['$scope', '$rootScope', '$location', '$routeParams', '$modal', 'LoginManager', 'flash', 'Restangular', 'Cart',
 	function($scope, $rootScope, $location, $routeParams, $modal, LoginManager, flash, Restangular, Cart) {
 		$scope.searchObject = $location.search();
-		console.log($routeParams);
-		console.log($location.path());
 		
 		$scope.predictiveSearch = [];
 		

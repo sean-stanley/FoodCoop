@@ -1,8 +1,14 @@
-<div class="page-header">
-	<h1>{{user.name}} <small>{{user.user_type.name}}</small></h1>
-</div>
+<div class="col-md-10 col-md-offset-1">
+	<div class="page-header">
+		<h1 ng-controller="logoutCtrl">
+			{{user.name}} <small>{{user.user_type.name}}</small>
+			<a href="/" class="btn btn-primary pull-right"><span class="glyphicon glyphicon-lock"></span> Logout</a>
+		</h1>
+	</div>
+	
 
-<form name="editMe" novalidate>
+<form name="editMe" novalidate ng-class="{'col-sm-3': user.user_type.name === 'Producer'}">
+	<legend ng-if="user.user_type.name === 'Producer'">Basic Details</legend>
 	<div class="form-group">
 		<label for="email">Email address</label>
 		<input ng-model="user.email" name="email" type="email" class="form-control" placeholder="Enter email" autofocus required>
@@ -66,7 +72,91 @@
 		</div>
 </form>
 
+<div ng-if="user.user_type.name === 'Producer'" class="col-sm-9" ng-controller="producerCtrl">
+<!--
+<alert ng-show="alert" type="{{alert.type}}">{{alert.message}}</alert>
+-->
+	<div id="producer-preview-column" class="col-md-6">
+		
+		
+	</div>
+
+<div id="producer-form-container" class="col-md-12" >
+	<form name="producerEdit" autocomplete="off" ng-submit="submitForm();" novalidate>
+		<fieldset>
+			<legend>Producer Profile <a class="pull-right" ng-href="/producer/{{currentUser.producerData.companyName | forURL}}-{{currentUser.name}}"><span class="glyphicon glyphicon-user"></span> View Profile</a></legend>
+			<div class="row">
+				
+				<div class="form-group col-sm-6">	
+					<div file-dropzone="[image/png, image/jpeg, image/gif]" file="currentUser.producerData.logo" data-max-file-size="3" id="file-dropzone" class="image-drop form-group">
+						<div>
+							<p class="text-muted" ng-if="currentUser.producerData.logo">Drop a new photo here</p>
+							<p class="text-muted" ng-if="!currentUser.producerData.logo">Drop a photo here</p>
+								<h1 class="text-muted"><span class="glyphicon glyphicon-cloud-upload"></span></h1>
+							<button type="button" class="btn btn-default btn-sm upload">
+								<span class="text-muted">Or click to upload</span>
+								<input type="file" class="opacity" 
+								fileread="currentUser.producerData.logo" 
+								accept="image/*" 
+								data-max-file-size="3">
+							</button>
+						</div>
+						
+					</div>
+					
+					<hr>
+				</div>
+				<div id="preview-container" class="preview-box col-sm-6">
+					<img ng-if="currentUser.producerData.hasOwnProperty('logo')" ng-src="{{currentUser.producerData.logo}}" alt=" logo placeholder " class="img-responsive">	
+				</div>
+				
+				
+			</div>
+			<div class="row">
+				<div class="form-group col-md-6">
+					<label for="inputCompany">Company Name</label>
+					<input ng-model="currentUser.producerData.companyName" name="inputCompany" type="text" class="form-control" id="inputName" placeholder="e.g. {{currentUser.name}} Farms" autofocus required>
+				</div>
+				<div class="form-group col-md-6">
+					<label for="companyWebsite">Company Website <small>If you have one</small></label>
+					<input ng-model="currentUser.producerData.website" name="companyWebsite" type="text" class="form-control" id="inputName" placeholder="e.g. www.{{currentUser.name | forURL}}.com" autofocus>
+				</div>
+				<div class="form-group col-md-12">
+					<label for="bankAccount">Bank Account <small>To receive payment to</small></label>
+					<input ng-model="currentUser.producerData.bankAccount" name="bankAccount" type="text" class="form-control" id="inputName" placeholder="e.g. 01-2345-6789-012-00" autofocus>
+					<alert type="danger" 
+					ng-show="producerEdit.bankAccount.$dirty && producerEdit.bankAccount.$invalid">
+						<span>We need to know how to send you money online.</span>
+					</alert>
+				</div>
+				<div class="form-group col-md-12">
+					<label for="description">Company Description</label> 
+					<text-angular 
+					ng-model="currentUser.producerData.description" 
+					placeholder="Write a few paragraphs for customers to see about your business and methadologies"
+					name="description">
+					</text-angular>
+					
+				</div>
+				<div class="form-group col-md-12">
+					<label for="bio">Personal Bio <small>(Optional)</small></label>
+ 					<text-angular 
+ 					ng-model="currentUser.producerData.personalBio"
+ 					placeholder="Write a few paragraphs about yourself for people to see."
+ 					name="bio">
+ 					</text-angular>
+				</div>
+			</div>
+			<div class="form-group col-md-12">
+				<button type="submit" class="btn btn-primary" ng-disabled="producerEdit.$invalid">Save Changes</button>
+			</div>
+		</fieldset>
+	</form>
+</div>
+
 	
+
+</div>
 	
 <br>
 <br>

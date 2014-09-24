@@ -14,12 +14,13 @@ angular.module('co-op', [
 	'angular-loading-bar', 
 	'ngAnimate', 
 	'ui.bootstrap',
+	'textAngular',
 	'cropme',
 	'restangular'])
 
   .config(['$routeProvider', '$locationProvider', 'RestangularProvider', function($routeProvider, $locationProvider, RestangularProvider) {
     $routeProvider
-		.when('/', {templateUrl: 'partials/index-content.html', controller: 'MyCtrl1', reloadOnSearch: false})
+		.when('/', {templateUrl: 'partials/index-content.html', reloadOnSearch: false})
 		.when('/signup', {templateUrl: 'partials/signup.html', controller: 'userCtrl', reloadOnSearch: false, title: 'Signup',
 		description: 'Signup to be a member of the NNFC. Northland\'s first food co-op.'
 		})
@@ -204,7 +205,12 @@ angular.module('co-op', [
 	
 	
   }])
-	.run(function($rootScope, $route, $location, LoginManager, flash, Session, Restangular) {
+	.run(function($rootScope, $route, $location, LoginManager, flash, Session, Restangular, $window) {
+		$rootScope.slideInterval = 5000;
+		$rootScope.setInterval = function(interval) {
+			$rootScope.slideInterval = interval;
+			console.log('interval changed to '+ interval);
+		};
 		$rootScope.page_title = 'NNFC';
 		$rootScope.page_description = "We help Northland buy and sell local food through our co-op store. We are a food co-op dedicated to helping our community buy local food. Our member's supply produce, meat, dairy, milk, bread, and home-made goods.";
 		var originalDescription = $rootScope.page_description;
@@ -215,6 +221,7 @@ angular.module('co-op', [
 				$rootScope.page_title = (next.$$route.hasOwnProperty('title')) ? next.title : 'NNFC';
 				$rootScope.page_description = (next.$$route.hasOwnProperty('description')) ? next.description : originalDescription;
 			}
+			$window.ga('send', 'pageview', { page: $location.path() });
 			
 		});
 		

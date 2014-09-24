@@ -1,22 +1,22 @@
 
-<carousel interval="interval"  ng-init="interval=-5000">
+<carousel interval="slideInterval" >
 		<slide id="slide1" full-hero>
 			<!--<img src="/img/originals/cheese-wine-meat.jpg" style="margin:auto;">-->
-			<div class="carousel-caption" ng-mouseenter="interval = -1" ng-mouseleave="interval = 3000">
+			<div class="carousel-caption" ng-mouseover="setInterval(-1)" ng-mouseleave="setInterval(5000)"> 
 				<h1>Produce • Meat • Dairy • Baked Goods</h1>
 				<p><a class="btn btn-primary btn-lg" role="button" href="/store">All in our Store</a></p>
 			</div>
 		</slide>
 		<slide id="slide2" full-hero>
 			<!--<img src="/img/originals/cow-nosey.jpg" style="margin:auto;">-->
-			<div class="carousel-caption">
+			<div class="carousel-caption" ng-mouseover="setInterval(-1)" ng-mouseleave="setInterval(5000)">
 				<h1>Got local food? Sell through us</h1>
 				<p><a class="btn btn-primary btn-lg" role="button" href="/signup">Sign up</a></p>
 			</div>
 		</slide>
 		<slide id="slide3" full-hero>
 			<!--<img src="/img/originals/farm_wallpaper.jpg" style="margin:auto;">-->
-			<div class="carousel-caption">
+			<div class="carousel-caption" ng-mouseover="setInterval(-1)" ng-mouseleave="setInterval(5000)">
 				<h1 class="text-center">Sign Up</h1>
 				<h1 class="text-center big-icons">
 					<span class="glyphicon glyphicon-pencil"></span><span class="glyphicon glyphicon-arrow-right"></span>
@@ -29,7 +29,7 @@
 		</slide>
 		<slide id="slide4" full-hero>
 			<!--<img src="/img/originals/crowd2.jpg" style="margin:auto;">-->
-			<div class="carousel-caption">
+			<div class="carousel-caption" ng-mouseover="setInterval(-1)" ng-mouseleave="setInterval(5000)">
 				<h1>We are 100% Member Owned</h1>
 				<p><a class="btn btn-primary btn-lg" role="button" href="/about">Read More</a></p>
 			</div>
@@ -37,7 +37,7 @@
 		
 		<slide id="slide5" full-hero>
 			<!--<img src="/img/originals/directory-books.jpg" style="margin:auto;">-->
-			<div class="carousel-caption">
+			<div class="carousel-caption" ng-mouseover="setInterval(-1)" ng-mouseleave="setInterval(5000)">
 		    	<h1>Producer Directory</h1>
 		    	<h3>We have a directory of all our producers conveniently available online</h3>
 		    	<p><a class="btn btn-primary btn-lg" role="button" href="/producer-list">See Directory</a></p>

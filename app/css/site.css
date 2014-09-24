@@ -83,13 +83,8 @@ html, body {
 .carousel-caption h1 {font-size: 3.5em;}
 .carousel-indicators .active {margin: 2px 4px;}
 .carousel-indicators li {margin:3px;}
-.carousel img {
-	-moz-filter: brightness(80%);
-	-ms-filter: brightness(80%);
-	-o-filter: brightness(80%);
-	-webkit-filter: brightness(80%);
-	filter: brightness(80%);
-}
+.carousel-indicators {bottom: 70px;}
+
 
 
 .img-content {clear: both; overflow: hidden; padding: 0; width:100%; background-color: #eeeeee; position: relative;}
@@ -97,10 +92,9 @@ html, body {
 .img-content > .img-column {height: 650px; float:left; margin-right: 30px;}
 .img-column > img {height: 100%; width: auto;}
 .img-column.img-right {margin-right:0!important; margin-left: 30px;}
-
-.sheep {background: #DDD url('img/agricultural_landscape.jpg') no-repeat fixed top center;}
-
-.map-frame {border:none; margin: 20px 0;}
+.white {background-color: white;}
+.jumbotron.white img {border: 5px solid #642c4a; margin-top: 2em; max-width: 93%;}
+.map-frame {border:none; margin-top: 20px; margin-bottom: 20px;}
 
 /*	-------------
 	-- Sidebar --
@@ -129,7 +123,7 @@ html, body {
 #close-sidebar-button {padding: 0 20px; display:block; margin-top: 51px;}
 #close-sidebar-button:hover {color:white;}
 
-.sidebar-main {margin-bottom: -102px; height:100%;}
+.sidebar-main {margin-bottom: -102px; }
 .sidebar-main:after {content:"";display:block;}
 .sidebar-bottom, .sidebar-main:after {height: 122px;}
 .sidebar-bottom {width: 100%; border:none;}*/

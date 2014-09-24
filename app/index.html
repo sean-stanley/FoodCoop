@@ -12,8 +12,9 @@
     
 	<!-- Google Font -->
 	<link href='http://fonts.googleapis.com/css?family=Raleway:700,500' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="css/font-awesome.min.css" type="text/css" media="screen" title="no title" charset="utf-8">
+	
 	<link rel="stylesheet" href="lib/bower_components/angular-loading-bar/build/loading-bar.css" type="text/css">
-	<link rel="stylesheet" href="css/preload.css" type="text/css" media="screen" title="no title" charset="utf-8">
 	
 	<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
     
@@ -44,6 +45,9 @@
 	<script src="lib/bower_components/lodash/dist/lodash.compat.min.js" type="text/javascript" charset="utf-8"></script>
 	<!--lodash: Restangular Dependency-->
 	<script src="lib/bower_components/restangular/dist/restangular.min.js"></script>
+	
+	<!-- textAngular -->
+	<script src="lib/bower_components/textAngular/dist/textAngular.min.js" type="text/javascript" charset="utf-8"></script>
 	
 	<!-- cropme dependencies -->
 
@@ -79,7 +83,7 @@
 
 </head>
 
-<body ng-controller="MyCtrl1" ng-init="cart = {open: false};" >		
+<body ng-controller="navCtrl" ng-init="cart = {open: false};" >		
 	<div id="sidebar" class="sidebar" ng-show="panelDisplay" ng-class="{'wide-sidebar':cart.open, 'narrow-sidebar':!cart.open}" >
 		<div class="sidebar-main">
 			<a href="" id="close-sidebar-button" class="panel-btn panel-btn-lg" ng-click="panelDisplay = false">&times;</a>
@@ -108,7 +112,7 @@
 			<accordion close-others="false" ng-if="currentUser" >
 				<accordion-group is-open="cart.open" ng-class="{'panel-open-sidebar':cart.open}">
 					<accordion-heading>
-					<h1 class="text-center"><span class="glyphicon glyphicon-shopping-cart"></span> <span class="badge">{{cartTally}}</span></h1>
+					<h1 class="text-center"><i class="fa fa-shopping-cart"></i> <span class="badge">{{cartTally}}</span></h1>
 					</accordion-heading>
 						<div ng-controller="cartPageCtrl">
 							<table class="table">
@@ -164,9 +168,6 @@
 					<li ng-class="{active:isActive('/product-upload')}" 
 					ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
 					><a href="product-upload">Upload a Product</a></li>
-					<li ng-class="{active:isActive('/producer-profile')}" 
-					ng-show="currentUser && currentUser.user_type.name === 'Producer'"
-					><a href="producer-profile">Edit Producer Profile</a></li>
 					<li ng-class="{active:isActive('/my-invoices')}" ng-show="currentUser"><a ng-href="my-invoices">Invoices</a></li>
 			</ul>
 		</div>
