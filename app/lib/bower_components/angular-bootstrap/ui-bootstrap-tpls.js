@@ -419,6 +419,21 @@ angular.module('ui.bootstrap.carousel', ['ui.bootstrap.transition'])
   self.currentSlide = null;
 
   var destroyed = false;
+  
+  // custom image caching event
+	var images = [ 
+		'/img/cheese-wine-meat-sm.jpg',
+		'/img/cow-nosey-sm.jpg',
+		'/img/farm_wallpaper-sm.jpg',
+		'/img/crowd2-sm.jpg',
+		'/img/directory-books-sm.jpg',
+		'/img/originals/directory-books.jpg',
+		'/img/originals/crowd2.jpg',
+		'/img/originals/farm_wallpaper.jpg',
+		'/img/originals/cow-nosey.jpg',
+		'/img/originals/cheese-wine-meat.jpg'
+	];
+
   /* direction: "prev" or "next" */
   self.select = $scope.select = function(nextSlide, direction) {
     var nextIndex = slides.indexOf(nextSlide);
@@ -548,6 +563,18 @@ angular.module('ui.bootstrap.carousel', ['ui.bootstrap.transition'])
       resetTimer();
     }
   };
+  
+  function preload() {
+	  var preloadArray = [];
+	  $scope.pause();
+	  for (var i = preload.arguments[0].length - 1; i >= 0; i--) {
+	  	preloadArray[i] = new Image();
+		preloadArray[i].src = preload.arguments[0][i];
+	  }
+	  $scope.play();
+  }
+  
+  preload(images);
 
   self.addSlide = function(slide, element) {
     slide.$element = element;
@@ -3837,7 +3864,7 @@ angular.module("template/alert/alert.html", []).run(["$templateCache", function(
 
 angular.module("template/carousel/carousel.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("template/carousel/carousel.html", //ng-mouseenter=\"pause()\" ng-mouseleave=\"play()\" was removed from template
-    "<div class=\"carousel\" ng-swipe-right=\"prev()\" ng-swipe-left=\"next()\">\n" +
+    "<div class=\"carousel\" ng-swipe-right=\"prev()\" ng-swipe-left=\"next()\" ng-init=\"preload()\">\n" +
     "    <ol class=\"carousel-indicators\" ng-show=\"slides.length > 1\">\n" +
     "        <li ng-repeat=\"slide in slides track by $index\" ng-class=\"{active: isActive(slide)}\" ng-click=\"select(slide)\"></li>\n" +
     "    </ol>\n" +

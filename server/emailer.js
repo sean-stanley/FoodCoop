@@ -46,7 +46,7 @@
 			return emailer.createTransport(smtpTransport({
 				service: "gmail",
 				auth: config.gmailCredentials
-			}))
+			}));
 		};
 
 		Emailer.prototype.getHtml = function(templateName, data) {

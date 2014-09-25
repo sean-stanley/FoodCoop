@@ -7,7 +7,7 @@ require('datejs');
 exports.coopName = "Northland Natural Food Co-op";
 
 // The Co-op's short name
-exports.coopShortName = "NNFC"
+exports.coopShortName = "NNFC";
 
 // set the co-op's country -- New Zealand! Not used anywhere in the app yet.
 exports.country = "New Zealand";

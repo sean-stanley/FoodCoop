@@ -28,6 +28,7 @@ html, body {
   /* equal to footer height */
   margin-bottom: -144px; 
 }
+.page-wrap:before {height: 51px; display: block; content: "";}
 .page-wrap:after {
   content: "";
   display: block;
@@ -41,15 +42,7 @@ html, body {
 	color: white;
 }
 
-
-
-
-
 #view {clear: both;overflow: hidden;}
-
-.alerts-open {margin-top:0;}
-
-.alerts-closed {margin-top: 51px;}
 
 /* Navigation */
 
@@ -87,13 +80,17 @@ html, body {
 
 
 
-.img-content {clear: both; overflow: hidden; padding: 0; width:100%; background-color: #eeeeee; position: relative;}
+.img-content {clear: both; overflow: hidden; padding: 0; width:100%; position: relative; margin-bottom: 0;}
 .jumbotron > h2 {font-size: 3em;}
 .img-content > .img-column {height: 650px; float:left; margin-right: 30px;}
 .img-column > img {height: 100%; width: auto;}
 .img-column.img-right {margin-right:0!important; margin-left: 30px;}
 .white {background-color: white;}
-.jumbotron.white img {border: 5px solid #642c4a; margin-top: 2em; max-width: 93%;}
+.bg-warning {background-color: #fcf8e3;}
+.bg-info {background-color: #87d3ea;}
+.bg-success {background-color: #dff0d8;}
+.jumbotron p {margin-right: 1em;}
+.jumbotron.white img.img-circle {border: 5px solid #642c4a; margin-top: 2em; max-width: 93%;}
 .map-frame {border:none; margin-top: 20px; margin-bottom: 20px;}
 
 /*	-------------
@@ -156,10 +153,10 @@ html, body {
 .image-drop div {margin-top:2.3em;}
 .image-drop div p{margin-bottom:-10px;}
 
-/*	------------------
-	-- Alerts --
-	------------------	*/
-.alerts:first-child {margin-top:66px;}
+/*	-------------
+	-- Alert Box --
+	-------------	*/
+.alert-box {position: fixed; top: 66px; z-index: 999999999; width: 100%;}
 
 /*
 ProducerList Page

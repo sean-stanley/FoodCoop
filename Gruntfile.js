@@ -19,10 +19,11 @@ module.exports = function(grunt) {
                 },
                 nodejs: {
                     files: {
-                        src: ['*.js']
+                        src: ['server/*.js']
                     },
                     options: {
-                        node: true
+                        node: true,
+						globalstrict: false
                     }
                 },
                 options: {
@@ -139,6 +140,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-contrib-uglify'); //new
     grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks('grunt-concurrent');
     grunt.loadNpmTasks('grunt-nodemon');

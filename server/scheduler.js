@@ -24,7 +24,7 @@ var orderCycleChecker = schedule.scheduleJob({hour:0, minute: 0}, checkConfig);
 // schedule emails to send alerting members that it is delivery day.
 // To be executed at 9:15am Wednesday;
 function checkConfig() {
-	console.log(Date.now().toString() + ". Checking if today is a significant day")
+	console.log(Date.now().toString() + ". Checking if today is a significant day");
 	var today = Date.today(), cycle = config.cycle, key;
 
 	// test for an exact day match and run reminder email functions if it is.
@@ -39,6 +39,7 @@ function checkConfig() {
 				case 'cycleIncrementDay':
 					incrementCycle();
 					mailChimp.mailSchedule();
+					break;
 				case 'ProductUploadStart':
 					exports.canUpload = true;
 					// schedule email reminder to producers here.
@@ -72,7 +73,6 @@ function checkConfig() {
 					break;
 				default:
 					// no functions to execute for this day
-					null
 				}
 			}
 			// if the date is between the productUploadStart date and the productUpoad Stop date
@@ -90,7 +90,7 @@ function checkConfig() {
 			}
 		}
 	}
-};
+}
 
 // looks for all the orders of the cycle and groups them by customer
 function checkout() {
@@ -102,24 +102,24 @@ function checkout() {
 			.group({ _id: "$customer", orders: { $push : {product: "$product", quantity: "$quantity"} }})
 			.exec(function(e, customers) {
 				// customers is a plain javascript object not a special mongoose document.
-				done(e, customers)
-			})
+				done(e, customers);
+			});
 		},
 		function(customers, done) {
 			models.Product.populate(customers, {path: 'orders.product', select: 'fullName variety productName priceWithMarkup price units refrigeration -_id'}
 			, function(e, result){
-				done(null, result)
+				done(null, result);
 			});
 		},
 		function(customers, done) {
 			models.User.populate(customers, {path: '_id', select: 'name email'}
 			, function(e, result){
-				done(null, result)
+				done(null, result);
 			});
 		}
 	],function(e, result){
 		if (e) {
-			console.log(e)
+			console.log(e);
 		}
 		else {
 			for (var i = 0; i < result.length; i++) {
@@ -127,14 +127,13 @@ function checkout() {
 			}
 		}
 	});
-};
+}
 
 // called by checkout() for each customer. Creates invoices for customers to pay
 // and emails them a copy
 function invoiceCustomer(customer) {
 	async.waterfall([
 		function (done) {
-			customer
 			
 			var invoice = new models.Invoice({
 				dueDate: config.cycle.PaymentDueDay.toString(),
@@ -147,7 +146,7 @@ function invoiceCustomer(customer) {
 			.save(function(e, invoice){
 				console.log(invoice.total);
 				if (e) done(e);
-				else done(null, invoice)
+				else done(null, invoice);
 			});
 			
 		},
@@ -185,7 +184,7 @@ function invoiceCustomer(customer) {
 	], function(error) {
 		console.log(error);
 	});
-};
+}
 
 function orderGoods() {
 	async.waterfall([
@@ -197,8 +196,8 @@ function orderGoods() {
 			
 			.exec(function(e, producers) {
 				// customers is a plain javascript document not a special mongoose document.
-				done(e, producers)
-			})
+				done(e, producers);
+			});
 		},
 		function(producers, done) {
 			models.Product.populate(producers, {path: 'orders.product', select: 'fullName variety productName price units refrigeration -_id'}
@@ -208,20 +207,20 @@ function orderGoods() {
 					producer.orders = _.sortBy(producer.orders, function(order) {
 						return order.product.fullName.toLowerCase();
 					});
-					return producer
+					return producer;
 				});
-				done(null, result)
+				done(null, result);
 			});
 		},
 		function(producers, done) {
 			models.User.populate(producers, [{path: '_id', select: 'name email producerData.bankAccount'}, {path: 'orders.customer', select: 'name email'}]
 			, function(e, result){
-				done(null, result)
+				done(null, result);
 			});
 		}
 	],function(e, result){
 		if (e) {
-			console.log(e)
+			console.log(e);
 		}
 		else {
 			for (var i = 0; i < result.length; i++) {
@@ -229,7 +228,7 @@ function orderGoods() {
 			}
 		}
 	});
-};
+}
 
 // called by orderGoods() for each customer. Creates invoices for producers to
 // be paid. Creates invoices for producers to know what to deliver and emails
@@ -247,7 +246,7 @@ function invoiceFromProducer(producer) {
 			})
 			
 			.save(function(e, invoice) {
-							console.log(invoice.total)
+							console.log(invoice.total);
 							if (e) done(e);
 							else done(null, invoice);
 						});
@@ -287,15 +286,15 @@ function invoiceFromProducer(producer) {
 	],function(error) {
 		console.log(error);
 	});
-};
+}
 
 // increment the number of cycles by 1 and set the ID to the total +1 (just like with invoices);
 // use Cycle number 0 for testing stuff
 function incrementCycle() {
 	models.Cycle.findById("orderCycle").exec(function(e, cycle) {
-		if (e) console.log(e) 
+		if (e) console.log(e);
 		else {
-			if ( cycle && Date.equals(Date.today(), Date.parse(cycle.dateModified).clearTime()) ) console.log("cycle already incremented today")
+			if ( cycle && Date.equals(Date.today(), Date.parse(cycle.dateModified).clearTime()) ) console.log("cycle already incremented today");
 			else {
 				models.Cycle.findByIdAndModify({_id: 'orderCycle'},{ dateModified: Date.now(), $inc: {seq: 1} }, function(err, cycle){
 					console.log(cycle);
@@ -307,9 +306,9 @@ function incrementCycle() {
 				});	
 			}
 		}
-	})
+	});
 	
-};
+}
 
 function findCycle() {
 	models.Cycle.findById('orderCycle', function(e, cycle) {
@@ -320,9 +319,9 @@ function findCycle() {
 		}
 		
 	});
-};
+}
 
 findCycle();
-checkConfig()
+checkConfig();
 
 

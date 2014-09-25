@@ -59,8 +59,8 @@ app.use(function(req, res){
 
 // for deployment
 
-var server_port = config.deploy.port || 8081
-var server_ip_address = config.deploy.ip || 'localhost'
+var server_port = config.deploy.port || 8081,
+	server_ip_address = config.deploy.ip || 'localhost';
 
 app.listen(server_port, server_ip_address, function() {
 	console.log("Listening on " + server_ip_address + ", " + server_port);

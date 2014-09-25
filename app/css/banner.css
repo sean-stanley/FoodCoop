@@ -1,14 +1,39 @@
-#slide1 {background: url('/img/cheese-wine-meat-sm.jpg') no-repeat; background-position: top center;}
-#slide2 {background: url('/img/cow-nosey-sm.jpg') no-repeat; background-position: top center;}
-#slide3 {background: url('/img/farm_wallpaper-sm.jpg') no-repeat; background-position: top center;}
-#slide4 {background: url('/img/crowd2-sm.jpg') no-repeat; background-position: top center;}
-#slide5 {background: url('/img/directory-books-sm.jpg') no-repeat; background-position: top center;}
+#slide1 {background: url('/img/cheese-wine-meat-sm.jpg') no-repeat center center fixed; 
+-webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+#slide2 {background: url('/img/cow-nosey-sm.jpg') no-repeat center center fixed; 
+-webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+#slide3 {background: url('/img/farm_wallpaper-sm.jpg') no-repeat center center fixed; 
+-webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+#slide4 {background: url('/img/crowd2-sm.jpg') no-repeat center center fixed; 
+-webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+#slide5 {background: url('/img/directory-books-sm.jpg') no-repeat center center fixed; 
+-webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
 @media (min-width: 769px) {
-	#slide1 {background: url('/img/originals/cheese-wine-meat.jpg') no-repeat; background-position: top center;}
-	#slide2 {background: url('/img/originals/cow-nosey.jpg') no-repeat; background-position: top center;}
-	#slide3 {background: url('/img/originals/farm_wallpaper.jpg') no-repeat; background-position: top center;}
-	#slide4 {background: url('/img/originals/crowd2.jpg') no-repeat; background-position: top center;}
-	#slide5 {background: url('/img/originals/directory-books.jpg') no-repeat; background-position: top center;}
+	#slide1 {background: url('/img/originals/cheese-wine-meat.jpg') no-repeat center center fixed;}
+	#slide2 {background: url('/img/originals/cow-nosey.jpg') no-repeat center center fixed;}
+	#slide3 {background: url('/img/originals/farm_wallpaper.jpg') no-repeat center center fixed;}
+	#slide4 {background: url('/img/originals/crowd2.jpg') no-repeat center center fixed;}
+	#slide5 {background: url('/img/originals/directory-books.jpg') no-repeat center center fixed;}
 }
 
 
@@ -52,7 +77,7 @@ h2.slogan {
 }
 
 #banner {
-	background: url(/img/Grass-Field.jpg) center no-repeat;
+	background: url(/img/originals/cropped-Agricultural_grass.jpg) center no-repeat;
 	margin-bottom: 0px;
 	border-bottom: 5px solid #652c4a;
 	overflow: hidden;

@@ -4,14 +4,7 @@
 /* Directives */
 
 
-angular.module('co-op.directives', []).
-  directive('appVersion', ['version', function(version) {
-    return function(scope, elm, attrs) {
-      elm.text(version);
-    };
-  }])
-	
-  
+angular.module('co-op.directives', [])
   /**
    * A directive for adding google places autocomplete to a text box
    * google places autocomplete info: https://developers.google.com/maps/documentation/javascript/places
@@ -43,7 +36,7 @@ angular.module('co-op.directives', []).
    *
    *
    */
-  .directive('ngAutocomplete', function($parse) {
+  .directive('ngAutocomplete', [ '$parse', function($parse) {
       return {
 
         scope: {
@@ -104,7 +97,7 @@ angular.module('co-op.directives', []).
           }, true);
         }
       };
-    })
+    }])
 	/*
 	.directive("nnfcScroll", function ($window, $document) {
 		    return function(scope, element, attrs) {
@@ -142,7 +135,7 @@ angular.module('co-op.directives', []).
 		}]);*/
 	
   
-	.directive("fullHero", function ($window, $document, $timeout) {
+	.directive("fullHero", [ '$window', '$document', '$timeout', function ($window, $document, $timeout) {
 	    return function(scope, element, attrs) {
         
 			var timer;
@@ -199,7 +192,7 @@ angular.module('co-op.directives', []).
 				angular.element($window).bind("resize", fullSize);
 	        });
 	    };
-	})
+	}])
 
 	.directive('setNgAnimate', ['$animate', function ($animate) {
 	    return {
@@ -254,7 +247,7 @@ angular.module('co-op.directives', []).
         }
     };
 }])
-  .directive('fileDropzone', function() {
+  .directive('fileDropzone', [function() {
       return {
           restrict: 'A',
           scope: {
@@ -316,5 +309,5 @@ angular.module('co-op.directives', []).
               });
           }
       };
-  });  
+  }]);  
 

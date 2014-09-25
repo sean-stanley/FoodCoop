@@ -1,10 +1,9 @@
-var mongoose = require('mongoose'); // middleware for connecting to the mongodb database
-var Schema = mongoose.Schema; // mongoose schema object for defining collections.
-var passportLocalMongoose = require('passport-local-mongoose');
-var _ = require('lodash'); // this creates salted and hashed passwords
-var config = require('./coopConfig.js')
-
-var markup = config.markup;
+var mongoose = require('mongoose'), // middleware for connecting to the mongodb database
+	Schema = mongoose.Schema, // mongoose schema object for defining collections.
+	passportLocalMongoose = require('passport-local-mongoose'),
+	_ = require('lodash'), // this creates salted and hashed passwords
+	config = require('./coopConfig.js'),
+	markup = config.markup;
 
 // this is a helpful setter function to return a value as lowercase. It is used
 // to keep email addresses as all lowercase.
@@ -127,10 +126,10 @@ InvoiceSchema.virtual('total').get(function () {
 		}
 		else if (this.items[i].hasOwnProperty('product')) {
 			if (this.toCoop) {
-				total += this.items[i].product.price * this.items[i].quantity
+				total += this.items[i].product.price * this.items[i].quantity;
 			}
 			else {
-				total += this.items[i].product.priceWithMarkup * this.items[i].quantity
+				total += this.items[i].product.priceWithMarkup * this.items[i].quantity;
 			}
 		}
 	}
@@ -141,10 +140,10 @@ InvoiceSchema.virtual('total').get(function () {
 function validStatus (val) {
 	var validOptions = ['un-paid', 'PAID', 'OVERDUE', 'To Refund', 'Refunded', 'CANCELLED'];
 	if ( _.contains(validOptions, val) ) {
-		return val
+		return val;
 	}
 	else {
-		throw new Error("Oops, the invoice status is not being set to a proper value.")
+		throw new Error("Oops, the invoice status is not being set to a proper value.");
 	}
 }
 
@@ -156,10 +155,10 @@ InvoiceSchema.pre('save', function(next) {
 			if (e) {
 				next(e);
 			}
-			doc['_id'] = count.seq;
+			doc._id = count.seq;
 			if (doc._id == count.seq) next();
 			else {
-				doc['_id'] = count.seq;
+				doc._id = count.seq;
 			}
 		});
 	}
@@ -210,10 +209,10 @@ UserSchema.options.toObject.transform = function (doc, ret, options) {
 };
 
 UserSchema.virtual('firstName').get(function() {
-	return this.name.substr(0, this.name.indexOf(' '))
+	return this.name.substr(0, this.name.indexOf(' '));
 });
 UserSchema.virtual('lastName').get(function() {
-	return this.name.substr(this.name.indexOf(' ')+1)
+	return this.name.substr(this.name.indexOf(' ')+1);
 });
 
 // occurs just before an invoice is saved. should work with Model.create() shortcut

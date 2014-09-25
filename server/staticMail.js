@@ -1,6 +1,6 @@
-var Emailer = require('./emailer')
-var adminRecipients = [' "Sean Stanley" <sean@maplekiwi.com>', '"Michael Taylor" <michael@maplekiwi.com>'];
-var companyEmail = {email: 'sean@maplekiwi.com', name: 'Sean Stanley'}
+var Emailer = require('./emailer'),
+	adminRecipients = [' "Sean Stanley" <sean@maplekiwi.com>', '"Michael Taylor" <michael@maplekiwi.com>'],
+	companyEmail = {email: 'sean@maplekiwi.com', name: 'Sean Stanley'};
 
 function currentTime() {
 	  var date, hour, min;
@@ -8,10 +8,10 @@ function currentTime() {
 	  hour = date.getHours();
 	  min = date.getMinutes();
 	  if (min < 10) {
-		 min = '0' + min.toString()
+		 min = '0' + min.toString();
 	  }
 	  return hour + ":" + min;
-  };
+  }
   
 var currentTimeString = currentTime();
 

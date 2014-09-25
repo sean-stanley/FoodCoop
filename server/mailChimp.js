@@ -9,7 +9,7 @@ var config = require('./coopConfig.js'),
 var mc = new mcapi.Mailchimp('106c008a4dda3fa2fe00cae070e178b9-us9');
 
 exports.scheduleCampaign = function () {
-	mc.Campaigns.schedule()
+	mc.Campaigns.schedule();
 };
 
 // get all campaigns in original folder
@@ -57,7 +57,7 @@ function updateUsers() {
 		mc.lists.batchSubscribe({id: 'e481a3338d', update_existing: true, batch: batch}, function(result) {
 			console.log(result);
 		});
-	})
+	});
 }
 
 function segmentsList () {
@@ -68,67 +68,83 @@ exports.mailSchedule = function() {
 
 	async.waterfall([
 		// find originals
-		function(done) { mc.campaigns.list({ filters: { folder_id: '7865'} }, function(originals) {
-			dateTitleMap = _.map(originals.data, function(doc) {
-				var el = {title: doc.title, scheduleTime: ''}
-				el.scheduleTime = titleDateMatcher(doc.title);
-				return el
-			});
+		function(done) { 
+			mc.campaigns.list({ filters: { folder_id: '7865'} }, function(originals) {
+				dateTitleMap = _.map(originals.data, function(doc) {
+					var el;
+					el.title = doc.title;
+					el.scheduleTime = titleDateMatcher(doc.title);
+					return el;
+				});
+				for (var i = 0; i < originals.data.length; i++) {
+					var dictionary = {};
+					dictionary[originals.data[i].title] = titleDateMatcher(doc.title);
+					dateTitleMap.push(dictionary);
+				}
+				
 		
-			done(null, originals, dateTitleMap);
-			}, function(error) {done(error)})
+				done(null, originals, dateTitleMap);
+			}, 
+			function(error) {
+				done(error);
+			});
 		}, //replicate originals
 		function (originals, dateTitleMap, done) {
-			var key, dateTitle, batch = [];
-			if (originals.hasOwnProperty('total')) {
-				for (key in originals.data) {
-					if (originals.data.hasOwnProperty(key)) {
-						if (originals.data[key].title === 'Payment Reminder') {
-							// find which users have not paid shopping invoices
-							models.Invoice.find({status: 'un-paid', title: /(Shopping Order for )\w+/g}, function(e, invoices) {
-								if (e) console.log(e);
-								if (invoices.length > 0) {
-									models.Invoice.populate(invoices, {path:'invoicee', select: 'email -_id'}, function(e, invoices) {
-										for (var i = 0; i < invoices.length; i++) {
-											batch.push({
-												email: {email: invoices[i].invoicee.email}, 
-												merge_vars: {OVERDUE: 'yes'} 
-											});
-										}
-										console.log(invoices);
-								
-										mc.lists.batchSubscribe({id: 'e481a3338d', update_existing: true, batch: batch}, function(result) {
-											console.log(result);
-										});
-								
-										batch2 = _.map(batch, function(user) {delete user.merge_vars; return user;});
-										console.log(batch2);
-								
-										mc.lists.staticSegmentMembersAdd({id:'e481a3338d', seg_id: 20457, batch: batch2}, function(result) {
-											console.log(result);
-										});
-									});
-								}
-								
-							})
+			var batch = [], batch2 = [];
+			
+			// I could take this out of the waterfall as it may be benificial to call it
+			// from the scheduler
+			
+			// find which users have not paid shopping invoices
+			models.Invoice.find({status: 'un-paid', title: /(Shopping Order for )\w+/g}, function(e, invoices) {
+				if (e) console.log(e);
+				if (invoices.length > 0) {
+					// if we find unpaid invoices populate the email field
+					models.Invoice.populate(invoices, {path:'invoicee', select: 'email -_id'}, function(e, invoices) {
+						// for each unpaid invoice, mark the user with the OVERDUE value as 'yes'
+						for (var i = 0; i < invoices.length; i++) {
+							batch.push({
+								email: {email: invoices[i].invoicee.email}, 
+								merge_vars: {OVERDUE: 'yes'} 
+							});
 						}
-						dateTitle = _.find(dateTitleMap, function(pair) {
-							return pair.title === originals.data[key].title ? pair.scheduleTime : false
-						});
+						// update the members list with the overdue variable
+						mc.lists.batchSubscribe({id: 'e481a3338d', update_existing: true, batch: batch});
 						
-						mc.campaigns.replicate({cid: originals.data[key].id}
-							, function(result) {
-								console.log('replicated'); 
-								schedule(result, dateTitle.scheduleTime);
-							}, 
-							function(error) { done(error) }
-						);
-						
-					}
+						// to add members to the overdue segment, we remove the merge_vars property
+						for (i = 0; i < batch.length; i++) {
+							batch2.push(batch[i].email);
+						}
+						mc.lists.staticSegmentMembersAdd({id:'e481a3338d', seg_id: 20457, batch: batch2});
+					});
 				}
-				done(null);
-			};
-			done(null);
+				done(e, originals, dateTitleMap);
+			});
+		},
+		function(originals, dateTitleMap) {
+			
+		// currently untested feature. Expect work or reworking to be needed
+			(function repeat(i) {
+				if (i < originals.data.length) {
+					
+					dateTitle = dateTitleMap[originals.data[i].title];
+				
+					mc.campaigns.replicate({cid: originals.data[i].id},
+					function(replica) {
+						schedule(replica.id, dateTitle.scheduleTime, function(result) {
+							console.log(result);
+							repeat(i + 1);
+						},
+						function(error) {
+							console.log(error);
+						});
+					}, 
+					function(error) { 
+						done(error); 
+					});
+				}
+				else done(null);
+			}(0));
 		}], 
 		function(e) {
 			if (e) console.log(e);
@@ -137,11 +153,8 @@ exports.mailSchedule = function() {
 	
 };
 
-function schedule (campaign, date) {	
-	mc.campaigns.schedule({cid: campaign.id, schedule_time: date }
-	, function(result) {
-		console.log(result) // expect { confirmed: true }
-	}, function(error) {console.log(error)});
+function schedule (id, date, callback, errorHandle) {	
+	mc.campaigns.schedule({cid: id, schedule_time: date }, callback, errorHandle);
 }
 
 function titleDateMatcher(title) {
@@ -152,6 +165,7 @@ function titleDateMatcher(title) {
 		break;
 	case 'Reminder: Upload Products':
 		date = config.cycle.ProductUploadStop;
+		break;
 	case 'Ordering Now Open':
 		date = config.cycle.ShoppingStart;
 		break;
@@ -168,7 +182,7 @@ function titleDateMatcher(title) {
 		date = config.cycle.DeliveryDay;
 		break;
 	default:
-		null
+		return null;
 	}
 	return date.toString('yyyy-MM-dd HH:mm:ss');
 }

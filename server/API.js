@@ -108,7 +108,7 @@ exports.configAPI = function configAPI(app) {
 			// variable is the completed message object.
 			toMe.send(function(err, result) {
 				if (err) {
-					return console.log(err);
+					console.log(err);
 					res.status(500).end();
 				}
 				/*
@@ -136,7 +136,7 @@ exports.configAPI = function configAPI(app) {
 					name: req.body.toName,
 					email: req.body.to
 				}
-			}
+			};
 			toProducerData = {
 				from: req.body.name,
 				subject: req.body.subject,
@@ -180,7 +180,7 @@ exports.configAPI = function configAPI(app) {
 				}, {
 					path: 'producer_ID',
 					select: 'name producerData.companyName'
-				}]
+				}];
 
 				// replace the id references in the product with the names of the category, certification and producer
 				models.Product.populate(results, opts, function(e, product) {
@@ -191,9 +191,9 @@ exports.configAPI = function configAPI(app) {
 				});
 
 			} else {
-				console.log(e) // log the error
+				console.log(e); // log the error
 			}
-		})
+		});
 	});
 	
 	// return just one product for editing or use as a template for another product
@@ -214,7 +214,7 @@ exports.configAPI = function configAPI(app) {
 						}
 					}
 					else {
-						res.status(404).send();
+						res.status(404).end();
 					}
 				
 				} else {
@@ -222,7 +222,7 @@ exports.configAPI = function configAPI(app) {
 				}
 			});
 		}
-		else res.status(401).send();
+		else res.status(401).end();
 		
 	});
 	
@@ -254,7 +254,7 @@ exports.configAPI = function configAPI(app) {
 						if (!e) {
 							productObject = product.toObject();
 							needsSave = false;
-							for (key in req.body) {
+							for (var key in req.body) {
 								if (productObject[key] !== req.body[key]) {
 									// compare the values of the database object to the values of the request object.
 									product[key] = req.body[key]; // update the product's properties
@@ -270,7 +270,7 @@ exports.configAPI = function configAPI(app) {
 							}
 
 						} else {
-							console.log(e)
+							console.log(e);
 							// log the error to the console.
 						}
 					});
@@ -292,14 +292,14 @@ exports.configAPI = function configAPI(app) {
 						cycle: scheduler.currentCycle
 					}, function(e, product) {
 						if (!e) {
-							res.status(200).send();
+							res.status(200).end();
 						}
-						else console.log(e)
+						else console.log(e);
 					});
 				}
 			}
 			
-			else res.status(403).send("It's not the right time of the month to upload products")
+			else res.status(403).send("It's not the right time of the month to upload products");
 			
 			
 		} else {
@@ -324,8 +324,8 @@ exports.configAPI = function configAPI(app) {
 					}
 					else res.status(403).send('You aren\'t authorized to delete that product');
 				} else {
-					console.log(e) // log the error
-					res.status(404).send();
+					console.log(e); // log the error
+					res.status(404).end();
 				}
 			});
 		} 
@@ -345,11 +345,11 @@ exports.configAPI = function configAPI(app) {
 					res.json(products);
 				} else {
 					console.log(e);
-					res.status(500).send();
+					res.status(500).end();
 				}
 			});
 		}
-		else res.status(401).send();
+		else res.status(401).end();
 	});
 	// return a compact list of all the current user's products for the current month.
 	app.get("/api/product-list/current", function(req, res, next) {
@@ -366,7 +366,7 @@ exports.configAPI = function configAPI(app) {
 				}
 			});
 		}
-		else res.status(401).send();
+		else res.status(401).end();
 	});
 	// return a compact list of all the current user's products for the last month.
 	app.get("/api/product-list/recent", function(req, res, next) {
@@ -384,7 +384,7 @@ exports.configAPI = function configAPI(app) {
 				}
 			});
 		}
-		else res.status(401).send();
+		else res.status(401).end();
 	});
 
 	// this request will return orders based on a query. Generally this is used to
@@ -428,11 +428,11 @@ exports.configAPI = function configAPI(app) {
 					});
 
 				} else {
-					console.log(e) // log the error
+					console.log(e); // log the error
 				}
-			})
+			});
 		}
-		else res.status(401).send();
+		else res.status(401).end();
 
 	});
 	// get the orders made to the currently authenticated producer/supplier
@@ -469,13 +469,13 @@ exports.configAPI = function configAPI(app) {
 							res.json(orders);
 						} else {
 							console.log(e);
-							res.status(500).send();
+							res.status(500).end();
 						}
 					});
 				} else console.log(e);
 			});
 		}
-		else res.status(401).send();
+		else res.status(401).end();
 	});
 	// get a suppliers orders for the current cycle grouped by customer
 	app.get("/api/order/cycle", function(req,res, next){
@@ -487,8 +487,8 @@ exports.configAPI = function configAPI(app) {
 					.group({ _id: "$customer", orders: { $push : {product: "$product", quantity: "$quantity"} }})
 					.exec(function(e, customers) {
 						// customers is a plain javascript object not a special mongoose document.
-						done(e, customers)
-					})
+						done(e, customers);
+					});
 				},
 				function(customers, done) {
 					models.Product.populate(customers, {path: 'orders.product', select: 'fullName price units productName variety'}
@@ -497,26 +497,26 @@ exports.configAPI = function configAPI(app) {
 							producer.orders = _.sortBy(producer.orders, function(order) {
 								return order.product.fullName.toLowerCase();
 							});
-							return producer
+							return producer;
 						});
-						done(null, result)
+						done(null, result);
 					});
 				},
 				function(customers, done) {
 					models.User.populate(customers, {path: '_id', select: 'name email'}
 					, function(e, result){
-						done(null, result)
+						done(null, result);
 					});
 				}
 			],function(e, result){
 				if (e) {
-					console.log(e)
-					res.status(500).send();
+					console.log(e);
+					res.status(500).end();
 				}
 				else res.json(result);
 			});	
 		}
-		else res.status(401).send();
+		else res.status(401).end();
 	});
 	
 	app.get("/api/cart/:user/length", function(req, res, next) {
@@ -527,9 +527,9 @@ exports.configAPI = function configAPI(app) {
 				}
 				else {
 					console.log(e);
-					res.status(500).send();
+					res.status(500).end();
 				}
-			})
+			});
 		}
 	});
 	// get a customer's cart items by using their customer ID as a request parameter.
@@ -578,7 +578,7 @@ exports.configAPI = function configAPI(app) {
 				} else console.log(e);
 			});
 		}
-		else res.status(401).send();
+		else res.status(401).end();
 	});
 	// update an order from a user's perspective. Only allowed to change quantity
 	app.post("/api/cart", function(req, res, next) {
@@ -607,7 +607,7 @@ exports.configAPI = function configAPI(app) {
 									order.quantity = newQuantity;
 									order.save();
 								
-									res.status(200).send();
+									res.status(200).end();
 								}
 								else {
 									res.send("Sorry! Insufficient inventory to add more than " + product.quantity + " to your cart" );
@@ -625,10 +625,10 @@ exports.configAPI = function configAPI(app) {
 				], 
 				function(err) {
 					console.log(err);
-					res.status(500).send();
+					res.status(500).end();
 			});
 		}
-		else res.status(403).send();
+		else res.status(403).end();
 		
 	});
 	// Deletes a specific item from a users own cart and increases the quantity
@@ -655,9 +655,9 @@ exports.configAPI = function configAPI(app) {
 					res.status(204).send('Product removed from cart');
 				}
 
-			})
+			});
 		}
-		else res.status(401).send();
+		else res.status(401).end();
 	});
 	
 	// Creates a new order from the 'add to cart' buttons in the app. Returns the
@@ -682,7 +682,7 @@ exports.configAPI = function configAPI(app) {
 							}
 							else {
 								console.log(e);
-								res.status(500).send();
+								res.status(500).end();
 								callback(e);
 							}
 						});
@@ -708,7 +708,7 @@ exports.configAPI = function configAPI(app) {
 					}
 				], function(error) { 
 					console.log(error); 
-					res.status(500).send(); 
+					res.status(500).end(); 
 					return errorHandler(error);
 				});
 			}
@@ -739,7 +739,7 @@ exports.configAPI = function configAPI(app) {
 			// Save the time the invoice was modified
 			invoice.dateModified = Date();
 			invoice.save();
-			res.status(202).send();
+			res.status(202).end();
 		});
 	});
 	
@@ -767,7 +767,7 @@ exports.configAPI = function configAPI(app) {
 				certification: application.certification,
 				chemicals: application.chemicals,
 				products: application.products
-			}
+			};
 			
 			req.user.producerData.certification = application.certification;
 			req.user.producerData.chemicalDisclaimer = application.chemicals;
@@ -783,8 +783,8 @@ exports.configAPI = function configAPI(app) {
 				else res.status(200).send(result);
 			});
 		}
-		else if (req.user.user_type.canSell) res.status(403).send();
-		else res.status(401).send();
+		else if (req.user.user_type.canSell) res.status(403).end();
+		else res.status(401).end();
 	});
 	
 	//Get and return users as JSON data based on a query. Only really used for the
@@ -806,7 +806,7 @@ exports.configAPI = function configAPI(app) {
 				console.log('User just requested from api/user/');
 				res.json(results);
 			} else {
-				console.log(e) // log the error
+				console.log(e); // log the error
 			}
 		});
 	});
@@ -824,14 +824,14 @@ exports.configAPI = function configAPI(app) {
 						if (data.status === "OK") {
 							lat = data.results[0].geometry.location.lat;
 							lng = data.results[0].geometry.location.lng;
-							done(null, lat, lng)
+							done(null, lat, lng);
 						} else {
 							done(data.status);
 						}
 					
 					});
 				}
-				else done(null, 0, 0)
+				else done(null, 0, 0);
 			}, function(lat, lng, done) {
 				// disable unapproved producers from uploading immediately.
 				if (req.body.user_type.canSell) req.body.user_type.canSell = false;
@@ -922,8 +922,6 @@ exports.configAPI = function configAPI(app) {
 							req.logIn(user, function(err){
 								// req.user should now be assigned
 								if (err) console.log(err);
-								console.log('this is the logged in user: ')
-								console.log(req.user);
 								userObject = req.user.toObject();
 								delete userObject.salt;
 								delete userObject.hash;
@@ -933,7 +931,7 @@ exports.configAPI = function configAPI(app) {
 					})(req, res, next);
 				}
 				else {
-					console.log(err)
+					console.log(err);
 					res.status(500).send(err);
 				}
 			}
@@ -951,7 +949,7 @@ exports.configAPI = function configAPI(app) {
 					if (req.body.user_type !== user.user_type) {
 						canSell = (req.body.user_type.canSell) ? "can sell products through the co-op website" : "can no longer sell products through the co-op website";
 						mailOptions = {template: "user-rights-change", subject: "Your NNFC membership has changed", to: {name: user.name, email: req.body.email}};
-						mailData = {name: user.name, message: canSell}
+						mailData = {name: user.name, message: canSell};
 						mail = new Emailer(mailOptions, mailData);
 						mail.send(function(err, result) {
 							if (err) console.log(err);
@@ -959,7 +957,7 @@ exports.configAPI = function configAPI(app) {
 					}
 					
 					// update the database with the user's changes
-					for (key in req.body) {
+					for (var key in req.body) {
 						if (user[key] !== req.body[key] && key !== 'password' && key !== 'oldPassword') {
 							user[key] = req.body[key];
 						}
@@ -991,8 +989,8 @@ exports.configAPI = function configAPI(app) {
 									});
 								});
 							} else {
-								console.log('Old password does not match current password.')
-								res.status(400).send('Old password does not match current password.')
+								console.log('Old password does not match current password.');
+								res.status(400).send('Old password does not match current password.');
 							}
 						
 							delete user.password;
@@ -1007,12 +1005,12 @@ exports.configAPI = function configAPI(app) {
 					res.json(user);
 				} else {
 					console.log(e);
-					res.status(401).send("You must be logged in to change data about a user")
+					res.status(401).send("You must be logged in to change data about a user");
 				}
 				
 			});
 		}
-		else res.status(401).send();
+		else res.status(401).end();
 		
 	});
 
@@ -1028,7 +1026,7 @@ exports.configAPI = function configAPI(app) {
 					res.send(results);
 				}
 				else {
-					res.status(404).send();
+					res.status(404).end();
 				}
 				
 			} else {
@@ -1039,13 +1037,14 @@ exports.configAPI = function configAPI(app) {
 
 	// returns a user by name. This call is designed to return only a producer.
 	app.get("/api/user/producer/:producerName", function(req, res, next) {
+		var nameParam;
 		if (req.params.producerName) {
-			var name = req.params.producerName.split("+");
-			name = name.join(' ');
+			nameParam = req.params.producerName.split("+");
+			nameParam = nameParam.join(' ');
 		}
 		
 		models.User.findOne({
-			name: name
+			name: nameParam
 		}, null, {
 			sort: {
 				_id: 1
@@ -1075,7 +1074,7 @@ exports.configAPI = function configAPI(app) {
 				}
 			});
 		} else {
-			res.status(401).send();
+			res.status(401).end();
 		}
 	});
 	
@@ -1095,7 +1094,7 @@ exports.configAPI = function configAPI(app) {
 							models.Invoice.findOne({ invoicee: new ObjectId(user._id), title: 'Membership'}, function(e, invoice){
 								if (e) return handleError(e);
 								done(e, user, invoice);
-							})
+							});
 						}
 					});
 				},
@@ -1106,7 +1105,7 @@ exports.configAPI = function configAPI(app) {
 						template: 'member-leaving',
 						subject: user.name + ' wants to leave the NNFC',
 						to: mail.companyEmail
-					},
+					};
 					
 					toAdminData = {name: user.name};
 					
@@ -1118,8 +1117,8 @@ exports.configAPI = function configAPI(app) {
 						}
 						// a response is sent so the client request doesn't timeout and get an error.
 						console.log("Message sent to user about leaving the NNFC");
-						done(null, user, invoice)
-					})
+						done(null, user, invoice);
+					});
 				},
 				
 				// next we send an email notifying the user they will be re-imbursed for their membership fee
@@ -1144,12 +1143,12 @@ exports.configAPI = function configAPI(app) {
 							}
 							// a response is sent so the client request doesn't timeout and get an error.
 							console.log("Message sent to user about leaving the NNFC");
-							done(null, user, invoice)
+							done(null, user, invoice);
 						});
 					}
 					else {
 						//invoice not found
-						done(null, user, invoice)
+						done(null, user, invoice);
 					}
 				},
 				// make changes to the membership invoice
@@ -1157,7 +1156,7 @@ exports.configAPI = function configAPI(app) {
 					if (invoice) {
 						
 						invoice.exInvoicee = 'ex-member ' + user.name;
-						invoice.save()
+						invoice.save();
 						
 						switch (invoice.status) {
 						case 'PAID':
@@ -1181,12 +1180,12 @@ exports.configAPI = function configAPI(app) {
 						id: 'e481a3338d',
 						email: {email: user.email},
 					};
-					mc.lists.unsubscribe(params, function(data) {console.log(data); done(null, user)}, done(e));
+					mc.lists.unsubscribe(params, function(data) {console.log(data); done(null, user);}, done(e));
 				}, function (user, done) {
 					if (user.user_type.name === 'Producer') {
 						// add user to producer list as well;
-						params.id = 'f379285252'
-						mc.lists.unsubscribe(params, function(data) {console.log(data); done(null, user)}, done(e));
+						params.id = 'f379285252';
+						mc.lists.unsubscribe(params, function(data) {console.log(data); done(null, user);}, done(e));
 					}
 					else {
 						done(null, user);
@@ -1206,7 +1205,7 @@ exports.configAPI = function configAPI(app) {
 					models.User.remove({_id: user.id}, function(e) {
 						if (e) return handleError(e);
 					});	
-					console.log('The user and their products and orders are deleted')
+					console.log('The user and their products and orders are deleted');
 					done(null, 'done');
 				}
 				
@@ -1214,11 +1213,11 @@ exports.configAPI = function configAPI(app) {
 				// if the email sent successfully, delete the user's data
 				function(e, result) {
 					if (!e && result === 'done') {
-						res.status(200).send();
+						res.status(200).end();
 					}
 					else {
 						console.log(results);
-						res.status(500).send();
+						res.status(500).end();
 					}
 				});
 		}
@@ -1245,15 +1244,17 @@ exports.configAPI = function configAPI(app) {
 			if (err) { return next(err); }
 			if (!user) {
 				req.session.messages =  [info.message];
-				return res.status(403).send('Failed to authenticate user');
+				res.status(403).send({status: 403, message: 'Incorrect Login'});
 			}
-			req.logIn(user, function(err) {
-				if (err) { console.log(err); }
-				var userObject = req.user.toObject();
-				delete userObject.salt;
-				delete userObject.hash;
-				res.send(userObject);
-			});
+			else {
+				req.logIn(user, function(err) {
+					if (err) console.log(err);
+					var userObject = req.user.toObject();
+					delete userObject.salt;
+					delete userObject.hash;
+					res.send(userObject);
+				});
+			}
 		})(req, res, next);
 	})
 	// log the user out and delete their session	
@@ -1356,7 +1357,7 @@ exports.configAPI = function configAPI(app) {
 			function(done) {
 				models.User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
 					if (!user) {
-						return res.status(401).send('Password reset token is invalid or has expired');
+						return res.status(403).send('Password reset token is invalid or has expired');
 					}
 					user.setPassword(req.body.password, function() {
 						user.set(resetPasswordToken, undefined);
@@ -1367,7 +1368,6 @@ exports.configAPI = function configAPI(app) {
 							done(err, user);
 						});
 					});
-					
 				});
 			},
 			// send an email to the user informing them of their password being changed.
@@ -1415,8 +1415,8 @@ exports.configAPI = function configAPI(app) {
 				_id: 1
 			}
 		}, function(e, results) {
-			res.json(results)
-		})
+			res.json(results);
+		});
 	});
 
 	// get the certification collection for defining products
@@ -1426,8 +1426,8 @@ exports.configAPI = function configAPI(app) {
 				_id: 1
 			}
 		}, function(e, results) {
-			res.json(results)
-		})
+			res.json(results);
+		});
 	});
 	
 	app.get("/api/calendar", function(req, res, next) {
@@ -1451,4 +1451,4 @@ exports.configAPI = function configAPI(app) {
 		showStack: true
 	}));
 	return app;
-}
+};

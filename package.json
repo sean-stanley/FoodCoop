@@ -23,6 +23,7 @@
     "url": "https://github.com/StrategicDevelopment/FoodCoop/issues"
   },
   "devDependencies": {
+    "grunt-contrib-uglify": "^0.6.0",
     "karma": "~0.12.12"
   },
   "dependencies": {
@@ -60,6 +61,6 @@
     "passport-local": "~1.0.0",
     "passport-local-mongoose": "~0.3.0",
     "password-reset": "~0.1.4",
-	"prerender-node": "latest"
+    "prerender-node": "latest"
   }
 }
