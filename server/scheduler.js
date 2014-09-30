@@ -26,6 +26,8 @@ var orderCycleChecker = schedule.scheduleJob({hour:0, minute: 0}, checkConfig);
 function checkConfig() {
 	console.log(Date.now().toString() + ". Checking if today is a significant day");
 	var today = Date.today(), cycle = config.cycle, key;
+	exports.canShop = false;
+	exports.canUpload = false;
 
 	// test for an exact day match and run reminder email functions if it is.
 	for (key in cycle) {
@@ -112,7 +114,7 @@ function checkout() {
 			});
 		},
 		function(customers, done) {
-			models.User.populate(customers, {path: '_id', select: 'name email'}
+			models.User.populate(customers, {path: '_id', select: 'name email routeTitle'}
 			, function(e, result){
 				done(null, result);
 			});
@@ -140,7 +142,8 @@ function invoiceCustomer(customer) {
 				invoicee: customer._id._id,
 				title: "Shopping Order for " + Date.today().toString("MMMM"),
 				items: customer.orders,
-				cycle: exports.currentCycle
+				cycle: exports.currentCycle,
+				deliveryRoute: customer._id.routeTitle || "Whangarei"
 			})
 			
 			.save(function(e, invoice){
@@ -163,7 +166,7 @@ function invoiceCustomer(customer) {
 
 			mailData = {
 				name: customer._id.name,
-				dueDate: invoice.dueDate,
+				dueDate: invoice.dueDate.toString("ddd dd MMMM yyyy"),
 				code: invoice._id,
 				items: invoice.items,
 				total: invoice.total,
@@ -213,7 +216,7 @@ function orderGoods() {
 			});
 		},
 		function(producers, done) {
-			models.User.populate(producers, [{path: '_id', select: 'name email producerData.bankAccount'}, {path: 'orders.customer', select: 'name email'}]
+			models.User.populate(producers, [{path: '_id', select: 'name email producerData.bankAccount'}, {path: 'orders.customer', select: 'name email routeTitle'}]
 			, function(e, result){
 				done(null, result);
 			});
@@ -238,7 +241,7 @@ function invoiceFromProducer(producer) {
 	async.waterfall([
 		function(done) {
 			var invoice = new models.Invoice({
-				dueDate: config.cycle.DeliveryDay.toString(),
+				dueDate: config.cycle.DeliveryDay.toString("ddd dd MMMM yyyy"),
 				title: "Products Requested for " + Date.today().toString("MMMM"),
 				items: producer.orders,
 				cycle: exports.currentCycle,
@@ -265,7 +268,8 @@ function invoiceFromProducer(producer) {
 
 			mailData = {
 				name: producer._id.name,
-				dueDate: invoice.dueDate,
+				dueDate: invoice.dueDate.toString("ddd dd MMMM yyyy"),
+				deliveryDay: config.cycle.DeliveryDay.toString("ddd dd MMMM yyyy"),
 				code: invoice._id,
 				items: invoice.items,
 				total: invoice.total,
@@ -323,5 +327,11 @@ function findCycle() {
 
 findCycle();
 checkConfig();
+
+// checkout everyone's purchases
+//checkout();
+// send order requests to producers
+//orderGoods();
+
 
 

@@ -71,7 +71,8 @@ angular.module('co-op.services', [])
 		}
 		
 		function authenticate(user) {
-			$rootScope.currentUser = user.plain();
+			$rootScope.currentUser = user;
+			$rootScope.currentUser.route = 'api/user/' + $rootScope.currentUser._id;
 			getTally();
 			return true;
 		}
@@ -87,8 +88,7 @@ angular.module('co-op.services', [])
 						rememberMe: form.rememberMe
 						})
 					.then(function(user) {
-						$rootScope.currentUser = user.plain();
-						getTally();
+						authenticate(user);
 						$location.path($rootScope.savedLocation);
 						$rootScope.savedLocation = "";
 						flash.setNextMessage({type: 'success', message: 'Welcome back ' + $rootScope.currentUser.name + '. Check out the member tools sidebar!'});
@@ -168,12 +168,13 @@ angular.module('co-op.services', [])
 
 	// called for creating new users as well as has a promise for getting all the users. Editing a
 	// user though is handled by the userEditCtrl Controller. 
-	.factory('UserManager', ['$rootScope', 'Restangular', '$q', function($rootScope, Restangular, $q) {
+	.factory('UserManager', ['$rootScope', 'Restangular', '$q', 'flash', function($rootScope, Restangular, $q, flash) {
 		return {
 			createUser: function(userinfo) {
 				var result = $q.defer();
 				Restangular.all('api/user').post(userinfo).then(function(user){
 					$rootScope.currentUser = user;
+					$rootScope.currentUser.route = 'api/user/' + $rootScope.currentUser._id;
 					result.resolve();
 				}, function(error){
 					var message = {type: 'danger', message: 'Drat! Failed to create a new user. '+error.data.name + ': ' + error.data.message};
@@ -182,6 +183,20 @@ angular.module('co-op.services', [])
 				});
 			return result.promise;
 			},
+			save: function() {
+				$rootScope.currentUser.post().then(function(response) {
+					flash.setMessage({type: 'success', message: 'Details saved successfully'});
+				}, function(error) {
+					flash.setMessage({type: 'danger', message: 'Oops! Failed to save data. ' + error.name + ': ' + error.message});
+				});
+			},
+			delCurrentUser: function(callback) {
+				var cb = callback || angular.noop;
+				$rootScope.currentUser.customDELETE($rootScope.currentUser._id).then(function() {
+					callback();
+				});
+			},
+			
 			
 			// this is a promise. Call users.getList() to get the array of users. 
 			users: Restangular.all('api/user')
@@ -264,7 +279,6 @@ angular.module('co-op.services', [])
 		return {
 			saveProducer : function(callback) {
 				var cb = callback || angular.noop;				
-				console.log($rootScope.currentUser);
 				Restangular.one('api/user', $rootScope.currentUser._id).customPOST($rootScope.currentUser, 'producer/edit')
 				.then(function(result) {flash.setMessage({type: 'success', message: 'Profile Updated Successfully.'});},
 					function(){flash.setMessage({type: 'danger', message: 'Drat! Failed to update your profile.'});});

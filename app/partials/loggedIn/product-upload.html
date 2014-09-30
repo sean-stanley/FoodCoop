@@ -157,10 +157,6 @@
 							ng-model="productData.quantity" name="quantity" type="number" max="1000" class="form-control" id="quantity" placeholder="e.g. 27" required>
 					    </div>
 				   </div>
-			    
-			    
-			
-			     
 			     <div id="ingredients" class="form-group">
 					<label for="ingredients">Ingredients</label> 
 					<textarea class="form-control" 
@@ -168,12 +164,16 @@
 					ng-model="productData.ingredients" id="ingredients" maxlength="1000" placeholder="Please list all ingredients of this product in a format like follows: rice flour, organic sugar, raw milk butter, salt." rows="9" style="width: 100%;"></textarea>  
 			    </div>
 			    
-			    <div class="form-group">
+				<div class="form-group">
 					<label for="description">Description</label> 
-					<textarea class="form-control" 
-					ng-disabled="!productData.hasOwnProperty('category')"
-					ng-model="productData.description" id="description" maxlength="2000" placeholder="Write a couple paragraphs about how special your product is." rows="9" style="width: 100%;"></textarea>  
-			    </div> 
+					<text-angular
+					ng-disabled="!productData.hasOwnProperty('category')" 
+					ng-model="productData.description"
+					placeholder="Write a couple paragraphs about how special your product is."
+					name="description"
+					rows="9">
+					</text-angular>
+				</div>
 			    
 			    <div class="form-group">
 					<label for="certification">Certification</label>

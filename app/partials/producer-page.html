@@ -2,29 +2,34 @@
 	<h1 class="text-center">{{producer.producerData.companyName}}</h1>
 </div>
 
-<iframe ng-src="{{map}}" class="col-md-10 map-frame col-md-offset-1" height="500px"></iframe>
 
 <div class="row">
 
-	<div class="col-md-3 well col-md-offset-1">
+	<div class="col-md-3 well">
+		<div class="col-md-12">
 		<img ng-src="{{producer.producerData.logo}}" class="img-responsive"/>
 		<hr ng-if="producer.producerData.logo">
 		<h5>Contact Details</h5>
 		<ul class="list-unstyled" id="contact-details">
 			<li><span class="glyphicon glyphicon-earphone"></span> {{producer.phone}}</li>
 			<li><span class="glyphicon glyphicon-envelope"></span> <a ng-href="/contact/{{producer._id}}">{{producer.email}}</a></li>
-			<li><span class="glyphicon glyphicon-map-marker"></span> {{producer.address}}</li>
+			<li ng-if="producer.addressPermission"><span class="glyphicon glyphicon-map-marker"></span> {{producer.address}}</li>
 			<li><img src="../img/glyphicons/Globe.png" width="18" alt="Globe"> <a href="http://{{producer.producerData.website}}" target="_blank">{{producer.producerData.website}}</a></li>
 		</ul>
+		</div>
 	</div>
 
-	<article class="col-md-4" ta-bind ng-model="producer.producerData.description">
+	<article class="col-md-6" ta-bind ng-model="producer.producerData.description">
 		<p>No description available yet</p>
 	</article>
-
-	<div class="col-md-3 well" ta-bind ng-model="producer.producerData.personalBio">
+	
+	<div class="col-md-3 well" >
+		<article class="col-md-12" ta-bind ng-model="producer.producerData.personalBio"></article>
 	</div>
 </div>
+
+
+<iframe ng-src="{{map}}" class="col-md-10 map-frame col-md-offset-1" height="500px" ng-if="producer.addressPermission"></iframe>
 				
 
         

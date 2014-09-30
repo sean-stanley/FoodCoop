@@ -1,14 +1,23 @@
-<div class="col-md-4 well">
+<div class="col-sm-4 col-md-3 well">
 	<h2>Want to be a route manager?</h2>
 	<p>Route managers help coordinate members in their area to ensure goods are delivered to their community on delivery day. They are responsible for recruiting volunteer drivers each month and ensuring the members on their route know where and when to collect their goods on Delivery Day.</p>
 	<p>We'd love to have your support. Please notify our admin with the contact page and we can help you arrange your route.</p>
 	<p>Need more info on what the role entails?</p>
 	<a class="btn btn-primary" href="/contact?subject=I%20want%20to%20be%20a%20route%20manager">Contact Admin</a> 
-	<a class="btn btn-primary" href="/volunteer#route-manager">Full Job Descrption</a> 
+	<a class="btn btn-primary" scroll-anchor="sorter" offset='51' href="/volunteer">Full Job Descrption</a> 
 </div>
-<div class="col-md-8">	
+<div class="col-sm-8 col-md-9">	
 	<div class="page-header">
-		<h1>List of Route Managers</h1>
+		<h1>Co-op Delivery System</h1>
+	</div>
+	<p class="lead">The NNFC's delivery systems are powered by it's members. These systems are based on existing models in Canada and the US. The first step to participating in the Co-op's Delivery Systems is joining a delivery <strong>route</strong>.</p>
+	
+	<p>When choosing which route to join, please select one as close as possible to where you live. You can try searching for your town or region as well as by compass directions from Whangarei.</p>
+	
+	<p>If you don't see a route for your area listed, please consider becoming a <a scroll-anchor="route-manager" offset='51' href="/volunteer">route manager.</a></p>
+		
+	<div class="page-header">
+		<h1>List of Routes</h1>
 	</div>
 
 	<div class="input-group form-group">
@@ -27,13 +36,17 @@
 	      </ul>
 	    </div>
 
-	<div class="" ng-repeat="i in routeManagerList | orderBy:predicate:reverse | filter:search">
-		<div class="page-header"><h1>{{i.routeManager.title}}</h1></div>
+	<div class="col-md-12" ng-repeat="i in routeManagerList | orderBy:predicate:reverse | filter:search">
+		<div class="page-header">
+			<h1>{{i.routeManager.title}} <span class="pull-right">
+				<button ng-if="currentUser" class="btn btn-primary" ng-click="join(i.routeManager.title)">Join this Route</button>
+			</h1>
+		</div>
 		<div class="col-lg-4">
 			<h2 class="text-center">The Manager</h2>
 			<p>Name: {{i.name}}<br>
 				email: <a ng-href="/contact/{{i._id}}">{{i.email}}</a><br>
-				phont: {{i.phone}}
+				phone: {{i.phone}}
 			</p>
 		</div>
 		<div class="col-lg-4">

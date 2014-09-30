@@ -110,7 +110,9 @@ var InvoiceSchema = new Schema({
 	//valid types are 'un-paid', 'PAID', 'overdue', 'To Refund', 'refunded' and
 	//'CANCELLED'.
 	status: {type: String, required: true, default: 'un-paid', set:validStatus},
-	cycle: {type: Number, required: true},	
+	cycle: {type: Number, required: true},
+	// only for invoices to customers
+	deliveryRoute: String
 },{
 	toObject: { virtuals : true },
 	toJSON: { virtuals : true }
@@ -172,6 +174,7 @@ var UserSchema = new Schema({
 			email : {type: String, required: true, set: toLower},
 			phone : {type: String, required: true},
 			address : {type: String, required: true},
+			addressPermission : {type: Boolean, default: false},
 			// this is for a future feature that will be a map of all our producers
 			lat : Number,
 			lng : Number,
@@ -198,6 +201,7 @@ var UserSchema = new Schema({
 				townsOnRoute: {type: Array, set: toArray, get: toString},
 				pickupLocation: String
 			},
+			routeTitle: String,
 			resetPasswordToken: String,
 			resetPasswordExpires: Date
 });

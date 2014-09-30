@@ -51,7 +51,7 @@ angular.module('co-op', [
 			}
 		})
 		.when('/user/:userId', {
-			controller: 'userEditCtrl', 
+			controller: 'adminUserEditCtrl', 
 			templateUrl:'partials/admin/details.html',
 			title: 'Admin',
 			adminOnly: true, reloadOnSearch: false,
@@ -97,11 +97,11 @@ angular.module('co-op', [
 	 	})
 	
 		.when('/faq', {templateUrl: 'partials/faq.html', controller: 'faqCtrl', reloadOnSearch: false})
-		.when('/route-manager-directory', {
-			templateUrl: 'partials/route-managers.html',
-			controller: 'routeManagerListCtrl',
-			title : 'Help FAQ',
-			description: 'The FAQ has answers to common questions about being a member of our local food co-op.',
+		.when('/delivery', {
+			templateUrl: 'partials/delivery.html',
+			controller: 'deliveryCtrl',
+			title : 'Delivery',
+			description: 'Have your orders delivered to your community for more local pickup.',
 			resolve: {
 				routeManagerList : function(Restangular) {
 					return Restangular.all('api/user').getList({'user_type.isRouteManager': true}).$object;
@@ -157,16 +157,12 @@ angular.module('co-op', [
 			title : 'My Invoices',
 			description: 'Use the contact form to contact another northland natural food co-op member.',
 		})
-		.when('/me/:userId', {
+		.when('/me', {
 			controller: 'userEditCtrl',
 			templateUrl:'partials/loggedIn/edit-me.html',
 			loggedInOnly: true, reloadOnSearch: false,
 			title : 'My Settings',
-			resolve: {
-				user: function(Restangular, $route){
-					return Restangular.one('api/user', $route.current.params.userId).get();
-				}
-			}
+			
 		})
 
 		.when('/contact', {templateUrl: 'partials/contact.html', controller: 'contactCtrl', reloadOnSearch: false})
@@ -206,7 +202,7 @@ angular.module('co-op', [
 	
   }])
 	.run(function($rootScope, $route, $location, LoginManager, flash, Session, Restangular, $window) {
-		$rootScope.slideInterval = 5000;
+		$rootScope.slideInterval = 7000;
 		$rootScope.setInterval = function(interval) {
 			$rootScope.slideInterval = interval;
 			console.log('interval changed to '+ interval);

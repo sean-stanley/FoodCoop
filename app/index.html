@@ -10,6 +10,23 @@
 	
 	<base href="/index.html">
 	
+	<style>
+		/* Loading Page Styles are inline to increase speed */
+		[ng-cloak].splash {display: block;}
+		@font-face{font-family:'FontAwesome';src:url('fonts/fontawesome-webfont.eot?v=4.2.0');src:url('fonts/fontawesome-webfont.eot?#iefix&v=4.2.0') format('embedded-opentype'),url('fonts/fontawesome-webfont.woff?v=4.2.0') format('woff'),url('fonts/fontawesome-webfont.ttf?v=4.2.0') format('truetype'),url('fonts/fontawesome-webfont.svg?v=4.2.0#fontawesomeregular') format('svg');font-weight:normal;font-style:normal}
+.splash{position:fixed;display:block;width:100%;height:100%;padding:25%;background:purple;color:white;z-index:9999999;display:none;}
+.splash .fa{display:inline-block;font:normal normal normal 14px/1 FontAwesome;font-size:inherit;text-rendering:auto;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.splash .fa-cog:before{content:"\f013"}
+.splash .fa-spin{-webkit-animation:fa-spin 2s infinite linear;animation:fa-spin 2s infinite linear}
+@-webkit-keyframes fa-spin{0%{-webkit-transform:rotate(0deg);transform:rotate(0deg)}
+100%{-webkit-transform:rotate(359deg);transform:rotate(359deg)}
+}
+@keyframes fa-spin{0%{-webkit-transform:rotate(0deg);transform:rotate(0deg)}
+100%{-webkit-transform:rotate(359deg);transform:rotate(359deg)}
+}
+	</style>
+	
+	
 	<!-- Google Font -->
 	<link href='http://fonts.googleapis.com/css?family=Raleway:700,500' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="css/font-awesome.min.css" type="text/css" media="screen" title="no title" charset="utf-8">
@@ -23,10 +40,16 @@
 	<link href="css/banner.css" rel="stylesheet" media="screen">
 	<link href="css/animations.css" rel="stylesheet">
 	
+	
+	
 </head>
 
-<body ng-controller="navCtrl" ng-init="cart = {open: false};" >		
-	<div id="sidebar" class="sidebar" ng-show="panelDisplay" ng-class="{'wide-sidebar':cart.open, 'narrow-sidebar':!cart.open}" >
+<body ng-controller="navCtrl" ng-init="cart = {open: false};" >
+	<div ng-cloak="" class='splash text-center'>
+		<h1 style="font-size: 6em">Loading your Co-op</h1>
+		<i class="fa fa-cog fa-spin" style='font-size: 10em'></i>
+	</div>	
+	<div id="sidebar" class="sidebar" ng-show="panelDisplay" ng-class="{'wide-sidebar':cart.open, 'narrow-sidebar':!cart.open}" ng-cloak>
 		<div class="sidebar-main">
 			<a href="" id="close-sidebar-button" class="panel-btn panel-btn-lg" ng-click="panelDisplay = false">&times;</a>
 			<div class="form-group" ng-show="storePage()">
@@ -102,7 +125,7 @@
 			</accordion>
 			<ul class="nav nav-pills nav-stacked">
 					<li ng-class="{active:isActive('/producer-list')}"><a href="producer-list">Producer List</a></li>
-					<li ng-class="{active:isActive('/route-manager-directory')}"><a href="route-manager-directory">Route Manager List</a></li>
+					<li ng-class="{active:isActive('/delivery')}"><a href="delivery">Delivery</a></li>
 					<li ng-class="{active:isActive('/my-cart')}" ng-show="currentUser"><a href="my-cart">Cart Page</a></li>
 					<li ng-class="{active:isActive('/order-manager')}" 
 					ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
@@ -130,26 +153,37 @@
 					<span class="icon-bar"></span> 
 					<span class="icon-bar"></span> 
 				</button> 
-				<a class="navbar-brand" href="#">NNFC</a>
+				<a class="navbar-brand" href="/">NNFC Beta</a>
+				<a class="navbar-brand" ng-click="panelDisplay = !panelDisplay">
+					<small class="hidden-sm"><span class="glyphicon glyphicon-cog"></span> Member Tools</small>
+					<small class="visible-sm"><span class="glyphicon glyphicon-cog"></span> Member Tools</small>
+				</a>
+				<!--
 				<ul class="nav navbar-nav pull-left">
-					<li ng-click="panelDisplay = !panelDisplay"><a class="panel-btn panel-btn-sml">
-						<span class="glyphicon glyphicon-cog"></span> Member Tools</a></li>
-				</ul>
+									<li ng-click="panelDisplay = !panelDisplay">
+										<span class="glyphicon glyphicon-cog"></span> Member Tools</li>
+								</ul>-->
+				
 			</div> 
-			<div class="collapse navbar-collapse" collapse="mobileMenu">
+			<div class="collapse navbar-collapse" collapse="mobileMenu" ng-touch="mobileMenu = true"> <!-- change ng-touch to ng-click if not working on test site -->
 				<ul class="nav navbar-nav navbar-right">
+					<li class="hidden-md hidden-lg" ng-if="currentUser == null">
+						<a href="/login-page"><span class="glyphicon glyphicon-lock"></span>Login</a>
+					</li>
 					<li ng-class="{active:isActive('/store')}"><a href="store"><span class="glyphicon glyphicon-shopping-cart"></span> Store</a></li>
 					<li ng-class="{active:isActive('/')}"><a href="/">Home</a></li>
-					<li ng-class="{active:isActive('/signup')}" ng-hide="currentUser != null"><a href="signup">Sign Up</a></li>
+					<li ng-class="{active:isActive('/signup')}" ng-hide="currentUser != null"><a href="/signup">Sign Up</a></li>
 					<li ng-class="{active:isActive('/about')}"><a href="/about">About</a></li>
-					<li ng-class="{active:isActive('/faq')}"><a href="faq">FAQ</a></li>
-					<li ng-class="{active:isActive('/contact')}"><a href="contact">Contact</a></li>
-					<li ng-if="currentUser == null"><ng-include src=" 'partials/login.html' "></ng-include></li>
-					<li ng-if="currentUser" ng-class="{active:isActive('/me/' + currentUser._id)}">
-						<a ng-href="/me/{{currentUser._id}}">
+					<li ng-class="{active:isActive('/faq')}"><a href="/faq">FAQ</a></li>
+					<li ng-class="{active:isActive('/contact')}"><a href="/contact">Contact</a></li>
+					
+					<li class="hidden-sm hidden-xs" ng-if="currentUser == null"><ng-include src=" 'partials/login.html' "></ng-include></li>
+					<li ng-if="currentUser" ng-class="{active:isActive('/me')}">
+						<a href="/me">
 							<span class="glyphicon glyphicon-user"></span>
 						</a>
 					</li>
+					
 				</ul>
 			</div>
 		</div>
@@ -157,14 +191,15 @@
 		
 	<div class="page-wrap">
 
-		<div class="container-fluid alert-box">
-			<alert type="{{alert.type}}" ng-repeat="alert in queue" close="flash.closeMessage($index)" role="alert" class="alerts">
+		<div class="container-fluid alert-box" ng-cloak>
+			<alert type="{{alert.type}}" ng-repeat="alert in queue" close="flash.closeMessage($index)" role="alert" class="alerts" ng-click="flash.closeMessage($index)">
 				{{alert.message}}
 			</alert>
 		</div> 
 			
 		<!--  This is where the partials go for the forms and information pages. /-->    
-		<div id="view" 
+		<div id="view"
+		ng-cloak
 		ng-view
 		autoscroll="true" 
 		class="template-container app-body" 

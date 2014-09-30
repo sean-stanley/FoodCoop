@@ -12,6 +12,7 @@ body {
 	font-family: 'Raleway', sans-serif;
 	font-weight: 500;
 }
+
 h1 {font-family: 'Raleway', sans-serif; font-weight: 700;}
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
 
@@ -157,6 +158,8 @@ html, body {
 	-- Alert Box --
 	-------------	*/
 .alert-box {position: fixed; top: 66px; z-index: 999999999; width: 100%;}
+.alert {-webkit-box-shadow: 0 0 20px 20px rgba(255,255,255,0.5);
+box-shadow: 0 0 20px 20px rgba(255,255,255,0.5);}
 
 /*
 ProducerList Page

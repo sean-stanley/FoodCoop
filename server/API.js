@@ -123,7 +123,7 @@ exports.configAPI = function configAPI(app) {
 					res.status(500).end();
 				}
 				// a response is sent so the client request doesn't timeout and get an error.
-				res.send("text/plain", "Message sent to client");
+				res.send("Message sent to client");
 			});
 		} else if (req.body.hasOwnProperty('to')) {
 			// this case is for when a client is trying to send a message to one of our producer members.
@@ -945,8 +945,10 @@ exports.configAPI = function configAPI(app) {
 			models.User.findById(req.params.id, function(e, user) {
 				if (!e) {
 					
+					var userData = user.toJSON();
+					
 					// email the user that their account details were changed
-					if (req.body.user_type !== user.user_type) {
+					if ( !_.isEqual(req.body.user_type, userData.user_type) ) {
 						canSell = (req.body.user_type.canSell) ? "can sell products through the co-op website" : "can no longer sell products through the co-op website";
 						mailOptions = {template: "user-rights-change", subject: "Your NNFC membership has changed", to: {name: user.name, email: req.body.email}};
 						mailData = {name: user.name, message: canSell};
@@ -958,8 +960,17 @@ exports.configAPI = function configAPI(app) {
 					
 					// update the database with the user's changes
 					for (var key in req.body) {
-						if (user[key] !== req.body[key] && key !== 'password' && key !== 'oldPassword') {
-							user[key] = req.body[key];
+						if (userData[key] !== req.body[key] && key !== 'password' && key !== 'oldPassword') {
+							// rule out strings and numbers so we know to do a deep comparison
+							if (_.isObject(req.body[key]) && _.isObject(userData[key]) ) { 
+								// deep comparison
+								if ( !_.isEqual(userData[key], req.body[key]) ) {
+									user[key] = req.body[key];
+								}
+							}
+							// most likely string or number so this operation is safe
+							else user[key] = req.body[key];
+							
 						}
 					}
 					
@@ -1064,7 +1075,8 @@ exports.configAPI = function configAPI(app) {
 	app.post("/api/user/:id/producer/edit", function(req, res, next) {
 		if (req.user) {
 			models.User.findByIdAndUpdate(req.params.id, {
-				producerData: req.body.producerData
+				producerData: req.body.producerData,
+				addressPermission: req.body.addressPermission
 			}, function(err, user) {
 				console.log('The raw response from Mongo was ', user);
 				if (err) return handleError(err);
@@ -1432,13 +1444,16 @@ exports.configAPI = function configAPI(app) {
 	
 	app.get("/api/calendar", function(req, res, next) {
 		var calendar = [], nextMonth, twoMonth;
-		calendar.push(config.cycle);
-		
+
 		nextMonth = config.getCycleDates('t + 1 month');
 		twoMonth = config.getCycleDates('t + 2months');
-		calendar.push(nextMonth);
-		calendar.push(twoMonth);
-		calendar.push(scheduler.currentCycle);
+		
+		calendar.push(config.cycle); // 0
+		calendar.push(nextMonth); // 1
+		calendar.push(twoMonth); // 2
+		calendar.push(scheduler.currentCycle); // 3
+		calendar.push(scheduler.canUpload); // 4
+		calendar.push(scheduler.canShop); // 5
 		delete calendar[0].cycleIncrementDay;
 		delete calendar[1].cycleIncrementDay;
 		delete calendar[2].cycleIncrementDay;

@@ -8,7 +8,7 @@
         <p> Shopping is now closed for this month so we tallied up everything ordered from you and sent you this list. We've also tallied up the cost of those products.</p>
         <p> Assuming all your customers pay us promptly, we will transfer payment by <strong>{{dueDate}}</strong></p>
 		
-		<p>Below is the invoice we generated for us to pay you. You'll find it also contains the details of what you are required to deliver to us on delivery day which is <strong>{{dueDate}}</strong></p>
+		<p>Below is the invoice we generated for us to pay you. You'll find it also contains the details of what you are required to deliver to us on delivery day which is <strong>{{deliveryDay}}</strong></p>
        
        <table border="0" cellspacing="10" cellpadding="10">
            <thead>
@@ -49,8 +49,28 @@
        
 	   <hr>
         <p> A copy of this invoice and its status is available <a href="http://foodcoop.org.nz/my-invoices">online</a>
+			
+		<h1>Product Labels</h1>
+		<p>Please attach these labels to your sold items. Our sorting teams thank you for your co-operation.</p>
+		  <% _.each(items, function(item) { %> 
+			<table style="width: 500px; border: 1px dotted #333;">
+                <tr>
+					<td style="padding: 15px 10px 0 10px"><strong>{{item.product.fullName}}</strong> <br/>
+						Customer: {{item.customer.name}}
+					</td>
+					<td style="padding: 15px 10px 0 10px">Quantity: {{item.quantity}}<br/>
+					Total: ${{item.product.price * item.quantity}}</td>
+                </tr>
+				<tr>
+					<td style="padding: 0 10px 15px 10px">Route: {{item.customer.routeTitle}}</td>
+					<td style="padding: 0 10px 15px 10px">{{item.product.refrigeration}}</td>
+				</tr>
+			</table>
+		<% }); %>
+		
+			
         
-        <p> We look forward to continueing to provide you with a great online experience.</p>
+        <p> We look forward to providing you with a great online experience.</p>
         <p>Cheers, <br>
         The NNFC team </p>
         

@@ -28,13 +28,15 @@
 			<h3>{{i.producerData.companyName}} <small>{{i.name}}</small></h3>
 		
 	        <ul class="list-unstyled">
-				<li><span class="glyphicon glyphicon-map-marker"></span> 
+				<li ng-if="i.addressPermission"><span class="glyphicon glyphicon-map-marker"></span> 
 					<a ng-href="//mapof.it/{{currentUser.address | forURL}}/{{i.address | forURL}}">{{i.address}}</a>
 				</li>
 	        </ul>
 			<hr>
 		
-			<article>{{i.producerData.description | blurb}}</article>
+<!--
+			<article ta-bind ng-model="i.producerData.description"></article>
+-->
 			<a class="pull-right" ng-href="/producer/{{i.producerData.companyName | forURL}}-{{i.name | forURL}}"><button class="btn btn-default">More Details</button></a>
 		
 		</div>

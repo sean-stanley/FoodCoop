@@ -165,27 +165,12 @@ angular.module('co-op.directives', [])
 			                });
 			            }
 						scope.$apply();
-			        };
+			};
 						
 			function fullSize() {
-				
-				/*
-				if (timer) $timeout.cancel(timer);
-								else {
-									timer = $timeout(function(){
-										timer = undefined;
-										element.css({'height' : $window.innerHeight + 'px'});
-										rect = element[0].getBoundingClientRect();
-										scope.$apply();
-									}, 100);
-								}*/
-				
 				element.css({'height' : $window.innerHeight + 'px'});
 				scope.$apply();
-				
 			}
-			
-			var rect = element[0].getBoundingClientRect();
 			
 	        angular.element($document).ready(function() {
 	        	fullSize();
@@ -207,6 +192,56 @@ angular.module('co-op.directives', [])
             
 	        }
 	    };
+	}])
+	
+	.directive('scrollAnchor', ['$location', '$window', '$timeout', function($location, $window, $timeout) {
+		var callbacks = [];
+		
+		function scrollToCallback(id, location, offset, $scope) {
+			var currentLocation = $location.path();
+			event.preventDefault();
+		
+			function callback() {
+				var element = document.getElementById(id);
+				if (element) {
+					element.scrollIntoView();
+					// anything else I need can go here such as adding a class or calling another function
+					// next we add the offset typically this will be 51px for the top menubar
+					$window.scrollBy(0, - offset);
+				}
+			}
+			
+			$scope.$apply( function() {
+				if ($location.path() == location) {
+					callback();
+				}
+				else {
+					callbacks.push(callback);
+					$location.path(location);
+				}	
+			});
+		}
+		
+		return {
+			restrict: 'A',
+			scope: {
+				offset : '='
+			},
+			link: function($scope, iElement, attrs) {
+				angular.element(iElement).bind('click', function() {
+					scrollToCallback(attrs.scrollAnchor, attrs.href, attrs.offset, $scope);
+				});
+				$scope.$on('$routeChangeSuccess', function() {
+					console.log('all go!');
+					for (var i = 0; i < callbacks.length; i++) {
+						$timeout(callbacks[i], 200);
+					}
+					callbacks = [];
+				});
+			}
+		};
+		
+		
 	}])
 	
 

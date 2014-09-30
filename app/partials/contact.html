@@ -4,10 +4,17 @@
 	<p>Also feel free to phone or text us your questions at: <br>
 		<strong><span class="glyphicon glyphicon-earphone"></span> 021 040 9066</strong>
 	</p>
+	
+	<img class="img-responsive" src="img/cheese-fancy-local.jpg" alt="buy and sell dariy with the NNFC" ng-if="!member.producerData.img">
+	
+	
+	
+</article>
+
+<article ng-if="member" class=col-md-4>
+	<h2>{{member.name}}</h2>
 	<p ng-if="member" class="lead" >Use this form to contact <strong>{{member.name}}</strong> at the email address of {{member.email}}</p>
-	<img class="img-responsive" src="img/cheese-fancy-local.jpg" alt="buy and sell dariy with the NNFC">
-	
-	
+	<img class="img-responsive" ng-src="{{member.producerData.logo}}" ng-if="member.producerData.logo">
 </article>
 
 <form name="contactUs" ng-submit="submitForm(mail);" class="col-md-4">

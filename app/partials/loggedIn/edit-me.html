@@ -1,20 +1,21 @@
-<div class="col-md-10 col-md-offset-1">
+<div class="col-md-12">
 	<div class="page-header">
 		<h1 ng-controller="logoutCtrl">
-			{{user.name}} <small>{{user.user_type.name}}</small>
-			<a href="/" class="btn btn-primary pull-right"><span class="glyphicon glyphicon-lock"></span> Logout</a>
+			{{currentUser.name}} <small>{{currentUser.user_type.name}}</small>
+			<a href="/" class="btn btn-primary pull-right" ng-click="logOut()"><span class="glyphicon glyphicon-lock"></span> Logout</a>
 		</h1>
 	</div>
 	
 
-<form name="editMe" novalidate ng-class="{'col-sm-3': user.user_type.name === 'Producer'}">
-	<legend ng-if="user.user_type.name === 'Producer'">Basic Details</legend>
+<form name="editMe" novalidate ng-class="{'col-sm-4': currentUser.user_type.name === 'Producer', 'col-sm-12': currentUser.user_type.name === 'Customer'}">
+	<legend ng-if="currentUser.user_type.name === 'Producer'">Basic Details</legend>
+	<label ng-if="currentUser.routeTitle"><a href="/delivery">Route: {{currentUser.routeTitle}}</a></label>
 	<div class="form-group">
 		<label for="email">Email address</label>
-		<input ng-model="user.email" name="email" type="email" class="form-control" placeholder="Enter email" autofocus required>
-		<div class="custom-error" ng-show="userEdit.email.$dirty && userEdit.email.$invalid">Sorry:
-			<span ng-show="userEdit.email.$error.required">email is required.</span>
-			<span ng-show="userEdit.email.$error.email">Please, write a valid email address.</span>
+		<input ng-model="currentUser.email" name="email" type="email" class="form-control" placeholder="Enter email" autofocus required>
+		<div class="custom-error" ng-show="editMe.email.$dirty && editMe.email.$invalid">Sorry:
+			<span ng-show="editMe.email.$error.required">email is required.</span>
+			<span ng-show="editMe.email.$error.email">Please, write a valid email address.</span>
 		</div>
 	</div>
 		
@@ -22,27 +23,27 @@
 	    <accordion-group heading="Change Password">
 			<div class="form-group">
 				<label for="pwOld">Supply your old Password</label>
-				<input type="password" class="form-control" ng-model="user.oldPassword" name="pw" placeholder="old password here">
+				<input type="password" class="form-control" ng-model="currentUser.oldPassword" name="pw" placeholder="old password here">
 			</div>
 			<div class="form-group">
 				<label for="pw">Choose a New Password</label>
-				<input type="password" class="form-control" ng-model="user.password" name="pw" placeholder="new password here">
+				<input type="password" class="form-control" ng-model="currentUser.password" name="pw" placeholder="new password here">
 			</div>
 	    </accordion-group>
 	</accordion>
 	
 	<div class="form-group">
 		<label for="userFullName">Full Name</label>
-		<input ng-model="user.name" name="userFullName" type="text" class="form-control" placeholder="Full Name" required>
-		<div class="custom-error" ng-show="userEdit.userFullName.$dirty && userEdit.userFullName.$invalid">		Sorry:
-			<span ng-show="userEdit.userFullName.$error.required">Full name is required.</span>
+		<input ng-model="currentUser.name" name="userFullName" type="text" class="form-control" placeholder="Full Name" required>
+		<div class="custom-error" ng-show="editMe.userFullName.$dirty && editMe.userFullName.$invalid">		Sorry:
+			<span ng-show="editMe.userFullName.$error.required">Full name is required.</span>
 		</div>
 	</div>
 		
 		
 		<div class="form-group" ng-controller="geoCtrl">
 			<label for="address">Address</label>
-			<input type="text" class="form-control" ng-model="user.address"/>
+			<input type="text" class="form-control" ng-model="currentUser.address"/>
 			
 			<div class="custom-error" ng-show="editMe.address.$dirty && editMe.address.$invalid">		Sorry:
 				<span ng-show="editMe.userFullName.$error.required">Your NZ address is required.</span>
@@ -51,31 +52,36 @@
 		
 		<div class="form-group">
 			<label for="phone">Phone</label>
-			<input type="tel" class="form-control" ng-model="user.phone" name="phone" placeholder="Enter your preferred phone number" required>
+			<input type="tel" class="form-control" ng-model="currentUser.phone" name="phone" placeholder="Enter your preferred phone number" required>
 			<div class="custom-error" ng-show="editMe.phone.$dirty && editMe.phone.$invalid">		Sorry:
 				<span ng-show="editMe.userFullName.$error.required">Please give us a valid phone number to use to quickly sort out issues.</span>
 			</div>
 		</div>
 		
+		<div class="form-group" ng-if="currentUser.routeManager">
+			<h3>Route Manager Options</h3>
+			<label><a href="/delivery">Route: {{currentUser.routeManager.title}}</a></label>
+			<label for="pickup">Pick Up Location</label>
+			<input type="text" class="form-control" ng-model="currentUser.routeManager.pickupLocation" name="pickup" placeholder="Enter the current pickup location for this route here.">
+		</div>
+				
 		<div class="form-group">
 			<div class="btn-group">
-				<button type='button' class="btn btn-primary" ng-model="user.user_type.canSell" btn-radio="false">Customer</button>
-				<button type='button' class="btn btn-primary" ng-model="user.user_type.canSell" btn-radio="true">Producer</button>
+				<button type='button' class="btn btn-primary" ng-model="currentUser.user_type.canSell" btn-radio="false">Customer</button>
+				<button type='button' class="btn btn-primary" ng-model="currentUser.user_type.canSell" btn-radio="true">Producer</button>
 			</div>
 		</div>
 
 		<div class="form-group">
-	        <button ng-click="save()" ng-disabled="isClean() || userEdit.$invalid"
-	                class="btn btn-primary">Save</button>
+	        <button ng-click="save()" ng-disabled="editMe.$pristine || editMe.$invalid"
+	                class="btn btn-primary">Save User Info</button>
 	        <button ng-click="destroy()"
-	                ng-show="user._id" class="btn btn-danger">Leave Co-op</button>
+	                ng-show="currentUser._id" class="btn btn-danger">Leave Co-op</button>
 		</div>
 </form>
 
-<div ng-if="user.user_type.name === 'Producer'" class="col-sm-9" ng-controller="producerCtrl">
-<!--
-<alert ng-show="alert" type="{{alert.type}}">{{alert.message}}</alert>
--->
+<div ng-if="currentUser.user_type.name === 'Producer'" class="col-sm-8" ng-controller="producerCtrl">
+
 	<div id="producer-preview-column" class="col-md-6">
 		
 		
@@ -130,6 +136,14 @@
 					</alert>
 				</div>
 				<div class="form-group col-md-12">
+					<div class="checkbox">
+					  <label>
+					    <input type="checkbox" value="true" ng-model="currentUser.addressPermission">
+					    Share my address publicly
+					  </label>
+					</div>
+				</div>
+				<div class="form-group col-md-12">
 					<label for="description">Company Description</label> 
 					<text-angular 
 					ng-model="currentUser.producerData.description" 
@@ -148,7 +162,7 @@
 				</div>
 			</div>
 			<div class="form-group col-md-12">
-				<button type="submit" class="btn btn-primary" ng-disabled="producerEdit.$invalid">Save Changes</button>
+				<button type="submit" class="btn btn-primary" ng-disabled="producerEdit.$invalid || producerEdit.$pristine">Save Producer Info</button>
 			</div>
 		</fieldset>
 	</form>

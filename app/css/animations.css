@@ -131,31 +131,23 @@
 .alert.ng-leave {transition: 400ms linear all;}
 
 .alert.ng-enter, .alert.ng-leave-active {
-	/*
+	
 	-moz-transform: scaleY(0);
 		-webkit-transform: scaleY(0);
 		-o-transform: scaleY(0);
 		-ms-transform: scaleY(0);
-		transform: scaleY(0);*/
-	padding: 0;
-	line-height: 0;
-	font-size: 0;
-	margin: 0;
-	opacity: 0;
+		transform: scaleY(0);
+
 }
 
 .alert.ng-enter-active {
-	/*
+	
 	-moz-transform: scaleY(1);
 		-webkit-transform: scaleY(1);
 		-o-transform: scaleY(1);
 		-ms-transform: scaleY(1);
-		transform: scaleY(1);*/
-	padding: inherit;
-	line-height: inherit;
-	font-size: inherit;
-	margin: inherit;
-	opacity: 1;
+		transform: scaleY(1);
+
 }
 
 

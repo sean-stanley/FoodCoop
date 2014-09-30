@@ -132,7 +132,7 @@ angular.module('co-op.controllers', [])
 	}
 ])
 
-.controller('userEditCtrl', ['$scope', '$rootScope', 'LoginManager', 'flash', 'Restangular', '$route', 'user',
+.controller('adminUserEditCtrl', ['$scope', '$rootScope', 'LoginManager', 'flash', 'Restangular', '$route', 'user',
 	function($scope, $rootScope, LoginManager, flash, Restangular, $route, user) {
 		
 		var original = user;
@@ -173,13 +173,37 @@ angular.module('co-op.controllers', [])
 			if (!$scope.isClean()) {
 				$scope.user.post($scope.user._id).then(function(response) {
 					// success!
-					flash.setMessage('Details saved successfully');
+					flash.setMessage({type: 'success', message: 'Changes saved successfully'});
 				});
 			}
 			else {
-				return;
+				flash.setMessage({type: 'warning', message: 'No changes detected so no changes saved'});
 			}
 			
+		};
+	}
+])
+
+.controller('userEditCtrl', ['$scope', '$rootScope', 'Restangular', 'LoginManager', 'flash', 'UserManager',
+	function($scope, $rootScope, Restangular, LoginManager, flash, UserManager) {
+
+		$scope.destroy = function() {
+			var lastChance = confirm('Are you sure you want to delete the profile of ' + $rootScope.currentUser.name +'?');
+			if (lastChance) {
+				UserManager.delCurrentUser(function() {
+					LoginManager.logout();
+					flash.setMessage('User successfully Deleted');
+				});
+			}
+		};
+		
+		// sends a request for a password reset email to be sent to this user's email.
+		$scope.passwordReset = function() {
+			Restangular.all('api/forgot').post({email: $rootScope.currentUser.email});
+		};
+		
+		$scope.save = function() {
+			UserManager.save();
 		};
 	}
 ])
@@ -381,9 +405,14 @@ angular.module('co-op.controllers', [])
 	}
 ])
 
-.controller('routeManagerListCtrl', ['$scope', '$filter', 'routeManagerList',
-	function($scope, $filter, routeManagerList) {
+.controller('deliveryCtrl', ['$scope', '$rootScope', 'UserManager', 'routeManagerList',
+	function($scope, $rootScope, UserManager, routeManagerList) {
 		$scope.routeManagerList = routeManagerList;
+		
+		$scope.join = function(title) {
+			$rootScope.currentUser.routeTitle = title;
+			UserManager.save();
+		};
 	}
 ])
 
@@ -444,9 +473,13 @@ angular.module('co-op.controllers', [])
 ])
 
 // main controller for product upload page
-.controller('productUploadCtrl', ['$scope', '$rootScope', '$modal', '$sce', 'ProductManager', 'Restangular', 'product',
-	function($scope, $rootScope, $modal, $sce, ProductManager, Restangular, product) {
+.controller('productUploadCtrl', ['$scope', '$rootScope', '$modal', '$sce', 'ProductManager', 'Restangular', 'product', 'flash',
+	function($scope, $rootScope, $modal, $sce, ProductManager, Restangular, product, flash) {
 		// init
+		if (!$rootScope.canUpload) {
+			flash.setMessage({type: 'warning', message: 'Uploading is not allowed yet sorry. Please check the calendar for when uploading is open next.'});
+		}
+		
 		$scope.productData = product;
 		$scope.productData.refrigeration = product.refrigeration || 'none';
 		$scope.selectedImg = $scope.productData.img || null;
@@ -765,6 +798,9 @@ angular.module('co-op.controllers', [])
 
 .controller('storeCtrl', ['$scope', '$rootScope', '$location', '$routeParams', '$modal', 'LoginManager', 'flash', 'Restangular', 'Cart',
 	function($scope, $rootScope, $location, $routeParams, $modal, LoginManager, flash, Restangular, Cart) {
+		
+		
+		
 		$scope.searchObject = $location.search();
 		
 		$scope.predictiveSearch = [];
@@ -815,6 +851,10 @@ angular.module('co-op.controllers', [])
 		
 		Restangular.all('api/product').getList({cycle: $rootScope.cycle}).then(function(products){
 			$scope.products = products.plain();
+			
+			if (!$rootScope.canShop && $scope.products.length > 0) {
+				flash.setMessage({type: 'warning', message: 'Shopping is not allowed yet sorry. Please check the calendar for when shopping is open next.'});
+			}
 			
 			// deal with all hash and search on product successful load;
 			(function() {
@@ -1000,10 +1040,12 @@ angular.module('co-op.controllers', [])
 			$scope.nextMonth = result[1];
 			$scope.twoMonth = result[2];
 			$rootScope.cycle = result[3];
+			$rootScope.canUpload = result[4];
+			$rootScope.canSell = result[5];
 			
 			var key;
 			
-			for (var i=0; i < result.length -1; i ++) {
+			for (var i=0; i < 3; i ++) {
 				$scope.countDown[i] = [];
 				for(key in result[i]) {
 					if (result[i].hasOwnProperty(key)) {
@@ -1027,7 +1069,7 @@ angular.module('co-op.controllers', [])
 					present = end.future;
 					plural = Math.abs(end.daysUntil) != 1 ? 's' : '';
 					if (present) return 'is open for '+ end.daysUntil + ' more day'+ plural;
-					else return "is over for this month.";//return 'was '+ Math.abs(end.daysUntil) + ' day'+ plural+ " ago";
+					else return "is over for this month";//return 'was '+ Math.abs(end.daysUntil) + ' day'+ plural+ " ago";
 				}
 			};
 			
