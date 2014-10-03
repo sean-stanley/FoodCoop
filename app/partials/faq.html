@@ -10,7 +10,7 @@
 <div ng-class="{ 'col-sm-8' : !panelDisplay, 'col-sm-10' : panelDisplay}">
 <accordion close-others="true">
     <accordion-group heading="How do I join?">
-		<p>You can sign up as a Producer or Customer member by clicking the link on our website and paying the invoiced amount.</p>
+		<p>You can sign up as a Producer or Customer member <a href="/signup">here</a>. You will then be required to pay the invoiced amount.</p>
 
 		<p>Please note that if you want to become a Producer Member, you will need to fill out a specialised application form, which will be reviewed before your membership can be approved. However, anyone can sign up as a Customer member.</p>
     </accordion-group>
@@ -26,7 +26,7 @@
 	</accordion-group>
 	
 	<accordion-group heading="How do I know when to upload my products?" ng-click="hashFunction('upload-products')" is-open="hash === 'upload-products'">
-		<p>Check the <a href="/calendar">calendar</a> on our website to find out what days you can upload products. Access to the product uploading page is restricted outside these dates. Producer members will receive email notifications for when product uploading starts</p>
+		<p>Payment deadlines are marked on our <a href="/calendar">calendar</a>. If we have not received your payment by this date, we will send you a reminder.</p>
 		<h4>Why only have a set time?</h4>
 		<p>A set time for uploading is used to seperate uploading from ordering. It's analogous to the time spent setting up your booth at a farmer's market. If people tried to setup while customers were browsing for products, slow producers might miss out on customers and customers might miss the best deals.</p>
 	</accordion-group>
@@ -53,9 +53,9 @@
 	<accordion-group heading="Where do I collect my food once I’ve paid for it?" ng-click="hashFunction('delivery-day')" is-open="hash === 'delivery-day'">
 		<p>Member's orders are collected and sorted on <a href="/calendar">Delivery Day</a>. Delivery day is generally the last Wednesday of every month.</p>
 		
-		<p>If you live in Whangarei, or want to collect your food while you’re in town, you can pick up your order from The Woods, in central Whangarei. Orders are avaible for collection from 3:00 p.m. onwards on Delivery Day. You can find out when the next Delivery Day is by checking the calendar on our wesite.</p>
+		<p>If you live in Whangarei, or want to collect your food while you’re in town, you can pick up your order from The Woods (3 Woods Road), in central Whangarei. Orders are avaible for collection from 3:00 p.m. onwards on Delivery Day. You can find out when the next Delivery Day is by checking the <a href="/calendar">calendar </a>on our wesite.</p>
 
-		<p>If Whangarei is too far for you to travel, you can pick up your goods from a collection point closer to home. To find out times and places for community collection points, you’ll need to get in touch with your local Route Manager. Contact details for our Route Managers in communities all over Northland can be found <a href="/route-manager-directory">here.</a></p>
+		<p>If Whangarei is too far for you to travel, you can pick up your goods from a collection point closer to home. To find out times and places for community collection points, you’ll need to join a <a href="/delivery">delivery route</a>. Please also get in touch with your local Route Manager. Contact details for our Route Managers in communities all over Northland can be found <a href="/delivery">here.</a></p>
 		<br> 
 		<div class="btn-group">
 			<a target="_blank" class="btn btn-default" ng-href="https://www.google.com/maps/place/2+Woods+Rd,+Whangarei,+0110,+New+Zealand/"><span class="glyphicon glyphicon-map-marker"></span> See Map</a>
@@ -71,10 +71,8 @@
 
 		<p>All goods need to be dropped off at The Woods by 3:00 p.m. on Delivery Day. You can find out when the next Delivery day is by checking the calendar on our wesite.</p>
 	</accordion-group>
-	<accordion-group heading="How can I refund a faulty product?" ng-click="hashFunction('test')" is-open="hash === 'test'">
+	<accordion-group heading="How can I get a refund on a faulty product?" ng-click="hashFunction('refund')" is-open="hash === 'refund'">
 		<p>If you are unsatisfied with the quality of a purchase please <a href="/contact?subject=problem%20with%20product">contact us</a> right away. We will contact the producer and arrange for you to receive a complete refund for that product you purchased.</p>
 	</accordion-group>
-	
-	
 </accordion>
 </div>

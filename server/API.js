@@ -4,6 +4,7 @@ var util = require('util'),
 	url = require('url'),
 	async = require('async'),
 	_ = require('lodash'),
+	bunyan = require('bunyan'),
 	crypto = require('crypto'),
 	events = require('events'),
 	compression = require('compression'),
@@ -12,7 +13,7 @@ var util = require('util'),
 	methodOverride = require('method-override'), // an express module for overriding default http methods
 	cookieParser = require('cookie-parser'), // an express module for reading, writing and parsing cookies. In the app it is used for session cookies.
 	session = require('express-session'), // an express module for creating browser sessions.
-	errorHandler = require('express-error-handler'), // an express module for handling errors in the app.
+	//errorHandler = require('express-error-handler'), // an express module for handling errors in the app.
 	geocoder = require('geocoder'), // for geocoding user addresses.
 	mongoose = require('mongoose'), // used to connect to MongoDB and perform common CRUD operations with the API.
 	ObjectId = require('mongoose').Types.ObjectId,
@@ -32,6 +33,16 @@ require('datejs'); // provides the best way to do date manipulation.
 // sets date locality and formats to be for new zealand.
 Date.i18n.setLanguage("en-NZ");
 
+var log = bunyan.createLogger({
+	name: 'API', 
+	serializers: {
+		req: bunyan.stdSerializers.req,
+		err: bunyan.stdSerializers.err,
+		e: bunyan.stdSerializers.err,
+		res: bunyan.stdSerializers.res,
+		error: bunyan.stdSerializers.err
+	}
+});
 
 // This function exports all the routes and configured API so that the web-server file can remain small and compact.
 exports.configAPI = function configAPI(app) {
@@ -107,24 +118,16 @@ exports.configAPI = function configAPI(app) {
 			// Sends the email using settings from emailer.js The unused result
 			// variable is the completed message object.
 			toMe.send(function(err, result) {
-				if (err) {
-					console.log(err);
-					res.status(500).end();
-				}
-				/*
-				// a response is sent so the client request doesn't timeout and get an error.
-								res.send("text/plain", "Message sent to the NNFC");*/
-				
+				if (err) return next(err);
+				log.info(result);
+				toClient.send(function(err, result) {
+					if (err) return next(err);
+					// a response is sent so the client request doesn't timeout and get an error.
+					log.info(result);
+					res.status(200).send("Message sent to client");
+				});
 			});
-
-			toClient.send(function(err, result) {
-				if (err) {
-					console.log(err);
-					res.status(500).end();
-				}
-				// a response is sent so the client request doesn't timeout and get an error.
-				res.send("Message sent to client");
-			});
+			
 		} else if (req.body.hasOwnProperty('to')) {
 			// this case is for when a client is trying to send a message to one of our producer members.
 			// the data and objects data are very similar to other cases but here the 'to'
@@ -147,17 +150,14 @@ exports.configAPI = function configAPI(app) {
 			toProducer = new Emailer(toProducerOptions, toProducerData);
 
 			toProducer.send(function(err, result) {
-				if (err) {
-					console.log(err);
-					res.status(500).end();
-				}
+				if (err) return next(err);
 				// a response is sent so the client request doesn't timeout and get an error.
 				res.status(200).send("Message sent to producer");
 			});
 		} else {
 			// here if no message data was received in the request, a response is sent
 			// detailing what happened.
-			res.staus(403).send(403, "No messages sent");
+			res.status(403).send(403, "No messages sent");
 		}
 	});
 
@@ -165,60 +165,35 @@ exports.configAPI = function configAPI(app) {
 	app.get("/api/product", function(req, res, next) {
 		var opts;
 
-		models.Product.find(req.query, null, {
-			sort: {
-				_id: 1
-			}
-		}, function(e, results) {
-			if (!e) { // if no errors
-				opts = [{
-					path: 'category',
-					select: 'name -_id'
-				}, {
-					path: 'certification',
-					select: 'name -_id img'
-				}, {
-					path: 'producer_ID',
-					select: 'name producerData.companyName'
-				}];
-
-				// replace the id references in the product with the names of the category, certification and producer
-				models.Product.populate(results, opts, function(e, product) {
-					if (!e) res.json(product);
-
-					else console.log(e);
-
-				});
-
-			} else {
-				console.log(e); // log the error
-			}
+		models.Product.find(req.query).sort({_id: 1})
+		.populate('category', 'name -_id')
+		.populate('certification', 'name -_id img')
+		.populate('producer_ID', 'name producerData.companyName')
+		.exec(function(err, results) {
+			if (err) return next(err);
+			res.json(product);
 		});
 	});
 	
 	// return just one product for editing or use as a template for another product
 	app.get("/api/product/:id", function(req, res, next) {
 		if (req.user) {
-			models.Product.findById(req.params.id, function(e, product) {
-				if (!e) {
-					if (product) {
-						var productObject = product.toObject();
-						// if truthy then the product being requested is to be sold this month so pass the _id as well.
-						if (productObject.cycle == scheduler.currentCycle) {
-							res.send(productObject);
-						}
-						
-						else {
-							delete productObject._id;
-							res.send(productObject);
-						}
+			models.Product.findById(req.params.id, function(err, product) {
+				if (err) return next(err);
+				if (product) {
+					var productObject = product.toObject();
+					// if truthy then the product being requested is to be sold this month so pass the _id as well.
+					if (productObject.cycle == scheduler.currentCycle) {
+						res.send(productObject);
 					}
+					
 					else {
-						res.status(404).end();
+						delete productObject._id;
+						res.send(productObject);
 					}
-				
-				} else {
-					console.log(e);
+				}
+				else {
+					res.status(404).end();
 				}
 			});
 		}
@@ -231,52 +206,52 @@ exports.configAPI = function configAPI(app) {
 	// this either creates a new product or updates an existing product with data from the req.body. It is
 	// usually only called from the product-upload page of the app.
 	app.post("/api/product", function(req, res, next) {
-		var productObject, needsSave, key, newProduct;
+		var productObject, needsSave = false, key, newProduct;
 		// this tests if a user is authenticated.
 		if (req.user && req.user.user_type.canSell) {
-			
 			if (scheduler.canUpload) {
 				// convert ingredients string to an array
 				if (typeof req.body.ingredients === "string" && req.body.ingredients.length > 0) {
 					req.body.ingredients = req.body.ingredients.split(/,\s*/);
 				}
-			
 				else if (req.body.ingredients instanceof Array) {
 					req.body.ingredients = req.body.ingredients.join(', ');
 					req.body.ingredients = req.body.ingredients.split(/,\s*/);
 				}
-						
 				// If the body for a product contains an ID, it must already exist so we will
 				// update it. Only an admin or the user who
 				// created a product can update it. The original product is looked up by id.
-				if (req.body._id) {
-					models.Product.findById(req.body._id, function(e, product) { // first find the right product by it's ID
-						if (!e) {
-							productObject = product.toObject();
-							needsSave = false;
-							for (var key in req.body) {
+				if (req.body._id && req.body.cycle === scheduler.currentCycle) {
+					models.Product.findById(req.body._id, function(err, product) { // first find the right product by it's ID
+						if (err) return next(err);
+						productObject = product.toObject();
+						if (product.cycle == scheduler.currentCycle) {}
+						
+						for (var key in req.body) {
+							if (req.body.hasOwnProperty('key')) {
 								if (productObject[key] !== req.body[key]) {
 									// compare the values of the database object to the values of the request object.
 									product[key] = req.body[key]; // update the product's properties
 									needsSave = true;
 								}
 							}
-							if (needsSave) {
-								product.save();
+						}
+						// default false
+						if (needsSave) {
+							product.increment();
+							// save the changes
+							product.save(function(err, product) {
+								if (err) return next(err);
 								res.json(product); // send back the changed product to the app as JSON.
-							} // save the changes
-							else {
-								res.status(200).send('No changes detected');
-							}
-
-						} else {
-							console.log(e);
-							// log the error to the console.
+							});
+						} 
+						else {
+							res.status(200).send('No changes detected');
 						}
 					});
 				} else {
 					models.Product.create({
-						dateUploaded: Date.today(),
+						dateUploaded: Date(),
 						img: req.body.img,
 						category: req.body.category,
 						productName: req.body.productName,
@@ -290,19 +265,124 @@ exports.configAPI = function configAPI(app) {
 						certification: req.body.certification,
 						producer_ID: req.user._id,
 						cycle: scheduler.currentCycle
-					}, function(e, product) {
-						if (!e) {
-							res.status(200).end();
-						}
-						else console.log(e);
+					}, function(err, product) {
+						if (err) return next(err);
+						res.status(200).end();
 					});
 				}
+			}
+			// gain limited product change options during shopping week
+			else if (scheduler.canChange) {
+				models.Product.findById(req.body._id, 'price productName variety quantity amountSold description ingredients refrigeration cycle', function(err, product) {
+					if (err) return next(err);
+					if (scheduler.currentCycle == product.cycle) {
+						productObject = product.toObject();
+						
+						
+						if (product.amountSold > req.body.quantity ) {
+							var amountToRemove = product.amountSold - req.body.quantity;
+							// get orders for products
+							models.Order.find({cycle: scheduler.currentCycle, product: product._id})
+							.sort('-datePlaced').limit(amountToRemove)
+							.populate('customer', 'name email')
+							.populate('product', 'productName variety fullName producer_ID')
+							.remove(function(err, orders) {
+								if (err) return next(err);
+								var mailData, mailOptions, update;
+								(function repeat(i) {
+									if (i < orders.length) {
+										mailOptions = {
+											template: 'product-not-available',
+											subject: orders[i].productName + ' No Longer Available',
+											to: {
+												email: orders[i].customer.email,
+												name: orders[i].customer.name
+											}
+										};
+										mailData = {name: orders[i].customer.name, 
+											productName: orders[i].product.fullName, 
+											producerID: orders[i].product.producer_ID
+										};
+										update = new Emailer(mailOptions, mailData);
+										
+										update.send(function(err, result) {
+											if (err) return next(err);
+											log.info(result);
+											repeat(i + 1);
+										});
+									}
+									else return;
+								}(0));
+							})
+						}
+						
+						for (var key in req.body) {
+							if (req.body.hasOwnProperty('key')) {
+								if (productObject[key] !== req.body[key]) {
+									// compare the values of the database object to the values of the request object.
+									if (key === 'price') {
+										if (req.body.price <= productObject.price) {
+											product.price = req.body.price;
+											needsSave = true;
+										}
+									}
+									else {
+										product[key] = req.body[key]; // update the product's properties
+										needsSave = true;
+									}
+								}
+							}
+						}
+						
+						if (needsSave) {
+							product.increment();
+							product.save(function(err, product) {
+								if (err) return next(err);
+								models.Order.find({cycle: scheduler.currentCycle, product: product._id})
+								.populate('customer', 'name email')
+								.populate('product', 'productName variety fullName')
+								.exec(function(err, orders){
+									if (err) return next(err);
+									var mailData, mailOptions, update;
+									if (orders.length > 0) {
+										(function repeat(i) {
+											if (i < orders.length) {
+												mailOptions = {
+													template: 'product-change',
+													subject: 'Update to Product you are Ordering',
+													to: {
+														email: orders[i].customer.email,
+														name: orders[i].customer.name
+													}
+												};
+												mailData = {name: orders[i].customer.name, productName: orders[i].product.fullName};
+												update = new Emailer(mailOptions, mailData);
+												
+												update.send(function(err, result) {
+													if (err) return next(err);
+													log.info(result);
+													repeat(i + 1);
+												});
+											}
+											else res.status(200).send('Your product is successfully uploaded');
+										}(0));
+									}
+								});
+							});
+						}
+					}
+					else {
+						log.info('Failed to edit product. Current cycle: %s and product cycle: %s', scheduler.currentCycle, product.cycle);
+						res.status(403).send('Only products from this month can be modified right now.')
+					}
+				})
 			}
 			
 			else res.status(403).send("It's not the right time of the month to upload products");
 			
 			
 		} else {
+			log.info('Unauthorized access attempt to upload product');
 			res.status(401).send('Producer not signed in');
 		}
 
@@ -311,25 +391,68 @@ exports.configAPI = function configAPI(app) {
 	// this request will delete a product from the database. First we find the
 	// requested product.
 	app.delete("/api/product/:id", function(req, res, next) {
-
+		var mailData, mailOptions, deleteMail;
 		// ensure user is logged in to perform this request.		
-		if (req.user && scheduler.canUpload) {
-			// delete the product based on it's id and send a request confirming the deletion
-			// if it goes off without a hitch.
-			models.Product.findById(new ObjectId(req.params.id), function(e, result) {
-				if (!e && results) { // if no errors
-					if (result.producer_ID == req.user._id || req.user.user_type.isAdmin) {
-						result.remove();
-						res.status(200).send('product deleted');
-					}
-					else res.status(403).send('You aren\'t authorized to delete that product');
-				} else {
-					console.log(e); // log the error
-					res.status(404).end();
-				}
+		if ( req.user && (scheduler.canUpload || scheduler.canChange) ) {
+			// delete the product based on it's id
+			models.Product.findById(new ObjectId(req.params.id), function(err, product) {
+				if (err) return next(err);
+				if (product.producer_ID == req.user._id || req.user.user_type.isAdmin) {
+					if (product.cycle == scheduler.cycle) {
+						
+						if (scheduler.canChange) {
+							models.Order.find({cycle: scheduler.currentCycle, product: product._id})
+							.populate('customer', 'name email')
+							.populate('product', 'productName variety fullName')
+							.exec(function(e, orders){
+								var mailData, mailOptions, update
+								if (e) return next(e);
+								
+								if (orders.length > 0) {
+									(function repeat(i) {
+										if (i < orders.length) {
+											mailOptions = {
+												template: 'product-delete',
+												subject: 'Product you are Ordering is no Longer Available',
+												to: {
+													email: orders[i].customer.email,
+													name: orders[i].customer.name
+												}
+											};
+											mailData = {name: orders[i].customer.name, productName: orders[i].product.fullName};
+											deleteMail = new Emailer(mailOptions, mailData);
+										
+											deleteMail.send(function(err, result) {
+												if (err) return next(err);
+												// a response is sent so the client request doesn't timeout and get an error.
+												log.info(result);
+												repeat(i + 1);
+											});
+										}
+										else {
+											product.remove(function(err, product){
+												if (err) return next(err);
+												orders.remove(function(err, orders) {
+													if (err) return next(err);
+													res.status(200).send('product deleted');
+												});
+											});
+										}
+									}(0));
+								}
+							});
+						}
+						else {
+							product.remove(function(err, product){
+								if (err) return next(err);
+								else res.status(200).send('product deleted');
+							});
+						}
+					} else res.status(403).send('That product cannot be deleted. It is to be stored for record keeping.');
+				} else res.status(403).send('You aren\'t authorized to delete that product');
 			});
-		} 
-		else if (!scheduler.canUpload) res.status(403).send("Drat! Wrong time of the ordering cycle to delete products.");
+		}
+		else if (!scheduler.canUpload && !scheduler.canChange) res.status(403).send("Drat! Wrong time of the ordering cycle to delete products.");
 		else res.status(401).send('Not logged in');
 	});
 
@@ -341,12 +464,8 @@ exports.configAPI = function configAPI(app) {
 			.select('productName variety dateUploaded price quantity units')
 			.sort('datePlaced')
 			.exec(function(e, products){
-				if (!e) {
-					res.json(products);
-				} else {
-					console.log(e);
-					res.status(500).end();
-				}
+				if (e) return next(e);
+				res.json(products);
 			});
 		}
 		else res.status(401).end();
@@ -358,15 +477,10 @@ exports.configAPI = function configAPI(app) {
 				producer_ID : new ObjectId(req.user._id),
 				cycle: scheduler.currentCycle || 0
 			}, 'productName variety dateUploaded price quantity units', { sort: {datePlaced: 1} }, function(e, products) {
-				if (!e) {
-					res.json(products);
-				}
-				else {
-					console.log(e);
-				}
+				if (e) return next(e);
+				res.json(products);
 			});
-		}
-		else res.status(401).end();
+		} else res.status(401).end();
 	});
 	// return a compact list of all the current user's products for the last month.
 	app.get("/api/product-list/recent", function(req, res, next) {
@@ -376,12 +490,8 @@ exports.configAPI = function configAPI(app) {
 				cycle: scheduler.currentCycle - 1 || 0
 			}, 'productName variety dateUploaded price quantity units', { sort: {datePlaced: 1} },
 				function(e, products) {
-				if (!e) {
+					if (e) return next(e);
 					res.json(products);
-				}
-				else {
-					console.log(e);
-				}
 			});
 		}
 		else res.status(401).end();
@@ -395,44 +505,15 @@ exports.configAPI = function configAPI(app) {
 		// check if the current user is logged in
 		if (req.user) {
 			// finds all the orders requested by the query from the url query.
-			models.Order.find(req.query, null, {
-				sort: {
-					datePlaced: 1
-				}
-			}, function(e, results) {
-				if (!e) { // if no errors
-
-					// define options for replacing ID's in the order with the appropriate data from other collections
-					opts = [{
-						path: 'product',
-						model: 'models.Product',
-						select: 'fullName price units producer_ID productName variety'
-					}, {
-						path: 'customer',
-						model: 'models.User',
-						select: 'name'
-					}, {
-						path: 'product.producer_ID',
-						model: 'models.User',
-						select: 'name email producerData.companyName'
-					}];
-
-					// replace the ID's in an order with proper values before sending to the app.
-					// see mongoose API docs for more info.
-					models.Order.populate(results, opts, function(e, orders) {
-						// send the results to the app if no error occurred.
-						if (!e) {
-							res.json(orders);
-						} else console.log(e);
-
-					});
-
-				} else {
-					console.log(e); // log the error
-				}
+			models.Order.find(req.query).sort({datePlaced: 1})
+			.populate('product', 'fullName price units producer_ID productName variety')
+			.populate('customer', 'name')
+			.populate('product.producer_ID', 'name email producerData.companyName')
+			.exec( function(e, results) {
+				if (e) return next(e);
+				res.json(orders);
 			});
-		}
-		else res.status(401).end();
+		} else res.status(401).end();
 
 	});
 	// get the orders made to the currently authenticated producer/supplier
@@ -443,36 +524,31 @@ exports.configAPI = function configAPI(app) {
 			// get all cart orders for the current user.
 			// optional query params will select a cycle to sort from
 			models.Order.find(req.query).find({supplier: req.user._id}).sort({datePlaced: 1}).exec( function(e, results) {
-				if (!e) {
-					// define options for replacing ID's in the order with the appropriate data from
-					// other collections. The other collections are specified with the 'ref'
-					// property in the collections' Schema object.
-					opts = [{
-						path: 'product',
-						select: 'fullName price units productName variety'
-					}, {
-						path: 'customer',
-						select: 'name email'
-					}, {
-						path: 'supplier',
-						select: 'name email producerData.companyName'
-					}];
+				if (e) return next(e);
+				// define options for replacing ID's in the order with the appropriate data from
+				// other collections. The other collections are specified with the 'ref'
+				// property in the collections' Schema object.
+				opts = [{
+					path: 'product',
+					select: 'fullName price units productName variety'
+				}, {
+					path: 'customer',
+					select: 'name email'
+				}, {
+					path: 'supplier',
+					select: 'name email producerData.companyName'
+				}];
 
-					// replace the ID's in an order with proper values before sending to the app.
-					// @results is the results returned from the Order Query
-					// @opts is the array of options for the populate method to use.
-					// @e is the error
-					// @cart is the returned array or object of order data
-					models.Order.populate(results, opts, function(e, orders) {
-						// send the results to the app if no error occurred.
-						if (!e && orders) {
-							res.json(orders);
-						} else {
-							console.log(e);
-							res.status(500).end();
-						}
-					});
-				} else console.log(e);
+				// replace the ID's in an order with proper values before sending to the app.
+				// @results is the results returned from the Order Query
+				// @opts is the array of options for the populate method to use.
+				// @e is the error
+				// @cart is the returned array or object of order data
+				models.Order.populate(results, opts, function(e, orders) {
+					// send the results to the app if no error occurred.
+					if (e) return next(e);
+					res.json(orders);
+				});
 			});
 		}
 		else res.status(401).end();
@@ -509,10 +585,7 @@ exports.configAPI = function configAPI(app) {
 					});
 				}
 			],function(e, result){
-				if (e) {
-					console.log(e);
-					res.status(500).end();
-				}
+				if (e) return next(e);
 				else res.json(result);
 			});	
 		}
@@ -525,10 +598,7 @@ exports.configAPI = function configAPI(app) {
 				if (!e) {
 					res.send(count.toString());
 				}
-				else {
-					console.log(e);
-					res.status(500).end();
-				}
+				else return next(e);
 			});
 		}
 	});
@@ -567,15 +637,15 @@ exports.configAPI = function configAPI(app) {
 							// quick test we got the right cart items
 							cart.forEach(function(item) {
 								if (item.customer.name !== req.user.name) {
-									console.log('these cart items are not for the right user');
+									log.info('these cart items are not for the right user');
 								}
 							});
 							// converts and transforms the cart data into plain javascript before sending it
 							// to the client.
 							res.json(cart);
-						} else console.log(e);
+						} else log.info(e);
 					});
-				} else console.log(e);
+				} else log.info(e);
 			});
 		}
 		else res.status(401).end();
@@ -583,7 +653,6 @@ exports.configAPI = function configAPI(app) {
 	// update an order from a user's perspective. Only allowed to change quantity
 	app.post("/api/cart", function(req, res, next) {
 		if (req.user && scheduler.canShop) {
-
 			async.waterfall([
 				function(callback) {
 					models.Order.findById(req.body._id, 'quantity product cycle', function(e, order) {
@@ -591,24 +660,26 @@ exports.configAPI = function configAPI(app) {
 							callback(null, order.quantity, req.body.quantity, order);
 						}
 						else {
-							console.log(e);
 							callback(e);
 						}
 					});
 				},
 				function(oldQuantity, newQuantity, order, callback) {
-					models.Product.findById(order.product, function(e, product) {
+					models.Product.findById(order.product, 'quantity amountSold', function(e, product) {
 						if (!e) {
 							// make sure we are changing an order for the current cycle and a current product
-							if (order.cycle === product.cycle && product.cycle === scheduler.currentCycle) {
-								if (product.quantity + (oldQuantity - newQuantity) >= 0) {
-									product.quantity = product.quantity + (oldQuantity - newQuantity);
-									product.save();
-									order.quantity = newQuantity;
-									order.save();
-								
-									res.status(200).end();
+							if ( order.cycle === product.cycle && product.cycle === scheduler.currentCycle) {
+								if ( product.quantity >= (product.amountSold - oldQuantity + newQuantity) ) {
+									product.amountSold = product.amountSold - oldQuantity + newQuantity;
+									product.save(function(err) {
+										if (err) log.info(err);
+										else order.save(function(err) {
+											if (err) log.info(err);
+											else res.status(200).end();
+										});
+									});
 								}
+								
 								else {
 									res.send("Sorry! Insufficient inventory to add more than " + product.quantity + " to your cart" );
 								}
@@ -624,8 +695,8 @@ exports.configAPI = function configAPI(app) {
 				}
 				], 
 				function(err) {
-					console.log(err);
-					res.status(500).end();
+					log.info(err);
+					next(err)
 			});
 		}
 		else res.status(403).end();
@@ -642,19 +713,23 @@ exports.configAPI = function configAPI(app) {
 				if (!e) {
 					// make sure only recent orders are being deleted
 					if (order.cycle === scheduler.currentCycle) {
-						
+						// adjust the inventory of the product available
+						models.Product.findByIdAndUpdate(order.product, { $inc: {amountSold : order.quantity * -1}}, function(e, product) {
+							if (!e) {
+								// delete the requested order
+								order.remove(function(e) {
+									if (e) log.info(e);
+									// respond with a basic HTML message
+									res.status(200).send('Product removed from cart');
+								});
+							}
+						});
 					}
-					// adjust the inventory of the product available
-					models.Product.findByIdAndUpdate(order.product, { $inc: {quantity : order.quantity}}, function(e, product) {
-						if (!e) {
-							// delete the requested order
-							order.remove();
-						}
-					});
-					// respond with a basic HTML message
-					res.status(204).send('Product removed from cart');
+					else {
+						log.info('%s failed to delete an item from their cart because it\'s the wrong cycle', req.user.name);
+						res.status(403).send('Sorry you cannot delete orders from previous cycles');
+					}
 				}
-
 			});
 		}
 		else res.status(401).end();
@@ -668,6 +743,28 @@ exports.configAPI = function configAPI(app) {
 			if (req.body.customer !== req.body.supplier) {
 				async.waterfall([
 					function(callback) {
+						models.Product.findByIdAndUpdate(req.body.product, { $inc: {amountSold : req.body.quantity}})
+						.select('amountSold quantity variety productName fullName')
+						.exec(function(e, product) {
+							if (!e) {
+								log.info('product %s has %s/%s remaining', product.fullName, product.amountSold, product.quantity);
+								if (product.quantity >= product.amountSold) {
+									callback(null);
+								}
+								else {
+									product.amountSold -= req.body.quantity;
+									product.save(function(err) {
+										if (err) log.info(err);
+										var error = new Error('you can\'t buy that many. Insufficient quantity available.');
+										callback(error);
+									});
+									
+								}
+							}
+							else callback(e);
+						});
+					},
+					function(callback) {
 						models.Order.create({
 							product: req.body.product,
 							customer: req.body.customer,
@@ -678,38 +775,26 @@ exports.configAPI = function configAPI(app) {
 						}, function(e, newOrder) {
 							if (!e) {
 								callback(null, newOrder);
-						
 							}
 							else {
-								console.log(e);
-								res.status(500).end();
+								log.info(e);
+								next(err)
 								callback(e);
 							}
 						});
-						
 					},
 					function(newOrder, callback) {
-						models.Product.findByIdAndUpdate(newOrder.product, { $inc: {quantity : newOrder.quantity * -1}}, function(e, product) {
-							if (!e) {
-								callback(null, newOrder);
-							}
-							else callback(e);
-						});
-					},
-					function(newOrder, callback) {
-						
 						newOrder
 						.populate('product', 'price units fullName productName variety')
 						.populate('supplier', 'name email producerData.companyName', function(e, order) {
 							if (!e) res.json(newOrder);
 							else callback(e);
 						});
-						
 					}
 				], function(error) { 
-					console.log(error); 
-					res.status(500).end(); 
-					return errorHandler(error);
+					log.info(error); 
+					if (error.message === 'you can\'t buy that many. Insufficient quantity available.') res.status(400).send("That product is sold out");
+					else next(err) 
 				});
 			}
 			else res.status(403).send("Sorry, you can't try to buy your own products");
@@ -722,11 +807,19 @@ exports.configAPI = function configAPI(app) {
 	// get all the invoices or a query. Called in the app from the invoices page
 	app.get("/api/invoice", function(req, res, next) {
 		if (req.user) {
-			models.Invoice.find(req.query, null, {sort : {_id:1} }, function(e, invoices) {
-				models.Invoice.populate(invoices, {path:'invoicee', select: 'name address phone email -_id'}, function(e, invoices) {
-					if (e) return errorHandler(e);
-					res.json(invoices);
-				});
+			models.Invoice.find(req.query).sort({_id:1})
+			.populate('invoicee', 'name address phone email -_id')
+			.populate('items.customer', 'name email routeTitle')
+			.populate('items.product', 'fullName variety productName priceWithMarkup price units')
+			.exec(function(e, invoices) {
+				if (e) {
+					log.info(e);
+					res.status(404).send();
+				}
+				else {
+					log.info('sending invoices');
+					res.send(invoices);
+				}
 			});
 		}
 	});
@@ -777,7 +870,7 @@ exports.configAPI = function configAPI(app) {
 			email = new Emailer(mailOptions, mailData);
 			email.send(function(err, result) {
 				if (err) {
-					console.log(err);
+					log.info(err);
 					res.status(500).send("form failed to be sent to standards commitee. Reason: " + err);
 				}
 				else res.status(200).send(result);
@@ -803,10 +896,10 @@ exports.configAPI = function configAPI(app) {
 					delete userObject.hash;
 					delete userObject.salt;
 				});
-				console.log('User just requested from api/user/');
+				log.info('User just requested from api/user/');
 				res.json(results);
 			} else {
-				console.log(e); // log the error
+				log.info(e); // log the error
 			}
 		});
 	});
@@ -898,7 +991,7 @@ exports.configAPI = function configAPI(app) {
 						done(err, null);
 					}
 					// a response is sent so the client request doesn't timeout and get an error.
-					console.log("Message sent to new member");
+					log.info("Message sent to new member");
 					
 					done(null, user);
 				});
@@ -910,18 +1003,18 @@ exports.configAPI = function configAPI(app) {
 					// save the invoice made for the user;
 					invoice.save(function(err) {
 						if (err) return errorHandler(err);
-						console.log('Invoice saved');
+						log.info('Invoice saved');
 					});
 					// authenticate the newly created user
 					passport.authenticate('local', function(err, user, info){
 						if (!user) {
-							console.log(err);
+							log.info(err);
 							res.status(500).send(err);
 						}
 						else {
 							req.logIn(user, function(err){
 								// req.user should now be assigned
-								if (err) console.log(err);
+								if (err) log.info(err);
 								userObject = req.user.toObject();
 								delete userObject.salt;
 								delete userObject.hash;
@@ -931,7 +1024,7 @@ exports.configAPI = function configAPI(app) {
 					})(req, res, next);
 				}
 				else {
-					console.log(err);
+					log.info(err);
 					res.status(500).send(err);
 				}
 			}
@@ -954,7 +1047,7 @@ exports.configAPI = function configAPI(app) {
 						mailData = {name: user.name, message: canSell};
 						mail = new Emailer(mailOptions, mailData);
 						mail.send(function(err, result) {
-							if (err) console.log(err);
+							if (err) log.info(err);
 						});
 					}
 					
@@ -991,16 +1084,16 @@ exports.configAPI = function configAPI(app) {
 											changeEmail = new Emailer(changeOptions, changeData);
 											changeEmail.send(function(err, result) {
 												if (err) {
-													return console.log(err);
+													return log.info(err);
 												}
 												// a response is sent so the client request doesn't timeout and get an error.
-												console.log("Message sent to user confirming password change");
+												log.info("Message sent to user confirming password change");
 											});
 										}
 									});
 								});
 							} else {
-								console.log('Old password does not match current password.');
+								log.info('Old password does not match current password.');
 								res.status(400).send('Old password does not match current password.');
 							}
 						
@@ -1015,7 +1108,7 @@ exports.configAPI = function configAPI(app) {
 					user.save();
 					res.json(user);
 				} else {
-					console.log(e);
+					log.info(e);
 					res.status(401).send("You must be logged in to change data about a user");
 				}
 				
@@ -1041,7 +1134,7 @@ exports.configAPI = function configAPI(app) {
 				}
 				
 			} else {
-				console.log(e);
+				log.info(e);
 			}
 		});
 	});
@@ -1066,7 +1159,7 @@ exports.configAPI = function configAPI(app) {
 			} else if (results.user_type.name !== 'Producer') {
 				res.status(400).send(results.name + " is not a producer");
 			} else {
-				console.log(e);
+				log.info(e);
 			}
 		});
 	});
@@ -1078,7 +1171,7 @@ exports.configAPI = function configAPI(app) {
 				producerData: req.body.producerData,
 				addressPermission: req.body.addressPermission
 			}, function(err, user) {
-				console.log('The raw response from Mongo was ', user);
+				log.info('The raw response from Mongo was ', user);
 				if (err) return handleError(err);
 
 				else {
@@ -1125,10 +1218,10 @@ exports.configAPI = function configAPI(app) {
 					
 					toAdmin.send(function(err, result){
 						if (err) {
-							return console.log(err);
+							return log.info(err);
 						}
 						// a response is sent so the client request doesn't timeout and get an error.
-						console.log("Message sent to user about leaving the NNFC");
+						log.info("Message sent to user about leaving the NNFC");
 						done(null, user, invoice);
 					});
 				},
@@ -1151,10 +1244,10 @@ exports.configAPI = function configAPI(app) {
 						toUser = new Emailer(toUserOptions, toUserData);
 						toUser.send(function(err, result) {
 							if (err) {
-								return console.log(err);
+								return log.info(err);
 							}
 							// a response is sent so the client request doesn't timeout and get an error.
-							console.log("Message sent to user about leaving the NNFC");
+							log.info("Message sent to user about leaving the NNFC");
 							done(null, user, invoice);
 						});
 					}
@@ -1192,12 +1285,12 @@ exports.configAPI = function configAPI(app) {
 						id: 'e481a3338d',
 						email: {email: user.email},
 					};
-					mc.lists.unsubscribe(params, function(data) {console.log(data); done(null, user);}, done(e));
+					mc.lists.unsubscribe(params, function(data) {log.info(data); done(null, user);}, done(e));
 				}, function (user, done) {
 					if (user.user_type.name === 'Producer') {
 						// add user to producer list as well;
 						params.id = 'f379285252';
-						mc.lists.unsubscribe(params, function(data) {console.log(data); done(null, user);}, done(e));
+						mc.lists.unsubscribe(params, function(data) {log.info(data); done(null, user);}, done(e));
 					}
 					else {
 						done(null, user);
@@ -1217,7 +1310,7 @@ exports.configAPI = function configAPI(app) {
 					models.User.remove({_id: user.id}, function(e) {
 						if (e) return handleError(e);
 					});	
-					console.log('The user and their products and orders are deleted');
+					log.info('The user and their products and orders are deleted');
 					done(null, 'done');
 				}
 				
@@ -1228,8 +1321,7 @@ exports.configAPI = function configAPI(app) {
 						res.status(200).end();
 					}
 					else {
-						console.log(results);
-						res.status(500).end();
+						next(e);
 					}
 				});
 		}
@@ -1246,21 +1338,25 @@ exports.configAPI = function configAPI(app) {
 			delete userObject.salt;
 			delete userObject.hash;
 			res.send(userObject);
+			log.info('user %s just logged in', req.user.name);
 		} else {
+			log.info('failed login attempt');
 			res.status(401).send('Not logged in');
 		}
 	})
 	// attempt to log the user in
 	.post(function(req, res, next) {
 		passport.authenticate('local', function(err, user, info) {
-			if (err) { return next(err); }
-			if (!user) {
+			if (err) next(err);
+			else if (!user) {
 				req.session.messages =  [info.message];
-				res.status(403).send({status: 403, message: 'Incorrect Login'});
+				var error = new Error('Incorrect Login');
+				error.status = 401;
+				next(error);
 			}
 			else {
 				req.logIn(user, function(err) {
-					if (err) console.log(err);
+					if (err) next(err);
 					var userObject = req.user.toObject();
 					delete userObject.salt;
 					delete userObject.hash;
@@ -1286,7 +1382,7 @@ exports.configAPI = function configAPI(app) {
 			delete userObject.hash;
 			res.send(userObject);
 		}
-		else res.send("No session saved");	
+		else res.send("No session saved");
 	});
 	
 	// Sends an email for resetting a user's password. Token will expires in 1 hour.
@@ -1308,7 +1404,7 @@ exports.configAPI = function configAPI(app) {
 					}
 					user.resetPasswordToken = token;
 					user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
-					console.log('expires in: ' + user.resetPasswordExpires);
+					log.info('expires in: ' + user.resetPasswordExpires);
 					user.save(function(err) {
 						done(err, token, user);
 					});
@@ -1333,11 +1429,11 @@ exports.configAPI = function configAPI(app) {
 
 				resetEmail.send(function(err, result) {
 					if (err) {
-						return console.log(err);
+						return log.info(err);
 					}
 					// a response is sent so the client request doesn't timeout and get an error.
 					req.flash('info', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
-					console.log("Message sent to user for resetting their password");
+					log.info("Message sent to user for resetting their password");
 					done(err, 'done');
 				});
 			}
@@ -1358,7 +1454,6 @@ exports.configAPI = function configAPI(app) {
 			else {
 				res.status(403).send('Password reset token is invalid or has expired.');
 			}
-			
 		});
 	});
 	
@@ -1376,7 +1471,7 @@ exports.configAPI = function configAPI(app) {
 						user.set(resetPasswordExpires, undefined);
 
 						user.save(function(err) {
-							if (err) console.log(err);
+							if (err) next(err);
 							done(err, user);
 						});
 					});
@@ -1401,10 +1496,10 @@ exports.configAPI = function configAPI(app) {
 
 				changeEmail.send(function(err, result) {
 					if (err) {
-						return console.log(err);
+						return log.info(err);
 					}
 					// a response is sent so the client request doesn't timeout and get an error.
-					console.log("Message sent to user confirming password change");
+					log.info("Message sent to user confirming password change");
 					req.logIn(user, function(err) {
 						user.toObject();
 						res.send(user);
@@ -1413,7 +1508,8 @@ exports.configAPI = function configAPI(app) {
 				});
 			}
 			], function(err, results) {
-				console.log(results);
+				if (err) next(err);
+				log.info(results);
 				
 		});
 	});
@@ -1427,6 +1523,7 @@ exports.configAPI = function configAPI(app) {
 				_id: 1
 			}
 		}, function(e, results) {
+			if (e) next(e);
 			res.json(results);
 		});
 	});
@@ -1438,6 +1535,7 @@ exports.configAPI = function configAPI(app) {
 				_id: 1
 			}
 		}, function(e, results) {
+			if (e) next(e);
 			res.json(results);
 		});
 	});
@@ -1454,16 +1552,28 @@ exports.configAPI = function configAPI(app) {
 		calendar.push(scheduler.currentCycle); // 3
 		calendar.push(scheduler.canUpload); // 4
 		calendar.push(scheduler.canShop); // 5
+		calendar.push(scheduler.canChange) // 6
 		delete calendar[0].cycleIncrementDay;
 		delete calendar[1].cycleIncrementDay;
 		delete calendar[2].cycleIncrementDay;
 		res.send(calendar);
+		log.info({res: res}, 'sending calendar');
 	});
 
 	app.use(express.static(__dirname));
-	app.use(errorHandler({
-		dumpExceptions: true,
-		showStack: true
-	}));
+	
+	// Error Handling
+	
+	//Log errors
+	app.use(function(err, req, res, next) {
+		log.warn(err);
+		next(err);
+	});
+	
+	//Respond with 500
+	app.use(function(err, req, res, next) {
+		next(err)
+	});
+
 	return app;
 };

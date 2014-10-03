@@ -476,21 +476,22 @@ angular.module('co-op.controllers', [])
 .controller('productUploadCtrl', ['$scope', '$rootScope', '$modal', '$sce', 'ProductManager', 'Restangular', 'product', 'flash',
 	function($scope, $rootScope, $modal, $sce, ProductManager, Restangular, product, flash) {
 		// init
-		if (!$rootScope.canUpload) {
+		if (!$rootScope.canUpload && !$rootScope.canChange) {
 			flash.setMessage({type: 'warning', message: 'Uploading is not allowed yet sorry. Please check the calendar for when uploading is open next.'});
 		}
 		
-		$scope.productData = product;
+		$scope.productData = product || {};
 		$scope.productData.refrigeration = product.refrigeration || 'none';
 		$scope.selectedImg = $scope.productData.img || null;
 		$scope.productManager = ProductManager;
 		$scope.ingredients = false;
 		
 		// pass product to $scope.productData for editing in the main form
+/* No longer used
 		$scope.editProduct = function(product) {
 			$scope.productData = product;
 			console.log($scope.productData);
-		};
+		};*/
 		
 		$scope.setCategory = function(category) {
 			$scope.productData.category = category;
@@ -741,9 +742,6 @@ angular.module('co-op.controllers', [])
 		$scope.open = function(item) {
 			$rootScope.$broadcast('OPEN_PRODUCT', item);
 		};
-		
-		
-
 	}
 ])
 .controller('cartHistoryCtrl', ['$scope', 'Cart', function($scope, Cart) {
@@ -751,7 +749,6 @@ angular.module('co-op.controllers', [])
 		$scope.cartHistory = items;
 	});
 }])
-
 
 .controller('contactCtrl', ['$scope', 'MailManager', '$route', '$location',
 	function($scope, MailManager, $route, $location) {		
@@ -768,10 +765,7 @@ angular.module('co-op.controllers', [])
 			MailManager.mail(mail, function() {
 				$route.reload();
 			});
-			
 		};
-
-
 	}
 ])
 .controller('producerContactCtrl', ['$scope', 'MailManager', '$location', 'member',
@@ -798,9 +792,6 @@ angular.module('co-op.controllers', [])
 
 .controller('storeCtrl', ['$scope', '$rootScope', '$location', '$routeParams', '$modal', 'LoginManager', 'flash', 'Restangular', 'Cart',
 	function($scope, $rootScope, $location, $routeParams, $modal, LoginManager, flash, Restangular, Cart) {
-		
-		
-		
 		$scope.searchObject = $location.search();
 		
 		$scope.predictiveSearch = [];
@@ -833,7 +824,6 @@ angular.module('co-op.controllers', [])
 				}
 			}
 		}
-		
 		
 		var findCartItems = function() {
 			if ($scope.cartProduct_ids && $scope.products) {
@@ -1035,6 +1025,7 @@ angular.module('co-op.controllers', [])
 		$scope.countDown = [];
 		
 		
+		
 		$http.get('/api/calendar').success(function(result) {
 			$scope.significantDays = result[0];
 			$scope.nextMonth = result[1];
@@ -1042,6 +1033,10 @@ angular.module('co-op.controllers', [])
 			$rootScope.cycle = result[3];
 			$rootScope.canUpload = result[4];
 			$rootScope.canSell = result[5];
+			$rootScope.canChange = result[6];
+			
+			$scope.daysBeforeOrderingStops = Calendar.daysUntil($scope.significantDays.ProductUploadStop);
+			$scope.daysBeforeDeliveryDay = Calendar.daysUntil($scope.significantDays.DeliveryDay);
 			
 			var key;
 			
@@ -1058,13 +1053,14 @@ angular.module('co-op.controllers', [])
 					}
 				}
 			}
+			
 			// @start, @end are objects from the $scope.countDown[i] object. i = 0 for the current month.
 			$scope.inDateRange = function(start, end) {
 				var present, future, plural;
 				plural = start.daysUntil != 1 ? 's' : '';
 				future = start.future;
 				if (future) return 'starts in '+ start.daysUntil + ' day'+ plural;
-				
+			
 				else {
 					present = end.future;
 					plural = Math.abs(end.daysUntil) != 1 ? 's' : '';
@@ -1072,10 +1068,6 @@ angular.module('co-op.controllers', [])
 					else return "is over for this month";//return 'was '+ Math.abs(end.daysUntil) + ' day'+ plural+ " ago";
 				}
 			};
-			
-			$scope.daysBeforeOrderingStops = Calendar.daysUntil($scope.significantDays.ProductUploadStop);
-			$scope.daysBeforeDeliveryDay = Calendar.daysUntil($scope.significantDays.DeliveryDay);
-			
 			
 		});
 	}	

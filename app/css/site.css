@@ -27,7 +27,7 @@ html, body {
 .page-wrap {
   min-height: 100%;
   /* equal to footer height */
-  margin-bottom: -144px; 
+  margin-bottom: -156px; 
 }
 .page-wrap:before {height: 51px; display: block; content: "";}
 .page-wrap:after {
@@ -36,11 +36,18 @@ html, body {
 }
 .site-footer, .page-wrap:after {
   /* .push must be the same height as footer */
-  height: 144px; 
+  height: 156px; 
 }
 .site-footer {
-	background-color: #652c4a;
-	color: white;
+	background-color: #222222;
+	color: #999999;
+}
+
+.link-grid {
+	width: 50%;
+	margin-left: 15px;
+	margin-top: 15px;
+	float: right;
 }
 
 #view {clear: both;overflow: hidden;}
@@ -80,17 +87,23 @@ html, body {
 .carousel-indicators {bottom: 70px;}
 
 
-
-.img-content {clear: both; overflow: hidden; padding: 0; width:100%; position: relative; margin-bottom: 0;}
+.flex-center {display: flex;
+    align-items: center;
+	justify-items: center;}
+.img-content {width:100%; position: relative; margin-bottom: 0; }
 .jumbotron > h2 {font-size: 3em;}
-.img-content > .img-column {height: 650px; float:left; margin-right: 30px;}
-.img-column > img {height: 100%; width: auto;}
+.img-content > .img-column { float:left; margin-right: 30px;}
+.img-column {padding-top: 48px; padding-bottom: 48px;}
+.img-column > img {border: 5px solid #642c4a;}
 .img-column.img-right {margin-right:0!important; margin-left: 30px;}
 .white {background-color: white;}
 .bg-warning {background-color: #fcf8e3;}
 .bg-info {background-color: #87d3ea;}
 .bg-success {background-color: #dff0d8;}
 .jumbotron p {margin-right: 1em;}
+.center-content {
+	display: block;
+}
 .jumbotron.white img.img-circle {border: 5px solid #642c4a; margin-top: 2em; max-width: 93%;}
 .map-frame {border:none; margin-top: 20px; margin-bottom: 20px;}
 
@@ -105,6 +118,7 @@ html, body {
 	background: #222222;
 	overflow: scroll;
 	color: #aaa;
+	border-right: 1px solid black;
 }
 
 #sidebar button{padding: 20px;}
@@ -113,7 +127,9 @@ html, body {
 	padding: 10px;
 }
 
-#calendar-container, #sidebar li {cursor: pointer; border-left: solid 10px #642c4a;}
+#calendar-container, #sidebar li {cursor: pointer; border-left: solid 10px #642c4a; }
+#calendar-container {padding: 0.8em 0;}
+#calendar-container:hover {background: #642c4a; color: white;}
 #calendar-container > p {padding: 10px 15px}
 #sidebar .nav-stacked > li + li {margin-top: 0;}
 #sidebar li > a {border-radius:0; color: #aaa;}
@@ -206,14 +222,15 @@ Content Pages
      opacity: 0;
     }
 /*	---- Signup Page ----	*/
-.membership {border: solid 1px #ddd; background: #eeeeee;}
+.membership {border: solid 1px #ddd; background: #eeeeee; margin-bottom: 48px;}
 .membership-head {background-color: #8d4b73; color: white;}
-.membership-price {color: #8d4b73;}
+.membership-head > h1 {margin-bottom: 20px;}
+.membership-price {color: #8d4b73; margin: 2em 0;}
 .membership-summary {padding: 0 1em;}
-.membership-summary > h3 {margin-top: 0; margin-bottom: 1em;}
+.membership-price > h3 {margin-top: 0; margin-bottom: 1em; color: black;}
 .membership-percs ul {margin-bottom: 0;}
 .membership-percs li { 
-	padding: 0.5em 1em; 
+	padding: 1em; 
 	border-color: #aaa; 
 	border-style: solid; 
 	border-width: 0; 
@@ -262,9 +279,8 @@ border-radius: 200px;
 
 /* Store */ 
 
-
 .panel-btn-lg {
-	font-size: 2.5em;
+	font-size: 2em;
 }
 
 .panel-btn:hover {
@@ -355,14 +371,16 @@ a.panel-btn-sml {
 /* Store Modal */
 figure.store-modal {width: 400px; position: relative;}
 
-#footer-nav ul.nav > li > a {
-	color: white;
+.footer-nav ul.nav > li > a {
+	color: #999999;
 	font-size: 0.9em;
+	border-left: 10px solid #642c4a;
 }
 
-#footer-nav ul.nav > li > a:hover {
-	color: #652c4a;
+.footer-nav ul.nav > li > a:hover {
+	color: white;
+	background: #642c4a;
 }
-
-.site-footer .row small > a {color: white;}
-.site-footer .row small > a:hover {color: #ddd; text-decoration: none;}
+.site-footer small {margin: 5px 0;}
+.site-footer small > a {color: white;}
+.site-footer small > a:hover {color: #ddd; text-decoration: none;}

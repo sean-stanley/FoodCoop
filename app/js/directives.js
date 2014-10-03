@@ -134,7 +134,17 @@ angular.module('co-op.directives', [])
 		    "");
 		}]);*/
 	
-  
+	
+	.directive("imagePreload", [function() {
+		return {
+			restrict: 'E',
+		    scope: {
+		      imageUrl: "@src"
+		    },
+			template: '<img style="display:none" src="{{imageUrl}}"/>'
+		};
+	}])
+	
 	.directive("fullHero", [ '$window', '$document', '$timeout', function ($window, $document, $timeout) {
 	    return function(scope, element, attrs) {
         
@@ -168,7 +178,9 @@ angular.module('co-op.directives', [])
 			};
 						
 			function fullSize() {
-				element.css({'height' : $window.innerHeight + 'px'});
+				element.css({
+					'min-height' : $window.innerHeight + 'px'
+				});
 				scope.$apply();
 			}
 			

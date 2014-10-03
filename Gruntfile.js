@@ -41,6 +41,11 @@ module.exports = function(grunt) {
 				browsers: ['PhantomJS']
 			},
 		},
+		bunyan: {
+			strict: true, // prevent non-bunyan logs from being outputted
+			level: 'trace', // show all the things!
+			output: 'short', // least verbose
+		},
 		shell: {
 			chromeDebug: {
 				command: 'open -a "Google Chrome" "http://127.0.0.1:8080/debug?port=5858"',
@@ -136,7 +141,12 @@ module.exports = function(grunt) {
 			}
 		}
 	});
-
+	
+	grunt.loadNpmTasks('grunt-ngmin');
+	grunt.loadNpmTasks('grunt-contrib-concat');
+	grunt.loadNpmTasks('grunt-angular-templates');
+	
+	grunt.loadNpmTasks('grunt-bunyan');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-watch');

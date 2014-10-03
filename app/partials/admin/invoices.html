@@ -1,3 +1,4 @@
+<div class="col-md-10 col-md-offset-1">
 <div class="page-header">
 	<h1>Invoices <small>Current Date: {{now | shortDate}}</h1>
 </div>
@@ -25,7 +26,7 @@
 	<alert ng-if="invoice.toCoop" type="info">The Co-op must pay this Invoice</alert>
 	<ul class="list-unstyled">
 		<li ng-hide="invoice.toCoop">
-			To be paid to the NNFC by <span ng-show="invoice.invoicee.name">{{invoice.invoicee.name}}</span><span ng-show="invoice.exInvoicee">{{invoice.exInvoicee}}</span>
+			To be paid to the NNFC by <span ng-if="invoice.invoicee.name">{{invoice.invoicee.name}}</span><span ng-if="invoice.exInvoicee">{{invoice.exInvoicee}}</span>
 		</li>
 		<li ng-show="invoice.toCoop">
 			The NNFC must pay this invoice to {{invoice.invoicee.name}};
@@ -33,7 +34,7 @@
 		<li>Date Placed: {{invoice.datePlaced | shortDate}}</li>
 		<li>Due Date: {{invoice.dueDate | shortDate}}</li>
 	</ul>
-<table class="table">
+<table class="table" ng-if="invoice.items[0].name">
 	<thead>
 		<tr><th colspan='2'>Invoice #{{invoice._id}} {{invoice.title}}</th></tr>
 	</thead>
@@ -43,12 +44,66 @@
 	<tbody>
 		<tr ng-repeat="item in invoice.items">
 			<td>{{item.name}}</td>
-			<td ng-if="item.product">{{item.product.priceWithMarkup}} / {{item.product.units}}</td>
-			<td ng-if="item.quantity">{{item.quantity}}</td>
 			<td>{{item.cost | currency}}</td>
 		</tr>
 	</tbody>
 </table>
+<table class="table" ng-if="invoice.items[0].product && !invoice.toCoop">
+	<thead>
+		<tr>
+			<td colspan="4"><strong>Invoice #{{invoice._id}} {{invoice.title}}</strong></td>
+		</tr>
+		<tr>
+			<td><strong>Product</strong></td>
+			<td><strong>Unit Price</strong></td>
+			<td><strong>Quantity</strong></td>
+			<td><strong>Cost</strong></td>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="item in invoice.items">
+			<td>{{item.product.fullName}}</td>
+			<td>{{item.product.priceWithMarkup | currency}} / {{item.product.units}}</td>
+			<td>{{item.quantity}}</td>
+			<td>{{item.product.priceWithMarkup * item.quantity | currency}}</td>
+		</tr>
+	</tbody>
+	<tfooter>
+		<tr>
+			<td colspan="4"><strong>Total: {{invoice.total | currency}}</strong></td>
+		</tr>
+	</tfooter>
+</table>
+<table class="table" ng-if="invoice.items[0].product && invoice.toCoop">
+	<thead>
+		<tr>
+			<td colspan="4"><strong>Invoice #{{invoice._id}} {{invoice.title}}</strong></td>
+		</tr>
+		<tr>
+			<th><strong>Product</strong></th>
+			<th><strong>Customer</strong></th>
+			<th><strong>Unit Price</strong></th>
+			<th><strong>Quantity</strong></th>
+			<th><strong>Cost</strong></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="item in invoice.items">
+			<td>{{item.product.fullName}} </td>
+			<td>{{item.customer.name}}</td>
+			<td>{{item.product.price | currency}} / {{item.product.units}}</td>
+			<td>{{item.quantity}}</td>
+			<td>{{item.product.price * item.quantity | currency}}</td>
+		</tr>
+	</tbody>
+	<tfooter>
+		<tr>
+			<td colspan="4"> <strong>Total: {{invoice.total | currency}}</strong></td>
+		</tr>
+	</tfooter>
+</table>
+
+
 <p ng-show="invoice.toCoop">Payment is to be sent to <strong>{{invoice.bankAccount}}</strong></p>
 <div class="btn-group">
 	<button type='button' class="btn btn-default" ng-model="invoice.status" btn-radio=" 'un-paid' ">Un-paid</button>
@@ -61,5 +116,6 @@
 <button type='button' class="btn btn-primary" ng-click="invoiceSave(invoice)"> Update Status</button>
 <hr>
 </section>
+</div>
 
 

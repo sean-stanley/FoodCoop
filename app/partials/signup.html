@@ -1,15 +1,16 @@
 <div class="row">
 	
-	<div class="col-sm-10 col-sm-offset-1">
+	<div class="col-sm-10 col-sm-offset-1 ">
 		<div class="page-header">
 			<h1>Sign Up</h1>
 		</div>
 		
-		
 		<div class="membership col-md-4 col-md-offset-1 col-sm-6">
 			<div class="row membership-head"><h1 class="text-center">Customer</h1></div>
-			<div class="row membership-price"><h1 class="text-center" >$60</h1></div>
-			<div class="row membership-summary"><h3 class="text-center">BUY LOCAL FOOD</h3></div>
+			<div class="row membership-price">
+				<h1 class="text-center" >$60</h1>
+				<h3 class="text-center">BUY LOCAL FOOD</h3>
+			</div>
 			<div class="row membership-percs">
 				<ul class="list-unstyled">
 					<li><span class="glyphicon glyphicon-ok"></span> 100% refundable</li>
@@ -22,8 +23,10 @@
 		</div>
 		<div class="membership col-md-4 col-md-offset-1 col-sm-6">
 			<div class="row membership-head"><h1 class="text-center">Producer</h1></div>
-			<div class="row membership-price"><h1 class="text-center">$120</h1></div>
-			<div class="row membership-summary"><h3 class="text-center">BUY &amp; SELL LOCAL FOOD</h3></div>
+			<div class="row membership-price">
+				<h1 class="text-center">$120</h1>
+				<h3 class="text-center">BUY &amp; SELL LOCAL FOOD</h3>
+			</div>
 			<div class="row membership-percs">
 				<ul class="list-unstyled">
 					<li><span class="glyphicon glyphicon-ok"></span> 100% refundable</li>
@@ -34,103 +37,104 @@
 			</div>
 			<div class="row membership-button"><button class="btn btn-primary btn-block" ng-click="open('Producer')">JOIN</button></div>
 		</div>
+
 	</div>
 </div>
 <br>
 <br>
 <div class="row">
-	<div class="img-content jumbotron bg-warning">
-		<div class="img-column hidden-sm hidden-xs">
-			<img src="../img/happy-customer-producer.jpg" alt="Agricultural Landscape">
+	<div class="img-content jumbotron bg-warning flex-center" full-hero>
+		<div class="img-column hidden-sm hidden-xs col-md-4">
+			<img src="../img/happy-customer-producer.jpg" alt="Agricultural Landscape" class="img-responsive img-circle">
 		</div>
-		<div class="jumbotron bg-warning">
+		<div class="jumbotron bg-warning col-md-8">
 				<h2 class="text-center">
 					Want an easy way to
 				</h2>
 			<h1 class="text-center">buy &amp; sell local food?</h1>
 			<br>
-			<p class="text-justify">Producers: <a href="">upload</a> your product and pricing information. Consumers: place your monthly order. The food is then delivered to our central site, and distributed to pick-up sites all over Northland for customers to collect.</p>
 			<p class="text-justify">As a member of the Northland Natural Food Coop, you can <strong>buy</strong> and <strong>sell</strong> local food through our online store. Simply upload your products or place your order <strong>online.</strong> The food is then delivered to our offices, and <strong>distributed</strong> to pick-up sites all over Northland for customers to <strong>collect.</strong></p>
-			<div class="text-center" style="width=388px">
+			<div class="text-center" style="width:388px">
 				<button class="btn btn-primary btn-lg" ng-click="open('Customer')">Join as a Customer</button>
 				<button class="btn btn-primary btn-lg" ng-click="open('Producer')">Join as a Producer</button>
 			</div>
 		</div>
 	</div>
-		<div class="jumbotron img-content bg-success">
-			<div class="img-column hidden-sm hidden-xs pull-right img-right" style="height: 450px">
-				<img src="../img/mum_healthy_food.jpg" width="320" height="450" alt="Mum Healthy Food">
-			</div>
-			<div class="jumbotron bg-success">
-				<h2 class="text-center">
-					Want assurance your food is
-				</h2>
-				<h1 class="text-center"> fresh, healthy and local?</h1>
-				<br>
-				<p class="text-justify">As a customer, you will know exactly <strong>who</strong> produced your food, as well as <strong>where</strong> and <strong>how</strong> it was grown or raised. This gives you a unique opportunity to support the producers and <strong>production practices</strong> of your choice.</p>
-				<div class="text-center">
-					<button class="btn btn-primary btn-lg" ng-click="open('Customer')">Join as a Customer</button>
-				</div>
-			</div>
-			
-		</div>		
-		<div class="jumbotron img-content bg-info">
-			<div class="img-column hidden-sm hidden-xs">
-				<img src="../img/happy-grower.jpg" alt="Happy Beetroot Grower Member">
-			</div>
-			<div class="jumbotron bg-info">
-				<h1 class="text-center">
-					Want a fair price for your products?
-				</h1>
-				<br>
-				<p class="text-justify">As a producer, you will have complete <strong>control</strong> over the sale of your products. You set the <strong>prices</strong>; you decide what to sell, when to sell, and how much to sell. Regardless of your <strong>scale</strong> of operation, you will be connected with consumers who value quality products, healthy local economies, and a <strong>fair income</strong> for your work.</p>
-				<br>
-				<div class="text-center">
-					<button class="btn btn-primary btn-lg" ng-click="open('Producer')">Join as a Producer</button>
-				</div>
+</div>
+<div class="row">
+	<div class="jumbotron img-content bg-success flex-center" full-hero>
+		<div class="jumbotron bg-success col-md-8">
+			<h2 class="text-center">
+				Want assurance your food is
+			</h2>
+			<h1 class="text-center"> fresh, healthy and local?</h1>
+			<br>
+			<p class="text-justify">As a customer, you will know exactly <strong>who</strong> produced your food, as well as <strong>where</strong> and <strong>how</strong> it was grown or raised. This gives you a unique opportunity to support the producers and <strong>production practices</strong> of your choice.</p>
+			<div class="text-center">
+				<button class="btn btn-primary btn-lg" ng-click="open('Customer')">Join as a Customer</button>
 			</div>
 		</div>
+		<div class="img-column hidden-sm hidden-xs col-md-4" >
+			<img src="../img/mum_healthy_food.jpg" alt="Mum Healthy Food" class="img-responsive img-circle">
+		</div>
+	</div>
+</div>
+<div class="row">	
+	<div class="jumbotron img-content bg-info flex-center" full-hero>
+		<div class="img-column hidden-sm hidden-xs col-md-4">
+			<img src="../img/happy-grower-square.jpg" alt="Happy Beetroot Grower Member" class="img-responsive img-circle">
+		</div>
+		<div class="jumbotron bg-info col-md-8 ">
+			<h1 class="text-center">
+				Want a fair price for your products?
+			</h1>
+			<br>
+			<p class="text-justify">As a producer, you will have complete <strong>control</strong> over the sale of your products. You set the <strong>prices</strong>; you decide what to sell, when to sell, and how much to sell. Regardless of your <strong>scale</strong> of operation, you will be connected with consumers who value quality products, healthy local economies, and a <strong>fair income</strong> for your work.</p>
+			<br>
+			<div class="text-center">
+				<button class="btn btn-primary btn-lg" ng-click="open('Producer')">Join as a Producer</button>
+			</div>
+		</div>
+	</div>
+</div>
 		
 		
-		<div class="jumbotron clearfix white col-sm-11">
+		<div class="jumbotron clearfix white flex-center" full-hero>
 			<div class="col-sm-4">
 				<img src="../img/manyhandstogether.jpg" alt="Agricultural Landscape" class="img-responsive img-circle">
 			</div>
-			
-			<h1 class="text-center">
-				100% member owned
-			</h1>
-			<br>
-			
+			<div class="col-sm-8">
+				<h1 class="text-center">
+					100% member owned
+				</h1>
+				<br>
 				<p class="text-justify">The NNFC is 100% member owned and operated, so by signing up, you also become a <strong>shareholder</strong>. You will receive a percentage of the co-op’s <strong>profits</strong> each year, and have the right to <strong>vote</strong> on all major decisions. For details, see our <a href="/policy">policy handbook</a></p>
-				<div style="margin-top: 1.5em">
+				<div style="margin-top: 1.5em; width: 388px;" class="center-block" >
 					<button class="btn btn-primary btn-lg" ng-click="open('Customer')">Join as a Customer</button>
 					<button class="btn btn-primary btn-lg" ng-click="open('Producer')">Join as a Producer</button>
 				</div>
+			</div>
 		</div>
-		<div class="jumbotron clearfix white">
-			<div class="col-sm-4 col-sm-push-8">
-				<img src="../img/farmers-market.jpg" alt="online farmer's market" class="img-responsive img-circle">
-			</div>
-			<div class="col-sm-8 col-sm-pull-4">
-			<h2 class="text-center">No yearly fee or subscription</h2>
-			<h1 class="text-center">
-				Pay just once
-			</h1>
-			<br>
-			<div class="col-sm-6">
+		<div class="jumbotron clearfix white flex-center" full-hero>
+			<div class="col-sm-8">
+				<h1 class="text-center">
+					Pay just once
+				</h1>
+				<br>
 				<p class="text-left">The <strong>one time cost</strong> of joining gives you and your household <strong>lifetime</strong> membership in the NNFC. You will gain access to our <strong>exclusive online store</strong>, have the right to <strong>vote</strong> on all major decisions about the co-op, and receive a percentage of the co-op’s <strong>profits</strong> each year.</p>
-			</div>
-			
-			<div class="col-sm-6">
+
+		
 				<p class="text-left">Current fees are as follows:<br>
 					Customer Membership costs $60.00<br>
 					Producer Membership costs $120.00
 				</p>
-				
+	
 				<button class="btn btn-primary btn-lg" ng-click="open('Customer')">Join as a Customer</button>
 				<button class="btn btn-primary btn-lg" ng-click="open('Producer')">Join as a Producer</button><br>
 				<small>All prices are in NZD</small>
+			</div>
+				<div class="col-sm-4">
+				<img src="../img/farmers-market.jpg" alt="online farmer's market" class="img-responsive img-circle">
 			</div>
 		</div>
 </div>

@@ -47,13 +47,12 @@ function loggedIn(req, res, next) {
 }
 
 // SEO
-
 app.use(require('prerender-node').set('prerenderToken', 'AyY6GHZSR0aiwAuXqDzm'));
 
 
 // ensure redirects work with tidy and hashBangless URL's
 app.use(function(req, res){
-	res.sendfile(path.normalize(path.join(__dirname, '../app/index.html')));
+	res.sendFile(path.normalize(path.join(__dirname, '../app/index.html')));
 });
 
 

@@ -377,7 +377,6 @@ angular.module('co-op.services', [])
 				LoginManager.isLoggedIn().then(function() {
 					Restangular.one('api/cart', $rootScope.currentUser._id)
 					.get({cycle: $rootScope.cycle}).then(function(cart) {
-					//	currentCart = Calendar.currentMonth(cart, callback);
 						return currentCart;
 					});
 				});

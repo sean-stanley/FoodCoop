@@ -130,7 +130,7 @@ angular.module('co-op', [
 				}
 			}
 		})
-		.when('/producer-profile', {templateUrl: 'partials/loggedIn/edit-producer-profile.html', controller: 'producerCtrl', loggedInOnly: true, reloadOnSearch: false})
+		//.when('/producer-profile', {templateUrl: 'partials/loggedIn/edit-producer-profile.html', controller: 'producerCtrl', loggedInOnly: true, reloadOnSearch: false})
 		.when('/my-cart', {templateUrl: 'partials/loggedIn/my-cart.html', controller: 'cartPageCtrl', loggedInOnly: true, reloadOnSearch: false})
     	.when('/product-manager', {
 			templateUrl: 'partials/loggedIn/order-manager.html', 
@@ -255,7 +255,7 @@ angular.module('co-op', [
 					if (next.adminOnly) {
 						message = "Sorry! That page is only available to Administrators";
 						flash.setNextMessage({type: 'warning', message: message});
-						$location.path(current);
+						$location.path('must-login');
 					}
 					else {
 						$rootScope.savedLocation = $location.url();

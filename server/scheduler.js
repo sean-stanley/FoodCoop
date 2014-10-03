@@ -24,10 +24,11 @@ var orderCycleChecker = schedule.scheduleJob({hour:0, minute: 0}, checkConfig);
 // schedule emails to send alerting members that it is delivery day.
 // To be executed at 9:15am Wednesday;
 function checkConfig() {
-	console.log(Date.now().toString() + ". Checking if today is a significant day");
+	console.log(Date() + ". Checking if today is a significant day");
 	var today = Date.today(), cycle = config.cycle, key;
 	exports.canShop = false;
 	exports.canUpload = false;
+	exports.canChange = false;
 
 	// test for an exact day match and run reminder email functions if it is.
 	for (key in cycle) {
@@ -44,16 +45,13 @@ function checkConfig() {
 					break;
 				case 'ProductUploadStart':
 					exports.canUpload = true;
-					// schedule email reminder to producers here.
-					// and another reminder in 5 days saying there are only two days left
 					break;
 				case 'ProductUploadStop':
 					exports.canUpload = false;
+					exports.canChange = false;
 					break;
 				case 'ShoppingStart':
 					exports.canShop = true;
-					// schedule email reminders to all members here and another in 5 days saying
-					// there are only two days left	
 					break;
 				case 'ShoppingStop':
 					exports.canShop = false;
@@ -69,6 +67,7 @@ function checkConfig() {
 					// send reminders to those with unpaid invoices
 					break;
 				case 'DeliveryDay':
+					exports.canChange = false;
 					// send reminder emails
 					break;
 				case 'testDay':
@@ -108,7 +107,7 @@ function checkout() {
 			});
 		},
 		function(customers, done) {
-			models.Product.populate(customers, {path: 'orders.product', select: 'fullName variety productName priceWithMarkup price units refrigeration -_id'}
+			models.Product.populate(customers, {path: 'orders.product', select: 'fullName variety productName priceWithMarkup price units refrigeration'}
 			, function(e, result){
 				done(null, result);
 			});
@@ -134,8 +133,10 @@ function checkout() {
 // called by checkout() for each customer. Creates invoices for customers to pay
 // and emails them a copy
 function invoiceCustomer(customer) {
+	console.log('beginning invoicing of customer ' + customer._id.name);
 	async.waterfall([
 		function (done) {
+			console.log(customer.orders);
 			
 			var invoice = new models.Invoice({
 				dueDate: config.cycle.PaymentDueDay.toString(),
@@ -168,7 +169,7 @@ function invoiceCustomer(customer) {
 				name: customer._id.name,
 				dueDate: invoice.dueDate.toString("ddd dd MMMM yyyy"),
 				code: invoice._id,
-				items: invoice.items,
+				items: customer.orders,
 				total: invoice.total,
 				account: config.bankAccount
 			};
@@ -176,12 +177,13 @@ function invoiceCustomer(customer) {
 			mail = new Emailer(mailOptions, mailData);
 
 			mail.send(function(err, result) {
-				if (err) done(err);
-				// a response is sent so the client request doesn't timeout and get an error.
-				console.log("Message sent to customer " + customer._id.name);
-				
-				done(null, result);
-			});
+							if (err) done(err);
+							// a response is sent so the client request doesn't timeout and get an error.
+							console.log("Message sent to customer " + customer._id.name);
+							
+							done(null, result);
+						});
+			
 		}
 		
 	], function(error) {
@@ -198,12 +200,12 @@ function orderGoods() {
 			.group({ _id: "$supplier", orders: { $push : {product: "$product", customer: '$customer', quantity: "$quantity"} }})
 			
 			.exec(function(e, producers) {
-				// customers is a plain javascript document not a special mongoose document.
+				// producers is a plain javascript document not a special mongoose document.
 				done(e, producers);
 			});
 		},
 		function(producers, done) {
-			models.Product.populate(producers, {path: 'orders.product', select: 'fullName variety productName price units refrigeration -_id'}
+			models.Product.populate(producers, {path: 'orders.product', select: 'fullName variety productName price units refrigeration'}
 			, function(e, result){
 				
 				_.map(result, function(producer) {
@@ -238,18 +240,23 @@ function orderGoods() {
 // them a copy of the invoice. This function is for the producer's 
 // convenience and is as a way of invoicing the co-op for orders requested.
 function invoiceFromProducer(producer) {
+	console.log('beginning invoicing of producer ' + producer._id.name);
+	var order, items = [];
+	
 	async.waterfall([
 		function(done) {
 			var invoice = new models.Invoice({
 				dueDate: config.cycle.DeliveryDay.toString("ddd dd MMMM yyyy"),
+				invoicee: producer._id._id,
 				title: "Products Requested for " + Date.today().toString("MMMM"),
 				items: producer.orders,
 				cycle: exports.currentCycle,
-				toCoop: true
-			})
+				toCoop: true,
+				bankAccount: producer._id.producerData.bankAccount || "NO ACCOUNT ON RECORD"
+			});
 			
-			.save(function(e, invoice) {
-							console.log(invoice.total);
+			invoice.save(function(e, invoice) {
+							console.log(invoice);
 							if (e) done(e);
 							else done(null, invoice);
 						});
@@ -271,20 +278,22 @@ function invoiceFromProducer(producer) {
 				dueDate: invoice.dueDate.toString("ddd dd MMMM yyyy"),
 				deliveryDay: config.cycle.DeliveryDay.toString("ddd dd MMMM yyyy"),
 				code: invoice._id,
-				items: invoice.items,
+				items: producer.orders,
 				total: invoice.total,
 				account: producer._id.producerData.bankAccount
 			};
 			
 			mail = new Emailer(mailOptions, mailData);
 
+			
 			mail.send(function(err, result) {
-				if (err) done(err);
-				else {
-					console.log("Message sent to producer " + producer._id.name);
-					done(null, result);
-				}
-			});
+							if (err) done(err);
+							else {
+								console.log("Message sent to producer " + producer._id.name);
+								done(null, result);
+							}
+						});
+			
 		}
 		
 	],function(error) {
@@ -300,7 +309,7 @@ function incrementCycle() {
 		else {
 			if ( cycle && Date.equals(Date.today(), Date.parse(cycle.dateModified).clearTime()) ) console.log("cycle already incremented today");
 			else {
-				models.Cycle.findByIdAndModify({_id: 'orderCycle'},{ dateModified: Date.now(), $inc: {seq: 1} }, function(err, cycle){
+				models.Cycle.findOneAndUpdate({_id: 'orderCycle'},{ dateModified: Date.now(), $inc: {seq: 1} }, function(err, cycle){
 					console.log(cycle);
 					if (!err) {
 						config.cycleReset('today');

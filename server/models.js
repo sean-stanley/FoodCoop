@@ -16,14 +16,6 @@ function toArray (listString) {
 		return listString.split(/,\s*/);
 	}
 }
-/*
-
-function toString (listArray) {
-	if (listArray instanceof Array) {
-		listArray = listArray.join(", ")
-		return listArray;
-	}
-}*/
 
 
 // These are the most common properties that a product will have in our co-op.
@@ -44,6 +36,7 @@ var ProductSchema = new Schema({
 			certification: {type: Schema.ObjectId, required: false, ref: 'Certification'},
 			producer_ID: {type: Schema.ObjectId, required: true, ref: 'User'},
 			cycle: {type: Number, required: true},
+			amountSold: Number
 }, {
 	toObject: { virtuals : true },
 	toJSON: { virtuals : true }
@@ -105,7 +98,13 @@ var InvoiceSchema = new Schema({
 	exInvoicee: String,
 	toCoop: {type: Boolean, default: false},
 	title: String,
-	items: {type: Array, required:true},
+	items: [{
+		cost: Number,
+		quantity: {type: String}, 
+		name: {type: String}, 
+		customer: {type:Schema.ObjectId, ref: 'User'}, 
+		product: {type:Schema.ObjectId, ref: 'Product'} 
+	}],
 	bankAccount: {type:String, required: true, default: config.bankAccount},
 	//valid types are 'un-paid', 'PAID', 'overdue', 'To Refund', 'refunded' and
 	//'CANCELLED'.
@@ -123,18 +122,23 @@ InvoiceSchema.virtual('total').get(function () {
 	var total = 0;
 	for (var i = 0; i < this.items.length; i++) {
 		// works for membership invoices
-		if (this.items[i].hasOwnProperty('cost')) {
+		console.log(this.items[i]);
+		if (this.items[i].cost) {
 			total += this.items[i].cost;
+			console.log('added cost');
 		}
-		else if (this.items[i].hasOwnProperty('product')) {
+		
+		else if (this.items[i].product) {
 			if (this.toCoop) {
 				total += this.items[i].product.price * this.items[i].quantity;
 			}
 			else {
 				total += this.items[i].product.priceWithMarkup * this.items[i].quantity;
 			}
+			console.log('added product cost');
 		}
 	}
+	console.log(total);
 	return total;
 });
 
@@ -198,7 +202,7 @@ var UserSchema = new Schema({
 			},
 			routeManager: {
 				title: String,
-				townsOnRoute: {type: Array, set: toArray, get: toString},
+				townsOnRoute: {type: Array, set: toArray},
 				pickupLocation: String
 			},
 			routeTitle: String,

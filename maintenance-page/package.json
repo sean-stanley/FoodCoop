@@ -1,0 +1,10 @@
+{
+  "name": "maintenance",
+  "description": "a maintenance page to run when main site is down",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "4.x",
+	"path": "lastest"
+  }
+}

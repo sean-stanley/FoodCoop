@@ -70,17 +70,12 @@ exports.mailSchedule = function() {
 		// find originals
 		function(done) { 
 			mc.campaigns.list({ filters: { folder_id: '7865'} }, function(originals) {
-				dateTitleMap = _.map(originals.data, function(doc) {
-					var el;
-					el.title = doc.title;
-					el.scheduleTime = titleDateMatcher(doc.title);
-					return el;
-				});
+				console.log("successfully imported campaigns list.");
+				var dateTitleMap = {};
 				for (var i = 0; i < originals.data.length; i++) {
-					var dictionary = {};
-					dictionary[originals.data[i].title] = titleDateMatcher(doc.title);
-					dateTitleMap.push(dictionary);
+					dateTitleMap[originals.data[i].title] = titleDateMatcher(originals.data[i].title);
 				}
+				console.log(dateTitleMap);
 				
 		
 				done(null, originals, dateTitleMap);
@@ -121,17 +116,18 @@ exports.mailSchedule = function() {
 				done(e, originals, dateTitleMap);
 			});
 		},
-		function(originals, dateTitleMap) {
-			
+		function(originals, dateTitleMap, done) {
+			var date;
 		// currently untested feature. Expect work or reworking to be needed
 			(function repeat(i) {
 				if (i < originals.data.length) {
 					
-					dateTitle = dateTitleMap[originals.data[i].title];
+					date = dateTitleMap[originals.data[i].title];
+					console.log(date);
 				
 					mc.campaigns.replicate({cid: originals.data[i].id},
 					function(replica) {
-						schedule(replica.id, dateTitle.scheduleTime, function(result) {
+						schedule(replica.id, date, function(result) {
 							console.log(result);
 							repeat(i + 1);
 						},
