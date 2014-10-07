@@ -27,7 +27,11 @@
 			</div>
 			<div class="form-group">
 				<label for="pw">Choose a New Password</label>
-				<input type="password" class="form-control" ng-model="currentUser.password" name="pw" placeholder="new password here">
+				<input type="password" class="form-control" ng-model="currentUser.password" name="pw" placeholder="new password here" ng-minlength="7">
+				<div class="custom-error" ng-show="editMe.pw.$dirty && editMe.pw.$invalid">Sorry:
+					<span ng-show="editMe.pw.$error.required">a password is definately required.</span>
+					<span ng-show="editMe.pw.$error.minlength">Passwords must be greater than 7 characters long.</span>
+				</div>
 			</div>
 	    </accordion-group>
 	</accordion>

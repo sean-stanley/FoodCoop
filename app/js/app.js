@@ -199,7 +199,6 @@ angular.module('co-op', [
 	.html5Mode(true)
 	.hashPrefix('!');
 	
-	
   }])
 	.run(function($rootScope, $route, $location, LoginManager, flash, Session, Restangular, $window) {
 		$rootScope.slideInterval = 7000;
@@ -220,9 +219,7 @@ angular.module('co-op', [
 			$window.ga('send', 'pageview', { page: $location.path() });
 			
 		});
-		
-		
-		
+
 		// when the app starts, check if the user is logged in. This does not return a
 		// 401 error but a custom error to avoid the regular errorInterceptor the app
 		// uses. 
@@ -269,38 +266,5 @@ angular.module('co-op', [
 			
 			
         });
-        
-       /* $rootScope.$on( '$locationChangeStart', function(event, next, current) {
-	        var nextPath = $location.path(); // return next path (not full URL);
-	        var nextRoute = $route.routes[nextPath]; // returns undefined if a route param is part of the next path
-			console.log($route);
-	        
-	        if (!$rootScope.currentUser && nextRoute.loggedInOnly ) {
-		        event.preventDefault();
-		        
-		        LoginManager.isLoggedIn().then(function(isAuth) {
-					var message;
-					// redirect a user who is not logged in from going to a logged in only page
-					if (!isAuth && nextRoute.loggedInOnly || nextRoute.adminOnly) {
-						$rootScope.savedLocation = $location.url();
-						flash.setMessage({type: 'warning', message: 'Not logged in'});
-						$location.path('/must-login');
-					}
-					// redirect a non-admin from viewing an admin only page
-					else if (isAuth && !$rootScope.currentUser.user_type.isAdmin && nextRoute.adminOnly) {
-						message = "Sorry! That page is only available to Administrators";
-						flash.setMessage({type: 'warning', message: message});
-						$location.path(current);
-					}
-					// allow a logged in user or admin to see a loggedInOnly page
-					else if (isAuth && nextRoute.loggedInOnly) {
-						//$route.updateParams(nextRoute.originalPath); not working
-						$location.path(next);
-					}
-				});
-	        }
-        });
-		*/
-
   });
   

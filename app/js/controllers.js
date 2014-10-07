@@ -171,7 +171,7 @@ angular.module('co-op.controllers', [])
 		
 		$scope.save = function() {
 			if (!$scope.isClean()) {
-				$scope.user.post($scope.user._id).then(function(response) {
+				$scope.user.put($scope.user._id).then(function(response) {
 					// success!
 					flash.setMessage({type: 'success', message: 'Changes saved successfully'});
 				});
@@ -420,11 +420,13 @@ angular.module('co-op.controllers', [])
 .controller('modalInstanceCtrl', ['$scope', '$location', '$modalInstance', 'data',
 	function($scope, $location, $modalInstance, data) {
 		
-		var twitterRenderedAttribute = function(bool){
-			document.body.dataset.twttrRendered = bool;
-		};
 		
-		twitterRenderedAttribute(true);
+		var twitterRenderedAttribute = function(bool){
+					document.body.dataset.twttrRendered = bool;
+				};
+				
+				twitterRenderedAttribute(true);
+		
 		
 		$scope.data = data;
 		
@@ -432,7 +434,7 @@ angular.module('co-op.controllers', [])
 			return data.producer_ID.producerData.companyName || data.producer_ID.name;
 		}
 		
-		$location.hash(data.fullName + "+" + producer()+ "&id=" + data._id);
+		if (data.hasOwnProperty('fullName') ) $location.hash(data.fullName + "+" + producer()+ "&id=" + data._id);
 		
 		$scope.addToCart = function(product) {
 			twitterRenderedAttribute(false);
@@ -446,38 +448,17 @@ angular.module('co-op.controllers', [])
 		};
 	}
 ])
-// left-column of product-upload page
-.controller('productHistoryCtrl', ['$scope', '$http', 'ProductHistory', 'ProductManager',
-	function($scope, $http, ProductHistory, ProductManager) {
 
-		ProductHistory.getCurrentProducts(function(result) {
-			$scope.currentProducts = result;
-		});
-		
-		ProductHistory.getRecentProducts(function(result) {
-			$scope.lastMonthProducts = result;
-		});
-		
-		ProductHistory.getAllProducts(function(result) {
-			$scope.allProducts = result;
-		});
-
-		$scope.predicate = 'dateUploaded';
-
-		$scope.delete = function(idx, id) {
-			var itemToDelete = $scope.currentProducts[idx];
-			$scope.currentProducts.splice(idx, 1);
-			ProductManager.deleteProduct(id);
-		};
-	}
-])
 
 // main controller for product upload page
-.controller('productUploadCtrl', ['$scope', '$rootScope', '$modal', '$sce', 'ProductManager', 'Restangular', 'product', 'flash',
-	function($scope, $rootScope, $modal, $sce, ProductManager, Restangular, product, flash) {
+.controller('productUploadCtrl', ['$scope', '$rootScope', '$modal', '$sce', '$location', 'ProductManager', 'Restangular', 'product', 'flash',
+	function($scope, $rootScope, $modal, $sce, $location, ProductManager, Restangular, product, flash) {
 		// init
 		if (!$rootScope.canUpload && !$rootScope.canChange) {
 			flash.setMessage({type: 'warning', message: 'Uploading is not allowed yet sorry. Please check the calendar for when uploading is open next.'});
+		}
+		else if ($rootScope.canChange) {
+			flash.setMessage({type: 'warning', message: 'Uploading new products is not allowed right now. This month\'s products can have some properties edited though. Editable properties are enabled.'});
 		}
 		
 		$scope.productData = product || {};
@@ -493,9 +474,8 @@ angular.module('co-op.controllers', [])
 			console.log($scope.productData);
 		};*/
 		
-		$scope.setCategory = function(category) {
-			$scope.productData.category = category;
-			return $scope.productData.category;
+		$scope.setCategory = function(categoryId) {
+			$scope.productData.category = categoryId;
 		};
 
 		var certifications = Restangular.all('api/certification');
@@ -513,7 +493,9 @@ angular.module('co-op.controllers', [])
 		});
 
 		$scope.submitForm = function() {
-			ProductManager.registerProduct($scope.productData);
+			ProductManager.registerProduct($scope.productData, function() {
+				$scope.$broadcast('REFRESHCURRENT');
+			});
 		};
 		
 		$scope.imageChoices = ['image1', 'image2', 'image3'];
@@ -540,6 +522,27 @@ angular.module('co-op.controllers', [])
 				};				
 				
 			}, function () {
+				console.log('Modal dismissed at: ' + new Date());
+			});
+		};
+		
+		$scope.preview = function(product) {
+			var modalInstance = $modal.open({
+				templateUrl: 'partials/store/store-modal.html',
+				controller: 'previewCtrl',
+				size: 'lg',
+				resolve: {
+					data: function() {
+						return product;
+					}
+				}
+			});
+
+			modalInstance.result.then(function(product) {
+				$location.hash('');
+				
+			}, function() {
+				$location.hash('');
 				console.log('Modal dismissed at: ' + new Date());
 			});
 		};
@@ -571,6 +574,59 @@ angular.module('co-op.controllers', [])
 	}
 ])
 
+.controller('previewCtrl', ['$scope', '$modalInstance', 'data', 'ProductManager', 
+function($scope, $modalInstance, data, ProductManager) {
+	var twitterRenderedAttribute = function(bool){
+		document.body.dataset.twttrRendered = bool;
+	};
+	
+	twitterRenderedAttribute(true);
+	
+	$scope.data = angular.copy(data);
+	$scope.data.fullName = data.variety + ' ' + data.productName;
+	
+	if ($scope.data.hasOwnProperty('certification')) {
+		$scope.data.certification = ProductManager.certificationByID($scope.data.certification);
+	}
+	
+	$scope.cancel = function() {
+		twitterRenderedAttribute(false);
+		$modalInstance.dismiss('cancel');
+	};
+	
+}])
+
+// left-column of product-upload page
+.controller('productHistoryCtrl', ['$scope', '$http', 'ProductHistory', 'ProductManager',
+	function($scope, $http, ProductHistory, ProductManager) {
+
+		$scope.$on('REFRESHCURRENT', function() {
+			ProductHistory.getCurrentProducts(function(result) {
+				$scope.currentProducts = result;
+			});
+		});
+		
+		ProductHistory.getCurrentProducts(function(result) {
+			$scope.currentProducts = result;
+		});
+		
+		ProductHistory.getRecentProducts(function(result) {
+			$scope.lastMonthProducts = result;
+		});
+		
+		ProductHistory.getAllProducts(function(result) {
+			$scope.allProducts = result;
+		});
+
+		$scope.predicate = 'dateUploaded';
+
+		$scope.delete = function(idx, id) {
+			var itemToDelete = $scope.currentProducts[idx];
+			$scope.currentProducts.splice(idx, 1);
+			ProductManager.deleteProduct(id);
+		};
+	}
+])
 
 .controller('producerCtrl', ['$scope', '$rootScope', 'ProducerManager', '$location',
 	function($scope, $rootScope, ProducerManager, $location) {
@@ -750,8 +806,8 @@ angular.module('co-op.controllers', [])
 	});
 }])
 
-.controller('contactCtrl', ['$scope', 'MailManager', '$route', '$location',
-	function($scope, MailManager, $route, $location) {		
+.controller('contactCtrl', ['$scope', 'MailManager', '$location',
+	function($scope, MailManager, $location) {		
 		$scope.mail = {
 			name: '',
 			email: '',
@@ -762,9 +818,7 @@ angular.module('co-op.controllers', [])
 		$scope.mail.subject = search.hasOwnProperty('subject') ? search.subject : '';
 		
 		$scope.submitForm = function(mail) {
-			MailManager.mail(mail, function() {
-				$route.reload();
-			});
+			MailManager.mail(mail);
 		};
 	}
 ])

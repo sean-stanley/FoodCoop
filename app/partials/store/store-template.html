@@ -2,7 +2,7 @@
 	{{message.message}}
 </alert>
 					
-<section id="main-nav-and-sorting">
+<section id="main-nav-and-sorting" class="col-sm-12">
 						
     <div ng-class="{ 'pull-left' : !panelDisplay}">
     	<label> Categories: </label>
@@ -34,15 +34,16 @@
            
 </section>
 
-<div id="products-section" class="row">
+<div id="products-section" class="col-sm-12">
 	<div ng-if="products.length <= 0" class="col-md-8 col-md-offset-2">
 		<div class="jumbotron">
 			<h1 class="text-center">What? No Products?</h1>
 			<p>This happens when no members have uploaded products for this month yet.</p>
 			<p>Please be patient and check back when <a href="/calendar">shopping</a> starts again.</p>
+		</div>
 	</div>
 	
-	<ul id="store-products">
+	<ul id="store-products" class="list-unstyled">
 		<li ng-repeat="product in products | orderBy:sort:reverse | filter:search | filter:filter" class="product-container" 
 		ng-controller="productUICtrl" 
 		ng-mouseleave="detailsVisible = false"

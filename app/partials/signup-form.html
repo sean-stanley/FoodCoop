@@ -11,24 +11,34 @@
 	<form name="signUp" autocomplete="on" ng-submit="submitForm()" novalidate role="form" id="signup-form">		
 		<div class="form-group">
 			<label for="email">Email address</label>
-			<input ng-model="userData.email" name="email" type="email" class="form-control" placeholder="Enter email" required>
-			<div class="custom-error" ng-show="signUp.email.$dirty && signUp.email.$invalid">Sorry:
+			<input autofocus ng-model="userData.email" name="email" type="email" class="form-control" placeholder="Enter email" required>
+			<alert type="warning" ng-show="signUp.email.$dirty && signUp.email.$invalid">Sorry:
 				<span ng-show="signUp.email.$error.required">email is required.</span>
 				<span ng-show="signUp.email.$error.email">Please, write a valid email address.</span>
-			</div>
+			</alert>
 		</div>
 	
 		<div class="form-group">
 			<label for="pw">Create a Password</label>
-			<input type="password" class="form-control" ng-model="userData.password" name="pw" placeholder="Enter a Password" required>
+			<input type="password" 
+			class="form-control" 
+			ng-model="userData.password"
+			ng-minlength="7" 
+			name="pw" 
+			placeholder="Enter a Password" 
+			required>
+			<alert type="danger" ng-show="signUp.pw.$dirty && signUp.pw.$invalid">Sorry:
+				<span ng-show="signUp.pw.$error.required">a password is definately required.</span>
+				<span ng-show="signUp.pw.$error.minlength">Passwords must be greater than 7 characters long.</span>
+			</alert>
 		</div>
 	
 		<div class="form-group">
 			<label for="userFullName">Full Name</label>
 			<input ng-model="userData.name" name="userFullName" type="text" class="form-control" placeholder="Full Name" required>
-			<div class="custom-error" ng-show="signUp.userFullName.$dirty && signUp.userFullName.$invalid">		Sorry:
+			<alert type="warning" ng-show="signUp.userFullName.$dirty && signUp.userFullName.$invalid">		Sorry:
 				<span ng-show="signUp.userFullName.$error.required">Full name is required.</span>
-			</div>
+			</alert>
 		</div>
 	
 	
@@ -36,17 +46,20 @@
 			<label for="address">Address</label>
 			<input type="text" id="Autocomplete" class="form-control" ng-autocomplete="userData.address" details="addressDetails" options="addressOptions" ng-model="userData.address"/>
 		
-			<div class="custom-error" ng-show="signUp.address.$dirty && signUp.address.$invalid">		Sorry:
+			<alert type="danger" ng-show="signUp.address.$dirty && signUp.address.$invalid">		Sorry:
 				<span ng-show="signUp.userFullName.$error.required">Your NZ address is required.</span>
-			</div>
+			</alert>
 		</div>
 	
 		<div class="form-group">
 			<label for="phone">Phone</label>
 			<input type="tel" class="form-control" ng-model="userData.phone" name="phone" placeholder="Enter your preferred phone number" required>
-			<div class="custom-error" ng-show="signUp.phone.$dirty && signUp.phone.$invalid">		Sorry:
-				<span ng-show="signUp.userFullName.$error.required">Please give us a valid phone number to use to quickly sort out issues.</span>
-			</div>
+			<alert type="warning" ng-show="signUp.phone.$dirty && signUp.phone.$invalid">		
+
+				<span ng-show="signUp.phone.$error.required">Sorry: Please give us your preferred contact phone number.</span>
+
+				
+			</alert>
 		</div>
 	
 		<div class="form-group">

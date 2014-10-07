@@ -184,7 +184,7 @@ angular.module('co-op.services', [])
 			return result.promise;
 			},
 			save: function() {
-				$rootScope.currentUser.post().then(function(response) {
+				$rootScope.currentUser.save().then(function(response) {
 					flash.setMessage({type: 'success', message: 'Details saved successfully'});
 				}, function(error) {
 					flash.setMessage({type: 'danger', message: 'Oops! Failed to save data. ' + error.name + ': ' + error.message});
@@ -206,7 +206,12 @@ angular.module('co-op.services', [])
 	
 	// collects and maps category id's with their names. 
 	.factory('ProductManager', ['$http', 'Restangular', '$rootScope', 'flash', function($http, Restangular, $rootScope, flash) {
-        var module, productCategoryPromise, categoryIdMapping = {}, categoryNameMapping = {}, unitSuggestions = [];
+        var module, productCategoryPromise, 
+		categoryIdMapping = {}, 
+		categoryNameMapping = {}, 
+		certificationNameMapping = {},
+		certificationIdMapping = {},
+		unitSuggestions = [];
         
         productCategoryPromise = Restangular.all("api/category");
         
@@ -214,6 +219,7 @@ angular.module('co-op.services', [])
         // the id and the name to the object
         productCategoryPromise.getList().then(function (categories) {
             var i, category, unit;
+			categories = categories.plain();
             for (i in categories) {
                 if (categories.hasOwnProperty(i)) {
                     category = categories[i];
@@ -229,13 +235,24 @@ angular.module('co-op.services', [])
                 }
             }
         });
+		
+		var certificationPromise = Restangular.all("api/certification");
+		
+		certificationPromise.getList().then(function(certifications){
+			var i, certification;
+			certifications = certifications.plain();
+			certificationNameMapping = _.indexBy(certifications, 'name');
+			certificationIdMapping = _.indexBy(certifications, '_id');
+		});
         
 		module = {
-			registerProduct : function(productData) {
+			registerProduct : function(productData, callback) {
+				var cb = callback || angular.noop;
 				Restangular.all('api/product').post(productData).then(function(result) {
 					flash.setMessage({type: 'success', 
-					message: 'Congratulations ' + $rootScope.currentUser.name + '! Your product ' + productData.variety + " " + productData.productName + ' was successfully added to the store.'
+					message: 'Congratulations ' + $rootScope.currentUser.name + '! Your ' + productData.variety + " " + productData.productName + ' was successfully added to the store.'
 					});
+					cb();
 				}, function(error) {
 					console.log(error);
 					flash.setMessage({type: 'danger', 
@@ -269,7 +286,15 @@ angular.module('co-op.services', [])
             
             categoryByName: function (name) {
                 return categoryNameMapping[name];
-            }
+            },
+			
+			certificationByID: function (id) {
+				return certificationIdMapping[id];
+			},
+			
+            certificationByName: function (name) {
+                return certificationNameMapping[name];
+            },
 		};
         
         return module;
@@ -278,10 +303,14 @@ angular.module('co-op.services', [])
 	.factory('ProducerManager', ['Restangular', '$rootScope', 'flash', function(Restangular, $rootScope, flash) {
 		return {
 			saveProducer : function(callback) {
-				var cb = callback || angular.noop;				
-				Restangular.one('api/user', $rootScope.currentUser._id).customPOST($rootScope.currentUser, 'producer/edit')
+				var cb = callback || angular.noop;
+								
+				$rootScope.currentUser.customPUT($rootScope.currentUser.plain(), 'producer')
 				.then(function(result) {flash.setMessage({type: 'success', message: 'Profile Updated Successfully.'});},
-					function(){flash.setMessage({type: 'danger', message: 'Drat! Failed to update your profile.'});});
+					function(error){
+						console.log(error);
+						flash.setMessage({type: 'danger', message: 'Drat! Failed to update your profile.'});
+					});
 			}
 		};
 	}])

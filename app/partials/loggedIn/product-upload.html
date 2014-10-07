@@ -5,7 +5,7 @@
 
 
 <div class="col-md-12">
-	<div id="product-upload-preview-column" class="col-md-4" >
+	<div id="product-upload-preview-column" class="col-sm-4" >
 		<section ng-show="productData.category">
 			<h2>Preview <small>Live</small></h2>
 			<div class="product-container" ng-controller="productUICtrl" ng-mouseleave="detailsVisible = false" 
@@ -22,16 +22,26 @@
 				</figure>
 				<section class="details-layer" ng-class="{ 'details-layer-visible' : detailsVisible}" ng-mouseleave="detailsVisible = false">
 					<article class="details">
+						<h4>{{currentUser.producerData.companyName}}</h4>
 						<h3>{{productData.variety}} {{productData.productName}}</h3>
 						<p>{{1.2 * productData.price|currency}} / {{productData.units}}</p>
-						<p>{{productData.producerCompany}} <br>
-						<span 
-						ng-if="product.certification.name !== 'none' || product.certification">
-							{{productData.certification.name}}
-						</span>
+						<hr>
+						<p> Category: {{productManager.categoryByID(productData.category).name}} 
+						<span ng-if="product.certification !== 'none' ">
+							Certification: {{productManager.certificationByID(productData.certification).name}}</span>
 						</p>
-						<p>{{productData.description | blurb}} <em>more...</em></p>
-						<button class="btn btn-primary" ng-click="">Add to Cart</button>
+						<div class="btn-group">
+							<button class="btn btn-danger pull-right" disabled ng-if="product.quantity <= 0">
+								SOLD OUT
+							</button>
+							<button class="btn btn-warning" ng-click="preview(productData)">
+								More Info
+							</button>
+
+							<button class="btn btn-primary" disabled>
+								Add to Cart
+							</button>
+						</div>
 					</article>
 				</section>
 			</div>
@@ -85,7 +95,7 @@
 		</div>
 	</div>
 
-	<div id="product-upload-form-container" class="col-md-8" >
+	<div id="product-upload-form-container" class="col-sm-8" >
 		<form name="productUpload" autocomplete="off" ng-submit="submitForm();" novalidate> <!-- add ng-submit="submitForm();" -->
 			<fieldset>
 					<div class="row">
@@ -147,7 +157,6 @@
 							<label for="units">Quantity Units</label>
 							<input ng-disabled="!productData.hasOwnProperty('category')" type="text" ng-model="productData.units" name="units" id="units" class="form-control" 
 							typeahead="unit for unit in productManager.categoryByID(productData.category).availableUnits | filter:$viewValue"
-							
 							placeholder ="e.g. kg or L or whole beast" required>
 					    </div>
 					    

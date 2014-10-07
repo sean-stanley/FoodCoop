@@ -156,7 +156,7 @@
 				<a class="navbar-brand" href="/">NNFC Beta</a>
 				<a class="navbar-brand" ng-click="panelDisplay = !panelDisplay">
 					<small class="hidden-sm"><span class="glyphicon glyphicon-cog"></span> Member Tools</small>
-					<small class="visible-sm"><span class="glyphicon glyphicon-cog"></span> Member Tools</small>
+					<small class="visible-sm" style="font-size: 0.72em"><span class="glyphicon glyphicon-cog"></span> Member Tools</small>
 				</a>
 				<!--
 				<ul class="nav navbar-nav pull-left">
@@ -207,15 +207,15 @@
 		</div>
 	</div>
 
-	<div class="site-footer">
+	<div class="site-footer" sticky-footer>
 		<div class="container-fluid">
 			<div class="row">
-				<section class="col-sm-4">
+				<section class="col-xs-6 col-sm-4">
 					<h1>NNFC</h1>
 					<h4>Local • Sustainable • Affordable</h4>
 				</section>
-				<div class="link-grid">
-					<section class="col-sm-6">
+				<div class="link-grid col-xs-6">
+					<section class="col-sm-5">
 						<nav class="footer-nav">
 							<ul class="nav">
 								<li ><a href="http://blog.foodcoop.org.nz" target="_blank">Blog</a></li>
@@ -224,7 +224,7 @@
 							</ul>
 						</nav>
 					</section>
-					<section class="col-sm-6">
+					<section class="col-sm-5">
 						<nav class="footer-nav">
 							<ul class="nav">
 								<li><a href="/policy">Co-op Policy</a></li>
@@ -232,6 +232,13 @@
 								<li><a href="/priv-pol">Privacy Policy</a></li>
 							</ul>
 						</nav>
+					</section>
+					<section class="col-sm-2 text-center">
+						<ul class="list-unstyled social-footer">
+							<li><a target="_blank" href="https://www.facebook.com/nzfoodcoop"><i class="fa fa-facebook-square fa-fw fa-2x"></i></a></li>
+							<li><a target="_blank" href="https://twitter.com/NorthlandNFC"><i class="fa fa-twitter-square fa-fw fa-2x"></i></a></li>
+							<li><a target="_blank" href="https://plus.google.com/105941223701197922003/posts"><i class="fa fa-google-plus-square fa-fw fa-2x"></i></a></li>
+						</ul>
 					</section>
 				</div>
 			</div>
@@ -288,29 +295,17 @@
 	 document.body.appendChild(e); 
 	} 
 	</script>
-	
-<script type="text/javascript">
-/*
-(function(callback) {
-	callback()
-}(function() {
-	alert("This website is in beta and only in a testing state. No products or members or financial transaction are yet allowed to proceed. Thank you for your patience.")
-}));*/
 
-</script>
+	<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
+	ga('create', 'UA-45071933-1', 'foodcoop.org.nz');
+	ga('send', 'pageview');
 
-
-		<script>
-		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-		ga('create', 'UA-45071933-1', 'foodcoop.org.nz');
-		ga('send', 'pageview');
-
-		</script>
+	</script>
 
 <image-preload src="/img/originals/cropped-Agricultural_grass.jpg"></image-preload>
 

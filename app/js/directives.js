@@ -190,6 +190,25 @@ angular.module('co-op.directives', [])
 	        });
 	    };
 	}])
+	
+	.directive("stickyFooter", ['$window', '$document', '$timeout', function($window, $document, $timeout) {
+		return function(scope, element, attrs) {
+			
+			function setHeight() {
+				element.css({
+					'height' : element[0].offsetHeight + 'px'
+				});
+				angular.element( document.querySelector('.page-wrap:after') ).css({
+					'height' : element[0].offsetHeight + 'px'
+				});
+			}
+			
+			angular.element($document).ready(function() {
+				setHeight();
+				angular.element($window).bind('resize', setHeight);
+			});
+		};
+	}])
 
 	.directive('setNgAnimate', ['$animate', function ($animate) {
 	    return {

@@ -12,8 +12,21 @@ var util = require('util'),
 	API = require('./API.js'),
 	passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy,
+	bunyan = require('bunyan'),
 	mcapi = require('mailchimp-api'),
     config = require('./config').Config;
+	
+	
+var log = bunyan.createLogger({
+	name: 'API', 
+	serializers: {
+		req: bunyan.stdSerializers.req,
+		err: bunyan.stdSerializers.err,
+		e: bunyan.stdSerializers.err,
+		res: bunyan.stdSerializers.res,
+		error: bunyan.stdSerializers.err
+	}
+});
 
 var forgot = require('password-reset')({
     uri : 'http://localhost:8080/password_reset',
@@ -32,7 +45,11 @@ mc = new mcapi.Mailchimp('106c008a4dda3fa2fe00cae070e178b9-us9');
 
 var app = API.configAPI(express());
 
-app.use(express.static(path.normalize(path.join(__dirname, '../app'))));
+// app options
+//app.set('etag', false);
+app.set('trust proxy', 'loopback');
+app.set('env', 'production');
+
 
 // Passport Authentication Setup
 passport.use(models.User.createStrategy());
@@ -50,16 +67,15 @@ function loggedIn(req, res, next) {
 app.use(require('prerender-node').set('prerenderToken', 'AyY6GHZSR0aiwAuXqDzm'));
 
 
-// ensure redirects work with tidy and hashBangless URL's
-app.use(function(req, res){
-	res.sendFile(path.normalize(path.join(__dirname, '../app/index.html')));
-});
-
-
 // for deployment
 
 var server_port = config.deploy.port || 8081,
-	server_ip_address = config.deploy.ip || 'localhost';
+	server_ip_address = 'localhost';
+
+/*
+app.listen(server_port, server_ip_address, function() {
+	console.log("Listening on " + server_ip_address + ", " + server_port);
+});*/
 
 app.listen(server_port, server_ip_address, function() {
 	console.log("Listening on " + server_ip_address + ", " + server_port);

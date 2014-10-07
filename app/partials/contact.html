@@ -1,27 +1,23 @@
+<div class="page-header col-sm-10 col-sm-offset-1">
+	<br>
+	<h1 id='contact-form'><i class="fa fa-envelope"></i> Contact Form</h1>
+</div>
+
 <br>
-<article ng-if="!member" class="col-md-4">
-	<p class="lead">Please feel free to contact us about any questions you have.</p>
-	<p>Also feel free to phone or text us your questions at: <br>
-		<strong><span class="glyphicon glyphicon-earphone"></span> 021 040 9066</strong>
-	</p>
-	
-	<img class="img-responsive" src="img/cheese-fancy-local.jpg" alt="buy and sell dariy with the NNFC" ng-if="!member.producerData.img">
-	
-	
+<div class="row clearfix">
+<article ng-if="!member" class="col-md-5 col-md-offset-1">
+	<img class="img-responsive" src="img/originals/Rooster-crowing.jpg" alt="buy and sell dariy with the NNFC" ng-if="!member.producerData.img">
 	
 </article>
 
-<article ng-if="member" class=col-md-4>
+<article ng-if="member" class="col-md-5 col-md-offset-1 col-sm-12">
 	<h2>{{member.name}}</h2>
 	<p ng-if="member" class="lead" >Use this form to contact <strong>{{member.name}}</strong> at the email address of {{member.email}}</p>
 	<img class="img-responsive" ng-src="{{member.producerData.logo}}" ng-if="member.producerData.logo">
 </article>
 
-<form name="contactUs" ng-submit="submitForm(mail);" class="col-md-4">
-	<fieldset>
-		
-		<legend><h1><span class="glyphicon glyphicon-envelope"></span> Contact Form</h1></legend>
-	
+<form name="contactUs" ng-submit="submitForm(mail);" class="col-md-5 col-sm-12" id="contactUs">
+	<fieldset>	
 		<div class="form-group">
 	    	<label for="senderName">Full Name</label>
 			<input ng-model="mail.name" name="senderName" type="text" class="form-control" placeholder="your full name here" ng-maxlength=20  required>
@@ -58,10 +54,61 @@
 		
 	</fieldset>	
 </form>
-
-<div class="col-md-4">
-	 <aside class="well">
-	 	<h3>Questions about how the co-op works?</h3>
+</div>
+<div class="clearfix col-md-10 col-md-offset-1 col-sm-12">
+	<br>
+	<hr>
+	<br>
+</div>
+<div class="col-md-10 col-md-offset-1 col-sm-12 text-center clearfix" >
+	<div class="col-sm-3">
+		<h1><i class="fa fa-map-marker fa-2x"></i></h1>
+		<p class='lead'>3 Woods Rd, Whangarei, New Zealand</p>
+	</div>
+	<div class="col-sm-3">
+		<h1><i class="fa fa-laptop fa-2x"></i></h1>
+		<p class='lead'><a href="/">foodcoop.org.nz</a><br>
+			<a href="http://blog.foodcoop.org.nz"></a>
+		</p>
+	</div>
+	<div class="col-sm-3">
+		<h1><i class="fa fa-envelope fa-2x"></i></h1>
+		<p class='lead'><a href="/contact" scroll-anchor="contact-form" offset='51'>info@foodcoop.org.nz</a></p>
+	</div>
+	<div class="col-sm-3">
+		<h1><i class="fa fa-mobile fa-2x"></i></h1>
+		<p class='lead'>M: 0210409066<br>
+			P: 094335623
+		</p>
+	</div>
+</div>
+<div class="clearfix col-md-10 col-md-offset-1 col-sm-12">
+	<br>
+	<hr>
+	<br>
+</div>
+<div class="row col-md-10 col-md-offset-1 col-sm-12 text-center social-icons clearfix" >
+	<div class="col-sm-3">
+		<h1><a target="_blank" href="https://www.facebook.com/nzfoodcoop"><img class="img-responsive" src="/img/social/Facebook.png"></a></h1>
+	</div>
+	<div class="col-sm-3">
+		<h1><a target="_blank" href="https://plus.google.com/105941223701197922003/posts"><img class="img-responsive" src="/img/social/Google+.png"></a></h1>
+	</div>
+	<div class="col-sm-3">
+		<h1><a target="_blank" href="https://twitter.com/NorthlandNFC"><img class="img-responsive" src="/img/social/Twitter.png"></a></h1>
+	</div>
+	<div class="col-sm-3">
+		<h1><a target="_blank" href="http://blog.foodcoop.org.nz"><img class="img-responsive" src="/img/social/Wordpress.png"></a></h1>
+	</div>
+	
+</div>
+<div class="clearfix col-md-10 col-md-offset-1 col-sm-12">
+	<br>
+	<hr>
+</div>
+<div class="col-md-5 col-md-offset-1 col-sm-12">
+	 <aside>
+	 	<h2>Questions about how the co-op works?</h2>
 		<p>Try the links below</p>
 		 <ul>
 			<li><a href="/faq">Frequently Asked Questions</a></li>
@@ -69,13 +116,20 @@
 			<li><a href="/volunteer">Volunteering</a></li>
 		</ul>
 	</aside>
-	 <aside class="well">
-	 	<h3>Questions about Technical Stuff?</h3>
+</div>
+<div class="col-md-5 col-sm-6">
+	 <aside>
+	 	<h2>Questions about Technical Stuff?</h2>
 		<p>Try the links below:</p>
 		 <ul>
 			<li><a href="https://github.com/StrategicDevelopment/FoodCoop/issues/new">Features Request</a></li>
 			<li><a href="https://github.com/StrategicDevelopment/FoodCoop/issues">Issues</a></li>
-			<li><a href="https://github.com/StrategicDevelopment/FoodCoop">Repository Homepage</a></li>
+			<li><a href="https://github.com/StrategicDevelopment/FoodCoop">Code Homepage</a></li>
 		</ul>
 	</aside>
+	<br>
+</div>
+<div class="clearfix col-md-10 col-md-offset-1 col-sm-6">
+	<br>
+	<br>
 </div>

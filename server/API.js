@@ -2,6 +2,7 @@ var util = require('util'),
 	http = require('http'),
 	fs = require('fs'), // file system
 	url = require('url'),
+	path = require('path'),
 	async = require('async'),
 	_ = require('lodash'),
 	bunyan = require('bunyan'),
@@ -49,7 +50,7 @@ exports.configAPI = function configAPI(app) {
 	
 	// Middleware
 	// ==========
-	app.use(compression({threshold: 512}));
+	app.use(compression({threshold: 128}));
 	
 	// here we load the bodyParser and tell it to parse the requests received as json data.
 	app.use(bodyParser.json({limit: '50mb'})); 
@@ -67,13 +68,32 @@ exports.configAPI = function configAPI(app) {
 	// Routes
 	// ======
 	
+	// static routes
+	app.use(express.static(path.normalize(path.join(__dirname, '../app'))));
+	
+	app.all('*', function(req, res, next) {
+	  res.header("Access-Control-Allow-Origin", "*");
+	  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+	  next();
+	 });
+	
+	app.put("*", function(req, res, next) {
+		log.info({req: req}, 'PUT attempt just made');
+		next();
+	});
+	
+	app.post("*", function(req, res, next) {
+		log.info({req: req}, 'POST attempt just made');
+		next();
+	});
+	
 	// this contains the common ways the app sends emails and is accessed in the app from the contact forms.
 	app.post("/api/mail", function(req, res, next) {
 		var toMeoptions, toMedata, toClientOptions, toClientData, toMe, toClient, toProducerOtpions, toProducerData;
 		// So far form validation has been done client side
 		// form validation is extensive and sufficient. However, more validation could
 		// be done at a later point just to be safe.
-		
+		log.info('sending mail...');
 		// if no 'to' the data must be for the co-op to recieve as opposed to another member.
 		if (!req.body.hasOwnProperty('to')) {
 
@@ -119,11 +139,11 @@ exports.configAPI = function configAPI(app) {
 			// variable is the completed message object.
 			toMe.send(function(err, result) {
 				if (err) return next(err);
-				log.info(result);
+				log.info({result:result});
 				toClient.send(function(err, result) {
 					if (err) return next(err);
 					// a response is sent so the client request doesn't timeout and get an error.
-					log.info(result);
+					log.info({result:result});
 					res.status(200).send("Message sent to client");
 				});
 			});
@@ -166,10 +186,10 @@ exports.configAPI = function configAPI(app) {
 		var opts;
 
 		models.Product.find(req.query).sort({_id: 1})
-		.populate('category', 'name -_id')
+		.populate('category', 'name')
 		.populate('certification', 'name -_id img')
 		.populate('producer_ID', 'name producerData.companyName')
-		.exec(function(err, results) {
+		.exec(function(err, product) {
 			if (err) return next(err);
 			res.json(product);
 		});
@@ -180,6 +200,7 @@ exports.configAPI = function configAPI(app) {
 		if (req.user) {
 			models.Product.findById(req.params.id, function(err, product) {
 				if (err) return next(err);
+				log.info('%s requested by current user', product.fullName);
 				if (product) {
 					var productObject = product.toObject();
 					// if truthy then the product being requested is to be sold this month so pass the _id as well.
@@ -224,11 +245,11 @@ exports.configAPI = function configAPI(app) {
 				if (req.body._id && req.body.cycle === scheduler.currentCycle) {
 					models.Product.findById(req.body._id, function(err, product) { // first find the right product by it's ID
 						if (err) return next(err);
+						var key;
 						productObject = product.toObject();
-						if (product.cycle == scheduler.currentCycle) {}
 						
-						for (var key in req.body) {
-							if (req.body.hasOwnProperty('key')) {
+						for (key in req.body) {
+							if (req.body.hasOwnProperty(key)) {
 								if (productObject[key] !== req.body[key]) {
 									// compare the values of the database object to the values of the request object.
 									product[key] = req.body[key]; // update the product's properties
@@ -398,7 +419,7 @@ exports.configAPI = function configAPI(app) {
 			models.Product.findById(new ObjectId(req.params.id), function(err, product) {
 				if (err) return next(err);
 				if (product.producer_ID == req.user._id || req.user.user_type.isAdmin) {
-					if (product.cycle == scheduler.cycle) {
+					if (product.cycle == scheduler.currentCycle) {
 						
 						if (scheduler.canChange) {
 							models.Order.find({cycle: scheduler.currentCycle, product: product._id})
@@ -1032,7 +1053,7 @@ exports.configAPI = function configAPI(app) {
 	});
 
 	// edit changes to a user including updates their password if they submitted a change.
-	app.post("/api/user/:id", function(req, res, next) {
+	app.put("/api/user/:id", function(req, res, next) {
 		var mailOptions, mailData, mail, changeOptions, changeData, changeEmail, canSell;
 		if (req.user) {
 			models.User.findById(req.params.id, function(e, user) {
@@ -1104,9 +1125,9 @@ exports.configAPI = function configAPI(app) {
 					}
 					
 
-					// save changes to the user and send the user back to the app.
+					// save changes to the user and send OK back to the app.
 					user.save();
-					res.json(user);
+					res.status(200).end();
 				} else {
 					log.info(e);
 					res.status(401).send("You must be logged in to change data about a user");
@@ -1165,17 +1186,19 @@ exports.configAPI = function configAPI(app) {
 	});
 
 	// updates a producer by ID. This id is generally the logged in user.
-	app.post("/api/user/:id/producer/edit", function(req, res, next) {
+	app.put("/api/user/:id/producer", function(req, res, next) {
 		if (req.user) {
+			log.info('about to search database to update details on %s', req.user.name);
 			models.User.findByIdAndUpdate(req.params.id, {
 				producerData: req.body.producerData,
 				addressPermission: req.body.addressPermission
 			}, function(err, user) {
-				log.info('The raw response from Mongo was ', user);
+				
 				if (err) return handleError(err);
 
 				else {
-					res.json(user);
+					log.info('%s successfully updated', user.name);
+					res.status(200).end();
 				}
 			});
 		} else {
@@ -1559,20 +1582,26 @@ exports.configAPI = function configAPI(app) {
 		res.send(calendar);
 		log.info({res: res}, 'sending calendar');
 	});
-
-	app.use(express.static(__dirname));
+	
+	// ensure redirects work with tidy and hashBangless URL's
+	app.get("*", function(req, res, next){
+		log.info({req: req}, 'attempting to send main app/index.html file');
+		res.sendFile(path.normalize(path.join(__dirname, '../app/index.html')));
+	});
+	
+	//app.use(express.static(__dirname));
 	
 	// Error Handling
 	
 	//Log errors
 	app.use(function(err, req, res, next) {
-		log.warn(err);
+		log.warn({err: err}, 'Oops, an error occurred and was not caught by the API.');
 		next(err);
 	});
 	
 	//Respond with 500
 	app.use(function(err, req, res, next) {
-		next(err)
+		res.status(500).send(err);
 	});
 
 	return app;

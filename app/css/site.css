@@ -22,33 +22,28 @@ a:hover {
 
 /* WRAP */
 html, body {
-  height: 100%;
+  min-height: 100%;
 }
 .page-wrap {
   min-height: 100%;
   /* equal to footer height */
-  margin-bottom: -156px; 
 }
 .page-wrap:before {height: 51px; display: block; content: "";}
 .page-wrap:after {
   content: "";
   display: block;
 }
+/*
 .site-footer, .page-wrap:after {
-  /* .push must be the same height as footer */
   height: 156px; 
 }
+*/
 .site-footer {
 	background-color: #222222;
 	color: #999999;
 }
 
-.link-grid {
-	width: 50%;
-	margin-left: 15px;
-	margin-top: 15px;
-	float: right;
-}
+
 
 #view {clear: both;overflow: hidden;}
 
@@ -106,6 +101,8 @@ html, body {
 }
 .jumbotron.white img.img-circle {border: 5px solid #642c4a; margin-top: 2em; max-width: 93%;}
 .map-frame {border:none; margin-top: 20px; margin-bottom: 20px;}
+
+.coop-img-circle {-webkit-border-radius: 50%; border-radius: 50%; border: 5px solid #642c4a; max-width: 93%; display:block;}
 
 /*	-------------
 	-- Sidebar --
@@ -273,9 +270,15 @@ border-radius: 200px;
 
 .big-button {margin-left: 20px; font-size: 1.2em; font-weight: 700;}
 
+/*	---- Contact Page Social Media ----	*/
+.social-icons h1 {margin-left: 25%; margin-right: 25%;}
+.social-footer > li > a {color: #999999;}
+.social-footer > li > a:hover {color: white;}
 
 /*Modals*/
 .modal-header section {position: relative}
+
+
 
 /* Store */ 
 
@@ -371,10 +374,24 @@ a.panel-btn-sml {
 /* Store Modal */
 figure.store-modal {width: 400px; position: relative;}
 
+/* Footer Style */
+
 .footer-nav ul.nav > li > a {
 	color: #999999;
 	font-size: 0.9em;
 	border-left: 10px solid #642c4a;
+}
+
+.social-footer > li {float: left}
+
+.link-grid {
+/* 	margin-left: 15px; */
+	margin-top: 15px;
+}
+
+@media (min-width: 768px) {
+	.link-grid {float: right; min-width: 50%}
+	.social-footer > li {float:none};
 }
 
 .footer-nav ul.nav > li > a:hover {

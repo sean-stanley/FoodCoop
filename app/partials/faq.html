@@ -1,13 +1,24 @@
-<div class="row">
-	<div class="page-header" ng-class="{ 'col-sm-8 col-sm-offset-4' : !panelDisplay, 'col-sm-10 col-sm-offset-2' : panelDisplay}">
-		<h1>Goat Questions? We goat answers!</h1>
+<div class="col-sm-10 col-sm-offset-1">
+	<div ng-class="{ 'col-sm-4' : !panelDisplay, 'col-sm-2' : panelDisplay}">
+		<br>
+		<img src="/img/funny-goat-with-glasses.jpg" alt="Co-op FAQ anwsers and questions how we work." class="coop-img-circle">
+	</div>
+	
+	<div ng-class="{ 'col-sm-8' : !panelDisplay, 'col-sm-10' : panelDisplay}">
+		<div class="page-header" >
+			<h1>Goat Questions? We goat answers!</h1>
+		</div>
+		<p class="lead">You'll find answers to most common questions about the co-op here. Got a question that's not covered? Please <a href="/contact">contact us</a>.</p>
 	</div>
 </div>
 
-<div ng-class="{ 'col-sm-4' : !panelDisplay, 'col-sm-2' : panelDisplay}">
-	<img src="/img/funny-goat-with-glasses.jpg" alt="Co-op FAQ anwsers and questions how we work." class="img-responsive">
+<div class="clearfix col-md-10 col-md-offset-1">
+	<br>
+	<hr>
+	<br>
 </div>
-<div ng-class="{ 'col-sm-8' : !panelDisplay, 'col-sm-10' : panelDisplay}">
+
+<div class="col-sm-10 col-sm-offset-1">
 <accordion close-others="true">
     <accordion-group heading="How do I join?">
 		<p>You can sign up as a Producer or Customer member <a href="/signup">here</a>. You will then be required to pay the invoiced amount.</p>
@@ -16,9 +27,6 @@
     </accordion-group>
 		
 	<accordion-group heading="Why does being a producer cost more?" ng-click="hashFunction('test')" is-open="hash === 'test'">
-		<a href="http://economictimes.indiatimes.com/photo/20020464.cms">
-			<img class="article-img" src="../img/working-hard.jpg" width="402" height="302" alt="Working Hard">
-		</a>
 
 		<p>Becoming a Producer Member allows you to use our website to sell your products. The slightly higher cost allows us to continue maintaining the website for you, and pays for reveiwing and approving Producer applications.</p>
 
@@ -63,9 +71,6 @@
 		</div>
 	</accordion-group>
 	<accordion-group heading="Where do I take the products I’ve sold?">
-		<a href="http://9kidfitness.com/wp-content/uploads/2014/05/bikeo-HEALTHY-FOOD-facebook.jpg">
-			<img src="/img/biking-healthy.jpg" alt="Biking Healthy">
-		</a>
 
 		<p>Producers should bring the goods their customers have ordered to The Woods, our facility in Central Whangarei. You should also bring a copy of your order list with you, as this makes it much easier for our volunteers to make sure the right customers receive your goods n the right quantities.</p>
 

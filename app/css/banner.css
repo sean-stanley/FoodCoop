@@ -80,7 +80,7 @@
 }
 
 
-.carousel-caption > h1, .carousel-caption > h2 {font-family: Nevis;}
+.carousel-caption > h1, .carousel-caption > h2 {font-family: Nevis, sans-serif;}
 
 .feature-box {
 	margin: auto;

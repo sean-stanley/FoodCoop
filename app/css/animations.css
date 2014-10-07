@@ -35,6 +35,14 @@
 	transform: translateX(-130%);
 }
 
+.alert {
+    -webkit-transition: 800ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    -moz-transition: 800ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    -ms-transition: 800ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    -o-transition: 800ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    transition: 800ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+}
+
 .login, .alert {
 	-ms-transform-origin:center top;
 	-webkit-transform-origin:center top;
@@ -43,7 +51,7 @@
 }
 
 
-.login.ng-hide-add, .login.ng-hide-remove {
+.login.ng-hide-add, .login.ng-hide-remove, .alert.ng-hide-add, .alert.ng-hide-remove {
   /* this is required as of 1.3x to properly
      apply all styling in a show/hide animation */
   transition:0s linear all;
@@ -52,16 +60,16 @@
   display:block!important;
 }
  
-.login.ng-hide-add-active,
-.login.ng-hide-remove-active {
+.login.ng-hide-add-active, .alert.ng-hide-add-active,
+.login.ng-hide-remove-active, .alert.ng-hide-remove-active {
   /* the transition is defined in the active class */
   transition:200ms linear all;
 }
  
-.login.ng-hide-add { transform: scaleY(1); }
-.login.ng-hide-remove { transform: scaleY(0); }
-.login.ng-hide-remove.ng-hide-remove-active { transform: scaleY(1); }
-.login.ng-hide-add.ng-hide-add-active { transform: scaleY(0); }
+.login.ng-hide-add, .alert.ng-hide-add { transform: scaleY(1); }
+.login.ng-hide-remove, .alert.ng-hide-remove { transform: scaleY(0); }
+.login.ng-hide-remove.ng-hide-remove-active, .alert.ng-hide-remove.ng-hide-remove-active { transform: scaleY(1); }
+.login.ng-hide-add.ng-hide-add-active, .alert.ng-hide-add.ng-hide-add-active { transform: scaleY(0); }
 
 
 /* Products in the store */
