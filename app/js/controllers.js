@@ -420,13 +420,40 @@ angular.module('co-op.controllers', [])
 .controller('modalInstanceCtrl', ['$scope', '$location', '$modalInstance', 'data',
 	function($scope, $location, $modalInstance, data) {
 		
+		// facebook sdk setup
+		(function(d, s, id) {
+		var js, fjs = d.getElementsByTagName(s)[0];
+			if (d.getElementById(id)) return;
+			js = d.createElement(s);
+			js.id = id;
+			js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.0";
+			fjs.parentNode.insertBefore(js, fjs);
+		}(document, 'script', 'facebook-jssdk'));
+
+		// google+ setup
+		(function() {
+			var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+			po.src = 'https://apis.google.com/js/platform.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+		})();
+		
+		// twitter setup
+		(function(d,s,id){
+			var js, fjs = d.getElementsByTagName('script')[0];
+			if(!d.getElementById(id)){
+				js=d.createElement(s);
+				js.id=id;
+				js.src="https://platform.twitter.com/widgets.js";
+				fjs.parentNode.insertBefore(js,fjs);
+			}
+		})(document,"script","twitter-wjs");
+		
 		
 		var twitterRenderedAttribute = function(bool){
-					document.body.dataset.twttrRendered = bool;
-				};
+			document.body.dataset.twttrRendered = bool;
+			};
 				
-				twitterRenderedAttribute(true);
-		
+		twitterRenderedAttribute(true);
 		
 		$scope.data = data;
 		
@@ -950,7 +977,11 @@ function($scope, $modalInstance, data, ProductManager) {
 					}
 				}
 			});
-
+			
+			modalInstance.opened.then(function() {
+				
+			});
+			
 			modalInstance.result.then(function(product) {
 				$location.hash('');
 				$scope.addToCart(product);

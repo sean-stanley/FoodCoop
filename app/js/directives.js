@@ -196,10 +196,10 @@ angular.module('co-op.directives', [])
 			
 			function setHeight() {
 				element.css({
-					'height' : element[0].offsetHeight + 'px'
+					'height' : angular.element(element).children()[0].offsetHeight + 'px'
 				});
-				angular.element( document.querySelector('.page-wrap:after') ).css({
-					'height' : element[0].offsetHeight + 'px'
+				angular.element( document.querySelector('body') ).css({
+					'margin-bottom' : angular.element(element).children()[0].offsetHeight + 'px'
 				});
 			}
 			

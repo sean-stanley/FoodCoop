@@ -6,11 +6,12 @@
 		url(/css/fonts/nevis.svg)
 		url(/css/fonts/nevis.otf);
 }
-
+html {min-height:100%; position: relative;}
 
 body {
 	font-family: 'Raleway', sans-serif;
 	font-weight: 500;
+
 }
 
 h1 {font-family: 'Raleway', sans-serif; font-weight: 700;}
@@ -20,19 +21,16 @@ a:hover {
 	cursor: pointer;
 }
 
-/* WRAP */
+/* WRAP 
 html, body {
-  min-height: 100%;
+  height: 100%;
 }
 .page-wrap {
   min-height: 100%;
-  /* equal to footer height */
-}
+  /* equal to footer height 
+}*/
 .page-wrap:before {height: 51px; display: block; content: "";}
-.page-wrap:after {
-  content: "";
-  display: block;
-}
+
 /*
 .site-footer, .page-wrap:after {
   height: 156px; 
@@ -41,6 +39,9 @@ html, body {
 .site-footer {
 	background-color: #222222;
 	color: #999999;
+	position: absolute;
+	bottom: 0;
+	width: 100%;
 }
 
 

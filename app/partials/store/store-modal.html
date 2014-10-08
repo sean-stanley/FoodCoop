@@ -1,17 +1,28 @@
-
+<div id="fb-root"></div>
+<script></script>
 <div class="modal-header" id="modal-top">
 	<h1>{{data.fullName}} <small ng-if="data.certification.name !== 'none'">{{data.certification.name}}</small></h1>
 </div>
 	
 <div class="modal-body media">
 	<ul class="list-unstyled pull-right col-sm-2">
-		<li><a href="https://twitter.com/share" class="twitter-share-button" data-url="https://dev.twitter.com/pages/tweet_button" data-via="your_screen_name" data-lang="en" data-related="anywhereTheJavascriptAPI" data-count="vertical">Tweet</a></li>
+		<li><a href="https://twitter.com/share" class="twitter-share-button" 
+			data-url="http://foodcoop.org.nz/store#{{data.fullName}}+{{data.producer_ID.producerData.companyName}}&id={{data._id}}" 
+			data-text="{{data.fullName}} for sale by {{data.producer_ID.name}} in the NNFC Store"
+			data-via="NorthlandNFC" 
+			data-lang="en" 
+			data-count="none">Tweet</a></li>
 		<li>
 			<!-- Place this tag where you want the +1 button to render. -->
 			<div class="g-plusone" data-size="tall"></div>
 		</li>
 		<li>
-			<iframe src="//www.facebook.com/plugins/like.php?href=https%3A%2F%2Ffacebook.com%2Fnzfoodcoop&amp;width&amp;layout=box_count&amp;action=like&amp;show_faces=true&amp;share=false&amp;height=65" scrolling="no" frameborder="0" style="border:none; overflow:hidden; height:65px;" allowTransparency="true"></iframe>
+			<a ng-href="https://plus.google.com/share?url=http://foodcoop.org.nz/store#{{data.fullName}}+{{data.producer_ID.producerData.companyName}}&id={{data._id}}" onclick="javascript:window.open(this.href,
+			  '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"><img
+			  src="https://www.gstatic.com/images/icons/gplus-64.png" alt="Share on Google+"/></a>
+		</li>
+		<li>
+			<div class="fb-share-button" data-layout="button" data-href="http://foodcoop.org.nz/store#{{data.fullName}}+{{data.producer_ID.producerData.companyName}}&id={{data._id}}"></div>
 		</li>
 	</ul>
 	
@@ -21,7 +32,7 @@
 	</figure>
 			
     <div class="media-body col-lg-6">
-        {{data.producerName}}<br>
+        {{data.producer_ID.name}}<br>
 		
 		<div class="well"><h2>Price: {{data.priceWithMarkup|currency}} / {{data.units}}</h2></div>
 	</div>
@@ -48,21 +59,3 @@
 	</button>
     <button class="btn btn-warning" ng-click="cancel()">Close</button>
 </div>
-		<!-- Place this tag after the last +1 button tag. -->
-		<script type="text/javascript">
-		  (function() {
-		    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-		    po.src = 'https://apis.google.com/js/platform.js';
-		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-		  })();
-		</script>
-		<!-- Place this tag after the last tweet button tag. -->
-		<script>!function(d,s,id){
-			var js, fjs = d.getElementById('modal-top');
-			if(!d.getElementById(id)){
-				js=d.createElement(s);
-				js.id=id;
-				js.src="https://platform.twitter.com/widgets.js";
-				fjs.parentNode.insertBefore(js,fjs);
-			}
-		}(document,"script","twitter-wjs");</script>
