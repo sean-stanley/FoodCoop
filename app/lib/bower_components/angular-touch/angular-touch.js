@@ -1,5 +1,5 @@
 /**
- * @license AngularJS v1.3.0-beta.7
+ * @license AngularJS v1.2.26
  * (c) 2010-2014 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -233,7 +233,7 @@ ngTouch.directive('ngClick', ['$parse', '$timeout', '$rootElement',
   //
   // What happens when the browser then generates a click event?
   // The browser, of course, also detects the tap and fires a click after a delay. This results in
-  // tapping/clicking twice. So we do "clickbusting" to prevent it.
+  // tapping/clicking twice. We do "clickbusting" to prevent it.
   //
   // How does it work?
   // We attach global touchstart and click handlers, that run during the capture (early) phase.
@@ -256,9 +256,9 @@ ngTouch.directive('ngClick', ['$parse', '$timeout', '$rootElement',
   // encapsulates this ugly logic away from the user.
   //
   // Why not just put click handlers on the element?
-  // We do that too, just to be sure. The problem is that the tap event might have caused the DOM
-  // to change, so that the click fires in the same position but something else is there now. So
-  // the handlers are global and care only about coordinates and not elements.
+  // We do that too, just to be sure. If the tap event caused the DOM to change,
+  // it is possible another element is now in that position. To take account for these possibly
+  // distinct elements, the handlers are global and care only about coordinates.
 
   // Checks if the coordinates are close enough to be within the region.
   function hit(x1, y1, x2, y2) {

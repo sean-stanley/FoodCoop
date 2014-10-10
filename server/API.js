@@ -482,7 +482,7 @@ exports.configAPI = function configAPI(app) {
 		if (req.user) {
 			models.Product.find(req.query)
 			.where('producer_ID').equals(new ObjectId(req.user._id))
-			.select('productName variety dateUploaded price quantity units')
+			.select('productName variety dateUploaded price quantity amountSold units')
 			.sort('datePlaced')
 			.exec(function(e, products){
 				if (e) return next(e);
@@ -497,7 +497,7 @@ exports.configAPI = function configAPI(app) {
 			models.Product.find({
 				producer_ID : new ObjectId(req.user._id),
 				cycle: scheduler.currentCycle || 0
-			}, 'productName variety dateUploaded price quantity units', { sort: {datePlaced: 1} }, function(e, products) {
+			}, 'productName variety dateUploaded price quantity amountSold units', { sort: {datePlaced: 1} }, function(e, products) {
 				if (e) return next(e);
 				res.json(products);
 			});
@@ -509,7 +509,7 @@ exports.configAPI = function configAPI(app) {
 			models.Product.find({
 				producer_ID : new ObjectId(req.user._id),
 				cycle: scheduler.currentCycle - 1 || 0
-			}, 'productName variety dateUploaded price quantity units', { sort: {datePlaced: 1} },
+			}, 'productName variety dateUploaded price quantity amountSold units', { sort: {datePlaced: 1} },
 				function(e, products) {
 					if (e) return next(e);
 					res.json(products);

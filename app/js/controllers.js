@@ -5,8 +5,8 @@
 
 angular.module('co-op.controllers', [])
 	
-	.controller('navCtrl', ['$scope', '$location', 'flash',
-		function($scope, $location, flash) {
+.controller('navCtrl', ['$scope', '$location', 'flash', '$swipe',
+	function($scope, $location, flash, $swipe) {
 			// init			
 			$scope.predictiveSearch = [];
 			$scope.flash = flash;
@@ -75,10 +75,9 @@ angular.module('co-op.controllers', [])
 				console.log($scope.predictiveSearch);
 			});
 		});
-			
-
-		}
-	])
+	
+	}
+])
 .controller('faqCtrl', ['$scope', '$location', '$sce', function($scope, $location, $sce){
 	$scope.hash = $location.hash();
 	$scope.hashFunction = function(hash) {
@@ -420,40 +419,44 @@ angular.module('co-op.controllers', [])
 .controller('modalInstanceCtrl', ['$scope', '$location', '$modalInstance', 'data',
 	function($scope, $location, $modalInstance, data) {
 		
+		/*
 		// facebook sdk setup
-		(function(d, s, id) {
-		var js, fjs = d.getElementsByTagName(s)[0];
-			if (d.getElementById(id)) return;
-			js = d.createElement(s);
-			js.id = id;
-			js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.0";
-			fjs.parentNode.insertBefore(js, fjs);
-		}(document, 'script', 'facebook-jssdk'));
-
-		// google+ setup
-		(function() {
-			var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-			po.src = 'https://apis.google.com/js/platform.js';
-			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-		})();
+				(function(d, s, id) {
+				var js, fjs = d.getElementsByTagName(s)[0];
+					if (d.getElementById(id)) return;
+					js = d.createElement(s);
+					js.id = id;
+					js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.0";
+					fjs.parentNode.insertBefore(js, fjs);
+				}(document, 'script', 'facebook-jssdk'));
 		
-		// twitter setup
-		(function(d,s,id){
-			var js, fjs = d.getElementsByTagName('script')[0];
-			if(!d.getElementById(id)){
-				js=d.createElement(s);
-				js.id=id;
-				js.src="https://platform.twitter.com/widgets.js";
-				fjs.parentNode.insertBefore(js,fjs);
-			}
-		})(document,"script","twitter-wjs");
-		
-		
-		var twitterRenderedAttribute = function(bool){
-			document.body.dataset.twttrRendered = bool;
-			};
+				// google+ setup
+				(function() {
+					var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+					po.src = 'https://apis.google.com/js/platform.js';
+					var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+				})();
 				
-		twitterRenderedAttribute(true);
+				// twitter setup
+				(function(d,s,id){
+					var js, fjs = d.getElementsByTagName('script')[0];
+					if(!d.getElementById(id)){
+						js=d.createElement(s);
+						js.id=id;
+						js.src="https://platform.twitter.com/widgets.js";
+						fjs.parentNode.insertBefore(js,fjs);
+					}
+				})(document,"script","twitter-wjs");*/
+		
+		
+		
+		/*
+		var twitterRenderedAttribute = function(bool){
+					document.body.dataset.twttrRendered = bool;
+					};
+						
+				twitterRenderedAttribute(true);*/
+		
 		
 		$scope.data = data;
 		
@@ -464,13 +467,13 @@ angular.module('co-op.controllers', [])
 		if (data.hasOwnProperty('fullName') ) $location.hash(data.fullName + "+" + producer()+ "&id=" + data._id);
 		
 		$scope.addToCart = function(product) {
-			twitterRenderedAttribute(false);
+			//twitterRenderedAttribute(false);
 			$modalInstance.close($scope.data);
 			
 		};
 
 		$scope.cancel = function() {
-			twitterRenderedAttribute(false);
+			//twitterRenderedAttribute(false);
 			$modalInstance.dismiss('cancel');
 		};
 	}
@@ -540,9 +543,11 @@ angular.module('co-op.controllers', [])
 			});
 			
 			modalInstance.result.then(function (selectedImg) {
+				console.log(selectedImg);
 				var reader = new window.FileReader();
 				reader.readAsDataURL(selectedImg);
 				reader.onloadend = function() {
+					console.log(reader.result);
 					$scope.productData.img = reader.result;
 					var fileURL = URL.createObjectURL(selectedImg);
 					$scope.selectedImg = $sce.trustAsResourceUrl(fileURL);
@@ -575,7 +580,6 @@ angular.module('co-op.controllers', [])
 		};
 		
 	}
-
 ])
 
 .controller('imageModalEditorCtrl', ['$scope', '$modalInstance', 'data', '$rootScope',
@@ -595,19 +599,14 @@ angular.module('co-op.controllers', [])
 			$modalInstance.dismiss('never mind');
 		};
 
-		$scope.$on("cropme:done", function(e, blob, canvasEl) {
-            $modalInstance.close(blob);
+		$scope.$on("cropme:done", function(e, result, canvasEl) {
+            $modalInstance.close(result.croppedImage);
 		});
 	}
 ])
 
 .controller('previewCtrl', ['$scope', '$modalInstance', 'data', 'ProductManager', 
 function($scope, $modalInstance, data, ProductManager) {
-	var twitterRenderedAttribute = function(bool){
-		document.body.dataset.twttrRendered = bool;
-	};
-	
-	twitterRenderedAttribute(true);
 	
 	$scope.data = angular.copy(data);
 	$scope.data.fullName = data.variety + ' ' + data.productName;
@@ -617,7 +616,6 @@ function($scope, $modalInstance, data, ProductManager) {
 	}
 	
 	$scope.cancel = function() {
-		twitterRenderedAttribute(false);
 		$modalInstance.dismiss('cancel');
 	};
 	
@@ -657,11 +655,9 @@ function($scope, $modalInstance, data, ProductManager) {
 
 .controller('producerCtrl', ['$scope', '$rootScope', 'ProducerManager', '$location',
 	function($scope, $rootScope, ProducerManager, $location) {
-		
 		$scope.submitForm = function() {
 			ProducerManager.saveProducer();
 		};
-
 	}
 ])
 
@@ -706,17 +702,19 @@ function($scope, $modalInstance, data, ProductManager) {
 		};
 		
 		// @id is _id of product and @list is which month list to search for purchases		
+		/*
 		$scope.isOrdered = function(id, list) {
-			var numOrdered = 0;
-			var ordersOfProduct = _.where(list, { product : {_id: id} });
-			if (ordersOfProduct !== [] ) {
-				for (var i = 0; i < ordersOfProduct.length; i++) {
-					numOrdered += ordersOfProduct[i].quantity;
-				}
-				return numOrdered;
-			}
-			else return 0;
-		};
+					var numOrdered = 0;
+					var ordersOfProduct = _.where(list, { product : {_id: id} });
+					if (ordersOfProduct !== [] ) {
+						for (var i = 0; i < ordersOfProduct.length; i++) {
+							numOrdered += ordersOfProduct[i].quantity;
+						}
+						return numOrdered;
+					}
+					else return 0;
+				};*/
+		
 		
 		$scope.lastMonth = Date.today().add(-1).months().toString('MMMM');
 		$scope.predicate = 'product';
@@ -964,6 +962,10 @@ function($scope, $modalInstance, data, ProductManager) {
 			$rootScope.$broadcast('PREDICTIVE_SEARCH', $scope.predictiveSearch);
 			
 		});
+		
+		$scope.searchFor = function(term) {
+			$location.search('search', term);
+		};
 				
 		// open the modal
 		$scope.open = function(product) {
@@ -1096,9 +1098,15 @@ function($scope, $modalInstance, data, ProductManager) {
 			timer = $timeout(function(){
 				$scope.detailsVisible = true;// run code
                 timer = undefined;
-			}, 1000);
+			}, 1200);
 		};
-
+		
+		$scope.$watch('detailsVisible', function() {
+			console.log($scope.detailsVisible);
+		});
+		
+		$scope.showHideDetails = function(bool) {$scope.detailsVisible = bool;};
+		
 		$scope.callCancelled = function() { $timeout.cancel(timer); };
 
 		$scope.$on("$destroy", function(event) { $timeout.cancel(timer); });

@@ -1,61 +1,66 @@
 <div id="fb-root"></div>
 <script></script>
+
+<!--
 <div class="modal-header" id="modal-top">
-	<h1>{{data.fullName}} <small ng-if="data.certification.name !== 'none'">{{data.certification.name}}</small></h1>
+	<a href="" class="panel-btn panel-btn-lg" ng-click="cancel()">&times;</a>
 </div>
+-->
+
 	
-<div class="modal-body media">
+<div class="modal-body col-xs-12 clearfix">
+	<a href="" class="panel-btn panel-btn-lg close-top-left" ng-click="cancel()">&times;</a>
+	<!--
 	<ul class="list-unstyled pull-right col-sm-2">
-		<li><a href="https://twitter.com/share" class="twitter-share-button" 
-			data-url="http://foodcoop.org.nz/store#{{data.fullName}}+{{data.producer_ID.producerData.companyName}}&id={{data._id}}" 
-			data-text="{{data.fullName}} for sale by {{data.producer_ID.name}} in the NNFC Store"
-			data-via="NorthlandNFC" 
-			data-lang="en" 
-			data-count="none">Tweet</a></li>
-		<li>
-			<!-- Place this tag where you want the +1 button to render. -->
-			<div class="g-plusone" data-size="tall"></div>
-		</li>
-		<li>
-			<a ng-href="https://plus.google.com/share?url=http://foodcoop.org.nz/store#{{data.fullName}}+{{data.producer_ID.producerData.companyName}}&id={{data._id}}" onclick="javascript:window.open(this.href,
-			  '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"><img
-			  src="https://www.gstatic.com/images/icons/gplus-64.png" alt="Share on Google+"/></a>
-		</li>
-		<li>
-			<div class="fb-share-button" data-layout="button" data-href="http://foodcoop.org.nz/store#{{data.fullName}}+{{data.producer_ID.producerData.companyName}}&id={{data._id}}"></div>
-		</li>
-	</ul>
+			<li><a href="https://twitter.com/share" class="twitter-share-button" 
+				data-url="http://foodcoop.org.nz/store#{{data.fullName}}+{{data.producer_ID.producerData.companyName}}&id={{data._id}}" 
+				data-text="{{data.fullName}} for sale by {{data.producer_ID.name}} in the NNFC Store"
+				data-via="NorthlandNFC" 
+				data-lang="en" 
+				data-count="none">Tweet</a></li>
+			<li>
+			</li>
+			<li>
+				<a ng-href="https://plus.google.com/share?url=http://foodcoop.org.nz/store#{{data.fullName}}+{{data.producer_ID.producerData.companyName}}&id={{data._id}}" onclick="javascript:window.open(this.href,
+				  '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"><img
+				  src="https://www.gstatic.com/images/icons/gplus-64.png" alt="Share on Google+"/></a>
+			</li>
+			<li>
+				<div class="fb-share-button" data-layout="button" data-href="http://foodcoop.org.nz/store#{{data.fullName}}+{{data.producer_ID.producerData.companyName}}&id={{data._id}}"></div>
+			</li>
+		</ul>-->
 	
-	<figure class="store-modal"><img ng-if="data.certification.name !== 'none' && data.img && data.certification.img"
+	<div class="col-md-6">
+	<figure class="store-modal center-block"><img ng-if="data.certification.name !== 'none' && data.img && data.certification.img"
 	 ng-src="img/certification/{{data.certification.img}}" class="certification-img" alt="organic certification">
 	<img class="product-image-modal img-responsive" ng-src="{{data.img}}"/>
+	<figcaption>
+		<h1 class='text-center'>{{data.fullName}}</h1>
+	</figcaption>
 	</figure>
-			
-    <div class="media-body col-lg-6">
-        {{data.producer_ID.name}}<br>
-		
-		<div class="well"><h2>Price: {{data.priceWithMarkup|currency}} / {{data.units}}</h2></div>
 	</div>
-	<div class="media-body col-lg-6">
-		
-		<strong>Quantity left:</strong> {{data.quantity}}<br>
+			
+	<div class="col-md-6">	
 		<article ta-bind ng-model="data.description"></article>
 		
-		<span ng-if="data.ingredients"><strong>Ingredients:</strong> 
-		<span ng-repeat="item in data.ingredients"><a ng-href="/store?search={{item}}">{{item}} </a> </span>
+		<p ng-if="data.ingredients"><strong>Ingredients:</strong>
+		<span ng-repeat="item in data.ingredients"><a ng-href="/store?search={{item}}">{{item}} </a> </span></p>
+		<p ng-if="data.certification.name !== 'none'"><strong>Certification:</strong> {{data.certification.name}}</p>
+		<p><strong>Produced By:</strong> {{data.producer_ID.producerData.companyName || currentUser.producerData.companyName || currentUser.name || 'no data found'}}<br></p>
+		<h3><strong>Quantity left:</strong> {{data.quantity - data.amountSold}}</h3>
+		<h2>
+			<strong>Price:</strong> {{data.priceWithMarkup|currency}} / {{data.units}}
+			<button class="btn btn-danger btn-lg" disabled ng-if="data.quantity === 0">
+				SOLD OUT
+			</button>
+			<button class="btn btn-primary btn-lg" ng-click="addToCart(data)" ng-if="!data.AlreadyInCart" ng-disabled="!currentUser">
+				Add to Cart
+			</button>
+			<button class="btn btn-primary btn-lg" disabled ng-if="data.AlreadyInCart">
+				Added to Cart
+			</button>
+		</h2>
+		
     </div>
 
-</div>
-<div class="modal-footer">
-	
-	<button class="btn btn-danger" disabled ng-if="data.quantity === 0">
-		SOLD OUT
-	</button>
-	<button class="btn btn-primary" ng-click="addToCart(data)" ng-if="!data.AlreadyInCart" ng-disabled="!currentUser">
-		Add to Cart
-	</button>
-	<button class="btn btn-primary" disabled ng-if="data.AlreadyInCart">
-		Added to Cart
-	</button>
-    <button class="btn btn-warning" ng-click="cancel()">Close</button>
 </div>

@@ -3,39 +3,52 @@
 	<h1 class="text-center">Product Upload <!--<i class="fa fa-question-circle pull-right" ng-click="showHelp = !showHelp" ng-init="showHelp = false"></i>--></h1>
 </div>
 
-
 <div class="col-md-12">
 	<div id="product-upload-preview-column" class="col-sm-4" >
 		<section ng-show="productData.category">
 			<h2>Preview <small>Live</small></h2>
-			<div class="product-container" ng-controller="productUICtrl" ng-mouseleave="detailsVisible = false" 
-			style="width:100%; margin: 0">
-				<figure class="first-layer" ng-mouseover="callDelayed()" ng-mouseleave="callCancelled()">
+			<div class="product-container center-block" ng-controller="productUICtrl" ng-mouseleave="detailsVisible = false" 
+			style="width:100%; max-width: 430px">
+				<figure class="first-layer" ng-mouseover="callDelayed()" ng-mouseleave="callCancelled()" ng-swipe-left="detailsVisible = true;">
 					<img ng-if="productData.certification != certifications[0]._id && productData.img"
 					 ng-src="img/certification/{{certificationImg(productData.certification)}}" class="certification-img">
-					<img ng-src="{{selectedImg}}" class="img-responsive">
+					<img ng-src="{{selectedImg}}" class="img-responsive" ng-click="preview(productData)">
 					<figcaption>
-						<button class="btn btn-primary pull-right" disabled>Add to Cart</button>
+						<div class="pull-right">
+							<button class="btn btn-primary pull-right" disabled>Add to Cart</button>
+							<br>
+							<span class="pull-right visible-xs visible-sm"
+							tooltip-placement="left" 
+							tooltip="Swipe left for more info"
+							tooltip-trigger="click"><i class="fa fa-chevron-circle-left"> swipe</i></span>
+						</div>
 						<h5>{{productData.variety}} {{productData.productName}}</h5>
 						<p>{{1.2 * productData.price|currency}} / {{productData.units}}</p>
+						
 					</figcaption>
 				</figure>
-				<section class="details-layer" ng-class="{ 'details-layer-visible' : detailsVisible}" ng-mouseleave="detailsVisible = false">
+				<section class="details-layer" ng-class="{ 'details-layer-visible' : detailsVisible}" ng-mouseleave="detailsVisible = false" ng-swipe-left="preview(productData)">
 					<article class="details">
-						<h4>{{currentUser.producerData.companyName}}</h4>
+						<a href="" class="panel-btn panel-btn-lg" ng-click="detailsVisible = false">&times;</a>
+						<h4><a ng-href="/producer/{{currentUser.producerData.companyName | forURL}}-{{currentUser.name | forURL}}">
+						<span class="glyphicon glyphicon-user"></span>
+						 {{currentUser.producerData.companyName || currentUser.name}}</a></h4>
+						
 						<h3>{{productData.variety}} {{productData.productName}}</h3>
 						<p>{{1.2 * productData.price|currency}} / {{productData.units}}</p>
 						<hr>
 						<p> Category: {{productManager.categoryByID(productData.category).name}} 
 						<span ng-if="product.certification !== 'none' ">
-							Certification: {{productManager.certificationByID(productData.certification).name}}</span>
+							Certified by  {{productManager.certificationByID(productData.certification).name}}</span>
 						</p>
+						<p ng-if="product.ingredients && product.ingredients.length > 0">Ingredients: 
+					<span ng-repeat="item in product.ingredients"><a ng-href="/store?search={{item}}">{{item}} </a> </span></p>
 						<div class="btn-group">
 							<button class="btn btn-danger pull-right" disabled ng-if="product.quantity <= 0">
 								SOLD OUT
 							</button>
 							<button class="btn btn-warning" ng-click="preview(productData)">
-								More Info
+								Details
 							</button>
 
 							<button class="btn btn-primary" disabled>

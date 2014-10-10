@@ -14,24 +14,25 @@ Copy the cropme.js and cropme.css files into your project and add the following 
 
 Alternatively, if you're using bower, you can add this to your component.json (or bower.json):
 
-		"angular-cropme": "~0.1.7"
+		"angular-cropme": "0.2.2"
 
 Or simply run
 
 		bower install angular-cropme
 
-Add the dependencies to your html:
+Check the dependencies to your html (unless you're using wiredep):
 
 		<script src="components/angular/angular.js"></script>
 		<script src="components/angular-sanitize/angular-sanitize.js"></script>
-		<script src="components/angular-route/angular-route.js"></script>
 		<script src="components/angular-touch/angular-touch.js"></script>
 		<script src="components/angular-superswipe/superswipe.js"></script>
 
-
-And add this to your HTML:
+And (unless you're using wiredep):
 
 		<script src="components/angular-cropme/cropme.js"></script>
+
+And the css:
+
 		<link rel="stylesheet" href="components/angular-cropme/cropme.css">
 
 
@@ -54,6 +55,8 @@ Usage
 - destination-width: (optional) target (cropped) picture width
 - destination-height: (optional) target (cropped) picture height. Cannot be set if ratio is set.
 - src: (optional) url of the image to preload (skips file selection)
+- send-original: (default: false) If you want to send the original file
+- send-cropped: (default: true) If you want to send the cropped image
 
 And don't forget to add the module to your application
 
@@ -68,7 +71,16 @@ Events Sent
 
 The blob will be sent through an event, to catch it inside your app, you can do like this:
 
-		$scope.$on("cropme:done", function(e, blob, canvasEl) { /* do something */ });
+		$scope.$on("cropme:done", function(e, result, canvasEl) { /* do something */ });
+
+Where result is
+
+		x: x position of the crop image relative to the original image
+		y: y position of the crop image relative to the original image
+		height: height of the crop image
+		width: width of the crop image
+		croppedImage: crop image as a blob
+		originalImage: original image as a blob
 
 Also cropme will send an event when a picture has been chosen by the user, so you can do something like
 
@@ -99,14 +111,6 @@ So, now, how do I send this image to my server?
 		});
 
 
-Demo
-----
+[Demo here!](http://standupweb.net/cropmedemo)
 
-Try the (very simple) demo. How to run the demo? Simple...
 
-		git clone git@github.com:standup75/cropme.git
-		cd cropme
-		npm install && bower install
-		grunt server
-
-This should open your browser at http://localhost:9000 where the demo now sits.

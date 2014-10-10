@@ -18,7 +18,10 @@ angular.module('co-op', [
 	'cropme',
 	'restangular'])
 
-  .config(['$routeProvider', '$locationProvider', 'RestangularProvider', function($routeProvider, $locationProvider, RestangularProvider) {
+  .config(['$compileProvider', '$routeProvider', '$locationProvider', 'RestangularProvider', function($compileProvider, $routeProvider, $locationProvider, RestangularProvider) {
+	var oldWhiteList = $compileProvider.imgSrcSanitizationWhitelist();
+	$compileProvider.imgSrcSanitizationWhitelist(/^\s*((https?|ftp|file|blob):|data:image\/)/ );
+	
     $routeProvider
 		.when('/', {templateUrl: 'partials/index-content.html', reloadOnSearch: false})
 		.when('/signup', {templateUrl: 'partials/signup.html', controller: 'userCtrl', reloadOnSearch: false, title: 'Signup',

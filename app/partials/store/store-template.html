@@ -2,21 +2,35 @@
 	{{message.message}}
 </alert>
 					
-<section id="main-nav-and-sorting" class="col-sm-12">
+<section id="main-nav-and-sorting" class="col-xs-12 clearfix">
 						
-    <div ng-class="{ 'pull-left' : !panelDisplay}">
+    <div ng-class="{ 'pull-left' : !panelDisplay}" class="hidden-sm hidden-xs">
     	<label> Categories: </label>
 		<div class="btn-group">
 			<button type='button' class="btn btn-default" ng-model="filter.category.name" btn-radio="'Produce'" >Produce</button>
 			<button type='button' class="btn btn-default" ng-model="filter.category.name" btn-radio="'Meat'" >Meat</button>
 			<button type='button' class="btn btn-default" ng-model="filter.category.name" btn-radio="'Processed-Goods'" >Processed Goods</button>
 			<button type='button' class="btn btn-default" ng-model="filter.category.name" btn-radio="'Baked Goods'" >Baked Goods</button>
-			<button type='button' class="btn btn-default" ng-model="filter.category.name" btn-radio="'Dairy'" >Dairy</button>
+			<button type='button' class="btn btn-default" ng-model="filter.category.name" btn-radio="'Dairy & Eggs'" >Dairy &amp; Eggs</button>
 			<button type='button' class="btn btn-default" ng-model="filter" btn-radio="">All</button>
 		</div>
 	</div>
+	
+	<div class="btn-group visible-sm visible-xs" dropdown>
+		<button class='btn btn-default dropdown-toggle'>Categories <span class="caret"></span></button>
+		<ul class="dropdown-menu" role="menu">
+	        <li><a ng-click="filter.category.name = 'Produce'">Produce</a></li>
+	        <li><a ng-click="filter.category.name = 'Meat'">Meat</a></li>
+	        <li><a ng-click="filter.category.name = 'Processed-Goods'">Processed Goods</a></li>
+	        <li><a ng-click="filter.category.name = 'Baked Goods'">Baked Goods</a></li>
+	        <li><a ng-click="filter.category.name = 'Dairy & Eggs'">Dairy &amp; Eggs</a></li>
+	        <li class="divider"></li>
+	        <li><a ng-click="filter = null">Show All</a></li>
+	    </ul>
+	</div>
+	   
 						
-	<div ng-class="{ 'pull-right' : !panelDisplay, 'sort-buttons-menu-open' : panelDisplay }">
+	<div ng-class="{ 'pull-right' : !panelDisplay, 'sort-buttons-menu-open' : panelDisplay }" ng-show="products.length > 1">
 		<label> Sort: </label>
 		<div class="btn-group">
 			<button type='button' class="btn btn-primary" 
@@ -34,7 +48,7 @@
            
 </section>
 
-<div id="products-section" class="col-sm-12">
+<div id="products-section" class="col-xs-12">
 	<div ng-if="products.length <= 0" class="col-md-8 col-md-offset-2">
 		<div class="jumbotron">
 			<h1 class="text-center">What? No Products?</h1>
@@ -47,10 +61,12 @@
 		<li ng-repeat="product in products | orderBy:sort:reverse | filter:search | filter:filter" class="product-container" 
 		ng-controller="productUICtrl" 
 		ng-mouseleave="detailsVisible = false"
+		ng-swipe-left="detailsVisible = true;"
 		>
 			<figure class="first-layer" ng-mouseover="callDelayed()" ng-mouseleave="callCancelled()">
-				<img ng-if="product.certification.name !== 'none' && product.img && product.certification.img"
-				 ng-src="img/certification/{{product.certification.img}}" class="certification-img" alt="organic certification">
+				<img
+				ng-if="product.certification.name !== 'none' && product.img && product.certification.img"
+				ng-src="img/certification/{{product.certification.img}}" class="certification-img" alt="organic certification">
 				<img ng-src="{{product.img}}" class="img-responsive" alt="product image" ng-click="open(product)">
 				<figcaption>
 					<div class="btn-group pull-right">
@@ -65,28 +81,39 @@
 						<button class="btn btn-danger pull-right" disabled ng-if="product.quantity === 0">
 							SOLD OUT
 						</button>
+						<br>
+						<span class="pull-right visible-xs visible-sm"
+						tooltip-placement="left" 
+						tooltip="Swipe left for more info"
+						tooltip-trigger="click"><i class="fa fa-chevron-circle-left"> swipe</i></span>
 					</div>
 					<h3>{{product.fullName}}</h3>
 					<p>{{product.priceWithMarkup|currency}} / {{product.units}}</p>
 				</figcaption>
 			</figure>
-			<section class="details-layer"  ng-class="{ 'details-layer-visible' : detailsVisible}" ng-mouseleave="detailsVisible = false">
+			<section class="details-layer"  ng-class="{ 'details-layer-visible' : detailsVisible}" ng-mouseleave="detailsVisible = false" ng-swipe-right="showHideDetails(false)" ng-swipe-left="open(product)">
+				
 				<article class="details">
-					<h4>{{product.producer_ID.producerData.companyName}}</h4>
+					<a href="" class="panel-btn panel-btn-lg" ng-click="detailsVisible = false">&times;</a>
+					<h4><a ng-href="/producer/{{product.producer_ID.producerData.companyName | forURL}}-{{product.producer_ID.name | forURL}}">
+					<span class="glyphicon glyphicon-user"></span> 
+					 {{product.producer_ID.producerData.companyName || product.producer_ID.name}}</a></h4>
 					<h3>{{product.fullName}}</h3>
 					<p>{{1.2 * product.price|currency}} / {{product.units}}</p>
 					
 					<!--<div ta-bind ng-model='product.description'></div>-->
 					<hr>
-					<p> Category: {{product.category.name}} 
-					<span ng-if="product.certification !== 'none' ">Certification: {{product.certification.name}}</span>
+					<p> Category: {{product.category.name}}<br>
+					<span ng-if="product.certification !== 'none' ">Certified by {{product.certification.name}}</span>
 					</p>
+					<p ng-if="product.ingredients && product.ingredients.length > 0">Ingredients: 
+					<span ng-repeat="item in product.ingredients"><a ng-click="searchFor(item)">{{item}} </a> </span></p>
 					<div class="btn-group">
 						<button class="btn btn-danger pull-right" disabled ng-if="product.quantity === 0">
 							SOLD OUT
 						</button>
 						<button class="btn btn-warning" ng-click="open(product)">
-							More Info
+							Details
 						</button>
 						<button class="btn btn-primary" disabled ng-if="product.AlreadyInCart" ng-hide="product.AlreadyInCart">
 							Added to Cart

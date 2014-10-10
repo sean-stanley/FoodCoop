@@ -5,31 +5,38 @@
 
 <div class="row">
 
-	<div class="col-md-3 well">
-		<div class="col-md-12">
-		<img ng-src="{{producer.producerData.logo}}" class="img-responsive"/>
-		<hr ng-if="producer.producerData.logo">
-		<h5>Contact Details</h5>
-		<ul class="list-unstyled" id="contact-details">
-			<li><span class="glyphicon glyphicon-earphone"></span> {{producer.phone}}</li>
-			<li><span class="glyphicon glyphicon-envelope"></span> <a ng-href="/contact/{{producer._id}}">{{producer.email}}</a></li>
-			<li ng-if="producer.addressPermission"><span class="glyphicon glyphicon-map-marker"></span> {{producer.address}}</li>
-			<li><img src="../img/glyphicons/Globe.png" width="18" alt="Globe"> <a href="http://{{producer.producerData.website}}" target="_blank">{{producer.producerData.website}}</a></li>
-		</ul>
+	<div class="col-sm-3 well clearfix">
+		<div class="col-xs-6 col-sm-12">
+			<img ng-src="{{producer.producerData.logo}}" class="img-responsive"/>
+			<hr ng-if="producer.producerData.logo">
+		</div>
+		<div class="col-xs-6 col-sm-12">
+			<h5>Contact Details</h5>
+			<ul class="list-unstyled" id="contact-details">
+				<li><span class="glyphicon glyphicon-earphone"></span> {{producer.phone}}</li>
+				<li><span class="glyphicon glyphicon-envelope"></span> <a ng-href="/contact/{{producer._id}}">{{producer.email}}</a></li>
+				<li ng-if="producer.addressPermission"><span class="glyphicon glyphicon-map-marker"></span> {{producer.address}}</li>
+				<li><img src="../img/glyphicons/Globe.png" width="18" alt="Globe"> <a href="http://{{producer.producerData.website}}" target="_blank">{{producer.producerData.website}}</a></li>
+			</ul>
 		</div>
 	</div>
 
-	<article class="col-md-6" ta-bind ng-model="producer.producerData.description">
-		<p>No description available yet</p>
-	</article>
+	<div class="col-sm-6 clearfix">
+		<article class="col-xs-12" ta-bind ng-model="producer.producerData.description">
+			<p>No description available yet</p>
+		</article>
+		<br>
+		<div class="text-center col-xs-12"><a ng-if="canUpload || canShop" class="btn btn-primary btn-lg text-center" href="/store?search={{producer.producerData.companyName}}">See My Products</a>
+		</div>
+	</div>
 	
-	<div class="col-md-3 well" >
+	<div class="col-sm-3 well" >
 		<article class="col-md-12" ta-bind ng-model="producer.producerData.personalBio"></article>
 	</div>
 </div>
 
 
-<iframe ng-src="{{map}}" class="col-md-10 map-frame col-md-offset-1" height="500px" ng-if="producer.addressPermission"></iframe>
+<iframe ng-src="{{map}}" class="col-sm-10 map-frame col-sm-offset-1 col-xs-12" height="500px" ng-if="producer.addressPermission"></iframe>
 				
 
         

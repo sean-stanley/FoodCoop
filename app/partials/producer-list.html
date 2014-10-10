@@ -24,20 +24,21 @@
 		<img ng-show="i.producerData.logo" class="producer-img-small pull-left" ng-src="{{i.producerData.logo}}" height="150px"/>
 
 		<div class="media-body">
-		
+			<h3><a class="pull-right" ng-href="/producer/{{i.producerData.companyName | forURL}}-{{i.name | forURL}}"><button class="btn btn-default">More Details</button></a></h3>
 			<h3>{{i.producerData.companyName}} <small>{{i.name}}</small></h3>
+			
 		
 	        <ul class="list-unstyled">
 				<li ng-if="i.addressPermission"><span class="glyphicon glyphicon-map-marker"></span> 
 					<a ng-href="//mapof.it/{{currentUser.address | forURL}}/{{i.address | forURL}}">{{i.address}}</a>
 				</li>
 	        </ul>
-			<hr>
+			
 		
 <!--
 			<article ta-bind ng-model="i.producerData.description"></article>
 -->
-			<a class="pull-right" ng-href="/producer/{{i.producerData.companyName | forURL}}-{{i.name | forURL}}"><button class="btn btn-default">More Details</button></a>
+			
 		
 		</div>
 	</div>

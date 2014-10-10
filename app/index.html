@@ -34,22 +34,25 @@
 	<link rel="stylesheet" href="lib/bower_components/angular-loading-bar/build/loading-bar.css" type="text/css">
 	
 	<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
-    
+    <link href="css/banner.css" rel="stylesheet" media="screen">
 	<link href="css/site.css" rel="stylesheet" type="text/css" media="screen">
 	
-	<link href="css/banner.css" rel="stylesheet" media="screen">
+	
 	<link href="css/animations.css" rel="stylesheet">
 	
 	
 	
 </head>
 
-<body ng-controller="navCtrl" ng-init="cart = {open: false};" >
+<body ng-controller="navCtrl" ng-init="cart = {open: false};" ng-swipe-right="panelDisplay = true">
 	<div ng-cloak="" class='splash text-center'>
 		<h1 style="font-size: 6em">Loading your Co-op</h1>
 		<i class="fa fa-cog fa-spin" style='font-size: 10em'></i>
 	</div>	
-	<div id="sidebar" class="sidebar" ng-show="panelDisplay" ng-class="{'wide-sidebar':cart.open, 'narrow-sidebar':!cart.open}" ng-cloak>
+	<div id="sidebar" class="sidebar" 
+	ng-swipe-left="panelDisplay = false" 
+	ng-show="panelDisplay" 
+	ng-class="{'wide-sidebar':cart.open, 'narrow-sidebar':!cart.open}" ng-cloak>
 		<div class="sidebar-main">
 			<a href="" id="close-sidebar-button" class="panel-btn panel-btn-lg" ng-click="panelDisplay = false">&times;</a>
 			<div class="form-group" ng-show="storePage()">
@@ -153,10 +156,9 @@
 					<span class="icon-bar"></span> 
 					<span class="icon-bar"></span> 
 				</button> 
-				<a class="navbar-brand" href="/">NNFC Beta</a>
+				<a class="navbar-brand" href="/">NNFC</a>
 				<a class="navbar-brand" ng-click="panelDisplay = !panelDisplay">
-					<small class="hidden-sm"><span class="glyphicon glyphicon-cog"></span> Member Tools</small>
-					<small class="visible-sm" style="font-size: 0.72em"><span class="glyphicon glyphicon-cog"></span> Member Tools</small>
+					<small class="hidden-sm hidden-xs"><span class="glyphicon glyphicon-cog"></span> Member Tools</small>
 				</a>
 				<!--
 				<ul class="nav navbar-nav pull-left">
@@ -188,12 +190,21 @@
 			</div>
 		</div>
 	</nav>
+	
+	
 		
 	<div class="page-wrap">
+	
+	<div 
+	class="visible-sm visible-xs mobile-arrow" 
+	 
+	ng-class="{'mobile-arrow-menu-open': panelDisplay}"
+	ng-show="!panelDisplay">
+		<i class="fa fa-chevron-circle-right fa-3x" ng-click="panelDisplay = true"></i>
+	</div>
 
 		<div class="container-fluid alert-box" ng-cloak>
-			<alert type="{{alert.type}}" ng-repeat="alert in queue" close="flash.closeMessage($index)" role="alert" class="alerts" ng-click="flash.closeMessage($index)">
-				{{alert.message}}
+			<alert type="{{alert.type}}" ng-repeat="alert in queue" close="flash.closeMessage($index)" role="alert" class="alerts" ng-click="flash.closeMessage($index)" ng-bind="alert.message">
 			</alert>
 		</div> 
 			
@@ -202,7 +213,7 @@
 		ng-cloak
 		ng-view
 		autoscroll="true" 
-		class="template-container app-body" 
+		class="template-container app-body clearfix" 
 		ng-class="{'menu-open-narrow' : panelDisplay && !cart.open, 'menu-open-wide': panelDisplay && cart.open, 'alerts-open': queue.length > 0, 'alerts-closed': queue.length <= 0}">
 		</div>
 	</div>

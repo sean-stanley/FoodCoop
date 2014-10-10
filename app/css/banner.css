@@ -77,10 +77,26 @@
 	  -o-background-size: cover;
 	  background-size: cover;
 }
+.carousel-caption {width: 70%}
+.carousel-control {width: 15%}
+.carousel-caption {/* padding: 30px; */ font-size: 1em;}
+.carousel-indicators {bottom: 70px;}
 }
 
 
-.carousel-caption > h1, .carousel-caption > h2 {font-family: Nevis, sans-serif;}
+.carousel {margin-bottom: 0px;}
+.carousel-caption h1 {font-size: 3.5em;}
+.carousel-indicators .active {margin: 2px 4px;}
+.carousel-indicators li {margin:3px;}
+.carousel-indicators {bottom: 15px;}
+
+.carousel-inner > .active, .carousel-inner > .next, .carousel-inner > .prev {display: flex;}
+.flex {display:flex; flex-direction: column; justify-content: center; align-items: center;}
+.carousel-caption {position: relative; left: inherit; right: inherit; width: 80%;}
+.carousel-control {width: 10%}
+.carousel-caption h1, .carousel-caption h2, carousel-caption h4 {font-family: Nevis, sans-serif;}
+
+.no-shadow {text-shadow: none}
 
 .feature-box {
 	margin: auto;

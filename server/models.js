@@ -41,7 +41,7 @@ var ProductSchema = new Schema({
 			producer_ID: {type: Schema.ObjectId, required: true, ref: 'User'},
 			cycle: {type: Number, required: true},
 			amountSold: Number,
-			regionID: {type: Schema.ObjectId, ref: 'Region'}
+			regionID: [{type: Schema.ObjectId, ref: 'Region'}]
 }, {
 	toObject: { virtuals : true },
 	toJSON: { virtuals : true }

@@ -35,7 +35,7 @@
 	transform: translateX(-130%);
 }
 
-.alert {
+.login, .alert {
     -webkit-transition: 800ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
     -moz-transition: 800ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
     -ms-transition: 800ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
@@ -48,16 +48,6 @@
 	-webkit-transform-origin:center top;
 	transform-origin:center top;
 	display: block;
-}
-
-
-.login.ng-hide-add, .login.ng-hide-remove, .alert.ng-hide-add, .alert.ng-hide-remove {
-  /* this is required as of 1.3x to properly
-     apply all styling in a show/hide animation */
-  transition:0s linear all;
- 
-  /* this must be set as block so the animation is visible */
-  display:block!important;
 }
  
 .login.ng-hide-add-active, .alert.ng-hide-add-active,
@@ -105,27 +95,20 @@
 
 .menu-open-narrow {margin-left: 20%;}
 
-.sidebar {
+.sidebar, .mobile-arrow {
 	transition: 400ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
 	display: block;
 }
 .wide-sidebar {width:35%; min-width: 320px;}
 .narrow-sidebar {width: 20%; min-width: 270px;}
-.sidebar.ng-hide-add, .sidebar.ng-hide-remove {
-  /* this is required as of 1.3x to properly
-     apply all styling in a show/hide animation */
-  transition:0s linear all;
- 
-  /* this must be set as block so the animation is visible */
-  display:block!important;
-}
+
  
 .sidebar.ng-hide-add-active,
 .sidebar.ng-hide-remove-active {
   /* the transition is defined in the active class */
   transition:400ms linear all;
 }
- 
+
 .sidebar.ng-hide-add { left: 0%; }
 .sidebar.ng-hide-remove { left:-30%; }
 .sidebar.ng-hide-remove.ng-hide-remove-active { left: 0; }

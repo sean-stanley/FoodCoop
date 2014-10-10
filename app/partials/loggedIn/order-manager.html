@@ -35,7 +35,7 @@
 			{{i.quantity}}
 		</td>
 		<td data-title="'times Ordered'">
-			{{isOrdered(i._id, currentOrders)}}
+			{{i.amountSold || 0}}
 		</td>
     </tr>
 </tbody>
@@ -62,7 +62,7 @@
 			            {{i.price | currency}} / {{i.units}}
 			        </td>
 					<td data-title="'times Ordered'">
-						{{isOrdered(i._id, recentOrders)}}
+						{{i.amountSold || 0}}
 					</td>
 			    </tr>
 			</tbody>
@@ -88,7 +88,7 @@
 			            {{i.price | currency}} / {{i.units}}
 			        </td>
 					<td data-title="'times Ordered'">
-						{{isOrdered(i._id, orders)}}
+						{{i.amountSold || 0}}
 					</td>
 			    </tr>
 			</tbody>
@@ -134,7 +134,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="i in recentOrders | orderBy:predicate:reverse " >
+					<tr ng-repeat="i in recentOrders | orderBy:predicate:reverse" >
 				        <td data-title="'Customer'">
 							<a ng-href="/contact/{{i.customer._id}}">{{i.customer.name}}</a>
 						</td>
