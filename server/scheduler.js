@@ -48,10 +48,10 @@ function checkConfig() {
 					break;
 				case 'ProductUploadStop':
 					exports.canUpload = false;
-					exports.canChange = false;
 					break;
 				case 'ShoppingStart':
 					exports.canShop = true;
+					exports.canChange = true;
 					break;
 				case 'ShoppingStop':
 					exports.canShop = false;
@@ -74,22 +74,28 @@ function checkConfig() {
 					break;
 				default:
 					// no functions to execute for this day
+					return
 				}
 			}
-			// if the date is between the productUploadStart date and the productUpoad Stop date
-			// double check that canShop is false and canUpload is true;
-			else if ( today.between(cycle.ProductUploadStart, cycle.ProductUploadStop) ) {
-				exports.canShop = false;
-				exports.canUpload = true;
-			}
-		
-			// if the date is between the ShoppingStart date and the ShoppingStop Stop date
-			// double check that canShop is true and canUpload is false;
-			else if ( today.between(cycle.ShoppingStart, cycle.ShoppingStop) ) {
-				exports.canShop = true;
-				exports.canUpload = false;
-			}
+			
 		}
+	}
+	
+	// if the date is between the productUploadStart date and the productUpoad Stop date
+	// double check that canShop is false and canUpload is true;
+	if ( !today.equals(cycle['ProductUploadStop']) && today.between(cycle.ProductUploadStart, cycle.ProductUploadStop) ) {
+		console.log('today is between the start of product uploading and the end');
+		exports.canShop = false;
+		exports.canUpload = true;
+	}
+
+	// if the date is between the ShoppingStart date and the ShoppingStop Stop date
+	// double check that canShop is true and canUpload is false;
+	else if ( !today.equals(cycle['ShoppingStart']) && today.between(cycle.ShoppingStart, cycle.ShoppingStop) ) {
+		console.log('today is between the start of shopping uploading and the end');
+		exports.canShop = true;
+		exports.canChange = true;
+		exports.canUpload = false;
 	}
 }
 
@@ -320,7 +326,6 @@ function incrementCycle() {
 			}
 		}
 	});
-	
 }
 
 function findCycle() {
@@ -330,12 +335,18 @@ function findCycle() {
 			exports.currentCycle = cycle.seq;
 			console.log("the current cycle is #" + exports.currentCycle);
 		}
-		
 	});
+}
+
+function disableCycle() {
+	exports.canShop = true;
+	exports.canUpload = true;
+	exports.canChange = true;
 }
 
 findCycle();
 checkConfig();
+disableCycle();
 
 // checkout everyone's purchases
 //checkout();

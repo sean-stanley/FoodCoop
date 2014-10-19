@@ -164,5 +164,4 @@ module.exports = function(grunt) {
 	grunt.registerTask('deploy', ['rsync:linode', 'shell:updateServer']);
 	grunt.registerTask('decrypt-config', ['shell:decryptConfig']);
 	grunt.registerTask('encrypt-config', ['shell:encryptConfig']);
-
 };

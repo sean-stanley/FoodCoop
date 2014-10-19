@@ -141,7 +141,7 @@ angular.module('co-op.directives', [])
 		    scope: {
 		      imageUrl: "@src"
 		    },
-			template: '<img style="display:none" src="{{imageUrl}}"/>'
+			template: '<img style="display:none" ng-src="{{imageUrl}}"/>'
 		};
 	}])
 	

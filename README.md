@@ -1,10 +1,12 @@
 FoodCoop
 ========
 
-Software for managing a local food co-op. This web app is built with a MEAN stack of MongoDB, Express v4, AngularJS v1.3 and Node.js
+Software for managing a local food co-op. This web app is built with a MEAN stack of MongoDB, Express v4, AngularJS v1.2.26 and Node.js.
+
+The live site can be found here(http://foodcoop.org.nz).
 
 
-Working Features include:
+Features include:
 -------------------------
 
 * local user authentication and email invoicing for membership
@@ -18,13 +20,7 @@ Working Features include:
 * invoices for producers that list all the products ordered from them by all producers in a set time period.
 * A general cycle counter that resets carts and products each ordering cycle.
 * schedule mass email reminders about important co-op dates with MailChimp.
-
-Features that are currently a work in progress:
------------------------------------------------
-
-* improve UX for mobile and tablet users.
-* General design improvements for home page, about us page, faq page, sign up page and some others
-* move the site to a live server.
+* Completely responsive design for easy mobile and tablet use.
 
 Future Feature Ideas:
 -----------------------------------------------
@@ -36,6 +32,9 @@ Future Feature Ideas:
 * list other sources for local food in Northland
 * when a member buys an animal that must be butchered, have the website provide a form for filling out butchery instructions.
 * make a note that whole beast sales are not handled on delivery day but upon arrangement with the producer.
+* Develop a list of regions that members can belong to and then filter shopping to their regions. This would allow multiple regions to buy at the same time or possibly on different schedules.
+* let producers sell outside of the ordering cycle with delivery arranged in a more traditional method like courier or pick-up.
+* integrate a method of searching for producers near a member.
 
 Setting Up
 ==========
@@ -61,9 +60,6 @@ This will give you access to a collection of sample users, sample products, cate
 You may also need to go to the app/lib directory where the bower components are stored and run
 
 	bower install
-or 
-
-	bower update
 
 
 Developing
@@ -71,9 +67,9 @@ Developing
 
 To start the server:
 
-    grunt dev
+    grunt dev | bunyan
 
-Then go to localhost:8081 to see the site.
+Then go to localhost:4001 to see the site.
 
 Configuring
 ===========

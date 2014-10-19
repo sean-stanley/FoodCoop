@@ -44,7 +44,7 @@
 	
 </head>
 
-<body ng-controller="navCtrl" ng-init="cart = {open: false};" ng-swipe-right="panelDisplay = true">
+<body ng-controller="navCtrl" ng-init="cartPanel = {open: false};" ng-swipe-right="panelDisplay = true">
 	<div ng-cloak="" class='splash text-center'>
 		<h1 style="font-size: 6em">Loading your Co-op</h1>
 		<i class="fa fa-cog fa-spin" style='font-size: 10em'></i>
@@ -52,10 +52,10 @@
 	<div id="sidebar" class="sidebar" 
 	ng-swipe-left="panelDisplay = false" 
 	ng-show="panelDisplay" 
-	ng-class="{'wide-sidebar':cart.open, 'narrow-sidebar':!cart.open}" ng-cloak>
+	ng-class="{'wide-sidebar':cartPanel.open, 'narrow-sidebar':!cartPanel.open}" ng-cloak>
 		<div class="sidebar-main">
 			<a href="" id="close-sidebar-button" class="panel-btn panel-btn-lg" ng-click="panelDisplay = false">&times;</a>
-			<div class="form-group" ng-show="storePage()">
+			<div ng-show="storePage()">
 				<div class="input-group">
 					<label class="sr-only" for="storeSearch">Search the store</label>
 					<div class="input-group-addon"><span class="glyphicon glyphicon-search"></span></div>
@@ -63,10 +63,7 @@
 					typeahead="keyword for keyword in predictiveSearch | filter:$viewValue | limitTo:8"
 					name="storeSearch" type="search" placeholder="Search"/>
 				</div>
-			</div>
-	
-			<br>
-	
+			</div>	
 			<div id="calendar-container" ng-controller="calendarCtrl" ng-click="href('/calendar')">
 				<h1 class="text-center"><span class="glyphicon glyphicon-calendar"></span></h1>
 				<p>
@@ -78,7 +75,7 @@
 			</div>
 	
 			<accordion close-others="false" ng-if="currentUser" >
-				<accordion-group is-open="cart.open" ng-class="{'panel-open-sidebar':cart.open}">
+				<accordion-group is-open="cartPanel.open" ng-class="{'panel-open-sidebar':cartPanel.open}">
 					<accordion-heading>
 					<h1 class="text-center"><i class="fa fa-shopping-cart"></i> <span class="badge">{{cartTally}}</span></h1>
 					</accordion-heading>
@@ -86,11 +83,11 @@
 							<table class="table">
 								<thead>
 									<tr>
-										<th><a href="" ng-click="predicate = '_id'; reverse=!reverse" tooltip-placement="right" tooltip="Remove Items">&times;</a></th>
+										<th class="hidden-xs"><a href="" ng-click="predicate = '_id'; reverse=!reverse" tooltip-placement="right" tooltip="Remove Items">&times;</a></th>
 										<th><a href="" ng-click="predicate = 'product.productName'; reverse=!reverse">Product</a></th>
 										<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse">Quantity</a></th>
 										<th><a href="" ng-click="predicate = 'orderPriceWithMarkup'; reverse=!reverse">Price</a></th>
-										<th><a href="" ng-click="predicate = 'supplier.producerData.companyName' || 'supplier.name'; reverse=!reverse">Producer</a></th>
+										<th class="hidden-xs"><a href="" ng-click="predicate = 'supplier.producerData.companyName' || 'supplier.name'; reverse=!reverse">Producer</a></th>
 									</tr>
 								</thead>
 								<tfoot>
@@ -100,27 +97,42 @@
 								</tfoot>
 								<tbody>
 									<tr ng-repeat="c in cart | orderBy:predicate:reverse" >
-								        <td data-title=" 'remove' ">
-								        	<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
+								        <td data-title=" 'remove' " class="hidden-xs">
+								        	<a ng-click="delete($index)"><i class="fa fa-trash"></i></a>
 										</td>
-								        <td data-title="'Product'" >
+								        <td data-title="'Product'" 
+										ng-init="showDelete = false" 
+										ng-swipe-right="showDelete = !showDelete" 
+										ng-hide="showDelete">
 								            <a href="" ng-click="open(c)">{{c.product.fullName}}</a>
 								        </td>
-								        <td data-title="'Quantity'">
-											<div class="input-group">
-												<div class="input-group-btn">
-													<button class="btn btn-default" ng-click="quantityChange($index)" ng-show="quantity.$dirty">Save</button>
+										<td ng-show="showDelete" ng-swipe-left="showDelete=false" colspan=2>
+											<button class="btn-danger btn" ng-click="delete($index); showDelete = false;">
+												<i class="fa fa-trash"></i> Delete
+											</button>
+										</td>
+								        <td data-title="'Quantity'" ng-hide="showDelete">
+											<form role="search" ng-submit="saveNewQuantity(c)" ng-controller="updateCartCtrl">
+												<div class="form-group">
+													<input type="number" class="form-control" ng-model="c.quantity" 
+													ng-init="lastQuantity = c.quantity"
+													ng-change="showSave = true;">
 												</div>
-												 <input name="quantity" type="number" class="form-control" ng-model="c.quantity">
-											</div>
+												<button type="submit" 
+												class="btn btn-default" 
+												ng-show="showSave" 
+												ng-click="showSave=false">Save</button>
+											</form>
 								        </td>
 								        <td data-title="'Price'">
 								            {{c.unitPriceWithMarkup * c.quantity | currency}}
 								        </td>
-								        <td data-title="'Customer'">
-								            {{c.supplier.producerData.companyName || c.supplier.name}}
+								        <td data-title="'Producer'" class="hidden-xs">
+								            <a 
+				ng-href="/producer/{{c.supplier.producerData.companyName | forURL}}-{{c.supplier.name | forURL}}">{{c.supplier.producerData.companyName || c.supplier.name}}</a>
 								        </td>
 								    </tr>
+									</tbody>
 								</tbody>
 							</table>
 						</div>
@@ -138,10 +150,11 @@
 					><a href="product-upload">Upload a Product</a></li>
 					<li ng-class="{active:isActive('/my-invoices')}" ng-show="currentUser"><a ng-href="my-invoices">Invoices</a></li>
 			</ul>
-		</div>
 		<ul class="nav nav-pills nav-stacked sidebar-bottom" ng-controller="logoutCtrl">
 			<li ng-show="currentUser != null"><a ng-click="logOut()" class="text-center"><h1><span class="glyphicon glyphicon-lock"></span></h1><p>Log Out</p></a></li>
 		</ul>
+		</div>
+		
 	</div>
 	
 	<nav class="navbar navbar-inverse navbar-fixed-top">
@@ -185,7 +198,6 @@
 							<span class="glyphicon glyphicon-user"></span>
 						</a>
 					</li>
-					
 				</ul>
 			</div>
 		</div>
@@ -214,7 +226,7 @@
 		ng-view
 		autoscroll="true" 
 		class="template-container app-body clearfix" 
-		ng-class="{'menu-open-narrow' : panelDisplay && !cart.open, 'menu-open-wide': panelDisplay && cart.open, 'alerts-open': queue.length > 0, 'alerts-closed': queue.length <= 0}">
+		ng-class="{'menu-open-narrow' : panelDisplay && !cartPanel.open, 'menu-open-wide': panelDisplay && cartPanel.open}">
 		</div>
 	</div>
 
@@ -265,11 +277,11 @@
 	<!-- Include all compiled plugins (below), or include individual files as needed -->
 	<!-- universal angular data here -->
 	
-	<script src="lib/bower_components/angular/angular.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
 	
 	<!-- project-specific angular data here -->
-	<script src="lib/bower_components/angular-animate/angular-animate.js"></script>
-	<script src="lib/bower_components/angular-route/angular-route.js" ></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular-animate.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular-route.min.js" ></script>
 	<script src="js/app.js"></script>
 	<script src="js/services.js"></script>
 	<script src="js/controllers.js"></script>
@@ -278,17 +290,18 @@
 	<script src="lib/bower_components/angular-loading-bar/build/loading-bar.min.js"></script>
 		
 	<script src="lib/bower_components/angular-bootstrap/ui-bootstrap-tpls.js" type="text/javascript" charset="utf-8"></script>
-	<script src="lib/bower_components/lodash/dist/lodash.compat.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.compat.min.js" type="text/javascript" charset="utf-8"></script>
 	<!--lodash: Restangular Dependency-->
-	<script src="lib/bower_components/restangular/dist/restangular.min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/restangular/1.4.0/restangular.min.js"></script>
 	
 	<!-- textAngular -->
-	<script src="lib/bower_components/textAngular/dist/textAngular.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src='http://cdnjs.cloudflare.com/ajax/libs/textAngular/1.2.2/textAngular-sanitize.min.js'></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/textAngular/1.2.2/textAngular.min.js" type="text/javascript" charset="utf-8"></script>
 	
 	<!-- cropme dependencies -->
 
-	<script src="lib/bower_components/angular-sanitize/angular-sanitize.js"></script>
-	<script src="lib/bower_components/angular-touch/angular-touch.js"></script>
+<!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular-sanitize.min.js"></script>-->
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular-touch.min.js"></script>
 	<script src="lib/bower_components/angular-superswipe/superswipe.js"></script>
 	<script src="lib/bower_components/angular-cropme/cropme.js"></script>
 	

@@ -58,7 +58,11 @@ a:hover {
 }
 .big-icons span {margin: 0 10px;}
 
-.flex-center {display: flex;
+.flex-center { display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
+  display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
+  display: -ms-flexbox;      /* TWEENER - IE 10 */
+  display: -webkit-flex;     /* NEW - Chrome */
+  display: flex;  
     align-items: center;
 	justify-items: center;}
 .img-content {width:100%; position: relative; margin-bottom: 0; }
@@ -80,6 +84,13 @@ a:hover {
 
 .coop-img-circle {-webkit-border-radius: 50%; border-radius: 50%; border: 5px solid #642c4a; max-width: 93%; display:block;}
 
+.jumbotron {padding: 15px;}
+
+@media (min-width: 768px) {
+	.jumbotron {padding-top: 30px;}
+}
+
+
 /*	-------------
 	-- Sidebar --
 	-------------	*/
@@ -94,8 +105,6 @@ a:hover {
 	border-right: 1px solid black;
 }
 
-#sidebar button{padding: 20px;}
-
 #sidebar > div {
 	padding: 10px;
 }
@@ -107,12 +116,14 @@ a:hover {
 #sidebar .nav-stacked > li + li {margin-top: 0;}
 .sidebar-main > ul > li > a, .sidebar-bottom > li a{border-radius:0; color: #aaa;}
 #sidebar .nav > li > a:hover, .nav > li > a:focus {background-color:#642c4a; color: white;}
-#close-sidebar-button {padding: 0 20px; display:block; margin-top: 51px;}
+#close-sidebar-button {padding: 0 20px; display:block; margin-top: 41px;
+margin-left: -21px;
+line-height: 1em;}
 #close-sidebar-button:hover {color:white;}
 
-.sidebar-main {margin-bottom: -102px; }
+.sidebar-main {margin-bottom: -122px; }
 .sidebar-main:after {content:"";display:block;}
-.sidebar-bottom, .sidebar-main:after {height: 122px;}
+.sidebar-bottom {height: 122px; position: absolute; bottom: 0;}
 .sidebar-bottom {width: 100%; border:none;}*/
 
 #calendar-container:hover, #sidebar .panel-heading:hover, #sidebar li:hover {border-color: #ddd; background: #642c4a; color: white;}
@@ -128,7 +139,9 @@ a:hover {
 #sidebar .panel {background: transparent; border: none;}
 
 #sidebar .panel-open-sidebar .panel-heading {border-color: #ddd; background: #642c4a; color: white;}
-#sidebar th a {color: #aaa; font-weight: 300;}
+#sidebar .table a {color: #aaa; font-weight: 300;}
+#sidebar tr {position: relative;}
+.cart-delete {position: absolute; right: 0; margin-right: 10px;}
 
 .image-drop {
 	display: block;
@@ -221,6 +234,8 @@ Content Pages
 .membership-percs li > span {margin-right: 0.5em;}
 .membership-button button {font-size: 1.5em;}
 
+.text-strike {opacity: 0.7;}
+
 /* For Google Places API Autocomplete */
 .pac-container {z-index:2000!important;}
 
@@ -257,6 +272,13 @@ border-radius: 200px;
 
 
 /* Store */ 
+
+.details-close-button {
+	position: absolute;
+	left: 5px;
+	top: 0px;
+	line-height: 1em;
+}
 
 .panel-btn-lg {
 	font-size: 2em;
@@ -298,6 +320,9 @@ a.panel-btn-sml {
 	  display: -ms-flexbox;
 	  display: -webkit-flex;
 	  display: flex;
+		-webkit-flex-flow: row wrap;
+		-webkit-justify-content: space-around;
+		-webkit-align-content: flex-start;
 	flex-flow: row wrap;
 	justify-content: space-around;
 	align-content: flex-start;
@@ -310,7 +335,7 @@ a.panel-btn-sml {
 	background:#ddd;
 }
 
-.product-container figcaption > h3{margin-top:10px;}
+.product-container figcaption > h3 {margin-top:10px;}
 
 .product-container figcaption .btn-group {margin-top: 0.8em}
 
@@ -333,10 +358,9 @@ a.panel-btn-sml {
 	-ms-transition: all 0.4s ease;
 	-o-transition: all 0.4s ease;
 	transition: all 0.4s ease;
-	
 }
 
-.details-layer-visible {right:0; opacity:1; visibility: visible; -moz-transform: scale(1.1) rotate(-2deg);}
+.details-layer-visible {right:0; opacity:1; visibility: visible;}
 	
 .details {padding: 15px;}
 

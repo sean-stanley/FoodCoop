@@ -18,8 +18,8 @@ exports.region = "Northland";
 // Membership prices
 // -----------------
 // these amounts are in local currency
-exports.customerMembership = 60;
-exports.producerMembership = 120;
+exports.customerMembership = 30;
+exports.producerMembership = 60;
 
 // set the co-op's markup as a whole number e.g. 20 for 20%
 exports.markup = 20;

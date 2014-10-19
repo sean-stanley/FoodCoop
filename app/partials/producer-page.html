@@ -1,5 +1,17 @@
-<div class="page-header">
-	<h1 class="text-center">{{producer.producerData.companyName}}</h1>
+
+<div class="page-header col-xs-12">
+	
+	<h1 class="text-center">
+		
+		{{producer.producerData.companyName}} 
+		
+	</h1>
+	<span class="pull-left">
+		<h4><a href="/producer-list"><span class="glyphicon glyphicon-book"></span> Back to Directory</a></h4>
+	</span>
+	<span class="pull-right" ng-show="currentUser._id && currentUser._id === producer._id">
+		<h4><a href="/me"><span class="glyphicon glyphicon-pencil"></span> Edit</a></h4>
+	</span>
 </div>
 
 
@@ -22,11 +34,11 @@
 	</div>
 
 	<div class="col-sm-6 clearfix">
-		<article class="col-xs-12" ta-bind ng-model="producer.producerData.description">
-			<p>No description available yet</p>
-		</article>
-		<br>
-		<div class="text-center col-xs-12"><a ng-if="canUpload || canShop" class="btn btn-primary btn-lg text-center" href="/store?search={{producer.producerData.companyName}}">See My Products</a>
+		<div class="col-xs-12" ta-bind ng-model="producer.producerData.description">
+		</div>
+		
+		<div class="text-center col-xs-12">
+			<br><a ng-if="canUpload || canShop" class="btn btn-primary btn-lg text-center" href="/store?search={{producer.producerData.companyName}}">See My Products</a>
 		</div>
 	</div>
 	

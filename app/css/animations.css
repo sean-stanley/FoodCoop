@@ -89,18 +89,27 @@
 	margin-left: 0%;
 }
 
-.menu-open-wide {
-	margin-left: 35%;
-}
 
-.menu-open-narrow {margin-left: 20%;}
 
 .sidebar, .mobile-arrow {
 	transition: 400ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
 	display: block;
 }
-.wide-sidebar {width:35%; min-width: 320px;}
-.narrow-sidebar {width: 20%; min-width: 270px;}
+
+.wide-sidebar {width: 100%;}
+.narrow-sidebar {width: 320px;}
+.menu-open-wide {margin-left: 100%;}
+.menu-open-narrow {margin-left: 320px;}
+
+@media (min-width: 768px) {
+	.wide-sidebar {width:35%; min-width: 390px;}
+	.narrow-sidebar {width: 20%; min-width: 320px;}
+	
+	.menu-open-wide {margin-left: 35%;}
+	.menu-open-narrow {margin-left: 20%;}
+}
+
+
 
  
 .sidebar.ng-hide-add-active,

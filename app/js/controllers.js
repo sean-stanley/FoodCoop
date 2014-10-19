@@ -131,8 +131,8 @@ angular.module('co-op.controllers', [])
 	}
 ])
 
-.controller('adminUserEditCtrl', ['$scope', '$rootScope', 'LoginManager', 'flash', 'Restangular', '$route', 'user',
-	function($scope, $rootScope, LoginManager, flash, Restangular, $route, user) {
+.controller('adminUserEditCtrl', ['$scope', '$rootScope', 'LoginManager', 'flash', 'Restangular', '$location', 'user',
+	function($scope, $rootScope, LoginManager, flash, Restangular, $location, user) {
 		
 		var original = user;
 		
@@ -158,7 +158,7 @@ angular.module('co-op.controllers', [])
 				}
 				original.customDELETE(original._id).then(function() {
 					flash.setMessage('User successfully Deleted');
-					$route.reload();
+					$location.path('/admin');
 				});
 			}
 		};
@@ -170,7 +170,7 @@ angular.module('co-op.controllers', [])
 		
 		$scope.save = function() {
 			if (!$scope.isClean()) {
-				$scope.user.put($scope.user._id).then(function(response) {
+				$scope.user.customPUT($scope.user, $scope.user._id).then(function(response) {
 					// success!
 					flash.setMessage({type: 'success', message: 'Changes saved successfully'});
 				});
@@ -191,7 +191,7 @@ angular.module('co-op.controllers', [])
 			if (lastChance) {
 				UserManager.delCurrentUser(function() {
 					LoginManager.logout();
-					flash.setMessage('User successfully Deleted');
+					flash.setMessage('Account successfully Deleted');
 				});
 			}
 		};
@@ -270,7 +270,8 @@ angular.module('co-op.controllers', [])
 			return match.length;
 		};
 		
-}])
+	}
+])
 
 .controller('userInvoiceCtrl', ['$scope', 'Restangular', '$rootScope', function($scope, Restangular, $rootScope){
 	$scope.now = Date();
@@ -312,7 +313,8 @@ angular.module('co-op.controllers', [])
 			});
 			
 			modalInstance.result.then(function (nextRoute) {
-				$location.path('nextRoute');		
+				console.log(nextRoute);
+				$location.path(nextRoute);	
 				
 			}, function () {
 				console.log('Modal dismissed at: ' + new Date());
@@ -339,11 +341,12 @@ angular.module('co-op.controllers', [])
 			}
 		};
 		
-		$scope.next_route = (data === "Producer") ? "/apply" : "/welcome";
+		$scope.nextRoute = ($scope.data === "Producer") ? "/apply" : "/welcome";
+		console.log($scope.nextRoute);
 		
 		$scope.submitForm = function() {
 			UserManager.createUser($scope.userData).then(function() {
-				$modalInstance.close($scope.next_route);
+				$modalInstance.close($scope.nextRoute);
 			}, function(error) {
 				$scope.message = error;
 			});
@@ -365,8 +368,8 @@ angular.module('co-op.controllers', [])
 	}
 ])
 
-.controller('producerApplicationCtrl', ['$scope', '$rootScope','certifications', '$http', "$location",
-	function ($scope, $rootScope, certifications, $http, $location) {
+.controller('producerApplicationCtrl', ['$scope', 'flash','certifications', '$http', "$location",
+	function ($scope, flash, certifications, $http, $location) {
 		certifications.getList().then(function(result) {
 			$scope.certifications = result;
 			$scope.producerApplication = {
@@ -376,10 +379,10 @@ angular.module('co-op.controllers', [])
 		
 		$scope.submitForm = function(form) {
 			$http.post('/api/producer-applicaiton', $scope.producerApplication).success(function(result) {
-				$rootScope.flash.setMessage({type: 'success', message: 'Thank you for your application. We\'ll be in touch shortly.'});
+				flash.setMessage({type: 'success', message: 'Thank you for your application. We\'ll be in touch shortly.'});
 				$location.path("welcome");
-			}).error(function(result) {
-				$rootScope.flash.setMessage({type: 'danger', message: '"Oops! Something went wrong. Error Code: " + result.status + " " + result.statusText;'});
+			}).error(function(error) {
+				flash.setMessage({type: 'danger', message: "Error: " + (error.status || "") + " " + (error.message || error)});
 			});
 		};
 		
@@ -661,7 +664,7 @@ function($scope, $modalInstance, data, ProductManager) {
 	}
 ])
 
-.controller('productOrderCtrl', ['$scope', 'myOrders', 'products', 'unfullfilledOrders', 'Calendar', 'ProductHistory', 'ProductManager', 
+.controller('productOrderCtrl', ['$scope', 'myOrders', 'products', 'unfullfilledOrders', 'Calendar', 'ProductHistory', 'ProductManager',
 	function($scope, myOrders, products, unfullfilledOrders, Calendar, ProductHistory, ProductManager) {
 		myOrders.getList().then(function(orders) {
 			$scope.orders = orders.plain();
@@ -721,15 +724,17 @@ function($scope, $modalInstance, data, ProductManager) {
 	}
 ])
 
-.controller('cartPageCtrl', ['$scope', '$rootScope', 'Cart',
-	function($scope, $rootScope, Cart) {
+.controller('cartPageCtrl', ['$scope', '$rootScope', '$location', 'Cart', 'flash',
+	function($scope, $rootScope, $location, Cart, flash) {
 		$scope.cart = [];
+		$scope.cartProduct_ids = [];
 		
-		Cart.getCurrentCart(function(cart) {
-			$scope.cartProduct_ids = [];
-			$scope.cart = cart;
-			getIds();
-		});
+		if ($rootScope.cycle) {
+			Cart.getCurrentCart(function(cart) {
+				$scope.cart = cart;
+				getIds();
+			});
+		}
 		
 		$scope.cartTotal = function(cart) {
 			$scope.total = 0;
@@ -747,71 +752,26 @@ function($scope, $modalInstance, data, ProductManager) {
 			$scope.cart.splice(idx, 1);
 			var index = $scope.cartProduct_ids.indexOf(itemToDelete.product._id);
 			if (index > -1) $scope.cartProduct_ids.splice(index, 1);
-			
-/*
-			for (var i = 0; i < $scope.cartProduct_ids.length; i++) {
-				if ($scope.cartProduct_ids[i] === itemToDelete.product._id) {
-					$scope.cartProduct_ids.splice(i, 1);
-				}
-			}*/
 
 			// for the store page:
 			$rootScope.$broadcast('CART_IDS', $scope.cartProduct_ids);
 			$scope.cartTotal();
 		};
 		
-		// update the cart on valid quantity changes and reset it on invalid ones;
-		$scope.$watchCollection(watchQuantity, function(newValue, oldValue) {
-			
-			if (oldValue.length >= 1 && newValue.length >= 1) {
-				$scope.oldQuantities = oldValue;
-			}
-			else {
-				$scope.oldQuantities = newValue;
-			}
-			
-		});
-		
-		function watchQuantity () {
-			if ($scope.cart) {
-				return $scope.cart.map(function(item) {
-					return item.quantity;
-				});
-			}
-		}
-		
-		$scope.quantityChange = function (idx) {
-			var item, message, areYouSure;
-			item = $scope.cart[idx];
-			message = "Are you sure you want to change the amount of " + item.product.productName + " you are ordering to: " + item.quantity + "?";
-			
-			areYouSure = confirm(message);
-			if (areYouSure) {
-				Cart.updateItem(item, function(result) {
-					if (result === "OK") {
-						$scope.cartTotal();
-					}
-					else {
-						// make a message on the store page
-						$scope.$emit('CANNOT_UPDATE_CART', result);
-						$scope.cart[idx].quantity = $scope.oldQuantities[idx];
-					}
-					
-				});
-			}
-			else {
-				$scope.cart[idx].quantity = $scope.oldQuantities[idx];
-			}
-		};
-		
 		// only for the store.html page use of this controller
-		
 		function getIds() {
 			$scope.cart.forEach(function(item) {
 				$scope.cartProduct_ids.push(item.product._id);
 			});
 			$rootScope.$broadcast('CART_IDS', $scope.cartProduct_ids);
 		}
+		
+		$scope.$on('GET_CART', function() {
+			Cart.getCurrentCart(function(cart) {
+				$scope.cart = cart;
+				getIds();
+			});
+		});
 		
 		$scope.$on('UPDATE_CART', function(event, item){
 			console.log(item);
@@ -820,11 +780,49 @@ function($scope, $modalInstance, data, ProductManager) {
 			$rootScope.$broadcast('CART_IDS', $scope.cartProduct_ids);
 		});
 		
+		$scope.$on('FAILED_CART_UPDATE', function(event, quantity, id) {
+			var idx = _.findIndex($scope.cart, {_id : id});
+			$scope.cart[idx].quantity = quantity;
+		});
+		
 		$scope.open = function(item) {
-			$rootScope.$broadcast('OPEN_PRODUCT', item);
+			var path = $location.path();
+			if (path === "/store") {
+				$rootScope.$broadcast('OPEN_PRODUCT', item);
+			}
+			else {
+				$location.path("/store");
+			}
 		};
 	}
 ])
+.controller('updateCartCtrl', ['$scope', '$rootScope', '$location', 'Cart', 'flash', function($scope, $rootScope, $location, Cart, flash) {
+	//$scope.lastQuantity = undefined;
+	
+	$scope.saveNewQuantity = function(item) {
+		if (item.quantity <= 0) {
+			flash.setMessage({type: 'warning', message: 'Please use a valid quantity and try again.'});
+		}
+		else {
+			Cart.updateItem(item, function(error) {
+				if (error) {
+					$scope.$emit('FAILED_CART_UPDATE', $scope.lastQuantity, item._id);
+					console.log($scope.lastQuantity);
+				}
+				// success!
+				else {
+					$scope.lastQuantity = item.quantity;
+					$scope.cartTotal();
+					console.log('new lastQuantity is ' + $scope.lastQuantity);
+					var path = $location.path();
+					if (path === "/my-cart") {
+						$rootScope.$broadcast('GET_CART');
+					}
+				}
+			});
+		}
+	};
+}])
 .controller('cartHistoryCtrl', ['$scope', 'Cart', function($scope, Cart) {
 	Cart.getAllItems(function(items) {
 		$scope.cartHistory = items;
@@ -916,14 +914,12 @@ function($scope, $modalInstance, data, ProductManager) {
 		};
 		
 		// initiate the real-time message container
-		$scope.message = {type: 'danger', closeMessage: function() {if (this.message) this.message = null;} };
+		//$scope.message = {type: 'danger', closeMessage: function() {if (this.message) this.message = null;} };
 		
 		Restangular.all('api/product').getList({cycle: $rootScope.cycle}).then(function(products){
 			$scope.products = products.plain();
 			
-			if (!$rootScope.canShop && $scope.products.length > 0) {
-				flash.setMessage({type: 'warning', message: 'Shopping is not allowed yet sorry. Please check the calendar for when shopping is open next.'});
-			}
+			
 			
 			// deal with all hash and search on product successful load;
 			(function() {
@@ -1008,10 +1004,6 @@ function($scope, $modalInstance, data, ProductManager) {
 			}
 		});
 		
-		$scope.$on('CANNOT_UPDATE_CART', function(event, message) {
-			$scope.message.message = message;
-		});
-		
 		// if the user has items in their cart that are also in the store
 		// flag those items with the bool AlreadyInCart = true;
 		$scope.$on('CART_IDS', function(event, cartProduct_ids) {
@@ -1035,7 +1027,6 @@ function($scope, $modalInstance, data, ProductManager) {
 					if (cartOrder) {
 						$rootScope.$broadcast('UPDATE_CART', cartOrder);
 						LoginManager.getTally();
-						$scope.panelDisplay = true;
 					}
 				});
 			}
@@ -1082,6 +1073,12 @@ function($scope, $modalInstance, data, ProductManager) {
 				$location.search('reverse' , true);
 			}
 		});
+		
+		$rootScope.$watch('canShop', function() {
+			if (!$rootScope.canShop) {
+				flash.setMessage({type: 'warning', message: 'Shopping is not allowed yet sorry. Please check the calendar for when shopping is open next.'});
+			}
+		});
 
 	}
 
@@ -1117,19 +1114,19 @@ function($scope, $modalInstance, data, ProductManager) {
 	function($scope, $rootScope, $http, Calendar) {
 		$scope.countDown = [];
 		
-		
-		
 		$http.get('/api/calendar').success(function(result) {
 			$scope.significantDays = result[0];
 			$scope.nextMonth = result[1];
 			$scope.twoMonth = result[2];
 			$rootScope.cycle = result[3];
 			$rootScope.canUpload = result[4];
-			$rootScope.canSell = result[5];
+			$rootScope.canShop = result[5];
 			$rootScope.canChange = result[6];
 			
 			$scope.daysBeforeOrderingStops = Calendar.daysUntil($scope.significantDays.ProductUploadStop);
 			$scope.daysBeforeDeliveryDay = Calendar.daysUntil($scope.significantDays.DeliveryDay);
+			
+			$rootScope.$broadcast('GET_CART');
 			
 			var key;
 			

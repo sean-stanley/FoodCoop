@@ -29,23 +29,6 @@
   background-size: cover;
 }
 
-/*
-.tint:before {
-	content: "";
-	display: block;
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	background: rgba(100, 44, 74, 0.8);
-	-moz-transition: background .3s linear;
-	-webkit-transition: background .3s linear;
-	-o-transition: background .3s linear;
-	transition: background .3s linear;
-}*/
-
-
 @media (min-width: 769px) {
 	#slide1 {background: url('/img/originals/cheese-wine-meat.jpg') no-repeat top center fixed;
 	-webkit-background-size: cover;
@@ -83,31 +66,37 @@
 .carousel-indicators {bottom: 70px;}
 }
 
-
 .carousel {margin-bottom: 0px;}
 .carousel-caption h1 {font-size: 3.5em;}
 .carousel-indicators .active {margin: 2px 4px;}
 .carousel-indicators li {margin:3px;}
 .carousel-indicators {bottom: 15px;}
 
-.carousel-inner > .active, .carousel-inner > .next, .carousel-inner > .prev {display: flex;}
-.flex {display:flex; flex-direction: column; justify-content: center; align-items: center;}
+.carousel-inner > .active, .carousel-inner > .next, .carousel-inner > .prev {
+    display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
+     display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
+     display: -ms-flexbox;      /* TWEENER - IE 10 */
+     display: -webkit-flex;     /* NEW - Chrome */
+     display: flex; 
+	 	-webkit-flex-direction: column; 
+	 	-webkit-justify-content: center; 
+	 	-webkit-align-items: center; 
+	 	flex-direction: column; 
+	 	justify-content: center; 
+	 	align-items: center; 
+	 }
+
 .carousel-caption {position: relative; left: inherit; right: inherit; width: 80%;}
 .carousel-control {width: 10%}
-.carousel-caption h1, .carousel-caption h2, carousel-caption h4 {font-family: Nevis, sans-serif;}
+.carousel-caption h1, .carousel-caption h2, .carousel-caption h4 {font-family: Nevis, sans-serif;}
 
 .no-shadow {text-shadow: none}
 
 .feature-box {
 	margin: auto;
-	padding: 4em;
-	width: 50%;
-	min-width: 350px;
 	position: relative;
 }
-
 h1.logo {
-	font-size: 8em;
 	font-family: 'Nevis', sans-serif;
 	font-weight: 500;
 	color: white;
@@ -115,8 +104,8 @@ h1.logo {
 	text-shadow: 1px 1px 1px #292828;
 	margin: 20px 0;
 	padding: 0;
+	font-size: 6em;
 }
-
 h2.slogan {
 	font-size: 1.5em;
 	color: yellow;
@@ -127,6 +116,22 @@ h2.slogan {
 	margin: 20px 0;
 	padding: 0;
 }
+
+
+@media (min-width: 768px) {
+	.feature-box {
+		margin: auto;
+		padding: 4em;
+		min-width: 350px;
+		position: relative;
+	}
+	h1.logo {
+		font-size: 8em;
+	}
+}
+
+
+
 
 .login {
 	background-color: rgba(255,255,255,0.86);

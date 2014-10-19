@@ -26,13 +26,23 @@
 		<tbody>
 			<tr ng-repeat="c in cart | orderBy:predicate:reverse" >
 		        <td data-title=" 'remove' ">
-		        	<button type="button" class="close" aria-hidden="true" ng-click="delete($index)">&times;</button>
+		        	<a ng-click="delete($index)"><i class="fa fa-trash"></i></a>
 				</td>
 		        <td data-title="'Product'" >
 		            {{c.product.fullName}}
 		        </td>
 		        <td data-title="'Quantity'">
-		           <input type="number" class="form-control" ng-change="quantityChange($index)" ng-model="c.quantity">
+					<form class="navbar-form navbar-left" role="search" ng-submit="saveNewQuantity(c)" ng-controller="updateCartCtrl">
+						<div class="form-group">
+							<input type="number" class="form-control" ng-model="c.quantity" 
+							ng-init="lastQuantity = c.quantity"
+							ng-change="showSave = true;">
+						</div>
+						<button type="submit" 
+						class="btn btn-default" 
+						ng-show="showSave" 
+						ng-click="showSave=false"><span class="glyphicon glyphicon-floppy-save"></span> Save</button>
+					</form>
 		        </td>
 		        <td data-title="'Price'">
 		            {{c.unitPriceWithMarkup * c.quantity | currency}}

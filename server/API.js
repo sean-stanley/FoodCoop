@@ -30,6 +30,8 @@ var util = require('util'),
 
 require('datejs'); // provides the best way to do date manipulation.
 
+//testing stuff comment out in production
+//var test = require('./testEmail.js');
 
 // sets date locality and formats to be for new zealand.
 Date.i18n.setLanguage("en-NZ");
@@ -71,11 +73,12 @@ exports.configAPI = function configAPI(app) {
 	// static routes
 	app.use(express.static(path.normalize(path.join(__dirname, '../app'))));
 	
+	/*
 	app.all('*', function(req, res, next) {
-	  res.header("Access-Control-Allow-Origin", "*");
-	  res.header("Access-Control-Allow-Headers", "X-Requested-With");
-	  next();
-	 });
+		  res.header("Access-Control-Allow-Origin", "*");
+		  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+		  next();
+		 });*/
 	
 	app.put("*", function(req, res, next) {
 		log.info({req: req}, 'PUT attempt just made');
@@ -84,6 +87,11 @@ exports.configAPI = function configAPI(app) {
 	
 	app.post("*", function(req, res, next) {
 		log.info({req: req}, 'POST attempt just made');
+		/*
+		test.testEmail.send(function(result) {
+					log.info(result);
+				})*/
+		
 		next();
 	});
 	
@@ -138,15 +146,14 @@ exports.configAPI = function configAPI(app) {
 			// Sends the email using settings from emailer.js The unused result
 			// variable is the completed message object.
 			toMe.send(function(err, result) {
-				if (err) return next(err);
+				if (err) next(err);
 				log.info({result:result});
-				toClient.send(function(err, result) {
-					if (err) return next(err);
-					// a response is sent so the client request doesn't timeout and get an error.
-					log.info({result:result});
-					res.status(200).send("Message sent to client");
-				});
 			});
+			toClient.send(function(err, result) {
+				if (err) next(err);
+				log.info({result:result});
+			});
+			res.status(200).send("Message sent to client");
 			
 		} else if (req.body.hasOwnProperty('to')) {
 			// this case is for when a client is trying to send a message to one of our producer members.
@@ -170,14 +177,15 @@ exports.configAPI = function configAPI(app) {
 			toProducer = new Emailer(toProducerOptions, toProducerData);
 
 			toProducer.send(function(err, result) {
-				if (err) return next(err);
-				// a response is sent so the client request doesn't timeout and get an error.
-				res.status(200).send("Message sent to producer");
+				if (err) next(err);
+				log.info({result:result});
 			});
+			// a response is sent so the client request doesn't timeout and get an error.
+			res.status(200).send("Message sent to producer");
 		} else {
 			// here if no message data was received in the request, a response is sent
-			// detailing what happened.
-			res.status(403).send(403, "No messages sent");
+			// error details will be in the log.
+			res.status(403).send(403, "Improperly formatted message. No message sent");
 		}
 	});
 
@@ -617,6 +625,7 @@ exports.configAPI = function configAPI(app) {
 		if (req.user && req.user._id == req.params.user) {
 			models.Order.count({customer: req.user._id, cycle: scheduler.currentCycle}, function(e, count) {
 				if (!e) {
+					log.info('the count is %n', count);
 					res.send(count.toString());
 				}
 				else return next(e);
@@ -686,12 +695,13 @@ exports.configAPI = function configAPI(app) {
 					});
 				},
 				function(oldQuantity, newQuantity, order, callback) {
-					models.Product.findById(order.product, 'quantity amountSold', function(e, product) {
+					models.Product.findById(order.product, 'quantity amountSold cycle', function(e, product) {
 						if (!e) {
 							// make sure we are changing an order for the current cycle and a current product
 							if ( order.cycle === product.cycle && product.cycle === scheduler.currentCycle) {
 								if ( product.quantity >= (product.amountSold - oldQuantity + newQuantity) ) {
 									product.amountSold = product.amountSold - oldQuantity + newQuantity;
+									order.quantity = newQuantity;
 									product.save(function(err) {
 										if (err) log.info(err);
 										else order.save(function(err) {
@@ -702,11 +712,11 @@ exports.configAPI = function configAPI(app) {
 								}
 								
 								else {
-									res.send("Sorry! Insufficient inventory to add more than " + product.quantity + " to your cart" );
+									res.status(403).send("Sorry! Insufficient inventory to add more than " + (product.quantity - product.amountSold) + " to your cart" );
 								}
 							}
 							else {
-								res.send("Sorry! That product cannot be changed at this time. Contact technical support for assistance");
+								res.status(403).send("Sorry! That product cannot be changed at this time. Contact technical support for assistance");
 							}
 						}
 						else {
@@ -779,7 +789,6 @@ exports.configAPI = function configAPI(app) {
 										var error = new Error('you can\'t buy that many. Insufficient quantity available.');
 										callback(error);
 									});
-									
 								}
 							}
 							else callback(e);
@@ -892,12 +901,11 @@ exports.configAPI = function configAPI(app) {
 			email.send(function(err, result) {
 				if (err) {
 					log.info(err);
-					res.status(500).send("form failed to be sent to standards commitee. Reason: " + err);
 				}
-				else res.status(200).send(result);
 			});
+			res.status(200).end();
 		}
-		else if (req.user.user_type.canSell) res.status(403).end();
+		else if (req.user.user_type.canSell) res.status(403).send('You are already approved to sell through the food co-op');
 		else res.status(401).end();
 	});
 	
@@ -924,7 +932,18 @@ exports.configAPI = function configAPI(app) {
 			}
 		});
 	});
-
+	
+	
+	//Get list of producer users for directory
+	app.get('/api/user/producer-list', function(req, res, next) {
+		models.User.find({'user_type.name' : 'Producer'}).select('producerData.logo producerData.companyName name address addressPermission dateJoined')
+		.exec(function(err, producers){
+			if (err) next(err);
+			else {
+				res.send(producers);
+			}
+		})
+	});
 	// This registers a new user and if no error occurs the user is logged in 
 	// A new email is sent to them as well.
 	app.post("/api/user", function(req, res, next) {
@@ -938,9 +957,11 @@ exports.configAPI = function configAPI(app) {
 						if (data.status === "OK") {
 							lat = data.results[0].geometry.location.lat;
 							lng = data.results[0].geometry.location.lng;
+							log.info('geocoded address successfully for %s', req.body.name);
 							done(null, lat, lng);
 						} else {
-							done(data.status);
+							log.info(data.status);
+							done(data.status, null);
 						}
 					
 					});
@@ -962,9 +983,10 @@ exports.configAPI = function configAPI(app) {
 				req.body.password,
 				function(e, account) {
 					if (!e) {
-						done(e, account);
+						log.info('added new user to database');
+						done(null, account);
 					} else {
-						done(e);
+						done(e, null);
 					}
 				});
 			},
@@ -981,7 +1003,7 @@ exports.configAPI = function configAPI(app) {
 					datePlaced: Date.today(),
 					invoicee: user._id,
 					title: 'Membership',
-					items: [{name:itemName, cost:req.body.cost}],
+					items: [{name:itemName, cost:cost}],
 					dueDate: Date.today().addDays(30)
 				});
 					
@@ -1009,28 +1031,42 @@ exports.configAPI = function configAPI(app) {
 
 				memberEmail.send(function(err, result) {
 					if (err) {
-						done(err, null);
+						log.warn(err);
 					}
-					// a response is sent so the client request doesn't timeout and get an error.
 					log.info("Message sent to new member");
-					
-					done(null, user);
 				});
+				done(null, user);
 			}
 			],
 			function(err, user){
 				var userObject;
 				if (user) {
+					var params = {
+						id: 'e481a3338d',
+						email: {email: user.email},
+						merge_vars : {
+							FNAME : user.name.substr(0, user.name.indexOf(" ")),
+							LNAME : user.name.substr(user.name.indexOf(" ")+1),
+							USER_TYPE : user.user_type.name,
+							ADDRESS : user.address,
+							PHONE : user.phone
+						}
+					};
+					//subscribe user to mailChimp
+					mc.lists.subscribe(params, function(result) {log.info(result);}, function(err) {
+						log.info(err);
+					});
+					
 					// save the invoice made for the user;
 					invoice.save(function(err) {
-						if (err) return errorHandler(err);
+						if (err) log.info(err);
 						log.info('Invoice saved');
 					});
 					// authenticate the newly created user
 					passport.authenticate('local', function(err, user, info){
 						if (!user) {
 							log.info(err);
-							res.status(500).send(err);
+							return next(err);
 						}
 						else {
 							req.logIn(user, function(err){
@@ -1046,7 +1082,7 @@ exports.configAPI = function configAPI(app) {
 				}
 				else {
 					log.info(err);
-					res.status(500).send(err);
+					next(err);
 				}
 			}
 		);
@@ -1162,25 +1198,32 @@ exports.configAPI = function configAPI(app) {
 
 	// returns a user by name. This call is designed to return only a producer.
 	app.get("/api/user/producer/:producerName", function(req, res, next) {
-		var nameParam;
+		var nameParam, companyQuery;
 		if (req.params.producerName) {
 			nameParam = req.params.producerName.split("+");
 			nameParam = nameParam.join(' ');
 		}
+		if (req.query.company) {
+			companyQuery = req.query.company.split("+");
+			companyQuery = companyQuery.join(" ");
+		}
 		
 		models.User.findOne({
-			name: nameParam
-		}, null, {
-			sort: {
-				_id: 1
+			name: nameParam,
+			'producerData.companyName' : companyQuery
+		})
+		.sort({_id: 1}).select('producerData name phone email address addressPermission user_type.name')
+		.exec(function(e, producer) {
+			if (producer) {
+				log.info(producer);
+				if (!e && producer.user_type.name === 'Producer') {
+					res.send(producer);
+				} else if (producer.user_type.name !== 'Producer') {
+					res.status(400).send(producer.name + " is not a producer");
+				}
 			}
-		}, function(e, results) {
-			if (!e && results.user_type.name === 'Producer') {
-				res.send(results);
-			} else if (results.user_type.name !== 'Producer') {
-				res.status(400).send(results.name + " is not a producer");
-			} else {
-				log.info(e);
+			else {
+				next(e);
 			}
 		});
 	});
@@ -1194,7 +1237,7 @@ exports.configAPI = function configAPI(app) {
 				addressPermission: req.body.addressPermission
 			}, function(err, user) {
 				
-				if (err) return handleError(err);
+				if (err) next(err);
 
 				else {
 					log.info('%s successfully updated', user.name);
@@ -1217,11 +1260,12 @@ exports.configAPI = function configAPI(app) {
 				// look up the user and their membership invoice
 				function(done) {
 					models.User.findById(req.params.id, function(e, user) {
-						if (e) handleError(e);
+						if (e) done(e);
+						log.info('preparing to delete user %s', user.name);
 						if (user) {
 							models.Invoice.findOne({ invoicee: new ObjectId(user._id), title: 'Membership'}, function(e, invoice){
-								if (e) return handleError(e);
-								done(e, user, invoice);
+								if (e) done(e);
+								done(null, user, invoice);
 							});
 						}
 					});
@@ -1229,6 +1273,7 @@ exports.configAPI = function configAPI(app) {
 				
 				// next send an email to the admin saying this user is being deleted
 				function(user, invoice, done) {
+					log.info('preparing to send email to admin');
 					toAdminOptions = {
 						template: 'member-leaving',
 						subject: user.name + ' wants to leave the NNFC',
@@ -1241,16 +1286,17 @@ exports.configAPI = function configAPI(app) {
 					
 					toAdmin.send(function(err, result){
 						if (err) {
-							return log.info(err);
+							log.info(err);
 						}
 						// a response is sent so the client request doesn't timeout and get an error.
-						log.info("Message sent to user about leaving the NNFC");
-						done(null, user, invoice);
+						log.info("Message sent to admin about %s leaving the NNFC", user.name);
 					});
+					done(null, user, invoice);
 				},
 				
 				// next we send an email notifying the user they will be re-imbursed for their membership fee
 				function(user, invoice, done) {
+					log.info('preparing to send email to user');
 					if (invoice) {
 						toUserOptions = {
 							template: "goodbye",
@@ -1261,7 +1307,6 @@ exports.configAPI = function configAPI(app) {
 							}
 						};
 						
-						
 						toUserData = {name: user.name, code: invoice._id, items: invoice.items, cost: invoice.total};
 						
 						toUser = new Emailer(toUserOptions, toUserData);
@@ -1270,9 +1315,10 @@ exports.configAPI = function configAPI(app) {
 								return log.info(err);
 							}
 							// a response is sent so the client request doesn't timeout and get an error.
-							log.info("Message sent to user about leaving the NNFC");
-							done(null, user, invoice);
+							log.info("Message sent to %s about leaving the NNFC", user.name);
+							
 						});
+						done(null, user, invoice);
 					}
 					else {
 						//invoice not found
@@ -1282,6 +1328,7 @@ exports.configAPI = function configAPI(app) {
 				// make changes to the membership invoice
 				function(user, invoice, done) {
 					if (invoice) {
+						log.info('cancelling %s membership invoice', user.name);
 						
 						invoice.exInvoicee = 'ex-member ' + user.name;
 						invoice.save();
@@ -1299,21 +1346,29 @@ exports.configAPI = function configAPI(app) {
 							break;
 						default:
 						}
-						
 						done(null, user);
 					}
 					else done(null, user);
-				}, function(user, done) { // add the user to mailing lists
+				}, function(user, done) { // remove the user from mailing lists
+					log.info('attempting to remove %s from mailchimp list', user.name);
 					var params = {
 						id: 'e481a3338d',
 						email: {email: user.email},
 					};
-					mc.lists.unsubscribe(params, function(data) {log.info(data); done(null, user);}, done(e));
-				}, function (user, done) {
+					mc.lists.unsubscribe(params, function(data) {log.info({result: data});}, function(error) {
+						log.info(error);
+					});
+					done(null, user, params);
+					
+				}, function (user, params, done) {
 					if (user.user_type.name === 'Producer') {
-						// add user to producer list as well;
+						log.info('attempting to remove user from producer mailchimp list');
+						// remove the user from producer list as well;
 						params.id = 'f379285252';
-						mc.lists.unsubscribe(params, function(data) {log.info(data); done(null, user);}, done(e));
+						mc.lists.unsubscribe(params, function(data) {log.info({result: data});}, function(error) {
+							log.info(error);
+						});
+						done(null, user);
 					}
 					else {
 						done(null, user);
@@ -1323,24 +1378,24 @@ exports.configAPI = function configAPI(app) {
 				function(user, done) {
 					//remove an account's cart first
 					models.Order.remove({customer: user._id}, function(e) {
-						if (e) return handleError(e);
+						if (e) done(e);
 					});
 					// then remove an account's products 
 					models.Product.remove({producer_ID: user._id}, function(e) {
-						if (e) return handleError(e);
+						if (e) done(e);
 					});
 					// finally remove the user itself
 					models.User.remove({_id: user.id}, function(e) {
-						if (e) return handleError(e);
+						if (e) done(e);
 					});	
 					log.info('The user and their products and orders are deleted');
-					done(null, 'done');
+					done(null);
 				}
 				
 				], 
 				// if the email sent successfully, delete the user's data
 				function(e, result) {
-					if (!e && result === 'done') {
+					if (!e) {
 						res.status(200).end();
 					}
 					else {
@@ -1580,12 +1635,17 @@ exports.configAPI = function configAPI(app) {
 		delete calendar[1].cycleIncrementDay;
 		delete calendar[2].cycleIncrementDay;
 		res.send(calendar);
-		log.info({res: res}, 'sending calendar');
+		log.info({res: res, permissions: {
+			canUpload: scheduler.canUpload,
+			canShop: scheduler.canShop,
+			canChange: scheduler.canChange
+			}}
+		, 'sending calendar');
 	});
 	
 	// ensure redirects work with tidy and hashBangless URL's
 	app.get("*", function(req, res, next){
-		log.info({req: req}, 'attempting to send main app/index.html file');
+		//log.info({req: req}, 'attempting to send main app/index.html file');
 		res.sendFile(path.normalize(path.join(__dirname, '../app/index.html')));
 	});
 	

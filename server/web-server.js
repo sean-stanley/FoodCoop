@@ -16,6 +16,7 @@ var util = require('util'),
 	mcapi = require('mailchimp-api'),
     config = require('./config').Config;
 	
+http.globalAgent.maxSockets = 50000;
 	
 var log = bunyan.createLogger({
 	name: 'API', 
@@ -78,6 +79,6 @@ app.listen(server_port, server_ip_address, function() {
 });*/
 
 app.listen(server_port, server_ip_address, function() {
-	console.log("Listening on " + server_ip_address + ", " + server_port);
+	log.info("Listening on " + server_ip_address + ", " + server_port);
 });
 

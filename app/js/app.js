@@ -27,7 +27,7 @@ angular.module('co-op', [
 		.when('/signup', {templateUrl: 'partials/signup.html', controller: 'userCtrl', reloadOnSearch: false, title: 'Signup',
 		description: 'Signup to be a member of the NNFC. Northland\'s first food co-op.'
 		})
-		.when('/welcome', {templateUrl: 'partials/thankyou.html', loggedInOnly: true, reloadOnSearch: false, title: 'Welcome New Member'})
+		.when('/welcome', {templateUrl: 'partials/welcome.html', loggedInOnly: true, reloadOnSearch: false, title: 'Welcome New Member'})
 		.when('/apply', {
 			templateUrl: 'partials/producer-application.html', 
 			controller: 'producerApplicationCtrl', 
@@ -43,8 +43,8 @@ angular.module('co-op', [
 		.when('/terms-cons', {templateUrl: 'partials/legal/terms-cons.html', reloadOnSearch: false, title: 'Terms and Conditions'})
 		.when('/priv-pol', {templateUrl: 'partials/legal/priv-pol.html', reloadOnSearch: false, title: 'Privacy Policy'})
 		.when('/policy', {templateUrl: 'partials/legal/policy.html', reloadOnSearch: false, title: 'Policy Handbook'})
-		.when('/users-rights', {
-			templateUrl: 'partials/admin/users-rights.html', 
+		.when('/admin', {
+			templateUrl: 'partials/admin/admin.html', 
 			controller: 'userAdminCtrl', 
 			adminOnly: true, reloadOnSearch: false, title: 'Admin',
 			resolve: {
@@ -94,7 +94,7 @@ angular.module('co-op', [
 			description: 'Members of the northland natural food co-op have a profile about their practices and operation. Contact details for the producer is also found here.',
 	 		resolve: {
 	 			producer: function(Restangular, $route){
-					return Restangular.one('api/user/producer', $route.current.params.userName).get();
+					return Restangular.one('api/user/producer', $route.current.params.userName).get({company : $route.current.params.companyName});
 	 			}
 	 		}
 	 	})

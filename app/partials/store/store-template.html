@@ -94,8 +94,8 @@
 			<section class="details-layer"  ng-class="{ 'details-layer-visible' : detailsVisible}" ng-mouseleave="detailsVisible = false" ng-swipe-right="showHideDetails(false)" ng-swipe-left="open(product)">
 				
 				<article class="details">
-					<a href="" class="panel-btn panel-btn-lg" ng-click="detailsVisible = false">&times;</a>
-					<h4><a ng-href="/producer/{{product.producer_ID.producerData.companyName | forURL}}-{{product.producer_ID.name | forURL}}">
+					<a href="" class="panel-btn-lg pull-left hidden-lg details-close-button" ng-click="detailsVisible = false">&times; </a>
+					<h4> <a ng-href="/producer/{{product.producer_ID.producerData.companyName | forURL}}-{{product.producer_ID.name | forURL}}">
 					<span class="glyphicon glyphicon-user"></span> 
 					 {{product.producer_ID.producerData.companyName || product.producer_ID.name}}</a></h4>
 					<h3>{{product.fullName}}</h3>

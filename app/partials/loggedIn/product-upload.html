@@ -1,10 +1,14 @@
 <link rel="stylesheet" href="lib/bower_components/angular-cropme/cropme.css">
-<div class="page-header">
+
+<div class="page-header col-xs-12">
 	<h1 class="text-center">Product Upload <!--<i class="fa fa-question-circle pull-right" ng-click="showHelp = !showHelp" ng-init="showHelp = false"></i>--></h1>
+	<span class="pull-left">
+		<h4><a href="/product-manager"><span class="glyphicon glyphicon-book"></span> To Product Manager</a></h4>
+	</span>
 </div>
 
-<div class="col-md-12">
-	<div id="product-upload-preview-column" class="col-sm-4" >
+<div class="col-xs-12">
+	<div id="product-upload-preview-column" class="col-sm-5 col-md-4" >
 		<section ng-show="productData.category">
 			<h2>Preview <small>Live</small></h2>
 			<div class="product-container center-block" ng-controller="productUICtrl" ng-mouseleave="detailsVisible = false" 
@@ -29,7 +33,7 @@
 				</figure>
 				<section class="details-layer" ng-class="{ 'details-layer-visible' : detailsVisible}" ng-mouseleave="detailsVisible = false" ng-swipe-left="preview(productData)">
 					<article class="details">
-						<a href="" class="panel-btn panel-btn-lg" ng-click="detailsVisible = false">&times;</a>
+						<a href="" class="panel-btn-lg pull-left hidden-lg details-close-button" ng-click="detailsVisible = false">&times; </a>
 						<h4><a ng-href="/producer/{{currentUser.producerData.companyName | forURL}}-{{currentUser.name | forURL}}">
 						<span class="glyphicon glyphicon-user"></span>
 						 {{currentUser.producerData.companyName || currentUser.name}}</a></h4>
@@ -51,9 +55,11 @@
 								Details
 							</button>
 
-							<button class="btn btn-primary" disabled>
+							<!--
+<button class="btn btn-primary" disabled>
 								Add to Cart
 							</button>
+-->
 						</div>
 					</article>
 				</section>
@@ -108,7 +114,7 @@
 		</div>
 	</div>
 
-	<div id="product-upload-form-container" class="col-sm-8" >
+	<div id="product-upload-form-container" class="col-sm-7 col-md-8" >
 		<form name="productUpload" autocomplete="off" ng-submit="submitForm();" novalidate> <!-- add ng-submit="submitForm();" -->
 			<fieldset>
 					<div class="row">

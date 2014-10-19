@@ -15,7 +15,7 @@
 		<th><a href="" ng-click="predicate = '_id'; reverse=!reverse" tooltip-placement="right" tooltip="Remove Items">&times;</a></th>
 		<th><a href="" ng-click="predicate = 'productName'; reverse=!reverse ">Product</a></th>
 		<th><a href="" ng-click="predicate = 'price'; reverse=!reverse ">Price</a></th>
-		<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Inventory</a></th>
+		<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Quantity</a></th>
 		<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Ordered Amount</a></th>
 	</tr>
 </thead>
@@ -83,7 +83,6 @@
 			        <td data-title="'Product'" >
 			            <a ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a>
 			        </td>
-	       
 			        <td data-title="'Price'">
 			            {{i.price | currency}} / {{i.units}}
 			        </td>
@@ -100,7 +99,7 @@
 	<h2>Unfulfilled Orders <small>Total: {{orderTotal(currentOrders) | currency}}</small></h2>
 	<table class="table">
 		<thead ng-repeat-start="order in sortedOrders">
-			<tr><th colspan="4"><a ng-href="/contact/{{order._id._id}}">{{order._id.name}} <small>email customer</small></a></th></tr>
+			<tr><th colspan="4"><a ng-href="/contact/{{order._id._id}}">{{order._id.name}} <i class="fa fa-envelope"></i></a></th></tr>
 			<tr><th>Product</th><th>Quantity</th><th>Unit Price</th><th>Price</th></tr>
 		</thead>
 		<tbody ng-repeat-end>

@@ -31,7 +31,7 @@ angular.module('co-op.filters', []).
 		  var URLready;
 		  if (forURL) {
 			  forURL.toString();
-			  URLready = forURL.replace(/[ ]/g, "+");
+			  URLready = forURL.replace(/\s/g, "+");
 			  return URLready;
 		  }
 	  };

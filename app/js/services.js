@@ -58,10 +58,12 @@ angular.module('co-op.services', [])
 	 function ($location, $rootScope, $q, Session, Restangular, flash){
 		$rootScope.failedAttempts = 0;
 		
-		function getTally() {
+		function getTally(callback) {
+			var done = callback || angular.noop;
 			Restangular.one('api/cart', $rootScope.currentUser._id)
 			.customGET('length').then(function(count) {
 				$rootScope.cartTally = count;
+				done();
 			});
 		}
 		
@@ -73,11 +75,13 @@ angular.module('co-op.services', [])
 		function authenticate(user) {
 			$rootScope.currentUser = user;
 			$rootScope.currentUser.route = 'api/user/' + $rootScope.currentUser._id;
-			getTally();
-			return true;
+			getTally(function() {return true;});
 		}
 		
 		return {
+			getTally : function() {
+				getTally();
+			},
 			login : function(provider, form, callback) {
 				var cb = callback || angular.noop;
 				if ($rootScope.failedAttempts <= 10) {
@@ -159,9 +163,9 @@ angular.module('co-op.services', [])
 			},
 			
 			logout : function() {
+				$location.path('/home');
 				Session.remove();
 				delete $rootScope.currentUser;
-				$location.path('/home');
 			}
 		};
 	}])
@@ -192,8 +196,8 @@ angular.module('co-op.services', [])
 			},
 			delCurrentUser: function(callback) {
 				var cb = callback || angular.noop;
-				$rootScope.currentUser.customDELETE($rootScope.currentUser._id).then(function() {
-					callback();
+				$rootScope.currentUser.remove().then(function() {
+					cb();
 				});
 			},
 			
@@ -391,7 +395,6 @@ angular.module('co-op.services', [])
 	function($rootScope, Restangular, LoginManager, Calendar, flash){
 				
 		return {
-			
 			getAllItems : function(callback) {
 				LoginManager.isLoggedIn().then(function() {
 					Restangular.one('api/cart', $rootScope.currentUser._id)
@@ -401,18 +404,17 @@ angular.module('co-op.services', [])
 			// optional @callback function will have @list which holds the cart items of
 			// the current month
 			getCurrentCart : function(callback) {
-				var currentCart;
+				var currentCart, cb = callback || angular.noop;
 				
 				LoginManager.isLoggedIn().then(function() {
 					Restangular.one('api/cart', $rootScope.currentUser._id)
-					.get({cycle: $rootScope.cycle}).then(function(cart) {
-						return currentCart;
-					});
+					.get({cycle: $rootScope.cycle}).then(callback);
 				});
 			},
 			addToCart : function(order, callback) {
 				Restangular.all("api/order").post(order).then(function(result){
 					flash.setMessage({type: 'success', message: 'Poof! Successfully added to order'});
+					LoginManager.getTally();
 					callback(result);
 				}, function(error){
 					console.log(error);
@@ -477,7 +479,7 @@ angular.module('co-op.services', [])
 		var module = {
 						
 			getData : function(callback) {
-	            $http.get("/api/user?user_type.name=Producer").success(callback);
+	            $http.get("/api/user/producer-list").success(callback);
 	        },
 			
 		};
