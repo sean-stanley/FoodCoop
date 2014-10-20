@@ -14,9 +14,11 @@
 	        Sort By <span class="caret"></span>
 	      </button>
 	      <ul class="dropdown-menu" role="menu">
-			<li><a ng-click="predicate= 'dateJoined'; reverse=!reverse">Date Joined</a></li>
-			<li><a ng-click="predicate= 'producerData.companyName'; reverse=!reverse">Company Name</a></li>
-			<li><a ng-click="predicate= 'name'; reverse=!reverse">Producer Name</a></li>
+			<li><a ng-click="predicate= 'dateJoined'">Date Joined</a></li>
+			<li><a ng-click="predicate= 'producerData.companyName'">Company Name</a></li>
+			<li><a ng-click="predicate= 'name'">Producer Name</a></li>
+			<li class="divider"></li>
+			<li><a ng-click="reverse=!reverse">Reverse Order</a></li>
 	      </ul>
 	    </div>
 

@@ -467,6 +467,11 @@ angular.module('co-op.controllers', [])
 			return data.producer_ID.producerData.companyName || data.producer_ID.name;
 		}
 		
+		if (typeof $scope.data.ingredients === 'string') {
+			console.log('converting string to array');
+			$scope.data.ingredients = $scope.data.ingredients.split(/,\s*/);
+		}
+		
 		if (data.hasOwnProperty('fullName') ) $location.hash(data.fullName + "+" + producer()+ "&id=" + data._id);
 		
 		$scope.addToCart = function(product) {
@@ -622,6 +627,11 @@ function($scope, $modalInstance, data, ProductManager) {
 	
 	if ($scope.data.hasOwnProperty('certification')) {
 		$scope.data.certification = ProductManager.certificationByID($scope.data.certification);
+	}
+	
+	if (typeof $scope.data.ingredients === 'string' && $scope.data.ingredients.length > 0) {
+		console.log('converting string to array');
+		$scope.data.ingredients = $scope.data.ingredients.split(/,\s*/);
 	}
 	
 	$scope.cancel = function() {

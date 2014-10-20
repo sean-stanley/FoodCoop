@@ -44,7 +44,7 @@
 		<article ta-bind ng-model="data.description"></article>
 		
 		<p ng-if="data.ingredients"><strong>Ingredients:</strong>
-		<span ng-repeat="item in data.ingredients"><a ng-href="/store?search={{item}}">{{item}} </a> </span></p>
+		<span ng-repeat="item in data.ingredients track by $index"><a ng-href="/store?search={{item}}">{{item}} </a> </span></p>
 		<p ng-if="data.certification.name !== 'none'"><strong>Certification:</strong> {{data.certification.name}}</p>
 		<p><strong>Produced By:</strong> {{data.producer_ID.producerData.companyName || currentUser.producerData.companyName || currentUser.name || 'no data found'}}<br></p>
 		<h3><strong>Quantity left:</strong> {{data.quantity - data.amountSold}}</h3>
