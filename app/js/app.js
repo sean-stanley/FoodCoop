@@ -103,6 +103,7 @@ angular.module('co-op', [
 		.when('/delivery', {
 			templateUrl: 'partials/delivery.html',
 			controller: 'deliveryCtrl',
+			reloadOnSearch: false,
 			title : 'Delivery',
 			description: 'Have your orders delivered to your community for more local pickup.',
 			resolve: {

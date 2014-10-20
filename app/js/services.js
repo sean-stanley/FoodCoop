@@ -95,7 +95,7 @@ angular.module('co-op.services', [])
 						authenticate(user);
 						$location.path($rootScope.savedLocation);
 						$rootScope.savedLocation = "";
-						flash.setNextMessage({type: 'success', message: 'Welcome back ' + $rootScope.currentUser.name + '. Check out the member tools sidebar!'});
+						flash.setNextMessage({type: 'success', message: 'Welcome back ' + $rootScope.currentUser.name + '. Please click on \'member tools\' on the left side of the top tool bar to get started.\n Mobile and tablet users tap the top left grey arrow.'});
 					}, function(error) {
 						// incorrect login attempt
 						var remainingAttempts;
