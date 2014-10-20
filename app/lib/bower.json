@@ -14,19 +14,11 @@
   "license": "MIT",
   "dependencies": {
     "momentjs": "~2.4.0",
-    "angular": "~1.2.26",
-    "angular-animate": "~1.2.26",
     "angular-bootstrap": "latest",
     "angular-cropme": "latest",
     "angular-loading-bar": "latest",
-    "angular-route": "~1.2.26",
-    "angular-sanitize": "~1.2.26",
     "angular-superswipe": "latest",
-    "angular-touch": "~1.2.26",
-    "datejs": "~1.0.0-rc1",
-    "lodash": "latest",
-    "restangular": "~1.4.0",
-    "textAngular": "~1.2.2"
+    "datejs": "~1.0.0-rc1"
   },
   "moduleType": [
     "globals",

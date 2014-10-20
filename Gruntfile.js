@@ -194,7 +194,7 @@ module.exports = function(grunt) {
                 },
                 files: {
                   'build/app/js/foodcoop.min.js': ['app/js/app.annotated.js', 
-                                                   'app/js/services.js', 
+                                                   'app/js/services.annotated.js', 
                                                    'app/js/controllers.annotated.js', 
                                                    'app/js/filters.annotated.js', 
                                                    'app/js/directives.annotated.js']
