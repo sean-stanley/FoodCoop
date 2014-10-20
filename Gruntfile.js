@@ -147,8 +147,16 @@ module.exports = function(grunt) {
                         dest: "Deploy/foodcoop.org.nz",
                         syncDest: true,
                         args: "-z",
-                        host: config.deploy.username + '@' + config.deploy.server,
-                        exclude: ["Bones-Data"]
+                        host: config.deploy.username + '@' + config.deploy.server
+                    }
+                },
+                linodeOpt: {
+                    options: {
+                        src: ["build/"],
+                        dest: "Deploy/foodcoop.org.nz",
+                        syncDest: true,
+                        args: "-z",
+                        host: config.deploy.username + '@' + config.deploy.server
                     }
                 },
                 copy_build: {
@@ -238,7 +246,8 @@ module.exports = function(grunt) {
     grunt.registerTask('build', ['concurrent:build', 'replace', 'clean:annotations', 'ngAnnotate', 'uglify']);
     grunt.registerTask('serve-opt', ['build', 'nodemon:opt']);
     grunt.registerTask('debug', ['concurrent:debug']);
-    grunt.registerTask('deploy', ['rsync:linode', 'shell:updateServer']);
+    grunt.registerTask('deploy-debug', ['rsync:linode', 'shell:updateServer']);
+    grunt.registerTask('deploy', ['build', 'rsync:linodeOpt', 'shell:updateServer']);
     grunt.registerTask('decrypt-config', ['shell:decryptConfig']);
     grunt.registerTask('encrypt-config', ['shell:encryptConfig']);
 };
