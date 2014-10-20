@@ -159,13 +159,37 @@ module.exports = function(grunt) {
                 },
                 
             },
+            clean: {
+              annotations: {
+                src: ['app/js/*.annotated.js']
+              }
+            },
+            ngAnnotate: {
+                options: {
+                    singleQuotes: true,
+                },
+                app: {
+                    files: [
+                        {
+                            expand: true,
+                            src: ['app/js/*.js'],
+                            ext: '.annotated.js', // Dest filepaths will have this extension.
+                            extDot: 'last'        // Extensions in filenames begin after the last dot
+                        },
+                    ],
+                }
+            },
             uglify: {
               app: {
                 options: {
                   sourceMap: 'build/app/js/foodcoop-map.js'
                 },
                 files: {
-                  'build/app/js/foodcoop.min.js': ['app/js/*.js']
+                  'build/app/js/foodcoop.min.js': ['app/js/app.annotated.js', 
+                                                   'app/js/services.js', 
+                                                   'app/js/controllers.annotated.js', 
+                                                   'app/js/filters.annotated.js', 
+                                                   'app/js/directives.annotated.js']
                 }
               }
             },
@@ -206,10 +230,12 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-rsync');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-replace');
+    grunt.loadNpmTasks('grunt-ng-annotate');
+    grunt.loadNpmTasks('grunt-contrib-clean');
     
     // Default task(s).
     grunt.registerTask('dev', ['concurrent:dev']);
-    grunt.registerTask('build', ['concurrent:build', 'replace']);
+    grunt.registerTask('build', ['concurrent:build', 'replace', 'clean:annotations', 'ngAnnotate', 'uglify']);
     grunt.registerTask('serve-opt', ['build', 'nodemon:opt']);
     grunt.registerTask('debug', ['concurrent:debug']);
     grunt.registerTask('deploy', ['rsync:linode', 'shell:updateServer']);
