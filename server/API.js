@@ -879,7 +879,8 @@ exports.configAPI = function configAPI(app) {
 	//Forward producer application to standards committee.
 	app.post("/api/producer-applicaiton", function(req, res, next) {
 		var application, mailData, mailOptions, email;
-		if (req.user && !req.user.user_type.canSell) {
+		//if (req.user && !req.user.user_type.canSell) {
+		if (req.user) {
 			application = req.body;
 			mailOptions = {template: 'producer-application-form', subject: 'Application form for member '+ req.user.name, to: {name: 'Standards Committee', email: config.standardsEmail}};
 			mailData = {
@@ -905,7 +906,7 @@ exports.configAPI = function configAPI(app) {
 			});
 			res.status(200).end();
 		}
-		else if (req.user.user_type.canSell) res.status(403).send('You are already approved to sell through the food co-op');
+		//else if (req.user.user_type.canSell) res.status(403).send('You are already approved to sell through the food co-op');
 		else res.status(401).end();
 	});
 	
@@ -969,7 +970,8 @@ exports.configAPI = function configAPI(app) {
 				else done(null, 0, 0);
 			}, function(lat, lng, done) {
 				// disable unapproved producers from uploading immediately.
-				if (req.body.user_type.canSell) req.body.user_type.canSell = false;
+				//if (req.body.user_type.canSell) req.body.user_type.canSell = false;
+				if (req.body.user_type.name === 'Producer') req.body.user_type.canSell = true;
 				models.User.register(new models.User({
 					dateJoined: Date.today(),
 					name: req.body.name,
@@ -1215,7 +1217,7 @@ exports.configAPI = function configAPI(app) {
 		.sort({_id: 1}).select('producerData name phone email address addressPermission user_type.name')
 		.exec(function(e, producer) {
 			if (producer) {
-				log.info(producer);
+				log.info('%s of %s\'s page is being requested.', producer.name, producer.producerData.companyName);
 				if (!e && producer.user_type.name === 'Producer') {
 					res.send(producer);
 				} else if (producer.user_type.name !== 'Producer') {
