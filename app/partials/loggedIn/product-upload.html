@@ -27,7 +27,7 @@
 							tooltip-trigger="click"><i class="fa fa-chevron-circle-left"> swipe</i></span>
 						</div>
 						<h5>{{productData.variety}} {{productData.productName}}</h5>
-						<p>{{1.2 * productData.price|currency}} / {{productData.units}}</p>
+						<p>{{productData.priceWithMarkup|currency}} / {{productData.units}}</p>
 						
 					</figcaption>
 				</figure>
@@ -39,7 +39,7 @@
 						 {{currentUser.producerData.companyName || currentUser.name}}</a></h4>
 						
 						<h3>{{productData.variety}} {{productData.productName}}</h3>
-						<p>{{1.2 * productData.price|currency}} / {{productData.units}}</p>
+						<p>{{productData.priceWithMarkup|currency}} / {{productData.units}}</p>
 						<hr>
 						<p> Category: {{productManager.categoryByID(productData.category).name}} 
 						<span ng-if="product.certification !== 'none' ">

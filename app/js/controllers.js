@@ -490,7 +490,7 @@ angular.module('co-op.controllers', [])
 		if (!$rootScope.canUpload && !$rootScope.canChange) {
 			flash.setMessage({type: 'warning', message: 'Uploading is not allowed yet sorry. Please check the calendar for when uploading is open next.'});
 		}
-		else if ($rootScope.canChange) {
+		else if ($rootScope.canChange && !$rootScope.canUpload) {
 			flash.setMessage({type: 'warning', message: 'Uploading new products is not allowed right now. This month\'s products can have some properties edited though. Editable properties are enabled.'});
 		}
 		
@@ -499,6 +499,12 @@ angular.module('co-op.controllers', [])
 		$scope.selectedImg = $scope.productData.img || null;
 		$scope.productManager = ProductManager;
 		$scope.ingredients = false;
+		$scope.productData.priceWithMarkup = $scope.productData.price * 1.2;
+		
+		$scope.$watch('productData.price', function(newValue) {
+			$scope.productData.priceWithMarkup = newValue * 1.2;
+		});
+		
 		
 		// pass product to $scope.productData for editing in the main form
 /* No longer used
