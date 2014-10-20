@@ -321,14 +321,27 @@ angular.module('co-op.directives', [])
               fileName: '='
           },
           link: function(scope, element, attrs) {
-              var checkSize, isTypeValid, processDragOverOrEnter, validMimeTypes;
+              var checkSize, isTypeValid, processDragOverOrEnter, startDrag, validMimeTypes;
               processDragOverOrEnter = function(event) {
                   if (event !== null) {
                       event.preventDefault();
                   }
-                  event.originalEvent.dataTransfer.effectAllowed = 'copy';
-                  return false;
+                  event.dataTransfer.effectAllowed = 'copy';
+									return false;
+									
               };
+							startDrag = function(event) {
+                if (event !== null) {
+                    event.preventDefault();
+                }
+                event.dataTransfer.effectAllowed = 'copy';
+								var dt = event.dataTransfer;
+							  //dt.mozSetDataAt("image/jpg", dt.files[0], 0);
+								//dt.mozSetDataAt("application/x-moz-file", dt.files[0], 0);
+								//dt.setData("text/uri-list", dt.files[0]);
+								//dt.setData("text/plain", dt.files[0]);
+								return false;
+							};
               validMimeTypes = attrs.fileDropzone;
               checkSize = function(size) {
                   var _ref;
@@ -347,10 +360,10 @@ angular.module('co-op.directives', [])
                       return false;
                   }
               };
-              element.bind('dragover', processDragOverOrEnter);
-              element.bind('dragenter', processDragOverOrEnter);
+							element.bind('dragover', processDragOverOrEnter);
+              element.bind('dragenter', startDrag);
               return element.bind('drop', function(event) {
-                  var file, name, reader, size, type;
+									var file, name, reader, size, type;
                   if (event !== null) {
                       event.preventDefault();
                   }
@@ -366,7 +379,7 @@ angular.module('co-op.directives', [])
                           });
                       }
                   };
-                  file = event.originalEvent.dataTransfer.files[0];
+                  file = event.dataTransfer.files[0];
                   name = file.name;
                   type = file.type;
                   size = file.size;

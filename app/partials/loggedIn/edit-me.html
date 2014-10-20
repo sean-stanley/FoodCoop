@@ -103,13 +103,14 @@
 							<p class="text-muted" ng-if="currentUser.producerData.logo">Drop a new photo here</p>
 							<p class="text-muted" ng-if="!currentUser.producerData.logo">Drop a photo here</p>
 								<h1 class="text-muted"><span class="glyphicon glyphicon-cloud-upload"></span></h1>
-							<button type="button" class="btn btn-default btn-sm upload">
-								<span class="text-muted">Or click to upload</span>
+							<span class="btn btn-default btn-sm upload">
 								<input type="file" class="opacity" 
 								fileread="currentUser.producerData.logo" 
 								accept="image/*" 
 								data-max-file-size="3">
-							</button>
+								<span class="text-muted">Or click to upload</span>
+							</span>
+							
 						</div>
 						
 					</div>
@@ -166,7 +167,7 @@
 				</div>
 			</div>
 			<div class="form-group col-md-12">
-				<button type="submit" class="btn btn-primary" ng-disabled="producerEdit.$invalid || producerEdit.$pristine">Save Producer Info</button>
+				<button type="submit" class="btn btn-primary">Save Producer Info</button>
 			</div>
 		</fieldset>
 	</form>

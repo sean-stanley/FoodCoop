@@ -1,10 +1,10 @@
 @font-face {
 	font-family: Nevis;
 	src: 
-		url(/css/fonts/nevis.woff),
-		url(/css/fonts/nevis.ttf),
-		url(/css/fonts/nevis.svg)
-		url(/css/fonts/nevis.otf);
+		url(fonts/nevis.woff) format('woff'),
+		url(fonts/nevis.ttf) format('truetype'),
+		url(fonts/nevis.svg) format('svg'),
+		url(fonts/nevis.otf);
 }
 html {min-height:100%; position: relative;}
 
@@ -62,8 +62,10 @@ a:hover {
   display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
   display: -ms-flexbox;      /* TWEENER - IE 10 */
   display: -webkit-flex;     /* NEW - Chrome */
-  display: flex;  
-    align-items: center;
+  display: flex; 
+  -webkit-align-items: center;
+	-webkit-justify-items: center; 
+  align-items: center;
 	justify-items: center;}
 .img-content {width:100%; position: relative; margin-bottom: 0; }
 .jumbotron > h2 {font-size: 3em;}
