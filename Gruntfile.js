@@ -154,7 +154,7 @@ module.exports = function(grunt) {
                     options: {
                         src: ["build/"],
                         dest: "Deploy/foodcoop.org.nz",
-                        syncDest: true,
+                        syncDest: false,
                         args: "-z",
                         host: config.deploy.username + '@' + config.deploy.server
                     }
