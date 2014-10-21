@@ -2,5 +2,6 @@
 node_modules
 server/config.js
 *.annotated.js
+build
 
 

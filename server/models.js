@@ -217,10 +217,12 @@ var UserSchema = new Schema({
 });
 // delete the salt and hash from requests for the user objects
 if (!UserSchema.options.toObject) UserSchema.options.toObject = {};
+/*
 UserSchema.options.toObject.transform = function (doc, ret, options) {
 	delete ret.salt;
 	delete ret.hash;
-};
+};*/
+
 
 UserSchema.virtual('firstName').get(function() {
 	return this.name.substr(0, this.name.indexOf(' '));

@@ -117,10 +117,14 @@ angular.module('co-op.controllers', [])
 ])
 
 // Used by Forgot page for requesting a password reset for a user
-.controller('forgotCtrl', ['$scope', '$location', 'Restangular',
-	function($scope, $location, Restangular) {
+.controller('forgotCtrl', ['$scope', 'flash', 'Restangular',
+	function($scope, flash, Restangular) {
 		$scope.passwordReset = function() {
-			Restangular.all('api/forgot').post({email: $scope.email});
+			Restangular.all('api/forgot').post({email: $scope.email}).then(function(result) {
+				flash.setMessage({type:'success', message: result});
+			}, function(error) {
+				flash.setMessage({type:'danger', message: error.message || error.data || error});
+			});
 		};
 	}
 ])

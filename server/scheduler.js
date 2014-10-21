@@ -266,7 +266,6 @@ function invoiceFromProducer(producer) {
 							if (e) done(e);
 							else done(null, invoice);
 						});
-			
 		},
 		function(invoice, done) {
 			var mailOptions, mailData, mail;
@@ -346,7 +345,7 @@ function disableCycle() {
 
 findCycle();
 checkConfig();
-disableCycle();
+//disableCycle();
 
 // checkout everyone's purchases
 //checkout();

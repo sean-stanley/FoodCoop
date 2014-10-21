@@ -250,6 +250,7 @@ exports.configAPI = function configAPI(app) {
 				// If the body for a product contains an ID, it must already exist so we will
 				// update it. Only an admin or the user who
 				// created a product can update it. The original product is looked up by id.
+				// If the product's cycle equals the current cycle, edit an existing product
 				if (req.body._id && req.body.cycle === scheduler.currentCycle) {
 					models.Product.findById(req.body._id, function(err, product) { // first find the right product by it's ID
 						if (err) return next(err);
@@ -964,14 +965,13 @@ exports.configAPI = function configAPI(app) {
 							log.info(data.status);
 							done(data.status, null);
 						}
-					
 					});
 				}
 				else done(null, 0, 0);
 			}, function(lat, lng, done) {
 				// disable unapproved producers from uploading immediately.
-				//if (req.body.user_type.canSell) req.body.user_type.canSell = false;
-				if (req.body.user_type.name === 'Producer') req.body.user_type.canSell = true;
+				if (req.body.user_type.canSell) req.body.user_type.canSell = false;
+				// if (req.body.user_type.name === 'Producer') req.body.user_type.canSell = true;
 				models.User.register(new models.User({
 					dateJoined: Date.today(),
 					name: req.body.name,
@@ -1008,35 +1008,38 @@ exports.configAPI = function configAPI(app) {
 					items: [{name:itemName, cost:cost}],
 					dueDate: Date.today().addDays(30)
 				});
-					
-				memberEmailOptions = {
-					template: "new-member",
-					subject: 'Welcome to the NNFC online Store',
-					to: {
+				// save the invoice made for the user;
+				invoice.save(function(err, invoice) {
+					if (err) log.info(err);
+					log.info('Invoice saved');
+					memberEmailOptions = {
+						template: "new-member",
+						subject: 'Welcome to the NNFC online Store',
+						to: {
+							email: user.email,
+							name: user.name
+						}
+					};
+					//send an email invoice
+					memberEmailData = {
+						name: user.name,
+						dueDate: invoice.dueDate,
+						code: invoice._id,
+						items: invoice.items,
+						cost: invoice.total,
+						account: config.bankAccount,
 						email: user.email,
-						name: user.name
-					}
-				};
-				//send an email invoice
-				memberEmailData = {
-					name: user.name,
-					dueDate: invoice.dueDate,
-					code: invoice._id,
-					items: invoice.items,
-					cost: invoice.total,
-					account: config.bankAccount,
-					email: user.email,
-					password: req.body.password
-				};
-
-				memberEmail = new Emailer(memberEmailOptions, memberEmailData);
-
-				memberEmail.send(function(err, result) {
-					if (err) {
-						log.warn(err);
-					}
-					log.info("Message sent to new member");
+						password: req.body.password
+					};
+					memberEmail = new Emailer(memberEmailOptions, memberEmailData);
+					memberEmail.send(function(err, result) {
+						if (err) {
+							log.warn(err);
+						}
+						log.info("Message sent to new member %s", user.name);
+					});
 				});
+				
 				done(null, user);
 			}
 			],
@@ -1048,7 +1051,7 @@ exports.configAPI = function configAPI(app) {
 						email: {email: user.email},
 						merge_vars : {
 							FNAME : user.name.substr(0, user.name.indexOf(" ")),
-							LNAME : user.name.substr(user.name.indexOf(" ")+1),
+							LNAME : user.name.substr(user.name.indexOf(" ")+1) || '',
 							USER_TYPE : user.user_type.name,
 							ADDRESS : user.address,
 							PHONE : user.phone
@@ -1057,12 +1060,6 @@ exports.configAPI = function configAPI(app) {
 					//subscribe user to mailChimp
 					mc.lists.subscribe(params, function(result) {log.info(result);}, function(err) {
 						log.info(err);
-					});
-					
-					// save the invoice made for the user;
-					invoice.save(function(err) {
-						if (err) log.info(err);
-						log.info('Invoice saved');
 					});
 					// authenticate the newly created user
 					passport.authenticate('local', function(err, user, info){
@@ -1479,15 +1476,16 @@ exports.configAPI = function configAPI(app) {
 			function(token, done) {
 				models.User.findOne({ email: req.body.email }, function(err, user) {
 					if (!user) {
-						req.flash('error', 'No account with that email address exists.');
-						return res.redirect('#/forgot');
+						log.warn('failed to reset password for %s', req.body.email);
+						res.status(404).send('Error! No account with that email address exists.');
+					} else {
+						user.resetPasswordToken = token;
+						user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+						log.info('reset token expires in: ' + user.resetPasswordExpires);
+						user.save(function(err) {
+							done(err, token, user);
+						});
 					}
-					user.resetPasswordToken = token;
-					user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
-					log.info('expires in: ' + user.resetPasswordExpires);
-					user.save(function(err) {
-						done(err, token, user);
-					});
 				});
 			},
 			// send the user an email with a link to reset their password
@@ -1509,25 +1507,26 @@ exports.configAPI = function configAPI(app) {
 
 				resetEmail.send(function(err, result) {
 					if (err) {
-						return log.info(err);
+						log.info(err);
+					} else {
+						log.info("Message sent to user for resetting their password");
 					}
-					// a response is sent so the client request doesn't timeout and get an error.
-					req.flash('info', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
-					log.info("Message sent to user for resetting their password");
-					done(err, 'done');
+					
 				});
+				done(null, 'done');
 			}
 			], 
 			// if there was no error, redirect the user to the home page
 			function(err) {
 				if (err) return next(err);
-				res.redirect('/#/forgot');
+				res.send('Your password reset instructions have been emailed to you.');
 		});
 	});
 	
 	// Get a user to have their password reset
 	app.get('/api/reset/:token', function(req,res) {
-		models.User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+		models.User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } })
+		.select('email name resetPasswordToken').exec(function(err, user) {
 			if (user) {
 				res.json(user);
 			}
@@ -1542,19 +1541,25 @@ exports.configAPI = function configAPI(app) {
 		async.waterfall([
 			// find and save the user's new password as well as reseting their token values.
 			function(done) {
-				models.User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+				models.User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, '-producerData', function(err, user) {
 					if (!user) {
-						return res.status(403).send('Password reset token is invalid or has expired');
+						log.info('Password reset token is invalid or has expired');
+						res.status(403).send('Password reset token is invalid or has expired');
 					}
-					user.setPassword(req.body.password, function() {
-						user.set(resetPasswordToken, undefined);
-						user.set(resetPasswordExpires, undefined);
+					else {
+						
+						user.setPassword(req.body.password, function() {
+							log.info({user: user}, '%s is having their password changed', user.name);
+							user.set('resetPasswordToken', undefined);
+							user.set('resetPasswordExpires', undefined);
 
-						user.save(function(err) {
-							if (err) next(err);
-							done(err, user);
+							user.save(function(err) {
+								if (err) next(err);
+							});
+							done(null, user);
 						});
-					});
+					}
+					
 				});
 			},
 			// send an email to the user informing them of their password being changed.
@@ -1576,16 +1581,16 @@ exports.configAPI = function configAPI(app) {
 
 				changeEmail.send(function(err, result) {
 					if (err) {
-						return log.info(err);
+						return next(err);
 					}
 					// a response is sent so the client request doesn't timeout and get an error.
 					log.info("Message sent to user confirming password change");
-					req.logIn(user, function(err) {
-						user.toObject();
-						res.send(user);
-					});
-					done(err, 'done');
 				});
+				req.logIn(user, function(err) {
+					user.toObject();
+					res.send(user);
+				});
+				done(null, 'done changing password for user');
 			}
 			], function(err, results) {
 				if (err) next(err);
@@ -1602,7 +1607,7 @@ exports.configAPI = function configAPI(app) {
 			sort: {
 				_id: 1
 			}
-		}, function(e, results) {
+		}).lean().exec(function(e, results) {
 			if (e) next(e);
 			res.json(results);
 		});
@@ -1614,7 +1619,7 @@ exports.configAPI = function configAPI(app) {
 			sort: {
 				_id: 1
 			}
-		}, function(e, results) {
+		}).lean().exec(function(e, results) {
 			if (e) next(e);
 			res.json(results);
 		});
@@ -1637,12 +1642,6 @@ exports.configAPI = function configAPI(app) {
 		delete calendar[1].cycleIncrementDay;
 		delete calendar[2].cycleIncrementDay;
 		res.send(calendar);
-		log.info({res: res, permissions: {
-			canUpload: scheduler.canUpload,
-			canShop: scheduler.canShop,
-			canChange: scheduler.canChange
-			}}
-		, 'sending calendar');
 	});
 	
 	// ensure redirects work with tidy and hashBangless URL's
