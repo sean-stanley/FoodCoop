@@ -67,7 +67,7 @@
     "nodemailer-smtp-transport": "^0.1.12",
     "passport": "^0.2.1",
     "passport-local": "~1.0.0",
-    "passport-local-mongoose": "~0.3.0",
+    "passport-local-mongoose": "^1.0.0",
     "password-reset": "~0.1.4",
     "prerender-node": "latest"
   }
