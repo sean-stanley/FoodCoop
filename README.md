@@ -25,12 +25,12 @@ Features include:
 Future Feature Ideas:
 -----------------------------------------------
 
+* when a member buys an animal that must be butchered, have the website provide a form for filling out butchery instructions.
 * have a live map showing markers where producers live on producer list page. Currently lat long data is already stored for users.
 * Promote subscription sales for things like milk or vege boxes
 * for Co-op presentations and promotional/educational events have a place for those to be promoted on the website
 * move the farmer's market map from the blog to the main website
 * list other sources for local food in Northland
-* when a member buys an animal that must be butchered, have the website provide a form for filling out butchery instructions.
 * make a note that whole beast sales are not handled on delivery day but upon arrangement with the producer.
 * Develop a list of regions that members can belong to and then filter shopping to their regions. This would allow multiple regions to buy at the same time or possibly on different schedules.
 * let producers sell outside of the ordering cycle with delivery arranged in a more traditional method like courier or pick-up.

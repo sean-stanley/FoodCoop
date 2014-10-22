@@ -192,15 +192,16 @@ exports.configAPI = function configAPI(app) {
 	// this route looks up products and sends an array of results back to the client.
 	app.get("/api/product", function(req, res, next) {
 		var opts;
-
-		models.Product.find(req.query).sort({_id: 1})
+		models.Product.find(req.query)
+		.sort({_id: 1})
 		.populate('category', 'name')
 		.populate('certification', 'name -_id img')
 		.populate('producer_ID', 'name producerData.companyName')
 		.exec(function(err, product) {
-			if (err) return next(err);
-			res.json(product);
-		});
+					if (err) return next(err);
+					res.send(product);
+				});
+		
 	});
 	
 	// return just one product for editing or use as a template for another product
