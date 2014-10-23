@@ -15,6 +15,7 @@ var util = require('util'),
 	cookieParser = require('cookie-parser'), // an express module for reading, writing and parsing cookies. In the app it is used for session cookies.
 	session = require('express-session'), // an express module for creating browser sessions.
 	//errorHandler = require('express-error-handler'), // an express module for handling errors in the app.
+	RedisStore = require('connect-redis')(session),
 	geocoder = require('geocoder'), // for geocoding user addresses.
 	mongoose = require('mongoose'), // used to connect to MongoDB and perform common CRUD operations with the API.
 	ObjectId = require('mongoose').Types.ObjectId,
@@ -60,7 +61,8 @@ exports.configAPI = function configAPI(app) {
 	app.use(methodOverride()); 
 	// here we initilize the cookieParser middleware for use in the API.
 	app.use(cookieParser()); 
-	app.use(session({saveUninitialized: true, resave: true, secret: 'Intrinsic Definability'}));
+	app.use(session({ saveUninitialized: true, resave: true, store: new RedisStore, secret: 'Intrinsic Definability' }));
+	//app.use(session({saveUninitialized: true, resave: true, secret: 'Intrinsic Definability'}));
 	app.use(passport.initialize()); // here we initilize Passport middleware for use in the app to handle user login.
 	// here we initilize passport's sessions which expand on the express sessions
 	// the ability to have our session confirm if a user is already logged in.
@@ -554,32 +556,31 @@ exports.configAPI = function configAPI(app) {
 		if (req.user) {
 			// get all cart orders for the current user.
 			// optional query params will select a cycle to sort from
-			models.Order.find(req.query).find({supplier: req.user._id}).sort({datePlaced: 1}).exec( function(e, results) {
+			models.Order.find(req.query).find({supplier: req.user._id}).sort({datePlaced: 1})
+			.populate('product', 'fullName price productName variety units')
+			.populate('customer', 'name')
+			.populate('supplier', 'name email producerData.companyName')
+			.exec( function(e, orders) {
 				if (e) return next(e);
+				res.json(orders);
+				
 				// define options for replacing ID's in the order with the appropriate data from
 				// other collections. The other collections are specified with the 'ref'
 				// property in the collections' Schema object.
-				opts = [{
-					path: 'product',
-					select: 'fullName price units productName variety'
-				}, {
-					path: 'customer',
-					select: 'name email'
-				}, {
-					path: 'supplier',
-					select: 'name email producerData.companyName'
-				}];
+				
 
 				// replace the ID's in an order with proper values before sending to the app.
 				// @results is the results returned from the Order Query
 				// @opts is the array of options for the populate method to use.
 				// @e is the error
 				// @cart is the returned array or object of order data
+			/*
 				models.Order.populate(results, opts, function(e, orders) {
-					// send the results to the app if no error occurred.
-					if (e) return next(e);
-					res.json(orders);
-				});
+								// send the results to the app if no error occurred.
+								if (e) return next(e);
+								res.json(orders);
+							});*/
+			
 			});
 		}
 		else res.status(401).end();
@@ -642,42 +643,51 @@ exports.configAPI = function configAPI(app) {
 		if (req.user && req.user._id == req.params.user) {
 			// get the cart orders for the current user.
 			// req.query is used for finding orders from a specific cycle
-			models.Order.find(req.query).find({customer: req.user._id}).sort({datePlaced: 1}).exec( function(e, results) {
+			models.Order.find(req.query).find({customer: req.user._id}).sort({datePlaced: 1})
+			.populate('product', 'fullName price productName variety')
+			.populate('customer', 'name')
+			.populate('supplier', 'name email producerData.companyName')
+			.exec( function(e, cart) {
 				if (!e) {
+					res.json(cart);
 					// define options for replacing ID's in the order with the appropriate data from
 					// other collections. The other collections are specified with the 'ref'
 					// property in the collections' Schema object.
+					/*
 					opts = [{
-						path: 'product',
-						select: 'fullName price productName variety'
-					}, {
-						path: 'customer',
-						select: 'name'
-					}, {
-						path: 'supplier',
-						select: 'name email producerData.companyName'
-					}];
+											path: 'product',
+											select: 'fullName price productName variety'
+										}, {
+											path: 'customer',
+											select: 'name'
+										}, {
+											path: 'supplier',
+											select: 'name email producerData.companyName'
+										}];*/
+					
 
 					// replace the ID's in an order with proper values before sending to the app.
 					// @results is the results returned from the Order Query
 					// @opts is the array of options for the populate method to use.
 					// @e is the error
 					// @cart is the returned array or object of order data
+					/*
 					models.Order.populate(results, opts, function(e, cart) {
-						// send the results to the app if no error occurred.
-						if (!e) {
-							// quick test we got the right cart items
-							cart.forEach(function(item) {
-								if (item.customer.name !== req.user.name) {
-									log.info('these cart items are not for the right user');
-								}
-							});
-							// converts and transforms the cart data into plain javascript before sending it
-							// to the client.
-							res.json(cart);
-						} else log.info(e);
-					});
-				} else log.info(e);
+											// send the results to the app if no error occurred.
+											if (!e) {
+												// quick test we got the right cart items
+												cart.forEach(function(item) {
+													if (item.customer.name !== req.user.name) {
+														log.info('these cart items are not for the right user');
+													}
+												});
+												// converts and transforms the cart data into plain javascript before sending it
+												// to the client.
+												res.json(cart);
+											} else log.info(e);
+										});*/
+					
+				} else next(e);
 			});
 		}
 		else res.status(401).end();
@@ -838,8 +848,10 @@ exports.configAPI = function configAPI(app) {
 	
 	// get all the invoices or a query. Called in the app from the invoices page
 	app.get("/api/invoice", function(req, res, next) {
+		// very slow request for some reason
 		if (req.user) {
-			models.Invoice.find(req.query).sort({_id:1})
+			models.Invoice.find(req.query)
+			//.sort({_id:1})
 			.populate('invoicee', 'name address phone email -_id')
 			.populate('items.customer', 'name email routeTitle')
 			.populate('items.product', 'fullName variety productName priceWithMarkup price units')
@@ -927,6 +939,9 @@ exports.configAPI = function configAPI(app) {
 					var userObject = user.toObject();
 					delete userObject.hash;
 					delete userObject.salt;
+					if ( userObject.producerData.hasOwnProperty('logo') ) {
+						delete userObject.producerData.logo;
+					}
 				});
 				log.info('User just requested from api/user/');
 				res.json(results);
@@ -940,7 +955,7 @@ exports.configAPI = function configAPI(app) {
 	//Get list of producer users for directory
 	app.get('/api/user/producer-list', function(req, res, next) {
 		models.User.find({'user_type.name' : 'Producer'}).select('producerData.logo producerData.companyName name address addressPermission dateJoined')
-		.exec(function(err, producers){
+		.lean().exec(function(err, producers){
 			if (err) next(err);
 			else {
 				res.send(producers);
@@ -1091,7 +1106,7 @@ exports.configAPI = function configAPI(app) {
 	// edit changes to a user including updates their password if they submitted a change.
 	app.put("/api/user/:id", function(req, res, next) {
 		var mailOptions, mailData, mail, changeOptions, changeData, changeEmail, canSell;
-		if (req.user) {
+		if (req.user._id == req.paramas.id || req.user.user_type.isAdmin) {
 			models.User.findById(req.params.id, function(e, user) {
 				if (!e) {
 					
@@ -1206,13 +1221,14 @@ exports.configAPI = function configAPI(app) {
 		if (req.query.company) {
 			companyQuery = req.query.company.split("+");
 			companyQuery = companyQuery.join(" ");
-		}
+		} else companyQuery = null;
 		
 		models.User.findOne({
 			name: nameParam,
 			'producerData.companyName' : companyQuery
 		})
 		.sort({_id: 1}).select('producerData name phone email address addressPermission user_type.name')
+		.lean()
 		.exec(function(e, producer) {
 			if (producer) {
 				log.info('%s of %s\'s page is being requested.', producer.name, producer.producerData.companyName);
