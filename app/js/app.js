@@ -240,8 +240,7 @@ angular.module('co-op', [
 					flash.setNextMessage({type: 'warning', message: 'You can\'t see that page unless you are logged in'});
 					return true;
 				}
-		        
-		    }
+		  }
 
 		    return true; // error not handled
 		});
@@ -249,24 +248,19 @@ angular.module('co-op', [
 		// good but not ideal way to do authentication. Need to find a solution that doesn't trigger a routeChange until after authentication has been resolved 
 		$rootScope.$on( '$routeChangeStart', function(event, next, current) {
 			if (next.loggedInOnly || next.adminOnly) {
-				LoginManager.isLoggedIn().catch(function(reason) {
-					var message;
-					
-					// redirect a non-admin from viewing an admin only page
-					if (next.adminOnly) {
-						message = "Sorry! That page is only available to Administrators";
-						flash.setNextMessage({type: 'warning', message: message});
-						$location.path('must-login');
+				LoginManager.isLoggedIn().then(function(result) {
+					if (next.adminOnly && !$rootScope.currentUser.user_type.isAdmin) {
+						flash.setNextMessage({type: 'warning', message: "Sorry! That page is only available to Administrators"});
+						$location.path('/');
 					}
-					else {
-						$rootScope.savedLocation = $location.url();
+					
+				}, function(reason) {
+					// redirect a user from viewing from a loggedInOnly page
+						if (next.LoggedInOnly) $rootScope.savedLocation = $location.url();
 						flash.setNextMessage({type: 'warning', message: 'Not logged in'});
 						$location.path('must-login');
-					}
-
 				});
-			}
-			else return;
+			} else return;
 			
 			
         });
