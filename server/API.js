@@ -61,8 +61,8 @@ exports.configAPI = function configAPI(app) {
 	app.use(methodOverride()); 
 	// here we initilize the cookieParser middleware for use in the API.
 	app.use(cookieParser()); 
-	app.use(session({ saveUninitialized: true, resave: true, store: new RedisStore, secret: 'Intrinsic Definability' }));
-	//app.use(session({saveUninitialized: true, resave: true, secret: 'Intrinsic Definability'}));
+	//app.use(session({ saveUninitialized: true, resave: true, store: new RedisStore({db:2}), secret: 'Intrinsic Definability' }));
+	app.use(session({saveUninitialized: true, resave: true, secret: 'Intrinsic Definability'}));
 	app.use(passport.initialize()); // here we initilize Passport middleware for use in the app to handle user login.
 	// here we initilize passport's sessions which expand on the express sessions
 	// the ability to have our session confirm if a user is already logged in.
@@ -80,22 +80,7 @@ exports.configAPI = function configAPI(app) {
 		  res.header("Access-Control-Allow-Origin", "*");
 		  res.header("Access-Control-Allow-Headers", "X-Requested-With");
 		  next();
-		 });*/
-	
-	app.put("*", function(req, res, next) {
-		log.info({req: req}, 'PUT attempt just made');
-		next();
-	});
-	
-	app.post("*", function(req, res, next) {
-		log.info({req: req}, 'POST attempt just made');
-		/*
-		test.testEmail.send(function(result) {
-					log.info(result);
-				})*/
-		
-		next();
-	});
+*/
 	
 	// this contains the common ways the app sends emails and is accessed in the app from the contact forms.
 	app.post("/api/mail", function(req, res, next) {
@@ -119,7 +104,11 @@ exports.configAPI = function configAPI(app) {
 			toMeoptions = {
 				template: "contact-form",
 				subject: req.body.subject,
-				to: mail.companyEmail
+				to: mail.companyEmail,
+				replyTo: {
+					email: req.body.email,
+					name: req.body.name
+				}
 			};
 			toMedata = {
 				from: req.body.name,
@@ -896,7 +885,12 @@ exports.configAPI = function configAPI(app) {
 		//if (req.user && !req.user.user_type.canSell) {
 		if (req.user) {
 			application = req.body;
-			mailOptions = {template: 'producer-application-form', subject: 'Application form for member '+ req.user.name, to: {name: 'Standards Committee', email: config.standardsEmail}};
+			mailOptions = {template: 'producer-application-form', subject: 'Application form for member '+ req.user.name, 
+				to: [
+						{name: config.standardsEmail[0].name, email: config.standardsEmail[0].email}, 
+						{name: config.standardsEmail[1].name, email: config.standardsEmail[1].email}
+				]
+			};
 			mailData = {
 				name: req.user.name,
 				email: req.user.email,
@@ -1106,10 +1100,10 @@ exports.configAPI = function configAPI(app) {
 	// edit changes to a user including updates their password if they submitted a change.
 	app.put("/api/user/:id", function(req, res, next) {
 		var mailOptions, mailData, mail, changeOptions, changeData, changeEmail, canSell;
-		if (req.user._id == req.paramas.id || req.user.user_type.isAdmin) {
-			models.User.findById(req.params.id, function(e, user) {
+		//log.info(req.user);
+		if (req.user._id == req.params.id || req.user.user_type.isAdmin) {
+			models.User.findById(new ObjectId(req.params.id), function(e, user) {
 				if (!e) {
-					
 					var userData = user.toJSON();
 					
 					// email the user that their account details were changed

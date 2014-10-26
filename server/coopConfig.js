@@ -28,7 +28,10 @@ exports.markup = 20;
 exports.mileage = 0.8;
 
 // CONTACT DETAILS
-exports.standardsEmail = "sean@maplekiwi.com";
+exports.standardsEmail = [
+{name: 'Sean Stanley', email: 'sean@maplekiwi.com'},
+{name: 'Klaus Lotz', email: 'klotz@northtec.ac.nz'}
+];
 exports.adminEmail = "sean@maplekiwi.com";
 
 // CALENDAR CYCLE
