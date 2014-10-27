@@ -34,7 +34,7 @@
 			attachments = this.getAttachments(html);
 			messageData = {
 				from: 'Northland Natural Food Co-op',
-				//to: "'" + this.options.to.name + "' <" + this.options.to.email + ">",
+				to: '',
 				subject: this.options.subject,
 				//replyTo: "'" + this.options.replyTo.name + "' <" + this.options.replyTo.email + ">",
 				html: html,

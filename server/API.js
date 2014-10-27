@@ -60,9 +60,9 @@ exports.configAPI = function configAPI(app) {
 	// here we initilize the methodOverride middleware for use in the API.
 	app.use(methodOverride()); 
 	// here we initilize the cookieParser middleware for use in the API.
-	app.use(cookieParser()); 
-	//app.use(session({ saveUninitialized: true, resave: true, store: new RedisStore({db:2}), secret: 'Intrinsic Definability' }));
-	app.use(session({saveUninitialized: true, resave: true, secret: 'Intrinsic Definability'}));
+	app.use(cookieParser('Intrinsic Definability')); 
+	app.use(session({ saveUninitialized: true, resave: true, store: new RedisStore(config.redis), secret: 'Intrinsic Definability' }));
+	//app.use(session({saveUninitialized: true, resave: true, secret: 'Intrinsic Definability'}));
 	app.use(passport.initialize()); // here we initilize Passport middleware for use in the app to handle user login.
 	// here we initilize passport's sessions which expand on the express sessions
 	// the ability to have our session confirm if a user is already logged in.
@@ -1099,7 +1099,7 @@ exports.configAPI = function configAPI(app) {
 
 	// edit changes to a user including updates their password if they submitted a change.
 	app.put("/api/user/:id", function(req, res, next) {
-		var mailOptions, mailData, mail, changeOptions, changeData, changeEmail, canSell;
+		var mailOptions, mailData, emailToSend, changeOptions, changeData, changeEmail, canSell, message;
 		//log.info(req.user);
 		if (req.user._id == req.params.id || req.user.user_type.isAdmin) {
 			models.User.findById(new ObjectId(req.params.id), function(e, user) {
@@ -1108,11 +1108,14 @@ exports.configAPI = function configAPI(app) {
 					
 					// email the user that their account details were changed
 					if ( !_.isEqual(req.body.user_type, userData.user_type) ) {
-						canSell = (req.body.user_type.canSell) ? "can sell products through the co-op website" : "can no longer sell products through the co-op website";
-						mailOptions = {template: "user-rights-change", subject: "Your NNFC membership has changed", to: {name: user.name, email: req.body.email}};
-						mailData = {name: user.name, message: canSell};
-						mail = new Emailer(mailOptions, mailData);
-						mail.send(function(err, result) {
+						canSell = (req.body.user_type.canSell) ? "can sell products through the co-op website" : "no longer sell products through the co-op website";
+						if (req.body.user_type.name !== userData.user_type.name) {
+							message = 'Your new membership type is ' + req.body.user_type.name + ' member.'
+						}
+						mailOptions = {template: "user-rights-change", subject: "Your NNFC membership has changed", to: [{name: req.body.name, email: req.body.email}, mail.companyEmail]};
+						mailData = {name: user.name, canSell: canSell, message: message};
+						emailToSend = new Emailer(mailOptions, mailData);
+						emailToSend.send(function(err, result) {
 							if (err) log.info(err);
 						});
 					}
@@ -1440,7 +1443,7 @@ exports.configAPI = function configAPI(app) {
 				req.session.messages =  [info.message];
 				var error = new Error('Incorrect Login');
 				error.status = 401;
-				next(error);
+				res.status(401).send(error);
 			}
 			else {
 				req.logIn(user, function(err) {

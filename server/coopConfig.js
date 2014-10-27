@@ -32,7 +32,7 @@ exports.standardsEmail = [
 {name: 'Sean Stanley', email: 'sean@maplekiwi.com'},
 {name: 'Klaus Lotz', email: 'klotz@northtec.ac.nz'}
 ];
-exports.adminEmail = "sean@maplekiwi.com";
+exports.adminEmail = {name: 'Sean Stanley', email: 'sean@maplekiwi.com'};
 
 // CALENDAR CYCLE
 
@@ -103,6 +103,12 @@ exports.getCycleDates = function(date) {
 };
 
 //exports.cycle.testDay = Date.today();
+// redis session store details
+exports.redis = {
+			host: '127.0.0.1',
+			port: '6379',
+			db: '2'
+		}
 
 // SENSITIVE //
 exports.bankAccount = "02-1248-0425752-001";

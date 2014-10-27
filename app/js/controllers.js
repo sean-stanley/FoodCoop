@@ -200,6 +200,13 @@ angular.module('co-op.controllers', [])
 			}
 		};
 		
+		$scope.$watch('currentUser.user_type.name', function(newValue) {
+			console.log(newValue);
+			if (newValue === 'Customer') {
+				$rootScope.currentUser.user_type.canSell = false;
+			}
+		});
+		
 		// sends a request for a password reset email to be sent to this user's email.
 		$scope.passwordReset = function() {
 			Restangular.all('api/forgot').post({email: $rootScope.currentUser.email});

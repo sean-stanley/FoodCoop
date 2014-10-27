@@ -3,7 +3,7 @@ FoodCoop
 
 Software for managing a local food co-op. This web app is built with a MEAN stack of MongoDB, Express v4, AngularJS v1.2.26 and Node.js.
 
-The live site can be found here(http://foodcoop.org.nz).
+The live site can be found [here](http://foodcoop.org.nz).
 
 
 Features include:
@@ -17,7 +17,7 @@ Features include:
 * a contact form for contacting the administrators or another producer about their products.
 * allow producers to manage previously uploaded products.
 * shopping carts creation, restriction, modification and manipulation
-* invoices for producers that list all the products ordered from them by all producers in a set time period.
+* invoices for producers that list all the products ordered from them by all customers in a set time period.
 * A general cycle counter that resets carts and products each ordering cycle.
 * schedule mass email reminders about important co-op dates with MailChimp.
 * Completely responsive design for easy mobile and tablet use.
@@ -25,6 +25,8 @@ Features include:
 Future Feature Ideas:
 -----------------------------------------------
 
+* Add E2E tests for common user tasks
+* Add a way to manage mailchimp subscription right from our site.
 * when a member buys an animal that must be butchered, have the website provide a form for filling out butchery instructions.
 * have a live map showing markers where producers live on producer list page. Currently lat long data is already stored for users.
 * Promote subscription sales for things like milk or vege boxes
@@ -38,9 +40,8 @@ Future Feature Ideas:
 
 Setting Up
 ==========
-You need to have node.js installed on your machine to run the site.
 
-We hope before long to have a live demo available online. Just waiting on the man with the server to give me access really.
+You need to have node.js installed on your machine to run the site. We develop on 0.10 so if you run into issues, try using that version.
 
 Install the necessary modules:
 
@@ -77,5 +78,3 @@ Configuring
 CALENDAR CYCLE
 
 The coopConfig.js file in the server directory contains static useful data for configuring a co-op. It also includes the dates that determine the co-op's ordering cycle. Different ordering cycles will require changes to these values. The datejs module is crucial for calculating these dates. If you wish to change the cycle, look at the documentation and examples [here](https://code.google.com/p/datejs/)
-
-At the moment these values are set once each time the server is started up. Later an event will be scheduled to update these values the day after delivery day.
