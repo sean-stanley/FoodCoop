@@ -78,9 +78,10 @@
 
 		<div class="form-group">
 	        <button ng-click="save()" ng-disabled="editMe.$pristine || editMe.$invalid"
-	                class="btn btn-primary">Save User Info</button>
+	                class="btn btn-primary"
+									analytics-on="click">Save User Info</button>
 	        <button ng-click="destroy()"
-	                ng-show="currentUser._id" class="btn btn-danger">Leave Co-op</button>
+	                ng-show="currentUser._id" class="btn btn-danger" analytics-on="click">Leave Co-op</button>
 		</div>
 </form>
 
@@ -110,7 +111,6 @@
 								data-max-file-size="3">
 								<span class="text-muted">Or click to upload</span>
 							</span>
-							
 						</div>
 						
 					</div>
@@ -120,8 +120,6 @@
 				<div id="preview-container" class="preview-box col-sm-6">
 					<img ng-if="currentUser.producerData.hasOwnProperty('logo')" ng-src="{{currentUser.producerData.logo}}" alt=" logo placeholder " class="img-responsive">	
 				</div>
-				
-				
 			</div>
 			<div class="row">
 				<div class="form-group col-md-6">
@@ -167,7 +165,7 @@
 				</div>
 			</div>
 			<div class="form-group col-md-12">
-				<button type="submit" class="btn btn-primary">Save Producer Info</button>
+				<button type="submit" class="btn btn-primary" analytics-on="click">Save Producer Info</button>
 			</div>
 		</fieldset>
 	</form>

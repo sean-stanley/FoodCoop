@@ -258,9 +258,21 @@ angular.module('co-op.services', [])
 					});
 					cb();
 				}, function(error) {
-					console.log(error);
+					console.log(error.data);
+					var messageData =  'Oops! Sorry ' + $rootScope.currentUser.name + ', your product didn\'t get uploaded. ' + error.status + ": ";
+					if (error.data) {
+						if (error.data.hasOwnProperty('errors')) {
+							for (var key in error.data.errors) {
+								if (error.data.errors.hasOwnProperty(key)) {
+									messageData += error.data.errors[key].name + " " + error.data.errors[key].message;
+								}
+							}
+						}
+						else messageData += error.data.name + ' ' + error.data.message;
+					}
+					else messageData += error.toString();
 					flash.setMessage({type: 'danger', 
-					message: 'Oops! Sorry ' + $rootScope.currentUser.name + ', your product didn\'t get uploaded. Reason: ' + error.data 
+					message: messageData
 					});
 				});
 			},

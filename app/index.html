@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="co-op">
+<html lang="en" ng-app="co-op" class="angular-app">
 <head>
 	<meta charset="utf-8">
 	<title ng-bind="$root.page_title + ' - Northland Natural Food Co-op' ">NNFC - Northland Natural Food Co-op</title>
@@ -62,11 +62,11 @@
 				</div>
 			</div>	
 			<div id="calendar-container" ng-controller="calendarCtrl" ng-click="href('/calendar')">
-				<h1 class="text-center"><span class="glyphicon glyphicon-calendar"></span></h1>
+				<h1 class="text-center"><i class="fa fa-calendar" style='font-size:1.5em'></i></h1>
 				<p>
-					Product Uploading: {{inDateRange(countDown[0].ProductUploadStart, countDown[0].ProductUploadStop)}}.<br>
-					Shopping: {{inDateRange(countDown[0].ShoppingStart, countDown[0].ShoppingStop)}}.<br>
-					Delivery Day: <span class="label label-default">{{daysBeforeDeliveryDay}}</span> days<br>
+					<i class="fa fa-cloud-upload fa-fw"></i> Product Uploading: {{inDateRange(countDown[0].ProductUploadStart, countDown[0].ProductUploadStop)}}.<br>
+					<i class="fa fa-shopping-cart fa-fw"></i> Shopping: {{inDateRange(countDown[0].ShoppingStart, countDown[0].ShoppingStop)}}.<br>
+					<i class="fa fa-gift fa-fw"></i> Delivery Day: <span class="label label-default">{{daysBeforeDeliveryDay}}</span> days<br>
 					<span ng-if="daysBeforeDeliveryDay < 1">Next delivery day in {{countDown[1].DeliveryDay.daysUntil}} days</span>
 				</p>
 			</div>
@@ -74,7 +74,7 @@
 			<accordion close-others="false" ng-if="currentUser" >
 				<accordion-group is-open="cartPanel.open" ng-class="{'panel-open-sidebar':cartPanel.open}">
 					<accordion-heading>
-					<h1 class="text-center"><i class="fa fa-shopping-cart"></i> <span class="badge">{{cartTally}}</span></h1>
+					<h1 class="text-center"><i class="fa fa-shopping-cart" style='font-size:1.5em'></i> <span class="badge">{{cartTally}}</span></h1>
 					</accordion-heading>
 						<div ng-controller="cartPageCtrl">
 							<table class="table">
@@ -143,15 +143,15 @@
 					ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
 					><a href="product-manager">My Products</a></li>
 					<li ng-class="{active:isActive('/product-upload')}" 
-					ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
+					ng-show="currentUser && currentUser.user_type.name === 'Producer'"
+					
 					><a href="product-upload">Upload a Product</a></li>
 					<li ng-class="{active:isActive('/my-invoices')}" ng-show="currentUser"><a ng-href="my-invoices">Invoices</a></li>
 			</ul>
+		</div>
 		<ul class="nav nav-pills nav-stacked sidebar-bottom" ng-controller="logoutCtrl">
 			<li ng-show="currentUser != null"><a ng-click="logOut()" class="text-center"><h1><span class="glyphicon glyphicon-lock"></span></h1><p>Log Out</p></a></li>
 		</ul>
-		</div>
-		
 	</div>
 	
 	<nav class="navbar navbar-inverse navbar-fixed-top">
@@ -257,7 +257,7 @@
 						<ul class="list-unstyled social-footer">
 							<li><a target="_blank" href="https://www.facebook.com/nzfoodcoop"><i class="fa fa-facebook-square fa-fw fa-2x"></i></a></li>
 							<li><a target="_blank" href="https://twitter.com/NorthlandNFC"><i class="fa fa-twitter-square fa-fw fa-2x"></i></a></li>
-							<li><a target="_blank" href="https://plus.google.com/105941223701197922003/posts"><i class="fa fa-google-plus-square fa-fw fa-2x"></i></a></li>
+							<li><a target="_blank" href="https://plus.google.com/105941223701197922003" rel="publisher"><i class="fa fa-google-plus-square fa-fw fa-2x"></i></a></li>
 						</ul>
 					</section>
 				</div>
@@ -298,6 +298,10 @@
 	<script src='http://cdnjs.cloudflare.com/ajax/libs/textAngular/1.2.2/textAngular-sanitize.min.js'></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/textAngular/1.2.2/textAngular.min.js" type="text/javascript" charset="utf-8"></script>
 	
+		<!-- Angulartics for Analytics dependencies -->
+	<script src="lib/bower_components/angulartics/dist/angulartics.min.js" type="text/javascript" charset="utf-8"></script>	
+	<script src="lib/bower_components/angulartics/dist/angulartics-ga.min.js" type="text/javascript" charset="utf-8"></script>
+	
 	<!-- cropme dependencies -->
 
 <!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular-sanitize.min.js"></script>-->
@@ -327,7 +331,7 @@
 	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
 	ga('create', 'UA-45071933-1', 'foodcoop.org.nz');
-	ga('send', 'pageview');
+	//ga('send', 'pageview');
 
 	</script>
 

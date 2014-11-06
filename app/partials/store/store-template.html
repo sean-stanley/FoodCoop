@@ -3,7 +3,18 @@
 </alert>
 					
 <section id="main-nav-and-sorting" class="col-xs-12 clearfix">
-						
+		<br>
+		<div ng-controller="calendarCtrl" ng-click="href('/calendar')" class="clearfix">
+			<a href="/calendar"><i class="fa fa-calendar pull-left fa-4x"></i></a>
+			<p>
+				<i class="fa fa-cloud-upload fa-fw"></i> Product Uploading: {{inDateRange(countDown[0].ProductUploadStart, countDown[0].ProductUploadStop)}}.<br>
+				<i class="fa fa-shopping-cart fa-fw"></i> Shopping: {{inDateRange(countDown[0].ShoppingStart, countDown[0].ShoppingStop)}}.<br>
+				<i class="fa fa-gift fa-fw"></i> Delivery Day: <span class="label label-default">{{daysBeforeDeliveryDay}}</span> days<br>
+				<span ng-if="daysBeforeDeliveryDay < 1">Next delivery day in {{countDown[1].DeliveryDay.daysUntil}} days</span>
+			</p>
+		</div>
+		<br>
+				
     <div ng-class="{ 'pull-left' : !panelDisplay}" class="hidden-sm hidden-xs">
     	<label> Categories: </label>
 		<div class="btn-group">
@@ -107,7 +118,9 @@
 					<span ng-if="product.certification !== 'none' ">Certified by {{product.certification.name}}</span>
 					</p>
 					<p ng-if="product.ingredients && product.ingredients.length > 0">Ingredients: 
-					<span ng-repeat="item in product.ingredients"><a ng-click="searchFor(item)">{{item}} </a> </span></p>
+					<span ng-repeat="item in product.ingredients">
+						<a class="yellow-link" ng-click="searchFor(item)">{{item}} </a> 
+					</span></p>
 					<div class="btn-group">
 						<button class="btn btn-danger pull-right" disabled ng-if="product.quantity === 0">
 							SOLD OUT

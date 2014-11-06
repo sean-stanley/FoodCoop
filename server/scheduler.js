@@ -25,7 +25,10 @@ var orderCycleChecker = schedule.scheduleJob({hour:0, minute: 0}, checkConfig);
 // To be executed at 9:15am Wednesday;
 function checkConfig() {
 	console.log(Date() + ". Checking if today is a significant day");
-	var today = Date.today(), cycle = config.cycle, key;
+	var today = Date.today(), cycle = config.cycleReset('today'), key;
+	
+	findCycle();
+	
 	exports.canShop = false;
 	exports.canUpload = false;
 	exports.canChange = false;
@@ -342,6 +345,8 @@ function disableCycle() {
 	exports.canUpload = true;
 	exports.canChange = true;
 }
+
+exports.findCycle = findCycle;
 
 findCycle();
 checkConfig();

@@ -54,7 +54,7 @@ a:hover {
 .mobile-arrow > i {position: relative; top: 20px; opacity: 0.5}
 
 .big-icons {
-	font-size: 7em;
+	font-size: 5em;
 }
 .big-icons span {margin: 0 10px;}
 
@@ -123,9 +123,9 @@ margin-left: -21px;
 line-height: 1em;}
 #close-sidebar-button:hover {color:white;}
 
-.sidebar-main {margin-bottom: -122px; }
+.sidebar-main {margin-bottom: -122px; min-height:100%; }
 .sidebar-main:after {content:"";display:block;}
-.sidebar-bottom {height: 122px; position: absolute; bottom: 0;}
+.sidebar-bottom, .sidebar-main:after {height: 122px;}
 .sidebar-bottom {width: 100%; border:none;}*/
 
 #calendar-container:hover, #sidebar .panel-heading:hover, #sidebar li:hover {border-color: #ddd; background: #642c4a; color: white;}
@@ -350,7 +350,7 @@ a.panel-btn-sml {
 	position: absolute;
 	bottom: 0;
 	right: -100%;
-	background: #222222;
+	background: #444;
 	height: 100%;
 	width: 100%;
 	visibility: hidden;
@@ -370,6 +370,7 @@ a.panel-btn-sml {
 
 .details > h4 > a {color: #fff}
 .details > h4 > a:hover {color: #642c4a}
+.details .yellow-link {color: #f0ad4e;}
 
 
 /* Store Modal */

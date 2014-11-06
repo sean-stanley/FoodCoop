@@ -72,6 +72,10 @@
 
 
 <div class="modal-footer">
-	<button type="submit" class="btn btn-primary" form="signup-form" ng-disabled="signUp.$invalid">Signup</button>
+	<button type="submit" 
+	class="btn btn-primary" 
+	form="signup-form" 
+	ng-disabled="signUp.$invalid"
+	analytics-on="click" analytics-event="Signup">Signup</button>
 	<button class="btn btn-warning" ng-click="cancel()" type="reset">Cancel</button>
 </div>

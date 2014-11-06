@@ -617,7 +617,7 @@ exports.configAPI = function configAPI(app) {
 		if (req.user && req.user._id == req.params.user) {
 			models.Order.count({customer: req.user._id, cycle: scheduler.currentCycle}, function(e, count) {
 				if (!e) {
-					log.info('the count is %n', count);
+					log.info('the count is %s', count);
 					res.send(count.toString());
 				}
 				else return next(e);
@@ -639,43 +639,6 @@ exports.configAPI = function configAPI(app) {
 			.exec( function(e, cart) {
 				if (!e) {
 					res.json(cart);
-					// define options for replacing ID's in the order with the appropriate data from
-					// other collections. The other collections are specified with the 'ref'
-					// property in the collections' Schema object.
-					/*
-					opts = [{
-											path: 'product',
-											select: 'fullName price productName variety'
-										}, {
-											path: 'customer',
-											select: 'name'
-										}, {
-											path: 'supplier',
-											select: 'name email producerData.companyName'
-										}];*/
-					
-
-					// replace the ID's in an order with proper values before sending to the app.
-					// @results is the results returned from the Order Query
-					// @opts is the array of options for the populate method to use.
-					// @e is the error
-					// @cart is the returned array or object of order data
-					/*
-					models.Order.populate(results, opts, function(e, cart) {
-											// send the results to the app if no error occurred.
-											if (!e) {
-												// quick test we got the right cart items
-												cart.forEach(function(item) {
-													if (item.customer.name !== req.user.name) {
-														log.info('these cart items are not for the right user');
-													}
-												});
-												// converts and transforms the cart data into plain javascript before sending it
-												// to the client.
-												res.json(cart);
-											} else log.info(e);
-										});*/
-					
 				} else next(e);
 			});
 		}
@@ -835,9 +798,10 @@ exports.configAPI = function configAPI(app) {
 		}
 	});
 	
+	app.route('/api/invoice')
 	// get all the invoices or a query. Called in the app from the invoices page
-	app.get("/api/invoice", function(req, res, next) {
-		// very slow request for some reason
+	.get(function(req, res, next) {
+		
 		if (req.user) {
 			models.Invoice.find(req.query)
 			//.sort({_id:1})
@@ -855,18 +819,33 @@ exports.configAPI = function configAPI(app) {
 				}
 			});
 		}
-	});
+	})
 	
 	// update an invoice's status
-	app.put("/api/invoice", function(req, res, next) {
-		models.Invoice.findByIdAndUpdate(req.body._id, {status: req.body.status}, function(e, invoice){
-			if (e) return errorHandler(e);
+	.put(function(req, res, next) {
+		if (req.user && req.user.user_type.isAdmin) {
+			models.Invoice.findByIdAndUpdate(req.body._id, {status: req.body.status}, function(e, invoice){
+				if (e) return next(e);
 			
-			// Save the time the invoice was modified
-			invoice.dateModified = Date();
-			invoice.save();
-			res.status(202).end();
-		});
+				// Save the time the invoice was modified
+				invoice.dateModified = Date();
+				invoice.save();
+				res.status(200).end();
+			});
+		}
+		else res.status(401).end()
+	})
+	
+	// delete an invoice. The invoice to delete is found in the query param. Ideally only delete cancelled invoices.
+	.delete(function(req, res, next) {
+		if (req.user && req.user.user_type.isAdmin) {
+			models.Invoice.findByIdAndRemove(req.query.id, function(e, invoice) {
+				if (e) return next(e);
+				if (invoice) res.status(200).end();
+				else res.status(404).end();
+			})
+		}
+		else res.status(401).end()
 	});
 	
 	// get a query of one specific invoice by id
@@ -1475,6 +1454,39 @@ exports.configAPI = function configAPI(app) {
 		}
 		else res.send("No session saved");
 	});
+	
+	app.route('/api/admin/cycle')
+	.get(function(req, res, next) {
+		if (req.user && req.user.user_type.isAdmin) {
+			models.Cycle.findById('orderCycle', function(e, cycle) {
+				if (e) log.warn(e);
+				else {
+					res.status(200).send(cycle.seq.toString());
+					log.info("the current cycle is #" + cycle.seq);
+				}
+			});
+			scheduler.findCycle();
+		}
+		else res.status(401).end();
+	})
+	.post(function(req, res, next) {
+		if (req.user && req.user.user_type.isAdmin) {
+			models.Cycle.findById("orderCycle").exec(function(e, cycle) {
+				if (e) return next(e);
+				
+				if ( cycle && Date.equals(Date.today(), Date.parse(cycle.dateModified).clearTime()) ) res.send("cycle already incremented today");
+				else {
+					models.Cycle.findOneAndUpdate({_id: 'orderCycle'},{ dateModified: Date.now(), $inc: {seq: 1} }, function(err, cycle){
+						if (err) return next(err);
+						res.status(200).send(cycle.seq.toString());
+						config.cycleReset('today');
+						scheduler.findCycle();
+					});	
+				}
+			});
+		}
+		else res.status(401).end();
+	})
 	
 	// Sends an email for resetting a user's password. Token will expires in 1 hour.
 	app.post('/api/forgot', function(req, res) {

@@ -281,6 +281,21 @@ angular.module('co-op.controllers', [])
 			return match.length;
 		};
 		
+		$scope.invoiceDelete = function(invoice) {
+			invoice.remove({id:invoice._id}).then(function(result){
+				flash.setMessage({type:'success', message: "invoice successfully removed: "+ result});
+			},
+			function(error) {
+				flash.setMessage({
+					message: "Sorry! Failed to delete the invoice " + error ,
+					type: "danger"
+				});
+			});
+			
+			$scope.invoices.splice($scope.invoices.indexOf(invoice), 1);
+			
+		};
+		
 	}
 ])
 
@@ -333,6 +348,25 @@ angular.module('co-op.controllers', [])
 		};
 	}
 ])
+
+// admin cycle control
+.controller('cycleCtrl', ['$scope', '$http', 'flash', 'cycle',
+	function($scope, $http, flash, cycle){
+		$scope.cycle = cycle.data;
+		console.log(cycle.data);
+		
+		$scope.next = function() {
+			$http.post('api/admin/cycle', {}).success(function(cycle) {
+				console.log(cycle);
+				if (!isNaN(cycle)) {
+					$scope.cycle = cycle;
+				}
+				else {
+					flash.setMessage({type:'warning', message: cycle});
+				}
+			});
+		};
+	}])
 
 // signup form control
 .controller('userModalCtrl', ['$scope', 'UserManager', '$modalInstance', 'data',
@@ -1181,7 +1215,7 @@ function($scope, $modalInstance, data, ProductManager) {
 				else {
 					present = end.future;
 					plural = Math.abs(end.daysUntil) != 1 ? 's' : '';
-					if (present) return 'is open for '+ end.daysUntil + ' more day'+ plural;
+					if (present) return 'closes in '+ end.daysUntil + ' day'+ plural;
 					else return "is over for this month";//return 'was '+ Math.abs(end.daysUntil) + ' day'+ plural+ " ago";
 				}
 			};

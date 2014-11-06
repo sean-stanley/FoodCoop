@@ -3,5 +3,7 @@ node_modules
 server/config.js
 *.annotated.js
 build
+app/videos
+app/lib/bower_components
 
 

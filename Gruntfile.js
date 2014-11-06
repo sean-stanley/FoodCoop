@@ -250,4 +250,5 @@ module.exports = function(grunt) {
     grunt.registerTask('deploy', ['build', 'rsync:linodeOpt', 'shell:updateServer']);
     grunt.registerTask('decrypt-config', ['shell:decryptConfig']);
     grunt.registerTask('encrypt-config', ['shell:encryptConfig']);
+	//	grunt.registerTask('test', ['concurrent:test']);
 };

@@ -3,6 +3,7 @@
 
 // Declare app level module which depends on filters, and services
 angular.module('co-op', [ 
+	'ngAnimate',
 	'ngRoute', 
 	'ngSanitize',
 	'ngTouch',
@@ -12,11 +13,12 @@ angular.module('co-op', [
 	'co-op.directives', 
 	'co-op.controllers',
 	'angular-loading-bar', 
-	'ngAnimate', 
 	'ui.bootstrap',
 	'textAngular',
 	'cropme',
-	'restangular'])
+	'restangular',
+	'angulartics', 'angulartics.google.analytics'
+	])
 
   .config(['$compileProvider', '$routeProvider', '$locationProvider', 'RestangularProvider', function($compileProvider, $routeProvider, $locationProvider, RestangularProvider) {
 	var oldWhiteList = $compileProvider.imgSrcSanitizationWhitelist();
@@ -65,7 +67,13 @@ angular.module('co-op', [
 			}
 		})
 		.when('/admin/invoices', { controller: 'invoiceCtrl', templateUrl: 'partials/admin/invoices.html', adminOnly: true, reloadOnSearch: false, title: 'Admin' })
-		
+		.when('/admin/cycle', { controller: 'cycleCtrl', templateUrl: 'partials/admin/cycle.html', adminOnly: true, reloadOnSearch: false, title: 'Cycle Manager Page',
+			resolve: {
+				cycle: function($http) {
+					return $http.get('api/admin/cycle');
+				}
+			}
+		})
 		.when('/forgot', {templateUrl: 'partials/forgot-password.html', controller: 'forgotCtrl', reloadOnSearch: false, title: 'Forgotten Password'})
 		.when('/reset/:token', {
 			controller: 'resetCtrl',
@@ -116,10 +124,12 @@ angular.module('co-op', [
 			description: 'The NNFC, Northland\'s local food coop, needs volunteers to help maintain the service. Volunteers are usually members and have jobs such as sorting orders, delivering orders and managing a delivery route.'
 		})
     
+		.when('/product-upload-401', {templateUrl: 'partials/loggedIn/upload401.html', reloadOnSearch: false, title:'401 - Unauthorized to Sell'})
+		
 		.when('/product-upload', {
 			templateUrl: 'partials/loggedIn/product-upload.html', 
-			controller: 'productUploadCtrl', 
-			loggedInOnly: true, reloadOnSearch: false,
+			controller: 'productUploadCtrl',
+			loggedInOnly: true, canSell: true, reloadOnSearch: false,
 			title : 'Upload Products to Sell',
 			resolve: { product: function() { return {}; } }
 		})
@@ -252,6 +262,11 @@ angular.module('co-op', [
 					if (next.adminOnly && !$rootScope.currentUser.user_type.isAdmin) {
 						flash.setNextMessage({type: 'warning', message: "Sorry! That page is only available to Administrators"});
 						$location.path('/');
+					}
+					if (next.canSell) {
+						if (!$rootScope.currentUser.user_type.canSell) {
+							$location.path('/product-upload-401');
+						}
 					}
 					
 				}, function(reason) {

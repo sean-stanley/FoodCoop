@@ -30,7 +30,7 @@ var ProductSchema = new Schema({
 			img: {},
 			category: {type: Schema.ObjectId, required: false, ref: 'Category'},
 			productName: {type: String, required: true},
-			variety: {type: String, required: true},
+			variety: String,
 			price: {type: Number, required: true},
 			quantity: {type: Number, required: true},
 			units: {type: String, required: true},
@@ -50,12 +50,13 @@ ProductSchema.virtual('priceWithMarkup').get(function () {
 	return (this.price * (markup/100 + 1)).toFixed(2);
 });
 ProductSchema.virtual('fullName').get(function () {
-	return this.variety + ' ' + this.productName;
+	if (this.variety) return this.variety + ' ' + this.productName;
+	else return this.productName
 });
 
 // for keeping records of all possible cycle codes. Codes are used by products
 // and orders to determine what has been bought and uploaded each cycle.
-var cycleShema = new Schema({
+var cycleSchema = new Schema({
 	_id: String,
 	dateModified: {type: Date, default: Date.now(), required: true},
 	seq: Number
@@ -288,5 +289,5 @@ exports.Invoice = mongoose.model('Invoice', InvoiceSchema);
 exports.User = mongoose.model('User', UserSchema);
 exports.Category = mongoose.model('Category', CategorySchema);
 exports.Certification = mongoose.model('Certification', CertificationSchema);
-exports.Cycle = mongoose.model('Cycle', cycleShema);
+exports.Cycle = mongoose.model('Cycle', cycleSchema);
 

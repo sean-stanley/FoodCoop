@@ -411,7 +411,7 @@ angular.module('ui.bootstrap.buttons', [])
 *
 */
 angular.module('ui.bootstrap.carousel', ['ui.bootstrap.transition'])
-.controller('CarouselController', ['$scope', '$timeout', '$transition', function ($scope, $timeout, $transition) {
+.controller('CarouselController', ['$scope', '$timeout', '$transition', function ($scope, $interval, $transition) {
   var self = this,
     slides = self.slides = $scope.slides = [],
     currentIndex = -1,
@@ -448,7 +448,7 @@ angular.module('ui.bootstrap.carousel', ['ui.bootstrap.transition'])
       if ($scope.$currentTransition) {
         $scope.$currentTransition.cancel();
         //Timeout so ng-class in template has time to fix classes for finished slide
-        $timeout(goNext);
+        $interval(goNext);
       } else {
         goNext();
       }
@@ -529,13 +529,13 @@ angular.module('ui.bootstrap.carousel', ['ui.bootstrap.transition'])
     resetTimer();
     var interval = +$scope.interval;
     if (!isNaN(interval) && interval>=0) {
-      currentTimeout = $timeout(timerFn, interval);
+      currentTimeout = $interval(timerFn, interval);
     }
   }
 
   function resetTimer() {
     if (currentTimeout) {
-      $timeout.cancel(currentTimeout);
+      $interval.cancel(currentTimeout);
       currentTimeout = null;
     }
   }
