@@ -1,0 +1,37 @@
+<div class="col-xs-12 col-sm-8 col-md-6 col-lg-4 col-sm-offset-2 col-md-offset-3 col-lg-offset-4">
+<h1>Orders</h1>
+			<table class="table">
+				<thead>
+					<tr>
+						<th><a href="" ng-click="predicate = 'datePlaced'; reverse=!reverse ">Date</a></th>
+						<th><a href="" ng-click="predicate = 'customer.name'; reverse=!reverse ">customer</a></th>
+						<th><a href="" ng-click="predicate = 'product.productName'; reverse=!reverse ">Product</a></th>
+						<th><a href="" ng-click="predicate = 'producerPrice'; reverse=!reverse ">Unit Price</a></th>
+						<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Ordered Amount</a></th>
+						<th><a href="" ng-click="predicate = 'orderPrice'; reverse=!reverse ">Price</a></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="i in orders | orderBy:predicate:reverse " >
+				        <td data-title="'Date Placed'">
+							{{i.datePlaced | shortDate}}
+						</td>
+						<td data-title="'Customer'">
+							<a ng-href="/contact/{{i.customer._id}}">{{i.customer.name}}</a>
+						</td>
+						<td data-title="'Product'" >
+				            <a ng-href="/product-upload/{{i._id}}">{{i.product.fullName}}</a>
+				        </td>
+				        <td data-title="'Price'">
+				            {{i.unitPrice | currency}} / {{i.product.units}}
+				        </td>
+						<td data-title="'Quantity'">
+							{{i.quantity}}
+						</td>
+						<td data-title="'times Ordered'">
+							{{i.orderPrice | currency}}
+						</td>
+				    </tr>
+				</tbody>
+			</table>
+</div>

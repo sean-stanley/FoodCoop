@@ -289,13 +289,13 @@ exports.configAPI = function configAPI(app) {
 						cycle: scheduler.currentCycle
 					}, function(err, product) {
 						if (err) return next(err);
-						res.status(200).end();
+						res.status(200).send(product._id);
 					});
 				}
 			}
 			// gain limited product change options during shopping week
 			else if (scheduler.canChange) {
-				models.Product.findById(req.body._id, 'price productName variety quantity amountSold description ingredients refrigeration cycle', function(err, product) {
+				models.Product.findById(req.body._id, 'price img productName variety quantity amountSold description ingredients refrigeration cycle', function(err, product) {
 					if (err) return next(err);
 					if (scheduler.currentCycle == product.cycle) {
 						productObject = product.toObject();
@@ -419,7 +419,7 @@ exports.configAPI = function configAPI(app) {
 			// delete the product based on it's id
 			models.Product.findById(new ObjectId(req.params.id), function(err, product) {
 				if (err) return next(err);
-				if (product.producer_ID == req.user._id || req.user.user_type.isAdmin) {
+				if (_.isEqual(req.user._id, product.producer_ID) || req.user.user_type.isAdmin) {
 					if (product.cycle == scheduler.currentCycle) {
 						
 						if (scheduler.canChange) {
@@ -623,6 +623,7 @@ exports.configAPI = function configAPI(app) {
 				else return next(e);
 			});
 		}
+		else res.status(403).end();
 	});
 	// get a customer's cart items by using their customer ID as a request parameter.
 	app.get("/api/cart/:user", function(req, res, next) {

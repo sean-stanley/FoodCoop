@@ -256,7 +256,8 @@ angular.module('co-op.services', [])
 					flash.setMessage({type: 'success', 
 					message: 'Congratulations ' + $rootScope.currentUser.name + '! Your ' + productData.variety + " " + productData.productName + ' was successfully added to the store.'
 					});
-					cb();
+					var r = JSON.parse(result);
+					cb(r);
 				}, function(error) {
 					console.log(error.data);
 					var messageData =  'Oops! Sorry ' + $rootScope.currentUser.name + ', your product didn\'t get uploaded. ' + error.status + ": ";
@@ -279,7 +280,8 @@ angular.module('co-op.services', [])
 			deleteProduct : function(id) {
 				Restangular.one('api/product', id).remove().then(function() {
 					flash.setMessage({type: 'success', message: 'Poof! Product successfully deleted'});
-				}, function() {
+				}, function(error) {
+					console.log(error);
 					flash.setMessage({type: 'danger', message: 'Drat! Could not delete that product.'});
 				});
 			},

@@ -151,13 +151,13 @@
 						<div class="form-group col-md-6">
 							<label for="inputName">Product Name</label>
 							<input ng-disabled="!productData.hasOwnProperty('category')" 
-							ng-model="productData.productName" type="text" class="form-control" id="inputName" maxlength="12" 
+							ng-model="productData.productName" type="text" class="form-control" id="inputName" maxlength="25" 
 							placeholder="e.g. {{ productManager.categoryByID(productData.category).placeholderName }}" autofocus required>
 						</div>
 						<div class="form-group col-md-6">
 							<label for="inputVariety" ng-model="variety">Variety</label>
 							<input ng-disabled="!productData.hasOwnProperty('category')" 
-							ng-model="productData.variety" type="text" class="form-control" id="inputVariety" maxlength="18" 
+							ng-model="productData.variety" type="text" class="form-control" id="inputVariety" maxlength="25" 
 							placeholder="e.g. {{ productManager.categoryByID(productData.category).placeholderVariety }}">
 						</div>
 					</div>

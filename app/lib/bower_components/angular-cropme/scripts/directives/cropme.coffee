@@ -58,6 +58,7 @@ angular.module("cropme").directive "cropme", ($swipe, $window, $timeout, $rootSc
 		</canvas>
 	"""
 	restrict: "E"
+	priority: 99 # it needs to run after the attributes are interpolated
 	scope: 
 		width: "=?"
 		destinationWidth: "="
@@ -130,19 +131,23 @@ angular.module("cropme").directive "cropme", ($swipe, $window, $timeout, $rootSc
 				scope.$apply -> loadImage e.target.result
 			reader.readAsDataURL(file);
 		loadImage = (src) ->
+			return unless src
+			imageEl.onerror = ->
+				scope.$apply ->
+					scope.cancel()
+					scope.dropError = "Unsupported type of image"
 			imageEl.onload = ->
 				width = imageEl.naturalWidth
 				height = imageEl.naturalHeight
 				errors = []
 				if width < scope.width
 					errors.push "The image you dropped has a width of #{width}, but the minimum is #{scope.width}."
-				if scope.height and height < scope.height
-					errors.push "The image you dropped has a height of #{height}, but the minimum is #{scope.height}."
-				if scope.ratio and scope.destinationHeight > height
-					errors.push "The image you dropped has a height of #{height}, but the minimum is #{scope.destinationHeight}."
+				minHeight = Math.min scope.height, scope.destinationHeight
+				if height < minHeight
+					errors.push "The image you dropped has a height of #{height}, but the minimum is #{minHeight}."
 				scope.$apply ->
 					if errors.length
-						scope.state = "step-1"
+						scope.cancel()
 						scope.dropError = errors.join "<br/>"
 					else
 						scope.imgLoaded = true
@@ -288,4 +293,6 @@ angular.module("cropme").directive "cropme", ($swipe, $window, $timeout, $rootSc
 
 		scope.$on "cropme:cancel", scope.cancel
 		scope.$on "cropme:ok", scope.ok
-		loadImage(scope.src) if scope.src
+		scope.$watch "src",  -> loadImage scope.src
+		
+		loadImage scope.src

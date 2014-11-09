@@ -3,7 +3,18 @@
 <head>
 	<meta charset="utf-8">
 	<title ng-bind="$root.page_title + ' - Northland Natural Food Co-op' ">NNFC - Northland Natural Food Co-op</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="viewport" content="width=device-width, initial-scale=1.00"/>
+	<script type="text/javascript">
+	    window.onload=function(){
+	        var ua = navigator.userAgent;
+	        if(ua.indexOf("Android")>=0){
+	            var androidversion=parseFloat(ua.slice(ua.indexOf("Android")+8)); 
+	            if(androidversion<=2.3){
+	                document.getElementsByName("viewport")[0].setAttribute("content","width=device-width, initial-scale=1.02");
+	            }
+	        }
+	    };
+	</script>
 	<meta name="fragment" content="!">
 	
 	<meta name="description" content="{{page_description}}">

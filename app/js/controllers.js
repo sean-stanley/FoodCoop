@@ -582,8 +582,11 @@ angular.module('co-op.controllers', [])
 		});
 
 		$scope.submitForm = function() {
-			ProductManager.registerProduct($scope.productData, function() {
+			ProductManager.registerProduct($scope.productData, function(id) {
+				
+				console.log(id);
 				$scope.$broadcast('REFRESHCURRENT');
+				$location.path('product-upload/'+id);
 			});
 		};
 		
