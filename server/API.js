@@ -330,7 +330,7 @@ exports.configAPI = function configAPI(app) {
 						if (product.amountSold > req.body.quantity ) {
 							var amountToRemove = product.amountSold - req.body.quantity;
 							// get orders for products
-							models.Order.find({cycle: scheduler.currentCycle, product: product._id})
+							models.Order.find({cycle: scheduler.currentCycle, product: new ObjectId(product._id)})
 							.sort('-datePlaced').limit(amountToRemove)
 							.populate('customer', 'name email')
 							.populate('product', 'productName variety fullName producer_ID')
@@ -449,7 +449,7 @@ exports.configAPI = function configAPI(app) {
 					if (product.cycle == scheduler.currentCycle) {
 						
 						if (scheduler.canChange) {
-							models.Order.find({cycle: scheduler.currentCycle, product: product._id})
+							models.Order.find({cycle: scheduler.currentCycle, product: new ObjectId(product._id)})
 							.populate('customer', 'name email')
 							.populate('product', 'productName variety fullName')
 							.exec(function(e, orders){
@@ -472,23 +472,21 @@ exports.configAPI = function configAPI(app) {
 										
 											deleteMail.send(function(err, result) {
 												if (err) return next(err);
-												// a response is sent so the client request doesn't timeout and get an error.
 												log.info(result);
-												repeat(i + 1);
 											});
+											repeat(i + 1);
 										}
-										else {
+										else { //done sending emails now delete the product and orders
+											models.Order.remove({cycle: scheduler.currentCycle, product: new ObjectId(product._id)}, function(err, orders) {
+												if (err) log.warn(err);
+											});
 											product.remove(function(err, product){
 												if (err) return next(err);
-												orders.remove(function(err, orders) {
-													if (err) return next(err);
-													res.status(200).send('product deleted');
-												});
+												res.status(200).send('product deleted');
 											});
 										}
 									}(0));
-								}
-								else {
+								} else { // no orders for that product
 									product.remove(function(err, product){
 										if (err) return next(err);
 										else res.status(200).send('product deleted');
@@ -496,7 +494,7 @@ exports.configAPI = function configAPI(app) {
 								}
 							});
 						}
-						else {
+						else { // don't even bother looking for orders just delete the product
 							product.remove(function(err, product){
 								if (err) return next(err);
 								else res.status(200).send('product deleted');

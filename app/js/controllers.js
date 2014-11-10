@@ -110,7 +110,9 @@ angular.module('co-op.controllers', [])
 			LoginManager.login('local', $scope.loginData, function() {
 				if ($rootScope.savedLocation) {
 					$location.path($rootScope.savedLocation);
+					$rootScope.savedLocation = "";
 				}
+				else $location.path('me');
 			});
 		};
 	}
@@ -555,14 +557,6 @@ angular.module('co-op.controllers', [])
 			$scope.productData.priceWithMarkup = newValue * 1.2;
 		});
 		
-		
-		// pass product to $scope.productData for editing in the main form
-/* No longer used
-		$scope.editProduct = function(product) {
-			$scope.productData = product;
-			console.log($scope.productData);
-		};*/
-		
 		$scope.setCategory = function(categoryId) {
 			$scope.productData.category = categoryId;
 		};
@@ -583,6 +577,11 @@ angular.module('co-op.controllers', [])
 
 		$scope.submitForm = function() {
 			ProductManager.registerProduct($scope.productData, function(id) {
+				/*
+				flash.setNextMessage({type: 'success', 
+								message: 'Congratulations ' + $rootScope.currentUser.name + '! Your ' + $scope.productData.variety + " " + $scope.productData.productName + ' was successfully added to the store.'
+								});*/
+				
 				$scope.$broadcast('REFRESHCURRENT');
 				$location.path('product-upload/'+id);
 			});
@@ -997,9 +996,6 @@ function($scope, $modalInstance, data, ProductManager) {
 		}
 		
 		if ($rootScope.cycle) {
-			loadProducts(productURL);
-			loadProducts(productURL);
-			loadProducts(productURL);
 			loadProducts(productURL);
 			productsStarted = true;
 		}

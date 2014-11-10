@@ -93,8 +93,7 @@ angular.module('co-op.services', [])
 						})
 					.then(function(user) {
 						authenticate(user);
-						$location.path($rootScope.savedLocation);
-						$rootScope.savedLocation = "";
+						cb();
 						flash.setNextMessage({type: 'success', message: 'Welcome back ' + $rootScope.currentUser.name + '. Please click on \'member tools\' on the left side of the top tool bar to get started.\n Mobile and tablet users tap the top left grey arrow.'});
 					}, function(error) {
 						// incorrect login attempt
@@ -253,12 +252,10 @@ angular.module('co-op.services', [])
 			registerProduct : function(productData, callback) {
 				var cb = callback || angular.noop;
 				Restangular.all('api/product').post(productData).then(function(result) {
-					flash.setMessage({type: 'success', 
+					flash.setNextMessage({type: 'success', 
 					message: 'Congratulations ' + $rootScope.currentUser.name + '! Your ' + productData.variety + " " + productData.productName + ' was successfully added to the store.'
 					});
 					//var r = JSON.parse(result);
-					console.log(result._id);
-					console.log(result);
 					cb(result._id);
 				}, function(error) {
 					console.log(error.data);
