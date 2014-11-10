@@ -8,7 +8,9 @@
 
 <div class="col-md-6">
 
-<h2>{{month}} Products</h2>
+<h2>{{month}} Products <a href="/product-upload"><span style="display: inline-block" class="label label-success">
+				+ Product
+			</span></a></h2>
 <table class="table">
 <thead>
 	<tr>
@@ -105,7 +107,7 @@
 		<tbody ng-repeat-end>
 			<tr ng-repeat="i in order.orders">
 		        <td data-title="'Product'" >
-		            <a ng-href="/product-upload/{{i._id}}">{{i.product.fullName}}</a>
+		            <a ng-href="/product-upload/{{i.product._id}}">{{i.product.fullName}}</a>
 		        </td>
  				<td data-title="'Quantity'">
  					{{i.quantity}}

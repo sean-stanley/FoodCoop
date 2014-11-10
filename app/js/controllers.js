@@ -1,12 +1,12 @@
 'use strict';
-/*global angular, _, Date*/
+/*global angular, _, Date, oboe*/
 
 /* Controllers */
 
 angular.module('co-op.controllers', [])
 	
-.controller('navCtrl', ['$scope', '$location', 'flash', '$swipe',
-	function($scope, $location, flash, $swipe) {
+.controller('navCtrl', ['$scope', '$location', 'flash',
+	function($scope, $location, flash) {
 			// init			
 			$scope.predictiveSearch = [];
 			$scope.flash = flash;
@@ -583,8 +583,6 @@ angular.module('co-op.controllers', [])
 
 		$scope.submitForm = function() {
 			ProductManager.registerProduct($scope.productData, function(id) {
-				
-				console.log(id);
 				$scope.$broadcast('REFRESHCURRENT');
 				$location.path('product-upload/'+id);
 			});
@@ -931,44 +929,22 @@ function($scope, $modalInstance, data, ProductManager) {
 	}
 ])
 
-.controller('storeCtrl', ['$scope', '$rootScope', '$location', '$routeParams', '$modal', 'LoginManager', 'flash', 'Restangular', 'Cart',
-	function($scope, $rootScope, $location, $routeParams, $modal, LoginManager, flash, Restangular, Cart) {
+.controller('storeCtrl', ['$scope', '$rootScope', '$location', '$routeParams', '$modal', 'LoginManager', 'flash', '$http', 'Cart',
+	function($scope, $rootScope, $location, $routeParams, $modal, LoginManager, flash, $http, Cart) {
+		var category, sort, reverse;
+		$scope.isProducts = true;
+		
 		$scope.searchObject = $location.search();
 		
 		$scope.predictiveSearch = [];
+		$scope.category = $scope.searchObject.hasOwnProperty('category') ? $scope.searchObject.category : undefined;
+		$scope.sort = $scope.searchObject.hasOwnProperty('sort') ? $scope.searchObject.sort : undefined;
+		$scope.reverse = $scope.searchObject.hasOwnProperty('reverse') ? $scope.searchObject.reverse : undefined;
 		
-		// initiate filter object
-		$scope.filter = {};
-		$scope.filter.category = {};
-		$scope.filter.category.name = "";
-		
-		
-		if ($scope.searchObject) {
-			for (var key in $scope.searchObject) {
-				if ($scope.searchObject.hasOwnProperty(key)) {
-					switch (key) {
-						case 'category':
-							$scope.filter.category.name = $scope.searchObject[key];
-							break;
-						case 'sort':
-							if ( $scope.searchObject[key] === 'producer') {
-								$scope.sort = 'producer_ID.producerData.companyName';
-							}
-							else $scope.sort = $scope.searchObject[key];
-							break;
-						case 'reverse':
-							$scope.reverse = $scope.searchObject[key];
-							break;
-						default:
-							console.log("no match found for " + key);
-					}
-				}
-			}
-		}
 		
 		var findCartItems = function() {
 			if ($scope.cartProduct_ids && $scope.products) {
-				$scope.products.forEach(function(product, idx, collection) {
+				$scope.products.forEach(function(product) {
 					if ( _.contains($scope.cartProduct_ids, product._id) ) {
 						product.AlreadyInCart = true;
 					}
@@ -979,49 +955,87 @@ function($scope, $modalInstance, data, ProductManager) {
 		
 		// initiate the real-time message container
 		//$scope.message = {type: 'danger', closeMessage: function() {if (this.message) this.message = null;} };
+		$scope.products = [];
 		
-		Restangular.all('api/product').getList({cycle: $rootScope.cycle}).then(function(products){
-			$scope.products = products.plain();
+		var productURL = 'api/product?cycle='+$rootScope.cycle;
+		var productsStarted;
+		
+		function loadProducts(productURL) {
+			oboe(productURL)
+				.path('!.*', function(product) {
+					if (product) $scope.isProducts = true;
+					else $scope.isProducts = false;
+				})
+				.node('!.*', function( product ){
+					// This callback will be called each time a new product is loaded
+					$scope.products.push(product);
+					console.log($scope.products.length);
+					$scope.$apply();
+					return oboe.drop;
+				})
+				.done(function() {
+					(function() {
+						var hashID, product, key, searchObject;
+						// if we need to open a product modal
+						if ($location.hash()) {
+							hashID = $location.hash().split('&id=');
+							hashID = hashID[1];
+							product = _.findWhere($scope.products, {_id: hashID});
+							$scope.open(product);
+						}
+					}());
 			
+					// this will do nothing if the products are loaded before the cart is ready
+					// or no user is logged in
+					findCartItems();
 			
-			
-			// deal with all hash and search on product successful load;
-			(function() {
-				var hashID, product, key, searchObject;
-				// if we need to open a product modal
-				if ($location.hash()) {
-					hashID = $location.hash().split('&id=');
-					hashID = hashID[1];
-					product = _.findWhere($scope.products, {_id: hashID});
-					$scope.open(product);
-				}
+					$scope.predictiveSearch = _.map($scope.products, 'fullName');
+					$rootScope.$broadcast('PREDICTIVE_SEARCH', $scope.predictiveSearch);
 				
-			}());
-			
-			
-			// this will do nothing if the products are loaded before the cart is ready
-			// or no user is logged in
-			findCartItems();
-			
-			//create array of useful typeahead texts
-			$scope.products.forEach(function(product) {
-				$scope.predictiveSearch.push(product.fullName);
-				$scope.predictiveSearch.push(product.variety);
-				$scope.predictiveSearch.push(product.productName);
-				$scope.predictiveSearch.push(product.category.name);
-				$scope.predictiveSearch.push(product.certification.name);
-				if ( product.hasOwnProperty('ingredients') && product.ingredients instanceof Array ) {
-					product.ingredients.forEach(function(item) {
-						$scope.predictiveSearch.push(item);
-					});
-				}
-				$scope.predictiveSearch.push(product.producer_ID.producerData.companyName);
-				$scope.predictiveSearch.push(product.producer_ID.name);
-			});
-			
-			$rootScope.$broadcast('PREDICTIVE_SEARCH', $scope.predictiveSearch);
-			
+					return oboe.drop;
+				});
+		}
+		
+		if ($rootScope.cycle) {
+			loadProducts(productURL);
+			loadProducts(productURL);
+			loadProducts(productURL);
+			loadProducts(productURL);
+			productsStarted = true;
+		}
+		
+		$rootScope.$watch('cycle', function(newValue){
+			if ($rootScope.cycle && !productsStarted) {
+				loadProducts(productURL);
+			}
 		});
+		
+		
+		// $http.get('api/product', {params: {cycle: $rootScope.cycle}}).success(function(products){
+// 			console.log(products);
+// 			$scope.products = products;
+// 			console.log($scope.products);
+//
+// 			// deal with all hash and search on product successful load;
+// 			(function() {
+// 				var hashID, product, key, searchObject;
+// 				// if we need to open a product modal
+// 				if ($location.hash()) {
+// 					hashID = $location.hash().split('&id=');
+// 					hashID = hashID[1];
+// 					product = _.findWhere($scope.products, {_id: hashID});
+// 					$scope.open(product);
+// 				}
+// 			}());
+//
+//
+// 			// this will do nothing if the products are loaded before the cart is ready
+// 			// or no user is logged in
+// 			findCartItems();
+//
+// 			$scope.predictiveSearch = _.map($scope.products, 'fullName');
+// 			$rootScope.$broadcast('PREDICTIVE_SEARCH', $scope.predictiveSearch);
+// 		});
 		
 		$scope.searchFor = function(term) {
 			$location.search('search', term);
@@ -1040,10 +1054,9 @@ function($scope, $modalInstance, data, ProductManager) {
 				}
 			});
 			
-			modalInstance.opened.then(function() {
-				
-			});
-			
+			// modalInstance.opened.then(function() {
+	//
+	// 		});
 			modalInstance.result.then(function(product) {
 				$location.hash('');
 				$scope.addToCart(product);
@@ -1105,7 +1118,7 @@ function($scope, $modalInstance, data, ProductManager) {
 		
 		// route params
 				
-		$scope.$watch('filter.category.name', function(newValue) {
+		$scope.$watch('category', function(newValue) {
 			// if newValue is falsey
 			if (!newValue) {
 				$location.search('category', null);
@@ -1143,9 +1156,7 @@ function($scope, $modalInstance, data, ProductManager) {
 				flash.setMessage({type: 'warning', message: 'Shopping is not allowed yet sorry. Please check the calendar for when shopping is open next.'});
 			}
 		});
-
 	}
-
 ])
 
 .controller('productUICtrl', ['$scope', '$timeout',
@@ -1161,10 +1172,6 @@ function($scope, $modalInstance, data, ProductManager) {
                 timer = undefined;
 			}, 1200);
 		};
-		
-		$scope.$watch('detailsVisible', function() {
-			console.log($scope.detailsVisible);
-		});
 		
 		$scope.showHideDetails = function(bool) {$scope.detailsVisible = bool;};
 		

@@ -4,7 +4,7 @@
 					
 <section id="main-nav-and-sorting" class="col-xs-12 clearfix">
 		<br>
-		<div ng-controller="calendarCtrl" ng-click="href('/calendar')" class="clearfix">
+		<div ng-controller="calendarCtrl" class="clearfix">
 			<a href="/calendar"><i class="fa fa-calendar pull-left fa-4x"></i></a>
 			<p>
 				<i class="fa fa-cloud-upload fa-fw"></i> Product Uploading: {{inDateRange(countDown[0].ProductUploadStart, countDown[0].ProductUploadStop)}}.<br>
@@ -18,25 +18,25 @@
     <div ng-class="{ 'pull-left' : !panelDisplay}" class="hidden-sm hidden-xs">
     	<label> Categories: </label>
 		<div class="btn-group">
-			<button type='button' class="btn btn-default" ng-model="filter.category.name" btn-radio="'Produce'" >Produce</button>
-			<button type='button' class="btn btn-default" ng-model="filter.category.name" btn-radio="'Meat'" >Meat</button>
-			<button type='button' class="btn btn-default" ng-model="filter.category.name" btn-radio="'Processed-Goods'" >Processed Goods</button>
-			<button type='button' class="btn btn-default" ng-model="filter.category.name" btn-radio="'Baked Goods'" >Baked Goods</button>
-			<button type='button' class="btn btn-default" ng-model="filter.category.name" btn-radio="'Dairy & Eggs'" >Dairy &amp; Eggs</button>
-			<button type='button' class="btn btn-default" ng-model="filter" btn-radio="">All</button>
+			<button type='button' class="btn btn-default" ng-model="category" btn-radio="'Produce'" >Produce</button>
+			<button type='button' class="btn btn-default" ng-model="category" btn-radio="'Meat'" >Meat</button>
+			<button type='button' class="btn btn-default" ng-model="category" btn-radio="'Processed-Goods'" >Processed Goods</button>
+			<button type='button' class="btn btn-default" ng-model="category" btn-radio="'Baked Goods'" >Baked Goods</button>
+			<button type='button' class="btn btn-default" ng-model="category" btn-radio="'Dairy & Eggs'" >Dairy &amp; Eggs</button>
+			<button type='button' class="btn btn-default" ng-model="category" btn-radio="null">All</button>
 		</div>
 	</div>
 	
 	<div class="btn-group visible-sm visible-xs" dropdown>
 		<button class='btn btn-default dropdown-toggle'>Categories <span class="caret"></span></button>
 		<ul class="dropdown-menu" role="menu">
-	        <li><a ng-click="filter.category.name = 'Produce'">Produce</a></li>
-	        <li><a ng-click="filter.category.name = 'Meat'">Meat</a></li>
-	        <li><a ng-click="filter.category.name = 'Processed-Goods'">Processed Goods</a></li>
-	        <li><a ng-click="filter.category.name = 'Baked Goods'">Baked Goods</a></li>
-	        <li><a ng-click="filter.category.name = 'Dairy & Eggs'">Dairy &amp; Eggs</a></li>
+	        <li><a ng-click="category = 'Produce'">Produce</a></li>
+	        <li><a ng-click="category = 'Meat'">Meat</a></li>
+	        <li><a ng-click="category = 'Processed-Goods'">Processed Goods</a></li>
+	        <li><a ng-click="category = 'Baked Goods'">Baked Goods</a></li>
+	        <li><a ng-click="category = 'Dairy & Eggs'">Dairy &amp; Eggs</a></li>
 	        <li class="divider"></li>
-	        <li><a ng-click="filter = null">Show All</a></li>
+	        <li><a ng-click="category = null">Show All</a></li>
 	    </ul>
 	</div>
 	   
@@ -60,7 +60,7 @@
 </section>
 
 <div id="products-section" class="col-xs-12">
-	<div ng-if="products.length <= 0" class="col-md-8 col-md-offset-2">
+	<div ng-show="!isProducts" class="col-md-8 col-md-offset-2">
 		<div class="jumbotron">
 			<h1 class="text-center">What? No Products?</h1>
 			<p>This happens when no members have uploaded products for this month yet.</p>
@@ -69,7 +69,7 @@
 	</div>
 	
 	<ul id="store-products" class="list-unstyled">
-		<li ng-repeat="product in products | orderBy:sort:reverse | filter:search | filter:filter" class="product-container" 
+		<li ng-repeat="product in products | orderBy:sort:reverse | filter:search | filter:category " class="product-container" 
 		ng-controller="productUICtrl" 
 		ng-mouseleave="detailsVisible = false"
 		ng-swipe-left="detailsVisible = true;"
@@ -118,7 +118,7 @@
 					<span ng-if="product.certification !== 'none' ">Certified by {{product.certification.name}}</span>
 					</p>
 					<p ng-if="product.ingredients && product.ingredients.length > 0">Ingredients: 
-					<span ng-repeat="item in product.ingredients">
+					<span ng-repeat="item in product.ingredients track by $index">
 						<a class="yellow-link" ng-click="searchFor(item)">{{item}} </a> 
 					</span></p>
 					<div class="btn-group">

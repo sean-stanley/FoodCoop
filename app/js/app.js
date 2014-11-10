@@ -6,8 +6,7 @@ angular.module('co-op', [
 	'ngAnimate',
 	'ngRoute', 
 	'ngSanitize',
-	'ngTouch',
-	'superswipe',
+	//'superswipe',
 	'co-op.filters', 
 	'co-op.services', 
 	'co-op.directives', 
@@ -17,7 +16,8 @@ angular.module('co-op', [
 	'textAngular',
 	'cropme',
 	'restangular',
-	'angulartics', 'angulartics.google.analytics'
+	'angulartics', 'angulartics.google.analytics',
+	'ngTouch'
 	])
 
   .config(['$compileProvider', '$routeProvider', '$locationProvider', 'RestangularProvider', function($compileProvider, $routeProvider, $locationProvider, RestangularProvider) {

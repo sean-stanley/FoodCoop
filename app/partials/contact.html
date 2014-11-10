@@ -15,7 +15,7 @@
 	<img class="img-responsive" ng-src="{{member.producerData.logo}}" ng-if="member.producerData.logo">
 </article>
 
-<form name="contactUs" ng-submit="submitForm(mail);" class="col-sm-5 col-xs-12" id="contactUs">
+<form name="contactUs" class="col-sm-5 col-xs-12" id="contactUs">
 	<fieldset>	
 		<div class="form-group">
 	    	<label for="senderName">Full Name</label>
@@ -49,7 +49,9 @@
 		</div>
 		
 		<button type="reset" class="btn btn-default">Reset</button>    
-	    <button type="submit" class="btn btn-default" ng-disabled="contactUs.$invalid" analytics-on="click" analytics-event="Contact-Form">Submit</button>
+	    <button type="submit" class="btn btn-default" ng-disabled="contactUs.$invalid" 
+			ng-click="submitForm(mail)"
+			analytics-on="click" analytics-event="Contact-Form">Submit</button>
 		
 	</fieldset>	
 </form>

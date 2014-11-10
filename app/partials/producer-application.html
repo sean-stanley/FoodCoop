@@ -40,7 +40,7 @@
 <br>
 <h1><span class="step">2</span> About You</h1>
 
-<form name="producerForm" ng-submit="submitForm(producerApplication);" id="applicationForm" class="application-list">
+<form name="producerForm" id="applicationForm" class="application-list">
 	<fieldset>
 	    <div class="form-group">
 			<label for="certification">I am organically certified with: </label>
@@ -73,7 +73,7 @@
 </form>
 <hr>
 <br>
-<h1><span class="step">3</span> <button type="submit" form="applicationForm" class="btn btn-default btn-lg big-button" ng-disabled="producerForm.$invalid && producerApplication.hasOwnProperty('agreed')"
+<h1><span class="step">3</span> <button type="submit" ng-click="submitForm(producerApplication)" form="applicationForm" class="btn btn-default btn-lg big-button" ng-disabled="producerForm.$invalid && producerApplication.hasOwnProperty('agreed')"
 	analytics-on="click">Apply</button></h1>
 
 </article>

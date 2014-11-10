@@ -32,7 +32,7 @@
 		            {{c.product.fullName}}
 		        </td>
 		        <td data-title="'Quantity'">
-					<form class="navbar-form navbar-left" role="search" ng-submit="saveNewQuantity(c)" ng-controller="updateCartCtrl">
+					<form class="navbar-form navbar-left" role="search" ng-controller="updateCartCtrl">
 						<div class="form-group">
 							<input type="number" class="form-control" ng-model="c.quantity" 
 							ng-init="lastQuantity = c.quantity"
@@ -41,7 +41,7 @@
 						<button type="submit" 
 						class="btn btn-default" 
 						ng-show="showSave" 
-						ng-click="showSave=false"><span class="glyphicon glyphicon-floppy-save"></span> Save</button>
+						ng-click="showSave=false; saveNewQuantity(c);"><span class="glyphicon glyphicon-floppy-save"></span> Save</button>
 					</form>
 		        </td>
 		        <td data-title="'Price'">

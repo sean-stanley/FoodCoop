@@ -1,12 +1,12 @@
 <br>
 <div class="visible-xs-block" style="height: 51px"></div>
-<div ng-class="{ 'col-sm-3' : !panelDisplay, 'col-sm-6' : panelDisplay}" class="hidden-xs">
+<div ng-class="{ 'col-sm-4' : !panelDisplay, 'col-sm-6' : panelDisplay}" class="hidden-xs">
 	<img src="/img/agricultural_landscape.jpg" alt="agricultural_landscape.jpg" width="675" height="1000" class="img-responsive"/>
 </div>
 
-<div ng-class="{ 'col-sm-3' : !panelDisplay, 'col-sm-6' : panelDisplay}">
+<div ng-class="{ 'col-sm-4' : !panelDisplay, 'col-sm-6' : panelDisplay}">
 
-<form name="signIn" autocomplete="on" ng-submit="submitForm()" novalidate ng-controller="loginCtrl">
+<form name="signIn" autocomplete="on" novalidate ng-controller="loginCtrl">
 	<div class="form-group">
 		<input ng-model="loginData.email" type="email" name="email" class="form-control" id="inputEmail" placeholder="Email">
 		<div class="alert alert-warning" ng-show="signIn.email.$dirty && signIn.email.$invalid">Sorry:
@@ -18,7 +18,7 @@
 		<input ng-model="loginData.password" type="password" name="password" class="form-control" id="inputPassword" placeholder="Password">
 	</div>
 	<div class="form-group">
-		<button type="submit" class="btn btn-default btn-block" ng-click="showLogin = false;">Sign in</button>
+		<button type="submit" class="btn btn-default btn-block" ng-click="submitForm()">Sign in</button>
 	</div>
 </form>
 <a href="/forgot" ng-click="showLogin = false">Forgot my password?</a>
@@ -26,9 +26,6 @@
 </div>
 
 
-<div class="col-sm-3" ng-hide="panelDisplay">
+<div class="col-sm-4" ng-hide="panelDisplay">
 	<img src="/img/Muwin-Estates-Orchard-tall.jpg" alt="Muwin-Estates-Orchard-tall" width="675" height="1000" class="img-responsive"/>
-</div>
-<div class="col-sm-3" ng-hide="panelDisplay">
-	<img src="../img/heifersHereford-lg.jpg" alt="heifersHereford-lg" width="675" height="1000" class="img-responsive"/>
 </div>

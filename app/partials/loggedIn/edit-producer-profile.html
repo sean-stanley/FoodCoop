@@ -13,7 +13,7 @@
 	</div>
 
 <div id="producer-form-container" class="col-md-8" >
-	<form name="producerEdit" autocomplete="off" ng-submit="submitForm();" novalidate>
+	<form name="producerEdit" autocomplete="off" novalidate>
 		<fieldset>
 			<legend>Edit Your Producer Information {{currentUser.name}}</legend>
 			<div class="row">
@@ -67,7 +67,7 @@
 			</div>
    
     
-			<button type="submit" class="btn btn-default" ng-disabled="producerEdit.$invalid">Save Changes</button>
+			<button type="submit" class="btn btn-default" ng-disabled="producerEdit.$invalid" ng-click="submitForm()">Save Changes</button>
 		</fieldset>
 	</form>
 </div>

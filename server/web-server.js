@@ -16,7 +16,7 @@ var util = require('util'),
 	mcapi = require('mailchimp-api'),
     config = require('./config').Config;
 	
-http.globalAgent.maxSockets = 50000;
+http.globalAgent.maxSockets = 500;
 	
 var log = bunyan.createLogger({
 	name: 'API', 

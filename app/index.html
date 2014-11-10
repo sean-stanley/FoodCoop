@@ -50,9 +50,15 @@
 	
 	
 	<link href="css/animations.css" rel="stylesheet">
+	
+	<!--[if lt IE 9]>
+	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js">
+	</script>
+	<![endif]-->
+	
 </head>
 
-<body ng-controller="navCtrl" ng-init="cartPanel = {open: false};" ng-swipe-right="panelDisplay = true">
+<body ng-controller="navCtrl" ng-init="cartPanel = {open: false};"  ng-swipe-right="panelDisplay = true">
 	<div ng-cloak="" class='splash text-center'>
 		<h1 style="font-size: 6em">Loading your Co-op</h1>
 		<i class="fa fa-cog fa-spin" style='font-size: 10em'></i>
@@ -120,7 +126,7 @@
 											</button>
 										</td>
 								        <td data-title="'Quantity'" ng-hide="showDelete">
-											<form role="search" ng-submit="saveNewQuantity(c)" ng-controller="updateCartCtrl">
+											<form role="search" ng-controller="updateCartCtrl">
 												<div class="form-group">
 													<input type="number" class="form-control" ng-model="c.quantity" 
 													ng-init="lastQuantity = c.quantity"
@@ -129,7 +135,7 @@
 												<button type="submit" 
 												class="btn btn-default" 
 												ng-show="showSave" 
-												ng-click="showSave=false">Save</button>
+												ng-click="showSave=false; saveNewQuantity(c)">Save</button>
 											</form>
 								        </td>
 								        <td data-title="'Price'">
@@ -193,7 +199,7 @@
 					<li class="hidden-md hidden-lg" ng-if="currentUser == null">
 						<a href="/login-page"><span class="glyphicon glyphicon-lock"></span>Login</a>
 					</li>
-					<li ng-class="{active:isActive('/store')}"><a href="store"><span class="glyphicon glyphicon-shopping-cart"></span> Store</a></li>
+					<li ng-class="{active:isActive('/store')}"><a ng-click="href('/store')" href="store"><span class="glyphicon glyphicon-shopping-cart"></span> Store</a></li>
 					<li ng-class="{active:isActive('/')}"><a href="/">Home</a></li>
 					<li ng-class="{active:isActive('/signup')}" ng-hide="currentUser != null"><a href="/signup">Sign Up</a></li>
 					<li ng-class="{active:isActive('/about')}"><a href="/about">About</a></li>
@@ -228,7 +234,7 @@
 			</alert>
 		</div> 
 			
-		<!--  This is where the partials go for the forms and information pages. /-->    
+		<!--  This is where the partials go for the forms and information pages.  ng-swipe-right="panelDisplay = true"/-->    
 		<div id="view"
 		ng-cloak
 		ng-view
@@ -313,11 +319,13 @@
 	<script src="lib/bower_components/angulartics/dist/angulartics.min.js" type="text/javascript" charset="utf-8"></script>	
 	<script src="lib/bower_components/angulartics/dist/angulartics-ga.min.js" type="text/javascript" charset="utf-8"></script>
 	
+	<script src="lib/oboe-browser.min.js" type="text/javascript" charset="utf-8"></script>
+	
 	<!-- cropme dependencies -->
 
 <!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular-sanitize.min.js"></script>-->
-	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular-touch.min.js"></script>
-	<script src="lib/bower_components/angular-superswipe/superswipe.js"></script>
+<!-- <script src="lib/bower_components/angular-superswipe/superswipe.js"></script> -->
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular-touch.js"></script>
 	<script src="lib/bower_components/angular-cropme/cropme.js"></script>
 	
 	<!-- Other plugins here -->	

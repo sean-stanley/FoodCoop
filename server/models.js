@@ -2,6 +2,8 @@ var mongoose = require('mongoose'), // middleware for connecting to the mongodb 
 	Schema = mongoose.Schema, // mongoose schema object for defining collections.
 	passportLocalMongoose = require('passport-local-mongoose'),
 	_ = require('lodash'), // this creates salted and hashed passwords
+	fs = require('fs'),
+	path = require('path'),
 	config = require('./coopConfig.js'),
 	markup = config.markup;
 
@@ -53,6 +55,26 @@ ProductSchema.virtual('fullName').get(function () {
 	if (this.variety) return this.variety + ' ' + this.productName;
 	else return this.productName
 });
+// occurs just before an invoice is saved. should work with Model.create() shortcut
+ProductSchema.pre('save', function(next) {
+	var product = this;
+
+	if (product.img && product.img.length > 200) { //not a base64 image if it's shorter than 200 characters.
+		var destination = path.normalize(path.join(__dirname, '../app', 'upload', 'products', product.productName+"+"+product.variety+"+id-"+product._id+".png"));
+		var base64Data = product.img.replace(/^data:image\/png;base64,/, "");
+
+		fs.writeFile(destination, base64Data, 'base64', function(err) {
+		  if (err) console.log(err);
+		});
+		//set img to be img path instead
+		product.img = path.normalize(path.join('upload', 'products', product.productName+"+"+product.variety+"+id-"+product._id+".png"));
+		console.log(product.img);
+	}
+	
+	
+	next();
+});
+
 
 // for keeping records of all possible cycle codes. Codes are used by products
 // and orders to determine what has been bought and uploaded each cycle.

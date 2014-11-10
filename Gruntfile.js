@@ -139,6 +139,7 @@ module.exports = function(grunt) {
             rsync: {
                 options: {
                     args: ["--verbose"],
+										exclude: [".git*","*.scss","node_modules", "app/uploads"],
                     recursive: true
                 },
                 linode: {

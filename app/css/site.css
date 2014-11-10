@@ -344,6 +344,15 @@ a.panel-btn-sml {
 /*
 .product-container figure {background:#ddd;}
 */
+@media (min-width: 768px) {
+	.first-layer > img.img-responsive {
+		min-height: 250px;
+		min-width: 330px;
+	}
+
+	.product-container { max-width: 369px; }
+}
+
 
 .details-layer {
 	color: #dddddd;

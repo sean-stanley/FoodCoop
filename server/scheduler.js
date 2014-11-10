@@ -346,11 +346,27 @@ function disableCycle() {
 	exports.canChange = true;
 }
 
+function writeProductImgToDisk() {
+	models.Product.find({}, null, function(err, products){
+		console.log(err);
+		
+		for (var i = products.length - 1; i >= 0; i--) {
+			products[i].save(function(err, product, num) {
+				if (err) console.log(err);
+				console.log(product.img);
+			})
+		}
+		
+	});
+}
+
+
 exports.findCycle = findCycle;
 
 findCycle();
 checkConfig();
-//disableCycle();
+disableCycle();
+//writeProductImgToDisk();
 
 // checkout everyone's purchases
 //checkout();

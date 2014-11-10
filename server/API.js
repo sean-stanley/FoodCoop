@@ -25,6 +25,7 @@ var util = require('util'),
 	mailChimp = require('./mailChimp.js'),
 	config = require('./coopConfig.js'), // static methods of important configuration info
 	scheduler = require('./scheduler.js'), // contains scheduled functions and their results
+	//oboe = require('oboe'); //JSON streaming and parsing
 	
 	passport = require('passport'), // middleware that provides authentication tools for the API.
 	LocalStrategy = require('passport-local').Strategy; // the passport strategy employed by this API.
@@ -53,7 +54,7 @@ exports.configAPI = function configAPI(app) {
 	
 	// Middleware
 	// ==========
-	app.use(compression({threshold: 128}));
+	app.use(compression());
 	
 	// here we load the bodyParser and tell it to parse the requests received as json data.
 	app.use(bodyParser.json({limit: '50mb'})); 
@@ -181,18 +182,42 @@ exports.configAPI = function configAPI(app) {
 	});
 
 	// this route looks up products and sends an array of results back to the client.
-	app.get("/api/product", function(req, res, next) {
-		var opts;
-		models.Product.find(req.query)
+	app.get("/api/product", function(req, res, next) {		
+		//
+		log.info('got request for products');
+		res.set('Charset' , 'utf-8');
+		
+		var stream = models.Product.find(req.query)
 		.sort({_id: 1})
+		//.select('-img')
 		.populate('category', 'name')
 		.populate('certification', 'name -_id img')
 		.populate('producer_ID', 'name producerData.companyName')
-		.exec(function(err, product) {
-					if (err) return next(err);
-					res.send(product);
-				});
+		//.stream({transform: JSON.stringify})
 		
+		// oboe( stream )
+// 		.node('![*]', function( productsLoadedSoFar ){
+// 			res.write(productsLoadedSoFar);
+// 		})
+// 		.done(function() {
+// 			res.end();
+// 		});
+		
+// 		res.write('[');
+// 		res.on('data', function (doc) {
+// 		  // do something with the mongoose document
+// 			//res.write(doc);
+// 			res.write(',');
+// 		}).on('error', function (err) {
+// 		  log.info(err)
+// 			res.end()
+// 		}).on('close', function () {
+// 		  res.end(']');
+// 		});
+		.exec(function(err, products) {
+					if (err) return next(err);
+					res.json(products);
+				});
 	});
 	
 	// return just one product for editing or use as a template for another product
@@ -210,7 +235,7 @@ exports.configAPI = function configAPI(app) {
 					
 					else {
 						delete productObject._id;
-						res.send(productObject);
+						res.json(productObject);
 					}
 				}
 				else {
@@ -250,8 +275,8 @@ exports.configAPI = function configAPI(app) {
 						productObject = product.toObject();
 						
 						for (key in req.body) {
-							if (req.body.hasOwnProperty(key)) {
-								if (productObject[key] !== req.body[key]) {
+							if (req.body.hasOwnProperty(key) && key !== "__v") {
+								if (!_.isEqual(productObject[key], req.body[key]) ) {
 									// compare the values of the database object to the values of the request object.
 									product[key] = req.body[key]; // update the product's properties
 									needsSave = true;
@@ -289,7 +314,8 @@ exports.configAPI = function configAPI(app) {
 						cycle: scheduler.currentCycle
 					}, function(err, product) {
 						if (err) return next(err);
-						res.status(200).send(product._id);
+						log.info('%s just uploaded', product.productName + " " + product.variety || '');
+						res.status(200).json(product);
 					});
 				}
 			}
@@ -417,7 +443,7 @@ exports.configAPI = function configAPI(app) {
 		// ensure user is logged in to perform this request.		
 		if ( req.user && (scheduler.canUpload || scheduler.canChange) ) {
 			// delete the product based on it's id
-			models.Product.findById(new ObjectId(req.params.id), function(err, product) {
+			models.Product.findById(req.params.id, function(err, product) {
 				if (err) return next(err);
 				if (_.isEqual(req.user._id, product.producer_ID) || req.user.user_type.isAdmin) {
 					if (product.cycle == scheduler.currentCycle) {
@@ -461,6 +487,12 @@ exports.configAPI = function configAPI(app) {
 											});
 										}
 									}(0));
+								}
+								else {
+									product.remove(function(err, product){
+										if (err) return next(err);
+										else res.status(200).send('product deleted');
+									});
 								}
 							});
 						}

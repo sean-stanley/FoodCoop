@@ -7,7 +7,7 @@
 
 <div class="col-sm-3">
 	<h2>Try Again</h2>
-		<form class="form-horizontal" name="signIn" autocomplete="on" ng-submit="submitForm()" novalidate ng-controller="loginCtrl">
+		<form class="form-horizontal" name="signIn" autocomplete="on" novalidate ng-controller="loginCtrl">
 			<div class="form-group">
 				<!-- <label for="inputEmail" class="col-lg-2 control-label">Email</label> -->
 				<input ng-model="loginData.email" type="email" name="email" class="form-control" id="inputEmail" placeholder="Email">
@@ -26,7 +26,7 @@
 					</div>-->
 			</div>
 			<div class="form-group">
-				<button type="submit" class="btn btn-default btn-block" ng-disabled="failedAttempts > 10">Sign in</button>
+				<button type="submit" class="btn btn-default btn-block" ng-disabled="failedAttempts > 10" ng-click="submitForm()">Sign in</button>
 			</div>
 		</form>
 </div>

@@ -8,7 +8,7 @@
 		{{message.message}}
 	</alert>
 
-	<form name="signUp" autocomplete="on" ng-submit="submitForm()" novalidate role="form" id="signup-form">		
+	<form name="signUp" autocomplete="on" novalidate role="form" id="signup-form">		
 		<div class="form-group">
 			<label for="email">Email address</label>
 			<input autofocus ng-model="userData.email" name="email" type="email" class="form-control" placeholder="Enter email" required>
@@ -76,6 +76,6 @@
 	class="btn btn-primary" 
 	form="signup-form" 
 	ng-disabled="signUp.$invalid"
-	analytics-on="click" analytics-event="Signup">Signup</button>
+	analytics-on="click" analytics-event="Signup" ng-click="submitForm()">Signup</button>
 	<button class="btn btn-warning" ng-click="cancel()" type="reset">Cancel</button>
 </div>

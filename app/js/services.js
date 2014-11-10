@@ -256,8 +256,10 @@ angular.module('co-op.services', [])
 					flash.setMessage({type: 'success', 
 					message: 'Congratulations ' + $rootScope.currentUser.name + '! Your ' + productData.variety + " " + productData.productName + ' was successfully added to the store.'
 					});
-					var r = JSON.parse(result);
-					cb(r);
+					//var r = JSON.parse(result);
+					console.log(result._id);
+					console.log(result);
+					cb(result._id);
 				}, function(error) {
 					console.log(error.data);
 					var messageData =  'Oops! Sorry ' + $rootScope.currentUser.name + ', your product didn\'t get uploaded. ' + error.status + ": ";
