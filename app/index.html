@@ -78,15 +78,7 @@
 					name="storeSearch" type="search" placeholder="Search"/>
 				</div>
 			</div>	
-			<div id="calendar-container" ng-controller="calendarCtrl">
-				<h1 class="text-center"><a href="/calendar" style="color:white;"><i class="fa fa-calendar" style='font-size:1.5em'></i></a></h1>
-				<p>
-					<i class="fa fa-cloud-upload fa-fw"></i> Product Uploading: {{inDateRange(countDown[0].ProductUploadStart, countDown[0].ProductUploadStop)}}.<br>
-					<i class="fa fa-shopping-cart fa-fw"></i> Shopping: {{inDateRange(countDown[0].ShoppingStart, countDown[0].ShoppingStop)}}.<br>
-					<i class="fa fa-gift fa-fw"></i> Delivery Day: <span class="label label-default">{{daysBeforeDeliveryDay}}</span> days<br>
-					<span ng-if="daysBeforeDeliveryDay < 1">Next delivery day in {{countDown[1].DeliveryDay.daysUntil}} days</span>
-				</p>
-			</div>
+			<a href="/calendar" style="color:#dddddd"><ng-include src=" 'partials/calendar-blurb.html' "></ng-include></a>
 	
 			<accordion close-others="false" ng-if="currentUser" >
 				<accordion-group is-open="cartPanel.open" ng-class="{'panel-open-sidebar':cartPanel.open}">
@@ -230,7 +222,8 @@
 	</div>
 
 		<div class="container-fluid alert-box" ng-cloak>
-			<alert type="{{alert.type}}" ng-repeat="alert in queue" close="flash.closeMessage($index)" role="alert" class="alerts" ng-click="flash.closeMessage($index)" ng-bind="alert.message">
+			<alert type="{{alert.type}}" dismiss-on-timeout='6000' ng-repeat="alert in queue" close="flash.closeMessage($index)" role="alert">
+				{{alert.message}}
 			</alert>
 		</div> 
 			
@@ -255,7 +248,7 @@
 					<section class="col-sm-5">
 						<nav class="footer-nav">
 							<ul class="nav">
-								<li ><a href="http://blog.foodcoop.org.nz" target="_blank">Blog</a></li>
+								<li ><a href="http://blog.foodcoop.org.nz" >Blog</a></li>
 								<li ><a href="/about">About</a></li>
 								<li ><a href="/contact">Contact</a></li>
 							</ul>
@@ -272,9 +265,9 @@
 					</section>
 					<section class="col-sm-2 text-center">
 						<ul class="list-unstyled social-footer">
-							<li><a target="_blank" href="https://www.facebook.com/nzfoodcoop"><i class="fa fa-facebook-square fa-fw fa-2x"></i></a></li>
-							<li><a target="_blank" href="https://twitter.com/NorthlandNFC"><i class="fa fa-twitter-square fa-fw fa-2x"></i></a></li>
-							<li><a target="_blank" href="https://plus.google.com/105941223701197922003" rel="publisher"><i class="fa fa-google-plus-square fa-fw fa-2x"></i></a></li>
+							<li><a  href="https://www.facebook.com/nzfoodcoop"><i class="fa fa-facebook-square fa-fw fa-2x"></i></a></li>
+							<li><a  href="https://twitter.com/NorthlandNFC"><i class="fa fa-twitter-square fa-fw fa-2x"></i></a></li>
+							<li><a  href="https://plus.google.com/105941223701197922003" rel="publisher"><i class="fa fa-google-plus-square fa-fw fa-2x"></i></a></li>
 						</ul>
 					</section>
 				</div>

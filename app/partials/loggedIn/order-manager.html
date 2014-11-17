@@ -98,7 +98,7 @@
 </accordion>
 </div>
 <div class="col-md-6">
-	<h2>Unfulfilled Orders <small>Total: {{orderTotal(currentOrders) | currency}}</small></h2>
+	<h2>Unfulfilled Orders</h2>
 	<table class="table">
 		<thead ng-repeat-start="order in sortedOrders">
 			<tr><th colspan="4"><a ng-href="/contact/{{order._id._id}}">{{order._id.name}} <i class="fa fa-envelope"></i></a></th></tr>
@@ -120,7 +120,9 @@
 				</td>
 			</tr>
 		</tbody>
-		
+		<tfoot>
+			<tr colspan='4'><td>Total: {{orderTotal(currentOrders) | currency}}</td></tr>
+		</tfoot>
 	</table>
 	<accordion>
 		<accordion-group heading="Last Month's Orders - Total: {{orderTotal(recentOrders) | currency}}">
@@ -155,7 +157,7 @@
 				</tbody>
 			</table>
 		</accordion-group>
-		<accordion-group heading="All Orders - Total: {{orderTotal(orders) | currency}}">
+		<accordion-group heading="Order History - Total: {{orderTotal(orders) | currency}}">
 			<table class="table">
 				<thead>
 					<tr>

@@ -94,6 +94,7 @@ angular.module('co-op.services', [])
 					.then(function(user) {
 						authenticate(user);
 						cb();
+						$rootScope.$broadcast('GET_CART');
 						flash.setNextMessage({type: 'success', message: 'Welcome back ' + $rootScope.currentUser.name + '. Please click on \'member tools\' on the left side of the top tool bar to get started.\n Mobile and tablet users tap the top left grey arrow.'});
 					}, function(error) {
 						// incorrect login attempt
@@ -155,8 +156,6 @@ angular.module('co-op.services', [])
 							result.reject("No Session Data");
 						});
 					}
-					
-					
 				}
 				return result.promise;
 			},
@@ -180,7 +179,7 @@ angular.module('co-op.services', [])
 					$rootScope.currentUser.route = 'api/user/' + $rootScope.currentUser._id;
 					result.resolve();
 				}, function(error){
-					var message = {type: 'danger', message: 'Drat! Failed to create a new user. '+error.data.name + ': ' + error.data.message};
+					var message = {type: 'danger', message: 'Drat! Failed to create a new user. '+ error.data.name + ': ' + error.data.message};
 					console.log(error);
 					result.reject(message);
 				});
@@ -234,10 +233,10 @@ angular.module('co-op.services', [])
 								unitSuggestions.push(category.availableUnits[unit]);
 							}
 						}
-                    }
-                }
-            }
-        });
+					}
+				}
+			}
+		});
 		
 		var certificationPromise = Restangular.all("api/certification");
 		
@@ -297,13 +296,13 @@ angular.module('co-op.services', [])
 				$http.get("api/product?producer_ID=:currentUser._id");
 			},
             
-            categoryByID: function (id) {
-                return categoryIdMapping[id];
-            },
-            
-            categoryByName: function (name) {
-                return categoryNameMapping[name];
-            },
+			categoryByID: function (id) {
+				return categoryIdMapping[id];
+			},
+			
+			categoryByName: function (name) {
+				return categoryNameMapping[name];
+			},
 			
 			certificationByID: function (id) {
 				return certificationIdMapping[id];
@@ -333,27 +332,65 @@ angular.module('co-op.services', [])
 	}])
 	
 	// Client side date managment. This job is shared by the client and server.
-	.factory('Calendar', ['$rootScope', function($rootScope) {
-		var monthStart, lastMonthStart;
+	.factory('Calendar', ['$rootScope', '$http', function($rootScope, $http) {
+		var monthStart, 
+		lastMonthStart, 
+		significantDays, 
+		nextMonth, 
+		twoMonth, 
+		daysBeforeOrderingStops,
+		daysBeforeDeliveryDay;
+		
+		// counts how many days until @date. Returns @INTEGER or NaN
+		// a negative result means that @date is in the past
+		function daysUntil (date) {				
+			var result, a, b;
+			a = new Date(date);
+			b = new Date();
+			result = Math.floor( 
+				(Date.UTC(a.getFullYear(), a.getMonth(), a.getDate()) -
+				Date.UTC(b.getFullYear(), b.getMonth(), b.getDate()) ) /
+				(1000 * 60 * 60 * 24) );
+			return result;
+		}
+		
+		$http.get('/api/calendar').success(function(result) {
+			module.significantDays = result[0];
+			module.nextMonth = result[1];
+			module.twoMonth = result[2];
+			$rootScope.cycle = result[3];
+			$rootScope.canUpload = result[4];
+			$rootScope.canShop = result[5];
+			$rootScope.canChange = result[6];
+			
+			module.daysBeforeOrderingStops = daysUntil(module.significantDays.ProductUploadStop);
+			module.daysBeforeDeliveryDay = daysUntil(module.significantDays.DeliveryDay);
+			
+			var key;
+			module.countDown = [];
+			for (var i=0; i < 3; i ++) {
+				module.countDown.push([]);
+				for(key in result[i]) {
+					if (result[i].hasOwnProperty(key)) {
+						module.countDown[i][key] = {
+							string: key.replace(/(?=[A-Z])/g, " $&"),
+							date: Date.parse(result[i][key]).toString("ddd d MMM yyyy"),
+							daysUntil: daysUntil(result[i][key]),
+							future: Date.today().compareTo(Date.parse(result[i][key])) == -1 
+						};
+					}
+				}
+			}
+			$rootScope.$broadcast('CALENDAR-LOADED');
+			$rootScope.$broadcast('GET_CART');
+		});
 		
 		monthStart = Date.today().moveToFirstDayOfMonth();
 		lastMonthStart = Date.today().addMonths(-1).moveToFirstDayOfMonth();
 						
-		return {
-			// counts how many days until @date. Returns @INTEGER or NaN
-			// a negative result means that @date is in the past
+		var module = {
 			daysUntil: function(date) {				
-				var result, a, b;
-				
-				a = new Date(date);
-				
-				b = new Date();
-				
-				result = Math.floor( 
-					(Date.UTC(a.getFullYear(), a.getMonth(), a.getDate()) -
-					Date.UTC(b.getFullYear(), b.getMonth(), b.getDate()) ) /
-					(1000 * 60 * 60 * 24) );
-				return result;
+				return daysUntil(date);
 			},
 			// This method filters an array to only contain stuff from the 
 			// current cycle. @group must be an array of objects with a property called
@@ -382,6 +419,7 @@ angular.module('co-op.services', [])
 				return list;
 			}
 		};
+		return module;
 	}])
 	
 	.factory('MailManager', ['flash', '$http', function(flash, $http) {
@@ -404,9 +442,8 @@ angular.module('co-op.services', [])
 		};
 	}])
 	
-.factory('Cart', ['$rootScope','Restangular', 'LoginManager', 'Calendar', 'flash',
-	function($rootScope, Restangular, LoginManager, Calendar, flash){
-				
+.factory('Cart', ['$rootScope','Restangular', 'LoginManager', 'flash', '$q',
+	function($rootScope, Restangular, LoginManager, flash, $q){
 		return {
 			getAllItems : function(callback) {
 				LoginManager.isLoggedIn().then(function() {
@@ -453,20 +490,26 @@ angular.module('co-op.services', [])
 				});
 			},
 			deleteItem : function(id) {
+				var result = $q.defer();
 				Restangular.all('api/cart')
 				.customDELETE(id)
 				.then(function() {
+					result.resolve();
 					$rootScope.cartTally --;
 					flash.setMessage({
 						type: 'success',
 						message: "Successfully got rid of that cart item for you."
 					});
 				}, function(error) {
+					result.reject();
 					flash.setMessage({
 						type: 'danger',
-						message: error
+						message: error.data
 					});
 				});
+				
+				return result.promise;
+				
 			}
 		};
 	}

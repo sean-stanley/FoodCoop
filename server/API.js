@@ -186,13 +186,19 @@ exports.configAPI = function configAPI(app) {
 		//
 		log.info('got request for products');
 		res.set('Charset' , 'utf-8');
+		if (req.query.hasOwnProperty('cycle') && req.query.cycle === scheduler.currentCycle ) {
+			req.query.cycle = scheduler.currentCycle;
+			log.info(req.query.hasOwnProperty('cycle'));
+			log.info(req.query.cycle != scheduler.currentCycle);
+			log.info('incorrect cycle number requested. what was requested was: %s instead of %s', req.query.cycle, scheduler.currentCycle);
+		}
 		
-		var stream = models.Product.find(req.query)
+		models.Product.find(req.query)
 		.sort({_id: 1})
 		//.select('-img')
 		.populate('category', 'name')
 		.populate('certification', 'name -_id img')
-		.populate('producer_ID', 'name producerData.companyName')
+		.populate('producer_ID', 'name producerData.companyName email')
 		//.stream({transform: JSON.stringify})
 		
 		// oboe( stream )
@@ -293,7 +299,8 @@ exports.configAPI = function configAPI(app) {
 							});
 						} 
 						else {
-							res.status(200).send('No changes detected');
+							// no changes found
+							res.status(200).json(product);
 						}
 					});
 				} else {
@@ -311,7 +318,7 @@ exports.configAPI = function configAPI(app) {
 						description: req.body.description,
 						certification: req.body.certification,
 						producer_ID: req.user._id,
-						cycle: scheduler.currentCycle
+						cycle: scheduler.currentCycle || -1
 					}, function(err, product) {
 						if (err) return next(err);
 						log.info('%s just uploaded', product.productName + " " + product.variety || '');
@@ -325,8 +332,6 @@ exports.configAPI = function configAPI(app) {
 					if (err) return next(err);
 					if (scheduler.currentCycle == product.cycle) {
 						productObject = product.toObject();
-						
-						
 						if (product.amountSold > req.body.quantity ) {
 							var amountToRemove = product.amountSold - req.body.quantity;
 							// get orders for products
@@ -411,8 +416,7 @@ exports.configAPI = function configAPI(app) {
 													log.info(result);
 													repeat(i + 1);
 												});
-											}
-											else res.status(200).send('Your product is successfully uploaded');
+											} else res.status(200).json(product);
 										}(0));
 									}
 								});
@@ -552,16 +556,14 @@ exports.configAPI = function configAPI(app) {
 	// this request will return orders based on a query. Generally this is used to
 	// return all of a month's orders.
 	app.get("/api/order", function(req, res, next) {
-		var order, opts, orderObject;
-
 		// check if the current user is logged in
 		if (req.user) {
 			// finds all the orders requested by the query from the url query.
 			models.Order.find(req.query).sort({datePlaced: 1})
-			.populate('product', 'fullName price units producer_ID productName variety')
+			.populate('product', 'fullName price units producer_ID productName variety cycle')
 			.populate('customer', 'name')
 			.populate('product.producer_ID', 'name email producerData.companyName')
-			.exec( function(e, results) {
+			.exec( function(e, orders) {
 				if (e) return next(e);
 				res.json(orders);
 			});
@@ -725,7 +727,7 @@ exports.configAPI = function configAPI(app) {
 					next(err)
 			});
 		}
-		else res.status(403).end();
+		else res.status(403).send("Sorry! It's not the right time of the month to add items to your cart.");
 		
 	});
 	// Deletes a specific item from a users own cart and increases the quantity
@@ -734,7 +736,7 @@ exports.configAPI = function configAPI(app) {
 		// Check if the current user is logged in and their ID in the params matches the
 		// id of their user data. If it does, delete that order from the database. Items
 		// entered after the end of ordering week can't be changed.
-		if (req.user) {
+		if (req.user && scheduler.canShop) {
 			models.Order.findById(req.params.id, function(e, order) {
 				if (!e) {
 					// make sure only recent orders are being deleted
@@ -757,6 +759,9 @@ exports.configAPI = function configAPI(app) {
 					}
 				}
 			});
+		}
+		else if (!scheduler.canShop) {
+			res.status(403).send('Sorry! You can\'t make changes to your cart after Shopping Week Closes');
 		}
 		else res.status(401).end();
 	});
@@ -982,8 +987,8 @@ exports.configAPI = function configAPI(app) {
 							log.info('geocoded address successfully for %s', req.body.name);
 							done(null, lat, lng);
 						} else {
-							log.info(data.status);
-							done(data.status, null);
+							log.info('geolocator status is %s and the number of results is %s', data.status, data.results.length);
+							done({name: "ZERO_RESULT", message: 'could not match your address to GPS coordinates. Try removing the rural delivery number as we don\'t need it'}, null);
 						}
 					});
 				}
@@ -1003,13 +1008,10 @@ exports.configAPI = function configAPI(app) {
 					lng: lng
 				}),
 				req.body.password,
-				function(e, account) {
-					if (!e) {
-						log.info('added new user to database');
-						done(null, account);
-					} else {
-						done(e, null);
-					}
+				function(err, account) {
+					if (err) return done(err, null);
+					log.info('added new user to database');
+					done(null, account);
 				});
 			},
 			// Create an invoice to be used in the email and also available to the app
@@ -1100,7 +1102,6 @@ exports.configAPI = function configAPI(app) {
 					})(req, res, next);
 				}
 				else {
-					log.info(err);
 					next(err);
 				}
 			}
@@ -1222,8 +1223,9 @@ exports.configAPI = function configAPI(app) {
 	app.get("/api/user/producer/:producerName", function(req, res, next) {
 		var nameParam, companyQuery;
 		if (req.params.producerName) {
-			nameParam = req.params.producerName.split("+");
+			nameParam = req.params.producerName.replace(/^-/,'').split("+");
 			nameParam = nameParam.join(' ');
+			
 		}
 		if (req.query.company) {
 			companyQuery = req.query.company.split("+");

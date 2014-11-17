@@ -56,13 +56,14 @@ angular.module('co-op.controllers', [])
 			});
 			
 			$scope.$watch('search', function(newValue) {
-			// if newValue is falsey
-			if (!newValue) {
-				$location.search('search', null);
-			}
-			else {
-				$location.search('search' , newValue);
-			}
+				// if newValue is falsey
+				if (!newValue) {
+					$location.search('search', null);
+				}
+				else {
+					$location.search('search' , newValue);
+				}
+			});
 			
 			$scope.$on("$routeUpdate", function() {
 				$scope.search = $location.search().search;
@@ -74,8 +75,7 @@ angular.module('co-op.controllers', [])
 				$scope.predictiveSearch = list;
 				console.log($scope.predictiveSearch);
 			});
-		});
-	
+		
 	}
 ])
 .controller('faqCtrl', ['$scope', '$location', '$sce', function($scope, $location, $sce){
@@ -511,7 +511,7 @@ angular.module('co-op.controllers', [])
 		$scope.data = data;
 		
 		function producer() {
-			return data.producer_ID.producerData.companyName || data.producer_ID.name;
+			return data.producer_ID.hasOwnProperty('producerData') ? data.producer_ID.producerData.companyName : data.producer_ID.name;
 		}
 		
 		if (typeof $scope.data.ingredients === 'string') {
@@ -785,6 +785,21 @@ function($scope, $modalInstance, data, ProductManager) {
 	}
 ])
 
+.controller('orderAdminCtrl', ['$scope', 'orders', function($scope, orders) {
+	$scope.orders = orders.getList().$object;
+	$scope.total = function(orders) {
+		var order, total = 0;
+		for (var i=0; i < orders.length; i++) {
+			total += orders[i].orderPriceWithMarkup;
+		}
+		return total;
+	};
+	
+	$scope.$watch('search', function() {
+		$scope.total($scope.orders);
+	});
+}])
+
 .controller('cartPageCtrl', ['$scope', '$rootScope', '$location', 'Cart', 'flash',
 	function($scope, $rootScope, $location, Cart, flash) {
 		$scope.cart = [];
@@ -809,14 +824,17 @@ function($scope, $modalInstance, data, ProductManager) {
 	
 		$scope.delete = function(idx) {
 			var itemToDelete = $scope.cart[idx];
-			Cart.deleteItem($scope.cart[idx]._id);
-			$scope.cart.splice(idx, 1);
-			var index = $scope.cartProduct_ids.indexOf(itemToDelete.product._id);
-			if (index > -1) $scope.cartProduct_ids.splice(index, 1);
+			Cart.deleteItem($scope.cart[idx]._id).then(function() {
+				$scope.cart.splice(idx, 1);
+				var index = $scope.cartProduct_ids.indexOf(itemToDelete.product._id);
+				if (index > -1) $scope.cartProduct_ids.splice(index, 1);
 
-			// for the store page:
-			$rootScope.$broadcast('CART_IDS', $scope.cartProduct_ids);
-			$scope.cartTotal();
+				// for the store page:
+				$rootScope.$broadcast('CART_IDS', $scope.cartProduct_ids);
+				$scope.cartTotal();
+			}, null);
+			
+			
 		};
 		
 		// only for the store.html page use of this controller
@@ -824,6 +842,7 @@ function($scope, $modalInstance, data, ProductManager) {
 			$scope.cart.forEach(function(item) {
 				$scope.cartProduct_ids.push(item.product._id);
 			});
+			$scope.cartProduct_ids = _.uniq($scope.cartProduct_ids, true);
 			$rootScope.$broadcast('CART_IDS', $scope.cartProduct_ids);
 		}
 		
@@ -920,6 +939,11 @@ function($scope, $modalInstance, data, ProductManager) {
 		$scope.member = member.plain();
 		$scope.mail.to = $scope.member.email;
 		$scope.mail.toName = $scope.member.name;
+		
+		var search = $location.search();
+		
+		$scope.mail.subject = search.hasOwnProperty('subject') ? search.subject : '';
+		
 				
 		$scope.submitForm = function(message) {
 			MailManager.mail($scope.mail);
@@ -930,7 +954,8 @@ function($scope, $modalInstance, data, ProductManager) {
 
 .controller('storeCtrl', ['$scope', '$rootScope', '$location', '$routeParams', '$modal', 'LoginManager', 'flash', '$http', 'Cart',
 	function($scope, $rootScope, $location, $routeParams, $modal, LoginManager, flash, $http, Cart) {
-		var category, sort, reverse;
+		var category, sort, reverse, productURL = 'api/product?cycle='+$rootScope.cycle;
+		$rootScope.$broadcast('GET_CART');
 		$scope.isProducts = true;
 		
 		$scope.searchObject = $location.search();
@@ -956,7 +981,7 @@ function($scope, $modalInstance, data, ProductManager) {
 		//$scope.message = {type: 'danger', closeMessage: function() {if (this.message) this.message = null;} };
 		$scope.products = [];
 		
-		var productURL = 'api/product?cycle='+$rootScope.cycle;
+		
 		var productsStarted;
 		
 		function loadProducts(productURL) {
@@ -996,12 +1021,14 @@ function($scope, $modalInstance, data, ProductManager) {
 		}
 		
 		if ($rootScope.cycle) {
+			productURL = 'api/product?cycle='+$rootScope.cycle;
 			loadProducts(productURL);
 			productsStarted = true;
 		}
 		
 		$rootScope.$watch('cycle', function(newValue){
 			if ($rootScope.cycle && !productsStarted) {
+				productURL = 'api/product?cycle='+$rootScope.cycle;
 				loadProducts(productURL);
 			}
 		});
@@ -1148,7 +1175,7 @@ function($scope, $modalInstance, data, ProductManager) {
 		});
 		
 		$rootScope.$watch('canShop', function() {
-			if (!$rootScope.canShop) {
+			if ($rootScope.canShop === false) {
 				flash.setMessage({type: 'warning', message: 'Shopping is not allowed yet sorry. Please check the calendar for when shopping is open next.'});
 			}
 		});
@@ -1179,53 +1206,43 @@ function($scope, $modalInstance, data, ProductManager) {
 
 .controller('calendarCtrl', ['$scope', '$rootScope', '$http', 'Calendar',
 	function($scope, $rootScope, $http, Calendar) {
-		$scope.countDown = [];
+		$scope.$on('CALENDAR-LOADED', function() {
+			console.log('loaded!');
+			$scope.countDown = Calendar.countDown;
+			$scope.significantDays = Calendar.significantDays;
+			$scope.nextMonth = Calendar.nextMonth;
+			$scope.twoMonth = Calendar.twoMonth;
+			$scope.daysBeforeOrderingStops = Calendar.daysBeforeOrderingStops;
+			$scope.daysBeforeDeliveryDay = Calendar.daysBeforeDeliveryDay;
+			//$scope.uploadingTime = $scope.inDateRange($scope.countDown[0].ProductUploadStart, $scope.countDown[0].ProductUploadStop);
+			//$scope.shoppingTime = $scope.inDateRange($scope.countDown[0].ShoppingStart, $scope.countDown[0].ShoppingStop);
+		});
 		
-		$http.get('/api/calendar').success(function(result) {
-			$scope.significantDays = result[0];
-			$scope.nextMonth = result[1];
-			$scope.twoMonth = result[2];
-			$rootScope.cycle = result[3];
-			$rootScope.canUpload = result[4];
-			$rootScope.canShop = result[5];
-			$rootScope.canChange = result[6];
-			
-			$scope.daysBeforeOrderingStops = Calendar.daysUntil($scope.significantDays.ProductUploadStop);
-			$scope.daysBeforeDeliveryDay = Calendar.daysUntil($scope.significantDays.DeliveryDay);
-			
-			$rootScope.$broadcast('GET_CART');
-			
-			var key;
-			
-			for (var i=0; i < 3; i ++) {
-				$scope.countDown[i] = [];
-				for(key in result[i]) {
-					if (result[i].hasOwnProperty(key)) {
-						$scope.countDown[i][key] = {
-							string: key.replace(/(?=[A-Z])/g, " $&"),
-							date: Date.parse(result[i][key]).toString("ddd d MMM yyyy"),
-							daysUntil: Calendar.daysUntil(result[i][key]),
-							future: Date.today().compareTo(Date.parse(result[i][key])) == -1 
-						};
-					}
-				}
-			}
-			
-			// @start, @end are objects from the $scope.countDown[i] object. i = 0 for the current month.
-			$scope.inDateRange = function(start, end) {
-				var present, future, plural;
+		$scope.inDateRange = function (start, end) {
+			var present, future, plural;
+			if (start && start.hasOwnProperty('daysUntil') && start.hasOwnProperty('future') ) {
 				plural = start.daysUntil != 1 ? 's' : '';
 				future = start.future;
 				if (future) return 'starts in '+ start.daysUntil + ' day'+ plural;
-			
+	
 				else {
 					present = end.future;
 					plural = Math.abs(end.daysUntil) != 1 ? 's' : '';
 					if (present) return 'closes in '+ end.daysUntil + ' day'+ plural;
 					else return "is over for this month";//return 'was '+ Math.abs(end.daysUntil) + ' day'+ plural+ " ago";
 				}
-			};
-			
-		});
+			}
+			return ':-D';
+		};
+		
+		$scope.countDown = Calendar.countDown;
+		$scope.significantDays = Calendar.significantDays;
+		$scope.nextMonth = Calendar.nextMonth;
+		$scope.twoMonth = Calendar.twoMonth;
+		$scope.daysBeforeOrderingStops = Calendar.daysBeforeOrderingStops;
+		$scope.daysBeforeDeliveryDay = Calendar.daysBeforeDeliveryDay;
+	//	$scope.uploadingTime = $scope.inDateRange($scope.countDown[0].ProductUploadStart, $scope.countDown[0].ProductUploadStop);
+	//	$scope.shoppingTime = $scope.inDateRange($scope.countDown[0].ShoppingStart, $scope.countDown[0].ShoppingStop);
+		
 	}	
 ]);

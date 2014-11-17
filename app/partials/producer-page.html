@@ -3,7 +3,7 @@
 	
 	<h1 class="text-center">
 		
-		{{producer.producerData.companyName}} 
+		{{producer.producerData.companyName || producer.name}} 
 		
 	</h1>
 	<span class="pull-left">
@@ -17,18 +17,18 @@
 
 <div class="row">
 
-	<div class="col-sm-3 well clearfix">
-		<div class="col-xs-6 col-sm-12">
+	<div class="col-sm-3 col-xs-12 well clearfix">
+		<div class="col-xs-12 col-sm-12">
 			<img ng-src="{{producer.producerData.logo}}" class="img-responsive"/>
 			<hr ng-if="producer.producerData.logo">
 		</div>
-		<div class="col-xs-6 col-sm-12">
+		<div class="col-xs-12 col-sm-12">
 			<h5>Contact Details</h5>
 			<ul class="list-unstyled" id="contact-details">
 				<li><span class="glyphicon glyphicon-earphone"></span> {{producer.phone}}</li>
 				<li><span class="glyphicon glyphicon-envelope"></span> <a ng-href="/contact/{{producer._id}}">{{producer.email}}</a></li>
 				<li ng-if="producer.addressPermission"><span class="glyphicon glyphicon-map-marker"></span> {{producer.address}}</li>
-				<li><img src="../img/glyphicons/Globe.png" width="18" alt="Globe"> <a href="http://{{producer.producerData.website}}" target="_blank">{{producer.producerData.website}}</a></li>
+				<li ng-show="producer.producerData.website"><img src="../img/glyphicons/Globe.png" width="18" alt="Globe"> <a href="http://{{producer.producerData.website}}" >{{producer.producerData.website}}</a></li>
 			</ul>
 		</div>
 	</div>
@@ -39,6 +39,8 @@
 		
 		<div class="text-center col-xs-12">
 			<br><a ng-if="canUpload || canShop" class="btn btn-primary btn-lg text-center" href="/store?search={{producer.producerData.companyName}}">See My Products</a>
+			<br>
+			<br>
 		</div>
 	</div>
 	

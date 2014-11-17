@@ -32,6 +32,23 @@ function checkConfig() {
 	exports.canShop = false;
 	exports.canUpload = false;
 	exports.canChange = false;
+	
+	// if the date is between the productUploadStart date and the productUpoad Stop date
+	// double check that canShop is false and canUpload is true;
+	if ( !today.equals(cycle['ProductUploadStop']) && today.between(cycle.ProductUploadStart, cycle.ProductUploadStop) ) {
+		console.log('today is between the start of product uploading and the end');
+		exports.canShop = false;
+		exports.canUpload = true;
+	}
+
+	// if the date is between the ShoppingStart date and the ShoppingStop Stop date
+	// double check that canShop is true and canUpload is false;
+	if ( !today.equals(cycle['ShoppingStart']) && today.between(cycle.ShoppingStart, cycle.ShoppingStop) ) {
+		console.log('today is between the start of shopping uploading and the end');
+		exports.canShop = true;
+		exports.canChange = true;
+		exports.canUpload = false;
+	}
 
 	// test for an exact day match and run reminder email functions if it is.
 	for (key in cycle) {
@@ -84,28 +101,14 @@ function checkConfig() {
 		}
 	}
 	
-	// if the date is between the productUploadStart date and the productUpoad Stop date
-	// double check that canShop is false and canUpload is true;
-	if ( !today.equals(cycle['ProductUploadStop']) && today.between(cycle.ProductUploadStart, cycle.ProductUploadStop) ) {
-		console.log('today is between the start of product uploading and the end');
-		exports.canShop = false;
-		exports.canUpload = true;
-	}
-
-	// if the date is between the ShoppingStart date and the ShoppingStop Stop date
-	// double check that canShop is true and canUpload is false;
-	else if ( !today.equals(cycle['ShoppingStart']) && today.between(cycle.ShoppingStart, cycle.ShoppingStop) ) {
-		console.log('today is between the start of shopping uploading and the end');
-		exports.canShop = true;
-		exports.canChange = true;
-		exports.canUpload = false;
-	}
+	
 }
 
 // looks for all the orders of the cycle and groups them by customer
 function checkout() {
 	async.waterfall([
 		function(done) {
+			console.log('beginning checkout process');
 			models.Order
 			.aggregate()
 			.match({cycle: exports.currentCycle})
@@ -162,6 +165,12 @@ function invoiceCustomer(customer) {
 				else done(null, invoice);
 			});
 			
+		},
+		function(invoice, done) {
+			invoice.populate('items.product', 'price priceWithMarkup', function(e, invoice) {
+				if (e) return done(e);
+				done(null, invoice);
+			})
 		},
 		function(invoice, done) {
 			var mailOptions, mailData, mail;
@@ -265,10 +274,15 @@ function invoiceFromProducer(producer) {
 			});
 			
 			invoice.save(function(e, invoice) {
-							console.log(invoice);
-							if (e) done(e);
-							else done(null, invoice);
-						});
+				if (e) done(e);
+				else done(null, invoice);
+			});
+		},
+		function(invoice, done) {
+			invoice.populate('items.product', 'price priceWithMarkup', function(e, invoice) {
+				if (e) return done(e);
+				done(null, invoice);
+			})
 		},
 		function(invoice, done) {
 			var mailOptions, mailData, mail;
@@ -332,8 +346,11 @@ function incrementCycle() {
 
 function findCycle() {
 	models.Cycle.findById('orderCycle', function(e, cycle) {
-		if (e) console.log(e);
-		else {
+		if (e) {
+			console.log(e);
+			// Set the CurrentCycle to Something Even if Looking up the Cycle Goes Wrong. That way any Data Created During This Time can be Saved and Changed to the Correct Cycle Later.
+			exports.currentCycle = -1; 
+		} else {
 			exports.currentCycle = cycle.seq;
 			console.log("the current cycle is #" + exports.currentCycle);
 		}
@@ -346,6 +363,7 @@ function disableCycle() {
 	exports.canChange = true;
 }
 
+/*
 function writeProductImgToDisk() {
 	models.Product.find({}, null, function(err, products){
 		console.log(err);
@@ -358,14 +376,15 @@ function writeProductImgToDisk() {
 		}
 		
 	});
-}
+}*/
+
 
 
 exports.findCycle = findCycle;
 
 findCycle();
 checkConfig();
-disableCycle();
+//disableCycle();
 //writeProductImgToDisk();
 
 // checkout everyone's purchases
@@ -373,5 +392,6 @@ disableCycle();
 // send order requests to producers
 //orderGoods();
 
+// checkOut and orderGoods don't run on initial server launch because exports.currentCycle is undefined by the time they get called. Convenient for now but a more elegant solution should be implemented.
 
 

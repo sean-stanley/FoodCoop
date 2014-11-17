@@ -74,6 +74,13 @@ angular.module('co-op', [
 				}
 			}
 		})
+		.when('/admin/orders', { controller: 'orderAdminCtrl', templateUrl: 'partials/admin/orders.html', adminOnly: true, reloadOnSearch: false, title: 'Order Manager Page',
+			resolve: {
+				orders: function(Restangular) {
+					return Restangular.all('api/order');
+				}
+			}
+		})
 		.when('/forgot', {templateUrl: 'partials/forgot-password.html', controller: 'forgotCtrl', reloadOnSearch: false, title: 'Forgotten Password'})
 		.when('/reset/:token', {
 			controller: 'resetCtrl',
@@ -103,6 +110,17 @@ angular.module('co-op', [
 	 		resolve: {
 	 			producer: function(Restangular, $route){
 					return Restangular.one('api/user/producer', $route.current.params.userName).get({company : $route.current.params.companyName});
+	 			}
+	 		}
+	 	})
+		.when('/producer/:id/:userName', {
+			controller: 'producerPageCtrl',
+	 		templateUrl:'partials/producer-page.html', reloadOnSearch: false,
+			title : 'Producer',
+			description: 'Members of the northland natural food co-op have a profile about their practices and operation. Contact details for the producer is also found here.',
+	 		resolve: {
+	 			producer: function(Restangular, $route){
+					return Restangular.one('api/user/producer', $route.current.params.userName).get({_id : $route.current.params.id});
 	 			}
 	 		}
 	 	})

@@ -28,26 +28,28 @@
 	<alert ng-if="invoice.toCoop" type="info">Income from the NNFC</alert>
 	<ul class="list-unstyled">
 		<li ng-hide="invoice.toCoop">
-			<h3><span style="display: inline-block" class="label" 
-			ng-class="{ 
-				'label-default': invoice.status === 'un-paid' || CANCELLED,
-				'label-info' : invoice.status === 'To Refund',
-				'label-success': invoice.status === 'PAID' || 'Refunded',
-				'label-danger' : invoice.status === 'OVERDUE'}">
-				{{invoice.status}}
-			</span> 
-			To you from the NNFC
+			<h3>
+			You owe the NNFC
+			<span style="display: inline-block" class="label" 
+						ng-class="{ 
+							'label-default': invoice.status === 'un-paid' || CANCELLED,
+							'label-info' : invoice.status === 'To Refund',
+							'label-success': invoice.status === 'PAID' || 'Refunded',
+							'label-danger' : invoice.status === 'OVERDUE'}">
+							{{invoice.status}}
+						</span>
 			</h3></li>
 		<li ng-show="invoice.toCoop">
-			<h3><span style="display: inline-block" class="label" 
-			ng-class="{ 
-				'label-default': invoice.status === 'un-paid' || CANCELLED,
-				'label-info' : invoice.status === 'To Refund',
-				'label-success': invoice.status === 'PAID' || 'Refunded',
-				'label-danger' : invoice.status === 'OVERDUE'}">
-				{{invoice.status}}
-			</span>
-			To the NNFC from you
+			<h3>
+			The NNFC owes you
+			<span style="display: inline-block" class="label" 
+						ng-class="{ 
+							'label-default': invoice.status === 'un-paid' || CANCELLED,
+							'label-info' : invoice.status === 'To Refund',
+							'label-success': invoice.status === 'PAID' || 'Refunded',
+							'label-danger' : invoice.status === 'OVERDUE'}">
+							{{invoice.status}}
+						</span>
 			</h3>
 		</li>
 		<li>Date Placed: {{invoice.datePlaced | shortDate}}</li>

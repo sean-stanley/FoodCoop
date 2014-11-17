@@ -95,7 +95,7 @@
 <div id="producer-form-container" class="col-md-12" >
 	<form name="producerEdit" autocomplete="off" novalidate>
 		<fieldset>
-			<legend>Producer Profile <a class="pull-right" ng-href="/producer/{{currentUser.producerData.companyName | forURL}}-{{currentUser.name}}"><span class="glyphicon glyphicon-user"></span> View Profile</a></legend>
+			<legend>Producer Profile <a class="pull-right" ng-href="/producer/{{currentUser.producerData.companyName || currentUser._id + '/' | forURL}}-{{currentUser.name | forURL}}"><span class="glyphicon glyphicon-user"></span> View Profile</a></legend>
 			<div class="row">
 				
 				<div class="form-group col-sm-6">	

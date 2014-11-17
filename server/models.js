@@ -58,16 +58,18 @@ ProductSchema.virtual('fullName').get(function () {
 // occurs just before an invoice is saved. should work with Model.create() shortcut
 ProductSchema.pre('save', function(next) {
 	var product = this;
+	var b64reg = /^data:image\/png;base64,/;
 
-	if (product.img && product.img.length > 200) { //not a base64 image if it's shorter than 200 characters.
-		var destination = path.normalize(path.join(__dirname, '../app', 'upload', 'products', product.productName+"+"+product.variety+"+id-"+product._id+".png"));
+	if (b64reg.test(product.img) ) { 
+		var productName = product.productName.replace(/\.+|\/+|\?+|=+/, "") + "+" + product.variety.replace(/\.+|\/+|\?+|=+/, "");
+		var destination = path.normalize(path.join(__dirname, '../app', 'upload', 'products', productName+"+id-"+product._id+".png"));
 		var base64Data = product.img.replace(/^data:image\/png;base64,/, "");
-
+		
 		fs.writeFile(destination, base64Data, 'base64', function(err) {
 		  if (err) console.log(err);
 		});
 		//set img to be img path instead
-		product.img = path.normalize(path.join('upload', 'products', product.productName+"+"+product.variety+"+id-"+product._id+".png"));
+		product.img = path.normalize(path.join('upload', 'products', productName+"+id-"+product._id+".png"));
 		console.log(product.img);
 	}
 	
@@ -177,7 +179,7 @@ InvoiceSchema.virtual('total').get(function () {
 		}
 	}
 	console.log(total);
-	return total;
+	return total.toFixed(2);
 });
 
 //setter function for Invoice status that tests the value is in the validOptions range.

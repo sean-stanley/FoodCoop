@@ -48,6 +48,7 @@
 		<p ng-if="data.certification.name !== 'none'"><strong>Certification:</strong> {{data.certification.name}}</p>
 		<p><strong>Produced By:</strong> {{data.producer_ID.producerData.companyName || currentUser.producerData.companyName || currentUser.name || 'no data found'}}<br></p>
 		<h3><strong>Quantity left:</strong> {{data.quantity - data.amountSold}}</h3>
+		<br>
 		<h2>
 			<strong>Price:</strong> {{data.priceWithMarkup|currency}} / {{data.units}}
 			<button class="btn btn-danger btn-lg" disabled ng-if="data.quantity === 0">
@@ -62,5 +63,7 @@
 		</h2>
 		
     </div>
-
+</div>
+<div class="modal-footer" id="modal-top">
+	<span class="glyphicon glyphicon-envelope"></span> <a ng-href="/contact/{{data.producer_ID._id}}?subject=Question%20about%20{{data.fullName}}">Ask the seller about this product</a>
 </div>

@@ -1,6 +1,6 @@
 {
   "name": "angular-loading-bar",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "main": [
     "build/loading-bar.js",
     "build/loading-bar.css"
@@ -24,11 +24,11 @@
     "angular": "1.2.23"
   },
   "homepage": "https://github.com/chieffancypants/angular-loading-bar",
-  "_release": "0.5.2",
+  "_release": "0.6.0",
   "_resolution": {
     "type": "version",
-    "tag": "0.5.2",
-    "commit": "44fbda5301fe7607a024ca564d414c198c438ef1"
+    "tag": "0.6.0",
+    "commit": "9015398813555eafd122d4b5aa541cc02eceeacb"
   },
   "_source": "git://github.com/chieffancypants/angular-loading-bar.git",
   "_target": "*",

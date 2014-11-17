@@ -16,7 +16,8 @@
 				<figure class="first-layer" ng-mouseover="callDelayed()" ng-mouseleave="callCancelled()" ng-swipe-left="detailsVisible = true;">
 					<img ng-if="productData.certification != certifications[0]._id && productData.img"
 					 ng-src="img/certification/{{certificationImg(productData.certification)}}" class="certification-img">
-					<img ng-src="{{selectedImg}}" class="img-responsive" ng-click="preview(productData)">
+					<img ng-src="{{selectedImg}}" class="img-responsive" ng-click="preview(productData)" style="min-height: inherit;
+min-width: inherit;">
 					<figcaption>
 						<div class="pull-right">
 							<button class="btn btn-primary pull-right" disabled>Add to Cart</button>
