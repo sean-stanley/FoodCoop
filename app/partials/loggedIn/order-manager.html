@@ -8,9 +8,9 @@
 
 <div class="col-md-6">
 
-<h2>{{month}} Products <a href="/product-upload"><span style="display: inline-block" class="label label-success">
+<h2>{{month}} Products <div class="btn-group"><a href="/product-upload" class="btn btn-success"><span style="display: inline-block">
 				+ Product
-			</span></a></h2>
+			</span></a><button class="btn btn-info" ng-click="getCurrentProducts()"><i class="fa fa-refresh"></i></button></div></h2>
 <table class="table">
 <thead>
 	<tr>
@@ -24,7 +24,7 @@
 <tbody>
 	<tr ng-repeat="i in currentProducts | orderBy:predicate:reverse " >
         <td data-title="'remove'">
-			<button type="button" class="close" aria-hidden="true" ng-click="delete($index, i._id)">&times;</button>
+			<button type="button" class="close" aria-hidden="true" ng-click="delete($index, i._id)"><i class="fa fa-times"></i></button>
 		</td>
 		<td data-title="'Product'" >
              <a ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a>
@@ -99,31 +99,33 @@
 </div>
 <div class="col-md-6">
 	<h2>Unfulfilled Orders</h2>
-	<table class="table">
-		<thead ng-repeat-start="order in sortedOrders">
+	<table class="table" ng-repeat="order in sortedOrders">
+		<thead>
 			<tr><th colspan="4"><a ng-href="/contact/{{order._id._id}}">{{order._id.name}} <i class="fa fa-envelope"></i></a></th></tr>
 			<tr><th>Product</th><th>Quantity</th><th>Unit Price</th><th>Price</th></tr>
 		</thead>
-		<tbody ng-repeat-end>
+		<tfoot>
+			<tr><td colspan='4'>Total: {{orderTotal(order.orders) | currency}}</td></tr>
+		</tfoot>
+		<tbody>
 			<tr ng-repeat="i in order.orders">
-		        <td data-title="'Product'" >
-		            <a ng-href="/product-upload/{{i.product._id}}">{{i.product.fullName}}</a>
-		        </td>
- 				<td data-title="'Quantity'">
- 					{{i.quantity}}
- 				</td>
-		        <td data-title="'Price'">
-		            {{i.product.price | currency}} / {{i.product.units}}
-		        </td>
+				<td data-title="'Product'" >
+					<a ng-href="/product-upload/{{i.product._id}}">{{i.product.fullName}}</a>
+				</td>
+				<td data-title="'Quantity'">
+					{{i.quantity}}
+				</td>
+				<td data-title="'Price'">
+					{{i.product.price | currency}} / {{i.product.units}}
+				</td>
 				<td data-title="'times Ordered'">
 					{{i.product.price * i.quantity | currency}}
 				</td>
 			</tr>
 		</tbody>
-		<tfoot>
-			<tr colspan='4'><td>Total: {{orderTotal(currentOrders) | currency}}</td></tr>
-		</tfoot>
 	</table>
+	<h4>Total for the month: <strong>{{orderTotal(currentOrders) | currency}}</strong></h4>
+	
 	<accordion>
 		<accordion-group heading="Last Month's Orders - Total: {{orderTotal(recentOrders) | currency}}">
 			<table class="table">
@@ -142,7 +144,7 @@
 							<a ng-href="/contact/{{i.customer._id}}">{{i.customer.name}}</a>
 						</td>
 						<td data-title="'Product'" >
-				            <a ng-href="/product-upload/{{i._id}}">{{i.product.fullName}}</a>
+				            <a ng-href="/product-upload/{{i.product._id}}">{{i.product.fullName}}</a>
 				        </td>
 				        <td data-title="'Price'">
 				            {{i.unitPrice | currency}} / {{i.product.units}}
@@ -178,7 +180,7 @@
 							<a ng-href="/contact/{{i.customer._id}}">{{i.customer.name}}</a>
 						</td>
 						<td data-title="'Product'" >
-				            <a ng-href="/product-upload/{{i._id}}">{{i.product.fullName}}</a>
+				            <a ng-href="/product-upload/{{i.product._id}}">{{i.product.fullName}}</a>
 				        </td>
 				        <td data-title="'Price'">
 				            {{i.unitPrice | currency}} / {{i.product.units}}

@@ -11,7 +11,10 @@ angular.module('co-op', [
 	'co-op.services', 
 	'co-op.directives', 
 	'co-op.controllers',
+	'co-op.admin',
+	'co-op.user',
 	'angular-loading-bar', 
+	'btford.socket-io',
 	'ui.bootstrap',
 	'textAngular',
 	'cropme',
@@ -45,42 +48,6 @@ angular.module('co-op', [
 		.when('/terms-cons', {templateUrl: 'partials/legal/terms-cons.html', reloadOnSearch: false, title: 'Terms and Conditions'})
 		.when('/priv-pol', {templateUrl: 'partials/legal/priv-pol.html', reloadOnSearch: false, title: 'Privacy Policy'})
 		.when('/policy', {templateUrl: 'partials/legal/policy.html', reloadOnSearch: false, title: 'Policy Handbook'})
-		.when('/admin', {
-			templateUrl: 'partials/admin/admin.html', 
-			controller: 'userAdminCtrl', 
-			adminOnly: true, reloadOnSearch: false, title: 'Admin',
-			resolve: {
-				users: function(Restangular) {
-					return Restangular.all('api/user');
-				}
-			}
-		})
-		.when('/user/:userId', {
-			controller: 'adminUserEditCtrl', 
-			templateUrl:'partials/admin/details.html',
-			title: 'Admin',
-			adminOnly: true, reloadOnSearch: false,
-			resolve: {
-				user: function(Restangular, $route){
-					return Restangular.one('api/user', $route.current.params.userId).get();
-				}
-			}
-		})
-		.when('/admin/invoices', { controller: 'invoiceCtrl', templateUrl: 'partials/admin/invoices.html', adminOnly: true, reloadOnSearch: false, title: 'Admin' })
-		.when('/admin/cycle', { controller: 'cycleCtrl', templateUrl: 'partials/admin/cycle.html', adminOnly: true, reloadOnSearch: false, title: 'Cycle Manager Page',
-			resolve: {
-				cycle: function($http) {
-					return $http.get('api/admin/cycle');
-				}
-			}
-		})
-		.when('/admin/orders', { controller: 'orderAdminCtrl', templateUrl: 'partials/admin/orders.html', adminOnly: true, reloadOnSearch: false, title: 'Order Manager Page',
-			resolve: {
-				orders: function(Restangular) {
-					return Restangular.all('api/order');
-				}
-			}
-		})
 		.when('/forgot', {templateUrl: 'partials/forgot-password.html', controller: 'forgotCtrl', reloadOnSearch: false, title: 'Forgotten Password'})
 		.when('/reset/:token', {
 			controller: 'resetCtrl',
@@ -140,61 +107,6 @@ angular.module('co-op', [
 		})
 		.when('/volunteer', {templateUrl: 'partials/volunteers.html', reloadOnSearch: false, title: "Volunteer Jobs", 
 			description: 'The NNFC, Northland\'s local food coop, needs volunteers to help maintain the service. Volunteers are usually members and have jobs such as sorting orders, delivering orders and managing a delivery route.'
-		})
-    
-		.when('/product-upload-401', {templateUrl: 'partials/loggedIn/upload401.html', reloadOnSearch: false, title:'401 - Unauthorized to Sell'})
-		
-		.when('/product-upload', {
-			templateUrl: 'partials/loggedIn/product-upload.html', 
-			controller: 'productUploadCtrl',
-			loggedInOnly: true, canSell: true, reloadOnSearch: false,
-			title : 'Upload Products to Sell',
-			resolve: { product: function() { return {}; } }
-		})
-		.when('/product-upload/:productId', {
-			controller: 'productUploadCtrl',
-			templateUrl: 'partials/loggedIn/product-upload.html',
-			loggedInOnly: true, reloadOnSearch: false,
-			title : 'Edit Product',
-			resolve: {
-				product: function(Restangular, $route) {
-					return Restangular.one('api/product', $route.current.params.productId).get();
-				}
-			}
-		})
-		//.when('/producer-profile', {templateUrl: 'partials/loggedIn/edit-producer-profile.html', controller: 'producerCtrl', loggedInOnly: true, reloadOnSearch: false})
-		.when('/my-cart', {templateUrl: 'partials/loggedIn/my-cart.html', controller: 'cartPageCtrl', loggedInOnly: true, reloadOnSearch: false})
-    	.when('/product-manager', {
-			templateUrl: 'partials/loggedIn/order-manager.html', 
-			controller: 'productOrderCtrl',
-			loggedInOnly: true, reloadOnSearch: false,
-			title : 'Manage Products',
-			resolve: {
-				products: function(Restangular, $route) {
-					return Restangular.all('api/product-list');
-				},
-				myOrders: function(Restangular, $route) {
-					return Restangular.all('api/order/me');
-				},
-				unfullfilledOrders: function(Restangular, $route) {
-					return Restangular.all('api/order/cycle');
-				}
-				
-			}
-		})
-		.when('/my-invoices', {
-			controller: 'userInvoiceCtrl',
-			templateUrl:'partials/loggedIn/invoices.html',
-			loggedInOnly: true, reloadOnSearch: false,
-			title : 'My Invoices',
-			description: 'Use the contact form to contact another northland natural food co-op member.',
-		})
-		.when('/me', {
-			controller: 'userEditCtrl',
-			templateUrl:'partials/loggedIn/edit-me.html',
-			loggedInOnly: true, reloadOnSearch: false,
-			title : 'My Settings',
-			
 		})
 
 		.when('/contact', {templateUrl: 'partials/contact.html', controller: 'contactCtrl', reloadOnSearch: false})

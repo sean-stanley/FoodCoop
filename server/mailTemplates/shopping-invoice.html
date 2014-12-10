@@ -29,15 +29,21 @@
 					 <td>{{item.product.fullName}}</td>
 					 <td>${{item.product.priceWithMarkup}} / {{item.product.units}}</td>
 					 <td>{{item.quantity}}</td>
-                     <td>${{item.product.priceWithMarkup * item.quantity}}</td>
+                     <td>${{ (item.product.priceWithMarkup * item.quantity).toFixed(2)}}</td>
                  </tr>
 			<% }); %>
            </tbody>
-           <tfooter>
-               <tr>
-                   <td colspan="5"> Total: ${{total}}</td>
+           <tfoot>
+	             <tr style="display: {{showCredit}}">
+								 <td colspan="6" style="text-align:right"> Subtotal: ${{subtotal}}</td>
+							 <tr>
+							 <tr style="display: {{showCredit}}">
+								 <td colspan="6"> CR:{{credit()}}</td>
+							 <tr>
+							 <tr>
+                   <td colspan="6"> Total: ${{total}}</td>
                </tr>
-           </tfooter>
+           </tfoot>
        </table>
 	   
 	   <p>Please make payment with your name as a reference and the global invoice number as a code.</p>

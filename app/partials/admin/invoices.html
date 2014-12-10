@@ -10,6 +10,7 @@
 <ul class="nav nav-pills">
 	<li><a href="" ng-click="sort = 'datePlaced'; reverse=!reverse ">Date Created</a></li>
 	<li><a href="" ng-click="sort = 'dateModified'; reverse=!reverse ">Date Modified</a></li>
+	<li><a href="" ng-click="sort = '_id'; reverse=!reverse">By Invoice Number</a></li>
 </ul>
 <h3>Filter By: </h3>
 <ul class="nav nav-pills">
@@ -40,6 +41,12 @@
 		<tr><th colspan='2'>Invoice #{{invoice._id}} {{invoice.title}}</th></tr>
 	</thead>
 	<tfoot>
+		<tr ng-show="invoice.credit" class="text-right">
+			<td colspan="4"><strong>Subtotal: {{invoice.subtotal | currency}}</strong></td>
+		</tr>
+		<tr ng-show="invoice.credit">
+			<td colspan="4"><strong>CR: {{invoice.credit | currency}}</strong></td>
+		</tr>
 		<tr><td colspan='2'><strong>Total: {{invoice.total | currency}}</strong></td></tr>
 	</tfoot>
 	<tbody>
@@ -61,6 +68,17 @@
 			<td><strong>Cost</strong></td>
 		</tr>
 	</thead>
+	<tfoot>
+		<tr ng-show="invoice.credit" class="text-right">
+			<td colspan="5"><strong>Subtotal: {{invoice.subtotal | currency}}</strong></td>
+		</tr>
+		<tr ng-show="invoice.credit">
+			<td colspan="5"><strong>CR: {{invoice.credit | currency}}</strong></td>
+		</tr>
+		<tr>
+			<td colspan="5"><strong>Total: {{invoice.total | currency}}</strong></td>
+		</tr>
+	</tfoot>
 	<tbody>
 		<tr ng-repeat="item in invoice.items">
 			<td>{{item.product.fullName}}</td>
@@ -69,11 +87,6 @@
 			<td>{{item.product.priceWithMarkup * item.quantity | currency}}</td>
 		</tr>
 	</tbody>
-	<tfooter>
-		<tr>
-			<td colspan="4"><strong>Total: {{invoice.total | currency}}</strong></td>
-		</tr>
-	</tfooter>
 </table>
 <table class="table" ng-if="invoice.items[0].product && invoice.toCoop">
 	<thead>
@@ -88,6 +101,17 @@
 			<th><strong>Cost</strong></th>
 		</tr>
 	</thead>
+	<tfoot>
+		<tr ng-show="invoice.credit" class="text-right">
+			<td colspan="5"><strong>Subtotal: {{invoice.subtotal | currency}}</strong></td>
+		</tr>
+		<tr ng-show="invoice.credit">
+			<td colspan="5"><strong>CR: {{invoice.credit | currency}}</strong></td>
+		</tr>
+		<tr>
+			<td colspan="5"><strong>Total: {{invoice.total | currency}}</strong></td>
+		</tr>
+	</tfoot>
 	<tbody>
 		<tr ng-repeat="item in invoice.items">
 			<td>{{item.product.fullName}} </td>
@@ -97,11 +121,7 @@
 			<td>{{item.product.price * item.quantity | currency}}</td>
 		</tr>
 	</tbody>
-	<tfooter>
-		<tr>
-			<td colspan="4"> <strong>Total: {{invoice.total | currency}}</strong></td>
-		</tr>
-	</tfooter>
+	
 </table>
 
 

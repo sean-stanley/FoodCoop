@@ -131,63 +131,6 @@ angular.module('co-op.controllers', [])
 	}
 ])
 
-.controller('userAdminCtrl', ['$scope', 'users', '$location',
-	function($scope, users) {
-		$scope.userLibrary = users.getList().$object;
-	}
-])
-
-.controller('adminUserEditCtrl', ['$scope', '$rootScope', 'LoginManager', 'flash', 'Restangular', '$location', 'user',
-	function($scope, $rootScope, LoginManager, flash, Restangular, $location, user) {
-		
-		var original = user;
-		
-		$scope.user = Restangular.copy(original);
-  
-  		$scope.$watch('user.user_type.canSell', function(newValue) {
-  			if ($scope.user.user_type.canSell) {
-  				$scope.user.user_type.name = "Producer";
-  			} else {
-  				$scope.user.user_type.name = "Customer";
-  			}
-  		});
-		  
-		$scope.isClean = function() {
-			return angular.equals(original, $scope.user);
-		};
-
-		$scope.destroy = function() {
-			var lastChance = confirm('Are you sure you want to delete the profile of ' + user.name +'?');
-			if (lastChance) {
-				if ($scope.user._id === $rootScope.currentUser._id) {
-					LoginManager.logout();
-				}
-				original.customDELETE(original._id).then(function() {
-					flash.setMessage('User successfully Deleted');
-					$location.path('/admin');
-				});
-			}
-		};
-		
-		// sends a request for a password reset email to be sent to this user's email.
-		$scope.passwordReset = function() {
-			Restangular.all('api/forgot').post({email: original.email});
-		};
-		
-		$scope.save = function() {
-			if (!$scope.isClean()) {
-				$scope.user.customPUT($scope.user, $scope.user._id).then(function(response) {
-					// success!
-					flash.setMessage({type: 'success', message: 'Changes saved successfully'});
-				});
-			}
-			else {
-				flash.setMessage({type: 'warning', message: 'No changes detected so no changes saved'});
-			}
-			
-		};
-	}
-])
 
 .controller('userEditCtrl', ['$scope', '$rootScope', 'Restangular', 'LoginManager', 'flash', 'UserManager',
 	function($scope, $rootScope, Restangular, LoginManager, flash, UserManager) {
@@ -234,72 +177,6 @@ angular.module('co-op.controllers', [])
 			});
 		};
 }])
-
-.controller('invoiceCtrl', ['$scope', '$rootScope', 'Restangular', 'flash',
-	function($scope, $rootScope, Restangular, flash) {
-		$scope.now = Date();
-		
-		$scope.soon = function(invoice) {
-			if (invoice.status === 'un-paid') {
-				if ( Date.parse(invoice.dueDate).between( Date.today(), Date.today().addWeeks(1) ) ) {
-					return true;
-					}
-			}
-			
-			return false;
-		};
-		
-		// the array of invoices for use in the template
-		$scope.invoices = Restangular.all('api/invoice').getList().$object;
-		
-		// update the invoice
-		$scope.invoiceSave = function (invoice) {
-			invoice.put().then(
-			function(result) {
-				flash.setMessage({
-					message: "Invoice Successfully updated",
-					type: "success"
-				});
-				$scope.unPaid();
-				$scope.overdue();
-				}, 
-			function(error) {
-				flash.setMessage({
-					message: "Sorry! Failed to update the invoice for some reason",
-					type: "danger"
-				});
-			});
-		};
-		
-		$scope.unPaid = function() {
-			var match;
-			match = _.where($scope.invoices, {status: 'un-paid'});
-			return match.length;
-		};
-		
-		$scope.overdue = function() {
-			var match;
-			match = _.where($scope.invoices, {status: 'OVERDUE'});
-			return match.length;
-		};
-		
-		$scope.invoiceDelete = function(invoice) {
-			invoice.remove({id:invoice._id}).then(function(result){
-				flash.setMessage({type:'success', message: "invoice successfully removed: "+ result});
-			},
-			function(error) {
-				flash.setMessage({
-					message: "Sorry! Failed to delete the invoice " + error ,
-					type: "danger"
-				});
-			});
-			
-			$scope.invoices.splice($scope.invoices.indexOf(invoice), 1);
-			
-		};
-		
-	}
-])
 
 .controller('userInvoiceCtrl', ['$scope', 'Restangular', '$rootScope', function($scope, Restangular, $rootScope){
 	$scope.now = Date();
@@ -350,25 +227,6 @@ angular.module('co-op.controllers', [])
 		};
 	}
 ])
-
-// admin cycle control
-.controller('cycleCtrl', ['$scope', '$http', 'flash', 'cycle',
-	function($scope, $http, flash, cycle){
-		$scope.cycle = cycle.data;
-		console.log(cycle.data);
-		
-		$scope.next = function() {
-			$http.post('api/admin/cycle', {}).success(function(cycle) {
-				console.log(cycle);
-				if (!isNaN(cycle)) {
-					$scope.cycle = cycle;
-				}
-				else {
-					flash.setMessage({type:'warning', message: cycle});
-				}
-			});
-		};
-	}])
 
 // signup form control
 .controller('userModalCtrl', ['$scope', 'UserManager', '$modalInstance', 'data',
@@ -539,19 +397,37 @@ angular.module('co-op.controllers', [])
 .controller('productUploadCtrl', ['$scope', '$rootScope', '$modal', '$sce', '$location', 'ProductManager', 'Restangular', 'product', 'flash',
 	function($scope, $rootScope, $modal, $sce, $location, ProductManager, Restangular, product, flash) {
 		// init
-		if (!$rootScope.canUpload && !$rootScope.canChange) {
-			flash.setMessage({type: 'warning', message: 'Uploading is not allowed yet sorry. Please check the calendar for when uploading is open next.'});
-		}
-		else if ($rootScope.canChange && !$rootScope.canUpload) {
-			flash.setMessage({type: 'warning', message: 'Uploading new products is not allowed right now. This month\'s products can have some properties edited though. Editable properties are enabled.'});
-		}
 		
-		$scope.productData = product || {};
-		$scope.productData.refrigeration = product.refrigeration || 'none';
+		$scope.$on('CALENDAR-LOADED', function() {
+			if (!$rootScope.canUpload && !$rootScope.canChange) {
+				flash.setMessage({type: 'warning', message: 'Uploading is not allowed yet sorry. Please check the calendar for when uploading is open next.'});
+			}
+			else if ($rootScope.canChange && !$rootScope.canUpload) {
+				flash.setMessage({type: 'warning', message: 'Uploading new products is not allowed right now. This month\'s products can have some properties edited though. Editable properties are enabled.'});
+			}
+		});
+		
+		$scope.newProduct = {
+			refrigeration: 'none',
+			img: null,
+			priceWithMarkup: this.price * 1.2,
+			price: undefined
+		};
+		
+		$scope.reset = function() {
+			var path = $location.path();
+			// console.log(path);
+			if (path !== '/product-upload') {
+				$location.path('product-upload');
+			}
+			else $scope.productData = angular.copy($scope.newProduct);
+		};
+		
+		$scope.productData = product || angular.copy($scope.newProduct);
 		$scope.selectedImg = $scope.productData.img || null;
 		$scope.productManager = ProductManager;
 		$scope.ingredients = false;
-		$scope.productData.priceWithMarkup = $scope.productData.price * 1.2;
+		//$scope.productData.priceWithMarkup = $scope.productData.price * 1.2;
 		
 		$scope.$watch('productData.price', function(newValue) {
 			$scope.productData.priceWithMarkup = newValue * 1.2;
@@ -576,14 +452,14 @@ angular.module('co-op.controllers', [])
 		});
 
 		$scope.submitForm = function() {
-			ProductManager.registerProduct($scope.productData, function(id) {
-				/*
-				flash.setNextMessage({type: 'success', 
-								message: 'Congratulations ' + $rootScope.currentUser.name + '! Your ' + $scope.productData.variety + " " + $scope.productData.productName + ' was successfully added to the store.'
-								});*/
-				
+			// disable the save button if a product is new or an update of an old month
+			if ($scope.productData._id === undefined || $rootScope.cycle !== $scope.productData.cycle ) {
+				$scope.hideSave = true;
+			}
+			
+			ProductManager.registerProduct($scope.productData, function(message) {
 				$scope.$broadcast('REFRESHCURRENT');
-				$location.path('product-upload/'+id);
+				//$location.path('product-upload/'+id);
 			});
 		};
 		
@@ -603,13 +479,13 @@ angular.module('co-op.controllers', [])
 			
 			modalInstance.result.then(function (selectedImg) {
 				console.log(selectedImg);
+				var fileURL = URL.createObjectURL(selectedImg);
+				$scope.selectedImg = $sce.trustAsResourceUrl(fileURL);
 				var reader = new window.FileReader();
 				reader.readAsDataURL(selectedImg);
 				reader.onloadend = function() {
 					console.log(reader.result);
 					$scope.productData.img = reader.result;
-					var fileURL = URL.createObjectURL(selectedImg);
-					$scope.selectedImg = $sce.trustAsResourceUrl(fileURL);
 				};				
 				
 			}, function () {
@@ -690,6 +566,7 @@ function($scope, $modalInstance, data, ProductManager) {
 	function($scope, $http, ProductHistory, ProductManager) {
 
 		$scope.$on('REFRESHCURRENT', function() {
+			console.log('refresh');
 			ProductHistory.getCurrentProducts(function(result) {
 				$scope.currentProducts = result;
 			});
@@ -741,7 +618,7 @@ function($scope, $modalInstance, data, ProductManager) {
 			$scope.orderTotal = function(list) {
 				var total = 0;
 				for (var i = 0; i < list.length; i++) {
-					total += list[i].orderPrice;
+					total += list[i].orderPrice ? list[i].orderPrice : list[i].product.price * list[i].quantity;
 				}
 				return total;
 			};			
@@ -749,14 +626,18 @@ function($scope, $modalInstance, data, ProductManager) {
 		
 		$scope.sortedOrders = unfullfilledOrders.getList().$object;
 		
-		ProductHistory.getCurrentProducts(function(products) {
-			$scope.currentProducts = products;
-		});
-		
 		ProductHistory.getRecentProducts(function(products) {
 			$scope.recentProducts = products;
 		});
 		
+		$scope.getCurrentProducts = function() {
+			ProductHistory.getCurrentProducts(function(products) {
+				$scope.currentProducts = products;
+			});
+		};
+		
+		$scope.getCurrentProducts();
+				
 		$scope.products = products.getList().$object; 
 		
 		$scope.delete = function(idx, id) {
@@ -765,40 +646,10 @@ function($scope, $modalInstance, data, ProductManager) {
 			ProductManager.deleteProduct(id);
 		};
 		
-		// @id is _id of product and @list is which month list to search for purchases		
-		/*
-		$scope.isOrdered = function(id, list) {
-					var numOrdered = 0;
-					var ordersOfProduct = _.where(list, { product : {_id: id} });
-					if (ordersOfProduct !== [] ) {
-						for (var i = 0; i < ordersOfProduct.length; i++) {
-							numOrdered += ordersOfProduct[i].quantity;
-						}
-						return numOrdered;
-					}
-					else return 0;
-				};*/
-		
-		
 		$scope.lastMonth = Date.today().add(-1).months().toString('MMMM');
 		$scope.predicate = 'product';
 	}
 ])
-
-.controller('orderAdminCtrl', ['$scope', 'orders', function($scope, orders) {
-	$scope.orders = orders.getList().$object;
-	$scope.total = function(orders) {
-		var order, total = 0;
-		for (var i=0; i < orders.length; i++) {
-			total += orders[i].orderPriceWithMarkup;
-		}
-		return total;
-	};
-	
-	$scope.$watch('search', function() {
-		$scope.total($scope.orders);
-	});
-}])
 
 .controller('cartPageCtrl', ['$scope', '$rootScope', '$location', 'Cart', 'flash',
 	function($scope, $rootScope, $location, Cart, flash) {
@@ -822,7 +673,8 @@ function($scope, $modalInstance, data, ProductManager) {
 			return $scope.total;
 		};
 	
-		$scope.delete = function(idx) {
+		$scope.delete = function(idx, error) {
+			var err = error || angular.noop;
 			var itemToDelete = $scope.cart[idx];
 			Cart.deleteItem($scope.cart[idx]._id).then(function() {
 				$scope.cart.splice(idx, 1);
@@ -832,7 +684,7 @@ function($scope, $modalInstance, data, ProductManager) {
 				// for the store page:
 				$rootScope.$broadcast('CART_IDS', $scope.cartProduct_ids);
 				$scope.cartTotal();
-			}, null);
+			}, err);
 			
 			
 		};
@@ -880,9 +732,16 @@ function($scope, $modalInstance, data, ProductManager) {
 	//$scope.lastQuantity = undefined;
 	
 	$scope.saveNewQuantity = function(item) {
-		if (item.quantity <= 0) {
-			flash.setMessage({type: 'warning', message: 'Please use a valid quantity and try again.'});
+		if (item.quantity === 0) {
+			$scope.delete($scope.cart.indexOf(item), function() {
+				$scope.$emit('FAILED_CART_UPDATE', $scope.lastQuantity, item._id);
+			});
 		}
+		else if (item.quantity < 1) {
+			flash.setMessage({type: 'warning', message: 'Please enter a valid quantity and try again.'});
+			$scope.$emit('FAILED_CART_UPDATE', $scope.lastQuantity, item._id);
+		}
+	
 		else {
 			Cart.updateItem(item, function(error) {
 				if (error) {

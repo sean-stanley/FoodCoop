@@ -160,13 +160,13 @@ function titleDateMatcher(title) {
 		date = config.cycle.ProductUploadStart;
 		break;
 	case 'Reminder: Upload Products':
-		date = config.cycle.ProductUploadStop;
+		date = config.cycle.ProductUploadStop.addDays(-3);
 		break;
 	case 'Ordering Now Open':
 		date = config.cycle.ShoppingStart;
 		break;
 	case 'Reminder: Ordering Closes Soon':
-		date = config.cycle.ShoppingStop.addDays(-2);
+		date = config.cycle.ShoppingStop.addDays(-3);
 		break;
 	case 'Sorting and driving Volunteers needed':
 		date = config.cycle.volunteerRecruitment;

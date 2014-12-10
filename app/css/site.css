@@ -21,6 +21,8 @@ a:hover {
 	cursor: pointer;
 }
 
+.text-disabled {text-decoration: line-through; background: #ccc;}
+
 .page-wrap:before {height: 51px; display: block; content: "";}
 
 .site-footer {

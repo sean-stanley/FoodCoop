@@ -43,7 +43,24 @@
 				<span ng-show="userEdit.userFullName.$error.required">A valid phone number is needed to quickly sort out issues.</span>
 			</div>
 		</div>
-	
+		
+		<div class="form-group">
+			<label for="route">Delivery Route</label>
+			<input type="text" class="form-control" ng-model="user.routeTitle" name="route" placeholder="Not Currently on a Route">
+		</div>
+		
+		<div class="form-group">
+			<label for="balance">Balance</label>
+			<input type="number" class="form-control" ng-model="user.balance" name="balance" placeholder="$" step="0.01">
+		</div>
+		
+		<div class="form-group">
+			<div class="btn-group">
+				<button type='button' class="btn btn-primary" ng-model="currentUser.user_type.name" btn-radio="'Customer'">Customer</button>
+				<button type='button' class="btn btn-primary" ng-model="currentUser.user_type.name" btn-radio="'Producer'">Producer</button>
+			</div>
+		</div>
+		
 		<div class="checkbox">
 			<label>Can Sell Products</label>
 			<input type="checkbox" ng-model="user.user_type.canSell">

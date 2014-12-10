@@ -5,13 +5,8 @@ var mongoose = require('mongoose'), // middleware for connecting to the mongodb 
 	fs = require('fs'),
 	path = require('path'),
 	config = require('./coopConfig.js'),
-	markup = config.markup;
-
-// this is a helpful setter function to return a value as lowercase. It is used
-// to keep email addresses as all lowercase.
-function toLower (v) {
-  return v.toLowerCase();
-}
+	markup = config.markup,
+	gm = require('gm');
 
 function toArray (listString) {
 	if (typeof listString === "string" && listString.length > 0) {
@@ -37,7 +32,7 @@ var ProductSchema = new Schema({
 			quantity: {type: Number, required: true},
 			units: {type: String, required: true},
 			refrigeration: {type: String, required: false},
-			ingredients: {type: Array, required: false},
+			ingredients: {type: Array, required: false, set: toArray},
 			description: {type: String, required: false},
 			certification: {type: Schema.ObjectId, required: false, ref: 'Certification'},
 			producer_ID: {type: Schema.ObjectId, required: true, ref: 'User'},
@@ -48,6 +43,12 @@ var ProductSchema = new Schema({
 	toObject: { virtuals : true },
 	toJSON: { virtuals : true }
 });
+function convertToArray (value) {
+	if (typeof value === "string" && value.length > 0) {
+		req.body.ingredients = req.body.ingredients.split(/,\s*/);
+	}
+}
+
 ProductSchema.virtual('priceWithMarkup').get(function () {
 	return (this.price * (markup/100 + 1)).toFixed(2);
 });
@@ -55,24 +56,26 @@ ProductSchema.virtual('fullName').get(function () {
 	if (this.variety) return this.variety + ' ' + this.productName;
 	else return this.productName
 });
-// occurs just before an invoice is saved. should work with Model.create() shortcut
+
+// occurs just before a product is saved. should work with Model.create() shortcut
 ProductSchema.pre('save', function(next) {
-	var product = this;
+	var product=this;
 	var b64reg = /^data:image\/png;base64,/;
 
-	if (b64reg.test(product.img) ) { 
+	if (b64reg.test(product.img) ) {
+		
 		var productName = product.productName.replace(/\.+|\/+|\?+|=+/, "") + "+" + product.variety.replace(/\.+|\/+|\?+|=+/, "");
-		var destination = path.normalize(path.join(__dirname, '../app', 'upload', 'products', productName+"+id-"+product._id+".png"));
+		var destination = path.normalize(path.join(__dirname, '../app', 'upload', 'products', productName+"+id-"+product._id+".jpg"));
 		var base64Data = product.img.replace(/^data:image\/png;base64,/, "");
 		
-		fs.writeFile(destination, base64Data, 'base64', function(err) {
-		  if (err) console.log(err);
+		gm(new Buffer(base64Data, 'base64')).write(destination, function(err) {
+			if (err) return console.log(err);
+			console.log('Yay! successfully wrote new jpeg image')
 		});
-		//set img to be img path instead
-		product.img = path.normalize(path.join('upload', 'products', productName+"+id-"+product._id+".png"));
+		
+		product.img = path.normalize(path.join('upload', 'products', productName+"+id-"+product._id+".jpg"));
 		console.log(product.img);
 	}
-	
 	next();
 });
 
@@ -116,16 +119,16 @@ OrderSchema.virtual('unitPriceWithMarkup').get(function () {
 	return (this.product.price * (this.markup/100 + 1)).toFixed(2);
 });
 OrderSchema.virtual('unitPrice').get(function () {
-	return this.product.price;
+	return this.product.price ? this.product.price.toFixed(2) : 'Failed to determine price of product ordered';
 });
 OrderSchema.virtual('unitMarkup').get(function () {
 	return (this.unitPriceWithMarkup - this.unitPrice).toFixed(2);
 });
 OrderSchema.virtual('orderPrice').get(function () {
-	return this.product.price * this.quantity;
+	return (this.product.price * this.quantity);
 });
 OrderSchema.virtual('orderPriceWithMarkup').get(function () {
-	return this.unitPriceWithMarkup * this.quantity;
+	return (this.unitPriceWithMarkup * this.quantity).toFixed(2);
 });
 
 // Schema for Invoice Data
@@ -145,10 +148,11 @@ var InvoiceSchema = new Schema({
 		customer: {type:Schema.ObjectId, ref: 'User'}, 
 		product: {type:Schema.ObjectId, ref: 'Product'} 
 	}],
+	credit: Number,
 	bankAccount: {type:String, required: true, default: config.bankAccount},
 	//valid types are 'un-paid', 'PAID', 'overdue', 'To Refund', 'refunded' and
 	//'CANCELLED'.
-	status: {type: String, required: true, default: 'un-paid', set:validStatus},
+	status: {type: String, required: true, default: 'un-paid', validator:validStatus},
 	cycle: Number,
 	// only for invoices to customers
 	deliveryRoute: String
@@ -158,7 +162,7 @@ var InvoiceSchema = new Schema({
 });
 
 // sets a virtual property that is the financial total of the invoice.
-InvoiceSchema.virtual('total').get(function () {
+InvoiceSchema.virtual('subtotal').get(function () {
 	var total = 0;
 	for (var i = 0; i < this.items.length; i++) {
 		// works for membership invoices
@@ -182,15 +186,15 @@ InvoiceSchema.virtual('total').get(function () {
 	return total.toFixed(2);
 });
 
+InvoiceSchema.virtual('total').get(function() {
+		if (this.credit >= 0 || this.credit <= 0) return this.subtotal -= this.credit;
+		return this.subtotal;
+});
+
 //setter function for Invoice status that tests the value is in the validOptions range.
 function validStatus (val) {
 	var validOptions = ['un-paid', 'PAID', 'OVERDUE', 'To Refund', 'Refunded', 'CANCELLED'];
-	if ( _.contains(validOptions, val) ) {
-		return val;
-	}
-	else {
-		throw new Error("Oops, the invoice status is not being set to a proper value.");
-	}
+	return /un-paid|PAID|OVERDUE|To Refund|Refunded|CANCELLED/i.test(val);
 }
 
 // occurs just before an invoice is saved. should work with Model.create() shortcut
@@ -211,12 +215,19 @@ InvoiceSchema.pre('save', function(next) {
 	else next();
 });
 
+var badgeSchema = new Schema({
+			name: {type: String, required: true},
+			img: {type: String, required: true},
+			quantity: Number,
+			details: {type: String, required: true}
+});
+
 // User schema for all the common user properties. Password is left out as it is
 // generated by passportLocalMongoose
 var UserSchema = new Schema({
 			dateJoined : {type: Date, default: Date.now()},
 			regionID: [{type: Schema.ObjectId, ref: 'Region'}],
-			email : {type: String, required: true, set: toLower},
+			email : {type: String, required: true, lowercase: true},
 			phone : {type: String, required: true},
 			address : {type: String, required: true},
 			addressPermission : {type: Boolean, default: false},
@@ -234,6 +245,7 @@ var UserSchema = new Schema({
 			producerData : {
 				companyName : String,
 				logo : {},
+				thumbnail: String,
 				description : String,
 				certification : String,
 				website : String,
@@ -246,18 +258,15 @@ var UserSchema = new Schema({
 				townsOnRoute: {type: Array, set: toArray},
 				pickupLocation: String
 			},
+			balance: Number,
+			badges: [badgeSchema],
+			
 			routeTitle: String,
 			resetPasswordToken: String,
 			resetPasswordExpires: Date
 });
 // delete the salt and hash from requests for the user objects
 if (!UserSchema.options.toObject) UserSchema.options.toObject = {};
-/*
-UserSchema.options.toObject.transform = function (doc, ret, options) {
-	delete ret.salt;
-	delete ret.hash;
-};*/
-
 
 UserSchema.virtual('firstName').get(function() {
 	return this.name.substr(0, this.name.indexOf(' '));
@@ -270,25 +279,71 @@ UserSchema.virtual('lastName').get(function() {
 UserSchema.pre('save', function(next) {
 	var user = this;
 	// params for updating MailChimp
-	var params = {
-		id: 'e481a3338d',
-		email: {email: user.email},
-		merge_vars : {
-			FNAME : user.name.substr(0, user.name.indexOf(" ")),
-			LNAME : user.name.substr(user.name.indexOf(" ")+1),
-			USER_TYPE : user.user_type.name,
-			ADDRESS : user.address,
-			PHONE : user.phone
+	if (user.name && user.email) {
+		var params = {
+			id: 'e481a3338d',
+			email: {email: user.email},
+			merge_vars : {
+				FNAME : user.name.substr(0, user.name.indexOf(" ")),
+				LNAME : user.name.substr(user.name.indexOf(" ")+1),
+				USER_TYPE : user.user_type.name,
+				ADDRESS : user.address,
+				PHONE : user.phone
+			}
+		};
+		if (!user.isNew) {
+			mc.lists.updateMember(params, function(result) {}, function(err) {
+				console.log(err);
+			});
 		}
-	};
-	if (!user.isNew) {
-		mc.lists.updateMember(params, function(result) {console.log(result)}, function(err) {
-			console.log(err);
-		});
-		next();
 	}
 	next();
 });
+
+UserSchema.pre('save', function(next) {
+	if (this.user_type.name === "Producer" && this.producerData.hasOwnProperty('logo')) {
+		var b64reg = /^data:image\/(jpeg|png|gif|tiff|webp);base64,/,
+			logoName = this.producerData.companyName ? this.producerData.companyName.replace(/\.+|\/+|\?+|=+/, "") : this.name.replace(/\.+|\/+|\?+|=+/, "");
+			
+		
+		if (b64reg.test(this.producerData.logo) ) {
+			console.log('base64 logo detected. Beginning conversion.');
+			//determine format. the actual string will be format[0]
+			var format = b64reg.exec(this.producerData.logo);
+			format = "." + format[1];
+			if (format === '.jpeg') format = '.jpg';
+			
+			var base64Data = this.producerData.logo.replace(/^data:image\/(jpeg|png|gif|tiff|webp);base64,/, ""),
+				destination = path.normalize(path.join(__dirname, '../app', 'upload', 'producer-logos', logoName+"+id-"+this._id+format)),
+				thumbnailDestination = path.normalize(path.join(__dirname, '../app', 'upload', 'producer-logos', 'thumbnails', logoName+ "-thumb" + "+id-"+this._id+format));
+				 buff = new Buffer(base64Data, 'base64');
+			//create main logo
+			gm(buff).resize('450', '450').write(destination, function(err) {
+				if (err) console.log(err);
+				else console.log('Yay! successfully wrote new jpeg logo');
+			});
+			
+			gm(buff).resize('150', '150').write(thumbnailDestination, function(err) {
+				if (err) console.log(err);
+				else console.log('Yay! successfully wrote new jpeg logo thumbnail');
+			});
+			
+			this.producerData.logo = path.normalize(path.join('upload', 'producer-logos', logoName+"+id-"+this._id+format));
+			this.producerData.thumbnail = path.normalize(path.join('upload', 'producer-logos', 'thumbnails', logoName+ "-thumb" + "+id-"+this._id+format));
+		} // else if (this.producerData.logo){
+// 			// create thumbnail
+// 			gm(destination).resize('150', '150').write(thumbnailDestination, function(err) {
+// 				if (err) return console.log(err);
+// 				console.log('Yay! successfully wrote new jpeg logo thumbnail');
+// 			});
+// 			this.producerData.thumbnail = path.normalize(path.join('upload', 'producer-logos', 'thumbnails', logoName+ "-thumb" + "+id-"+this._id+".jpg"));
+// 		} else {
+// 			console.log('deleting accidental thumbnail creation');
+// 			this.producerData.thumbnail = undefined;
+// 		}
+	}
+	next();
+})
 
 // Produce, Meat, Processed Goods, Dairy, Baked Goods all have properties that
 // modify the UI of product uploading. For example, the ingredients boolean

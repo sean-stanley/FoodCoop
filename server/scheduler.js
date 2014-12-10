@@ -31,13 +31,14 @@ function checkConfig() {
 	
 	exports.canShop = false;
 	exports.canUpload = false;
-	exports.canChange = false;
+	exports.canChange = true;
 	
 	// if the date is between the productUploadStart date and the productUpoad Stop date
 	// double check that canShop is false and canUpload is true;
 	if ( !today.equals(cycle['ProductUploadStop']) && today.between(cycle.ProductUploadStart, cycle.ProductUploadStop) ) {
 		console.log('today is between the start of product uploading and the end');
 		exports.canShop = false;
+		exports.canChange = false;
 		exports.canUpload = true;
 	}
 
@@ -61,13 +62,15 @@ function checkConfig() {
 				switch (cycleDay) {
 				case 'cycleIncrementDay':
 					incrementCycle();
-					mailChimp.mailSchedule();
+					//mailChimp.mailSchedule();
 					break;
 				case 'ProductUploadStart':
 					exports.canUpload = true;
+					exports.canChange = false;
 					break;
 				case 'ProductUploadStop':
 					exports.canUpload = false;
+					exports.canChange = true;
 					break;
 				case 'ShoppingStart':
 					exports.canShop = true;
@@ -111,7 +114,7 @@ function checkout() {
 			console.log('beginning checkout process');
 			models.Order
 			.aggregate()
-			.match({cycle: exports.currentCycle})
+			//.match({cycle: exports.currentCycle})
 			.group({ _id: "$customer", orders: { $push : {product: "$product", quantity: "$quantity"} }})
 			.exec(function(e, customers) {
 				// customers is a plain javascript object not a special mongoose document.
@@ -125,7 +128,7 @@ function checkout() {
 			});
 		},
 		function(customers, done) {
-			models.User.populate(customers, {path: '_id', select: 'name email routeTitle'}
+			models.User.populate(customers, {path: '_id', select: 'name email routeTitle balance user_type.name'}
 			, function(e, result){
 				done(null, result);
 			});
@@ -135,21 +138,19 @@ function checkout() {
 			console.log(e);
 		}
 		else {
-			for (var i = 0; i < result.length; i++) {
-				invoiceCustomer(result[i]);
-			}
+			async.each(result, invoiceCustomer, function(error) {
+				if (error) console.log(error);
+			})
 		}
 	});
 }
 
 // called by checkout() for each customer. Creates invoices for customers to pay
 // and emails them a copy
-function invoiceCustomer(customer) {
+function invoiceCustomer(customer, callback) {
 	console.log('beginning invoicing of customer ' + customer._id.name);
 	async.waterfall([
 		function (done) {
-			console.log(customer.orders);
-			
 			var invoice = new models.Invoice({
 				dueDate: config.cycle.PaymentDueDay.toString(),
 				invoicee: customer._id._id,
@@ -157,13 +158,21 @@ function invoiceCustomer(customer) {
 				items: customer.orders,
 				cycle: exports.currentCycle,
 				deliveryRoute: customer._id.routeTitle || "Whangarei"
-			})
-			
-			.save(function(e, invoice){
-				console.log(invoice.total);
-				if (e) done(e);
-				else done(null, invoice);
 			});
+			console.log(customer._id.balance);
+			
+			if (customer._id.user_type.name === 'Customer') {
+				invoice.credit = customer._id.balance
+				console.log('%s credited on shopping Bill', customer._id.name);
+			}
+			
+			
+			invoice.save(function(e, invoice){
+							console.log(invoice.total);
+							if (e) done(e);
+							else done(null, invoice);
+						});
+			
 			
 		},
 		function(invoice, done) {
@@ -182,30 +191,38 @@ function invoiceCustomer(customer) {
 					name: customer._id.name
 				}
 			};
-
+			
+			var showCredit = 'none'
+			if (!isNaN(parseFloat(invoice.credit))) showCredit = 'table-row';
+			
 			mailData = {
 				name: customer._id.name,
 				dueDate: invoice.dueDate.toString("ddd dd MMMM yyyy"),
 				code: invoice._id,
 				items: customer.orders,
+				showCredit: showCredit,
+				credit: function() {
+					if (invoice.credit >= 0) return '$' + invoice.credit.toFixed(2);
+					else return "-" + '$' + Math.abs(invoice.credit).toFixed(2);
+				},
+				subtotal: invoice.subtotal,
 				total: invoice.total,
 				account: config.bankAccount
 			};
 			
 			mail = new Emailer(mailOptions, mailData);
 
-			mail.send(function(err, result) {
-							if (err) done(err);
-							// a response is sent so the client request doesn't timeout and get an error.
-							console.log("Message sent to customer " + customer._id.name);
-							
-							done(null, result);
-						});
 			
+			mail.send(function(err, result) {
+										if (err) done(err);
+										// a response is sent so the client request doesn't timeout and get an error.
+										console.log("Message sent to customer " + customer._id.name);
+										done(null);
+									});
 		}
 		
 	], function(error) {
-		console.log(error);
+		callback(error);
 	});
 }
 
@@ -214,7 +231,7 @@ function orderGoods() {
 		function(done) {
 			models.Order
 			.aggregate()
-			.match({cycle: exports.currentCycle})
+			//.match({cycle: exports.currentCycle})
 			.group({ _id: "$supplier", orders: { $push : {product: "$product", customer: '$customer', quantity: "$quantity"} }})
 			
 			.exec(function(e, producers) {
@@ -236,7 +253,7 @@ function orderGoods() {
 			});
 		},
 		function(producers, done) {
-			models.User.populate(producers, [{path: '_id', select: 'name email producerData.bankAccount'}, {path: 'orders.customer', select: 'name email routeTitle'}]
+			models.User.populate(producers, [{path: '_id', select: 'name email producerData.bankAccount balance'}, {path: 'orders.customer', select: 'name email routeTitle balance'}]
 			, function(e, result){
 				done(null, result);
 			});
@@ -246,9 +263,9 @@ function orderGoods() {
 			console.log(e);
 		}
 		else {
-			for (var i = 0; i < result.length; i++) {
-				invoiceFromProducer(result[i]);
-			}
+			async.each(result, invoiceFromProducer, function(error) {
+				if (error) console.log(error);
+			})
 		}
 	});
 }
@@ -257,7 +274,7 @@ function orderGoods() {
 // be paid. Creates invoices for producers to know what to deliver and emails
 // them a copy of the invoice. This function is for the producer's 
 // convenience and is as a way of invoicing the co-op for orders requested.
-function invoiceFromProducer(producer) {
+function invoiceFromProducer(producer, callback) {
 	console.log('beginning invoicing of producer ' + producer._id.name);
 	var order, items = [];
 	
@@ -269,13 +286,16 @@ function invoiceFromProducer(producer) {
 				title: "Products Requested for " + Date.today().toString("MMMM"),
 				items: producer.orders,
 				cycle: exports.currentCycle,
+				credit: -producer._id.balance,
 				toCoop: true,
 				bankAccount: producer._id.producerData.bankAccount || "NO ACCOUNT ON RECORD"
 			});
 			
+			console.log(invoice.credit)
+			
 			invoice.save(function(e, invoice) {
-				if (e) done(e);
-				else done(null, invoice);
+				if (e) return done(e);
+				done(null, invoice);
 			});
 		},
 		function(invoice, done) {
@@ -294,32 +314,41 @@ function invoiceFromProducer(producer) {
 					name: producer._id.name
 				}
 			};
-
+			var showCredit = 'none'
+			if (!isNaN(parseFloat(invoice.credit))) showCredit = 'table-row';
+			
 			mailData = {
 				name: producer._id.name,
 				dueDate: invoice.dueDate.toString("ddd dd MMMM yyyy"),
 				deliveryDay: config.cycle.DeliveryDay.toString("ddd dd MMMM yyyy"),
 				code: invoice._id,
 				items: producer.orders,
+				showCredit: showCredit,
+				credit: function() {
+					if ( invoice.credit*-1 >= 0) return '$' + Math.abs(invoice.credit).toFixed(2);
+					else return "-" + '$' + Math.abs(invoice.credit).toFixed(2);
+				},
+				subtotal: invoice.subtotal,
 				total: invoice.total,
 				account: producer._id.producerData.bankAccount
 			};
 			
 			mail = new Emailer(mailOptions, mailData);
-
+			
 			
 			mail.send(function(err, result) {
-							if (err) done(err);
-							else {
-								console.log("Message sent to producer " + producer._id.name);
-								done(null, result);
-							}
-						});
+										if (err) done(err);
+										else {
+											console.log("Message sent to producer " + producer._id.name);
+											done(null);
+										}
+									});
+			
 			
 		}
 		
 	],function(error) {
-		console.log(error);
+		callback(error);
 	});
 }
 
@@ -363,20 +392,30 @@ function disableCycle() {
 	exports.canChange = true;
 }
 
-/*
+
 function writeProductImgToDisk() {
 	models.Product.find({}, null, function(err, products){
 		console.log(err);
-		
+
 		for (var i = products.length - 1; i >= 0; i--) {
 			products[i].save(function(err, product, num) {
 				if (err) console.log(err);
-				console.log(product.img);
 			})
 		}
-		
 	});
-}*/
+}
+
+function writeProducerImgToDisk() {
+	models.User.find({'user_type.name':'Producer'}, null, function(err, users){
+		console.log(err);
+
+		for (var i = users.length - 1; i >= 0; i--) {
+			users[i].save(function(err, user, num) {
+				if (err) console.log(err);
+			})
+		}
+	});
+}
 
 
 
@@ -386,11 +425,12 @@ findCycle();
 checkConfig();
 //disableCycle();
 //writeProductImgToDisk();
+//writeProducerImgToDisk();
 
 // checkout everyone's purchases
-//checkout();
+// checkout();
 // send order requests to producers
-//orderGoods();
+// orderGoods();
 
 // checkOut and orderGoods don't run on initial server launch because exports.currentCycle is undefined by the time they get called. Convenient for now but a more elegant solution should be implemented.
 

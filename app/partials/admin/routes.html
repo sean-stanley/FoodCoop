@@ -18,13 +18,15 @@
         <li><a href="/admin">Users</a></li>
         <li><a href="/admin/invoices">Invoices</a></li>
         <li class="dropdown">
-          <a href="" class="dropdown-toggle" data-toggle="dropdown">More <span class="caret"></span></a>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">More <span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
             <li><a href="/admin/cycle">Cycles</a></li>
             <li><a href="/admin/orders">Orders</a></li>
-            <li><a href="/admin/routes">Master Route List</a></li>
+            <li><a href="#">Something else here</a></li>
             <li class="divider"></li>
             <li><a href="#">Separated link</a></li>
+            <li class="divider"></li>
+            <li><a href="#">One more separated link</a></li>
           </ul>
         </li>
       </ul>
@@ -50,17 +52,17 @@
   </div><!-- /.container-fluid -->
 </nav>
 <div class="page-header">
-	<h1 class="text-center">User List</h1>
+	<h1 class="text-center">Route User List</h1>
 </div>
 
 <table class="table">
-	<caption>Users List</caption>
+	<caption>Route Users List</caption>
 	<thead>
 		<tr>
 			<th>Edit</th>
 			<th><a href="" ng-click="predicate = 'name'; reverse=!reverse ">Name</a></th>
-			<th><a href="" ng-click="predicate = 'address'; reverse=!reverse ">Address</a></th>
-			<th><a href="" ng-click="predicate = 'phone'; reverse=!reverse ">Phone Number</a></th>
+			<th><a href="" ng-click="predicate = 'routeTitle'; reverse=!reverse ">Route</a></th>
+			<th><a href="" ng-click="predicate = 'phone'; reverse=!reverse ">Route Manager</a></th>
 			<th><a href="" ng-click="predicate = 'user_type.name'; reverse=!reverse ">Membership</a></th>
 			<th><a href="" ng-click="predicate = 'dateJoined'; reverse=!reverse ">Date Joined</a></th>
 			<!--
@@ -69,18 +71,18 @@
 			
 		</tr>
 	<tbody>
-		<tr ng-repeat="user in userLibrary | orderBy:predicate:reverse | filter:search">
+		<tr ng-repeat="user in ruralUsers | orderBy:predicate:reverse | filter:search">
 			<td data-title=" 'edit' ">
 				<a href="/user/{{user._id}}"><span class="glyphicon glyphicon-pencil"></span></a>
 			</td>
 			<td data-title="'Full Name'" >
 				{{user.name}}
 			</td>
-			<td data-title="'Address'" >
-				{{user.address}}
+			<td data-title="'Route'" >
+				{{user.routeTitle}}
 			</td>
-			<td data-title="'Phone'" >
-				{{user.phone}}
+			<td data-title="'Manager'" >
+				{{user.user_type.isManager}}
 			</td>
 			<td data-title="'membership'">
 				{{user.user_type.name}}

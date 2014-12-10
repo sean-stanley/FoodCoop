@@ -10,8 +10,11 @@ angular.module('co-op.services', [])
 // for Authentication
 	.factory('Session', [ 'Restangular', function (Restangular) {
 		return Restangular.all('auth/session');
-		
 	}])
+	
+	.factory('socketAPI', function (socketFactory) {
+	  return socketFactory();
+	})
 	
 // Allows flash messages to be displayed on a page. Once a message is set though
 // it's generally not seen until the next route change. Primarily used for login
@@ -189,7 +192,8 @@ angular.module('co-op.services', [])
 				$rootScope.currentUser.save().then(function(response) {
 					flash.setMessage({type: 'success', message: 'Details saved successfully'});
 				}, function(error) {
-					flash.setMessage({type: 'danger', message: 'Oops! Failed to save data. ' + error.name + ': ' + error.message});
+					console.log(error);
+					flash.setMessage({type: 'danger', message: 'Oops! Failed to save data. ' + error.statusText + ': ' + error.data});
 				});
 			},
 			delCurrentUser: function(callback) {
@@ -246,34 +250,53 @@ angular.module('co-op.services', [])
 			certificationNameMapping = _.indexBy(certifications, 'name');
 			certificationIdMapping = _.indexBy(certifications, '_id');
 		});
+		
+		function failedToUpload(error) {
+			console.log(error.data);
+			var messageData =  'Oops! Sorry ' + $rootScope.currentUser.name + ', your product didn\'t get uploaded. ' + error.status + ": ";
+			if (error.data) {
+				if (error.data.hasOwnProperty('errors')) {
+					for (var key in error.data.errors) {
+						if (error.data.errors.hasOwnProperty(key)) {
+							messageData += error.data.errors[key].name + " " + error.data.errors[key].message;
+						}
+					}
+				}
+				else if (error.data.message) {
+					messageData += error.data.name + ' ' + error.data.message;
+				}
+				else messageData += error.data;
+			}
+			else messageData += error.toString();
+			flash.setMessage({type: 'danger', 
+			message: messageData
+			});
+		}
         
 		module = {
 			registerProduct : function(productData, callback) {
-				var cb = callback || angular.noop;
-				Restangular.all('api/product').post(productData).then(function(result) {
-					flash.setNextMessage({type: 'success', 
-					message: 'Congratulations ' + $rootScope.currentUser.name + '! Your ' + productData.variety + " " + productData.productName + ' was successfully added to the store.'
+				var cb = callback || angular.noop, message;
+				if (productData.hasOwnProperty('save')) {
+					message = productData.variety + " " + productData.productName + ' successfully updated';
+					productData.save().then(function(response) {
+						flash.setMessage({type: 'success', 
+						message: message
+						});
+						cb(response);
+					}, failedToUpload);
+				}
+				else Restangular.all('api/product').post(productData).then(function(response) {
+					
+					if (productData.hasOwnProperty('_id')) {
+						message = productData.variety + " " + productData.productName + ' successfully updated';
+					}
+					message = 'Congratulations ' + $rootScope.currentUser.name + '! Your ' + productData.variety + " " + productData.productName + ' was successfully added to the store.';
+					flash.setMessage({type: 'success', 
+					message: message
 					});
 					//var r = JSON.parse(result);
-					cb(result._id);
-				}, function(error) {
-					console.log(error.data);
-					var messageData =  'Oops! Sorry ' + $rootScope.currentUser.name + ', your product didn\'t get uploaded. ' + error.status + ": ";
-					if (error.data) {
-						if (error.data.hasOwnProperty('errors')) {
-							for (var key in error.data.errors) {
-								if (error.data.errors.hasOwnProperty(key)) {
-									messageData += error.data.errors[key].name + " " + error.data.errors[key].message;
-								}
-							}
-						}
-						else messageData += error.data.name + ' ' + error.data.message;
-					}
-					else messageData += error.toString();
-					flash.setMessage({type: 'danger', 
-					message: messageData
-					});
-				});
+					cb(response);
+				}, failedToUpload);
 			},
 			deleteProduct : function(id) {
 				Restangular.one('api/product', id).remove().then(function() {
@@ -519,7 +542,7 @@ angular.module('co-op.services', [])
 	.factory('ProductHistory', ['$http', function($http) {
 		var module = {
 			getCurrentProducts : function(callback) {
-				this.currentProducts = $http.get("/api/product-list/current").success(callback);
+				return $http.get("/api/product-list/current").success(callback);
 			},
 			getAllProducts : function(callback) {
 				this.recentProducts = $http.get("/api/product-list").success(callback);

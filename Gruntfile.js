@@ -14,7 +14,7 @@ module.exports = function(grunt) {
             jshint: {
                 browser: {
                     files: {
-                        src: ['app/js/*.js']
+                        src: ['app/js/*.js', 'app/js/*/*.js']
                     }
                 },
                 nodejs: {
@@ -74,7 +74,7 @@ module.exports = function(grunt) {
             },
             watch: {
                 scripts: {
-                  files: ['*.js', 'app/js/*.js', 'test/unit/*.js'],
+                  files: ['*.js', 'app/js/*.js', 'app/js/*/*.js', 'test/unit/*.js'],
                   tasks: ['concurrent:continuous'],
                   options: {
                     spawn: false,
@@ -170,7 +170,7 @@ module.exports = function(grunt) {
             },
             clean: {
               annotations: {
-                src: ['app/js/*.annotated.js']
+                src: ['app/js/*.annotated.js', 'app/js/*/*.annotated.js']
               }
             },
             ngAnnotate: {
@@ -181,7 +181,7 @@ module.exports = function(grunt) {
                     files: [
                         {
                             expand: true,
-                            src: ['app/js/*.js'],
+                            src: ['app/js/*.js', 'app/js/*/*.js'],
                             ext: '.annotated.js', // Dest filepaths will have this extension.
                             extDot: 'last'        // Extensions in filenames begin after the last dot
                         },
@@ -198,7 +198,10 @@ module.exports = function(grunt) {
                                                    'app/js/services.annotated.js', 
                                                    'app/js/controllers.annotated.js', 
                                                    'app/js/filters.annotated.js', 
-                                                   'app/js/directives.annotated.js']
+                                                   'app/js/directives.annotated.js',
+																									 'app/js/user/app.user.annotated.js',
+																									 'app/js/admin/app.admin.annotated.js',
+																									 'app/js/admin/controllers.admin.js',]
                 }
               }
             },

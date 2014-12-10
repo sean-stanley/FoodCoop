@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 var util = require('util'),
-    http = require('http'),
+    http = require('http')
     fs = require('fs'),
     path = require('path'),
     url = require('url'),
@@ -14,9 +14,13 @@ var util = require('util'),
 	LocalStrategy = require('passport-local').Strategy,
 	bunyan = require('bunyan'),
 	mcapi = require('mailchimp-api'),
-    config = require('./config').Config;
+  config = require('./config').Config,
+	SOCKETIO = require('./socket-io');
+
 	
 http.globalAgent.maxSockets = 500;
+var app = express();
+var server = http.Server(app);
 	
 var log = bunyan.createLogger({
 	name: 'API', 
@@ -44,7 +48,10 @@ var db = mongoose.connection;
 // set MailChimp API key here
 mc = new mcapi.Mailchimp('106c008a4dda3fa2fe00cae070e178b9-us9');
 
-var app = API.configAPI(express());
+API.configAPI(app);
+
+SOCKETIO.configSocketIO(server);
+
 
 // app options
 //app.set('etag', false);
@@ -73,7 +80,7 @@ app.use(require('prerender-node').set('prerenderToken', 'AyY6GHZSR0aiwAuXqDzm'))
 var server_port = config.deploy.port || 8081,
 	server_ip_address = 'localhost';
 
-app.listen(server_port, server_ip_address, function() {
+server.listen(server_port, server_ip_address, function() {
 	log.info("Listening on " + server_ip_address + ", " + server_port);
 });
 

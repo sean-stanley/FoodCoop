@@ -25,7 +25,14 @@ Features include:
 Future Feature Ideas:
 -----------------------------------------------
 
+* Add POLi online payment method
+* Add discount coupon codes for membership sign up
+* Add dicount sign up costs for social media likes
+* Add discounts for picking up delivery?
+* Integrate a community notice board with SocketIO
+* See if uploading products couldn't be better done with SocketIO.
 * Add E2E tests for common user tasks
+* Add unit tests for server-side functions
 * Add a way to manage mailchimp subscription right from our site.
 * when a member buys an animal that must be butchered, have the website provide a form for filling out butchery instructions.
 * have a live map showing markers where producers live on producer list page. Currently lat long data is already stored for users.

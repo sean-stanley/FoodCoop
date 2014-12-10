@@ -125,6 +125,8 @@ exports.configAPI = function configAPI(app) {
 					name: req.body.name
 				}
 			};
+			
+			
 
 			toClientData = {
 				name: req.body.name,
@@ -157,6 +159,10 @@ exports.configAPI = function configAPI(app) {
 				to: {
 					name: req.body.toName,
 					email: req.body.to
+				},
+				replyTo: {
+					email: req.body.email,
+					name: req.body.name
 				}
 			};
 			toProducerData = {
@@ -185,7 +191,6 @@ exports.configAPI = function configAPI(app) {
 	app.get("/api/product", function(req, res, next) {		
 		//
 		log.info('got request for products');
-		res.set('Charset' , 'utf-8');
 		if (req.query.hasOwnProperty('cycle') && req.query.cycle === scheduler.currentCycle ) {
 			req.query.cycle = scheduler.currentCycle;
 			log.info(req.query.hasOwnProperty('cycle'));
@@ -232,212 +237,263 @@ exports.configAPI = function configAPI(app) {
 			models.Product.findById(req.params.id, function(err, product) {
 				if (err) return next(err);
 				log.info('%s requested by current user', product.fullName);
-				if (product) {
-					var productObject = product.toObject();
-					// if truthy then the product being requested is to be sold this month so pass the _id as well.
-					if (productObject.cycle == scheduler.currentCycle) {
-						res.send(productObject);
-					}
-					
-					else {
-						delete productObject._id;
-						res.json(productObject);
-					}
-				}
-				else {
-					res.status(404).end();
-				}
+				res.json(product);
 			});
 		}
 		else res.status(401).end();
 		
 	});
 	
-	
+	app.put("/api/product", function(req, res, next) {
+		// if the product is from this cycle, edit all changes else give it a new _id before saving
+		if (req.user && req.user.user_type.canSell) {
+			if (scheduler.canUpload) {
+				models.Product.findById(req.body._id, function(err, product) { // first find the right product by it's ID
+					if (err) return next(err);
+					if (!_.isEqual(req.user._id, product.producer_ID) ) {
+						return res.status(401).send("You can't edit someone else's product");
+					}
+					var keys = Object.keys(req.body);
+					productObject = product.toObject();
+					
+			
+					async.each(keys, function(key, done) {
+						if ( !_.isEqual(productObject[key], req.body[key]) && key !== "__v" && key !== "_id") {
+							product[key] = req.body[key]; // update the product's properties
+							needsSave = true;
+						}
+						done();
+					}, function(err) {
+						if (err) return next(err);
+						if (needsSave) {
+							if (product.cycle !== scheduler.currentCycle) {
+								product.cycle = scheduler.currentCycle;
+								var updatedProduct = product.toObject();
+								delete updatedProduct._id
+								models.Product.create(updatedProduct, function(err) {log.info(err)});
+							}
+							else {
+								product.increment();
+								// save the changes
+								product.save(function(err) {
+									if (err) log.warn(err);
+								});
+							}
+							res.status(200).end();
+							// save the product before writing to disk.
+							
+						} else res.status(202).end(); // no changes found 
+					});
+				});
+			// complex checking for changes that conflict with current orders for the product
+			} else if (scheduler.canChange) {
+					models.Product.findById(req.body._id, 'price img productName variety quantity amountSold description ingredients refrigeration cycle', 
+					function(err, product) {
+						if (err) return next(err);
+						var keys = Object.keys(req.body);
+						if (scheduler.currentCycle == product.cycle) {
+							productObject = product.toObject();
+							if (product.amountSold > req.body.quantity ) {
+								var amountToRemove = product.amountSold - req.body.quantity;
+								product.amountSold -= amountToRemove;
+								needsSave = true; 
+							
+								// get orders for products
+								models.Order.find({cycle: scheduler.currentCycle, product: new ObjectId(product._id)})
+								.select('customer product quantity datePlaced')
+								.sort('-datePlaced')
+								.populate('customer', 'name email')
+								.populate('product', 'productName variety fullName producer_ID')
+								.exec(function(err, orders) {
+									if (err) return next(err);
+								
+									function sendProductNotAvailableEmail(order) {
+										var mailOptions, mailData, update;
+										mailOptions = {
+											template: 'product-not-available',
+											subject: product.productName + ' No Longer Available',
+											to: {
+												email: order.customer.email,
+												name: order.customer.name
+											}
+										};
+										mailData = {name: order.customer.name, 
+											productName: order.product.fullName, 
+											producerID: order.product.producer_ID
+										};
+										update = new Emailer(mailOptions, mailData);
+									
+										update.send(function(err, result) {
+											if (err) log.warn(err);
+											log.info('message sent about cart item removal to %s', order.customer.email);
+										});
+									}
+								
+									function sendProductChangeAmountEmail(order) {
+										var mailOptions, mailData, update;
+										mailOptions = {
+											template: 'product-quantity-decreased',
+											subject: 'The amount of ' + product.productName + ' in your cart has decreased',
+											to: {
+												email: order.customer.email,
+												name: order.customer.name
+											}
+										};
+										mailData = {
+											name: order.customer.name, 
+											productName: order.product.fullName, 
+											amount: order.quantity,
+											producerID: order.product.producer_ID
+										};
+										update = new Emailer(mailOptions, mailData);
+									
+										update.send(function(err, result) {
+											if (err) log.warn(err);
+											log.info('message sent about cart decreasing to %s', order.customer.email);
+										});
+									}
+								
+									// when fewer products are available than the amount ordered, preference is
+									// given to customers by time not an even averaging of quantities per order.
+									async.eachSeries(orders, function(order, done) {
+										// if the amount to remove is greater than the quantity of an order, delete that order
+										if (amountToRemove === 0) done('complete');
+									
+										else if (amountToRemove > order.quantity) {
+											amountToRemove -= order.quantity;
+											sendProductNotAvailableEmail(order);
+											models.Order.findByIdAndRemove(order._id, function(err, result) {
+												if (err) return done(err);
+												log.info('deleted order of %s because of quantity change', product.fullName);
+												if (amountToRemove > 0) done();
+												else done('complete');
+											
+											});
+										} else if (amountToRemove < order.quantity) {
+											order.quantity -= amountToRemove;
+											log.info('changed quantity of %s\'s order to be %s', order.customer.name, order.quantity);
+										
+											order.save(function(err, order) {
+												if (err) return done(err)
+												sendProductChangeAmountEmail(order);
+												if (amountToRemove > 0) done();
+												else done('complete');
+											});
+										}
+									}, function(result) {
+										if (result !== 'complete') return next(result);
+										log.info('all orders have been adjusted for product quantity change');
+									});
+								});
+							}
+						
+							async.each(keys, function(key, done) {
+								if ( !_.isEqual(productObject[key], req.body[key]) && key !== "__v" && key !== "_id") {
+									log.info({key: key});
+									if (key === 'price') {
+										if (req.body.price <= productObject.price) {
+											product['price'] = req.body.price;
+											needsSave = true;
+										}
+										// increases in price are ignored
+									} else {
+										product[key] = req.body[key]; // update the product's properties
+										log.info('%s just had it\'s %s changed to %s', product.fullName, key, product[key]);
+										needsSave = true;
+									}
+								}
+								done(null);
+							}, function(err) {
+								if (err) return next(err);
+								if (needsSave) {
+									res.status(200).end();
+									product.increment();
+									product.save(function(err, product) {
+										if (err) return next(err);
+									
+										models.Order.find({cycle: scheduler.currentCycle, product: new ObjectId(product._id) })
+										.populate('customer', 'name email')
+										.exec(function(err, orders){
+											if (err) return next(err);
+											var mailData, mailOptions, update;
+											if (orders.length > 0) {
+												async.each(orders, function(order, done) {
+													mailOptions = {
+														template: 'product-change',
+														subject: 'Update to Product you are Ordering',
+														to: {
+															email: order.customer.email,
+															name: order.customer.name
+														}
+													};
+													mailData = {name: order.customer.name, productName: product.fullName, amount: order.quantity};
+													update = new Emailer(mailOptions, mailData);
+										
+													update.send(function(err, result) {
+														if (err) return done(err);
+														log.info('message sent about product changes to %s', order.customer.email);
+													});
+													done();
+												}, function(err) {
+													if (err) log.warn(err);
+													log.info('finished sending messages to members who ordered %s which just had changes', product.fullName);
+												});
+											} else {
+												log.info('no orders found. Orders: %s', orders);
+											}
+										});
+									});
+								} else res.json(product); // no changes to save
+							});
+						
+						} else {
+							log.info('Failed to edit product. Current cycle: %s and product cycle: %s', scheduler.currentCycle, product.cycle);
+							res.status(403).send('Only products from this month can be modified right now.')
+						}
+					});
+				} else res.status(403).send("It's not the right time of the month to upload products");
+			
+		} else res.status(401).end() // not authorized to edit product
+		
+	});	
 
-	// this either creates a new product or updates an existing product with data from the req.body. It is
+	// this creates a new product. It is
 	// usually only called from the product-upload page of the app.
 	app.post("/api/product", function(req, res, next) {
-		var productObject, needsSave = false, key, newProduct;
+		var productObject, needsSave = false, newProduct;
 		// this tests if a user is authenticated.
 		if (req.user && req.user.user_type.canSell) {
 			if (scheduler.canUpload) {
 				// convert ingredients string to an array
-				if (typeof req.body.ingredients === "string" && req.body.ingredients.length > 0) {
-					req.body.ingredients = req.body.ingredients.split(/,\s*/);
-				}
-				else if (req.body.ingredients instanceof Array) {
-					req.body.ingredients = req.body.ingredients.join(', ');
-					req.body.ingredients = req.body.ingredients.split(/,\s*/);
-				}
-				// If the body for a product contains an ID, it must already exist so we will
-				// update it. Only an admin or the user who
-				// created a product can update it. The original product is looked up by id.
-				// If the product's cycle equals the current cycle, edit an existing product
-				if (req.body._id && req.body.cycle === scheduler.currentCycle) {
-					models.Product.findById(req.body._id, function(err, product) { // first find the right product by it's ID
-						if (err) return next(err);
-						var key;
-						productObject = product.toObject();
-						
-						for (key in req.body) {
-							if (req.body.hasOwnProperty(key) && key !== "__v") {
-								if (!_.isEqual(productObject[key], req.body[key]) ) {
-									// compare the values of the database object to the values of the request object.
-									product[key] = req.body[key]; // update the product's properties
-									needsSave = true;
-								}
-							}
-						}
-						// default false
-						if (needsSave) {
-							product.increment();
-							// save the changes
-							product.save(function(err, product) {
-								if (err) return next(err);
-								res.json(product); // send back the changed product to the app as JSON.
-							});
-						} 
-						else {
-							// no changes found
-							res.status(200).json(product);
-						}
-					});
-				} else {
-					models.Product.create({
-						dateUploaded: Date(),
-						img: req.body.img,
-						category: req.body.category,
-						productName: req.body.productName,
-						variety: req.body.variety,
-						price: req.body.price,
-						quantity: req.body.quantity,
-						units: req.body.units,
-						refrigeration: req.body.refrigeration,
-						ingredients: req.body.ingredients,
-						description: req.body.description,
-						certification: req.body.certification,
-						producer_ID: req.user._id,
-						cycle: scheduler.currentCycle || -1
-					}, function(err, product) {
-						if (err) return next(err);
-						log.info('%s just uploaded', product.productName + " " + product.variety || '');
-						res.status(200).json(product);
-					});
-				}
-			}
-			// gain limited product change options during shopping week
-			else if (scheduler.canChange) {
-				models.Product.findById(req.body._id, 'price img productName variety quantity amountSold description ingredients refrigeration cycle', function(err, product) {
-					if (err) return next(err);
-					if (scheduler.currentCycle == product.cycle) {
-						productObject = product.toObject();
-						if (product.amountSold > req.body.quantity ) {
-							var amountToRemove = product.amountSold - req.body.quantity;
-							// get orders for products
-							models.Order.find({cycle: scheduler.currentCycle, product: new ObjectId(product._id)})
-							.sort('-datePlaced').limit(amountToRemove)
-							.populate('customer', 'name email')
-							.populate('product', 'productName variety fullName producer_ID')
-							.remove(function(err, orders) {
-								if (err) return next(err);
-								var mailData, mailOptions, update;
-								(function repeat(i) {
-									if (i < orders.length) {
-										mailOptions = {
-											template: 'product-not-available',
-											subject: orders[i].productName + ' No Longer Available',
-											to: {
-												email: orders[i].customer.email,
-												name: orders[i].customer.name
-											}
-										};
-										mailData = {name: orders[i].customer.name, 
-											productName: orders[i].product.fullName, 
-											producerID: orders[i].product.producer_ID
-										};
-										update = new Emailer(mailOptions, mailData);
-										
-										update.send(function(err, result) {
-											if (err) return next(err);
-											log.info(result);
-											repeat(i + 1);
-										});
-									}
-									else return;
-								}(0));
-							})
-						}
-						
-						for (var key in req.body) {
-							if (req.body.hasOwnProperty('key')) {
-								if (productObject[key] !== req.body[key]) {
-									// compare the values of the database object to the values of the request object.
-									if (key === 'price') {
-										if (req.body.price <= productObject.price) {
-											product.price = req.body.price;
-											needsSave = true;
-										}
-									}
-									else {
-										product[key] = req.body[key]; // update the product's properties
-										needsSave = true;
-									}
-								}
-							}
-						}
-						
-						if (needsSave) {
-							product.increment();
-							product.save(function(err, product) {
-								if (err) return next(err);
-								models.Order.find({cycle: scheduler.currentCycle, product: product._id})
-								.populate('customer', 'name email')
-								.populate('product', 'productName variety fullName')
-								.exec(function(err, orders){
-									if (err) return next(err);
-									var mailData, mailOptions, update;
-									if (orders.length > 0) {
-										(function repeat(i) {
-											if (i < orders.length) {
-												mailOptions = {
-													template: 'product-change',
-													subject: 'Update to Product you are Ordering',
-													to: {
-														email: orders[i].customer.email,
-														name: orders[i].customer.name
-													}
-												};
-												mailData = {name: orders[i].customer.name, productName: orders[i].product.fullName};
-												update = new Emailer(mailOptions, mailData);
-												
-												update.send(function(err, result) {
-													if (err) return next(err);
-													log.info(result);
-													repeat(i + 1);
-												});
-											} else res.status(200).json(product);
-										}(0));
-									}
-								});
-							});
-						}
-					}
-					else {
-						log.info('Failed to edit product. Current cycle: %s and product cycle: %s', scheduler.currentCycle, product.cycle);
-						res.status(403).send('Only products from this month can be modified right now.')
-					}
-				})
-			}
-			
-			else res.status(403).send("It's not the right time of the month to upload products");
-			
-			
-		} else {
-			log.info('Unauthorized access attempt to upload product');
-			res.status(401).send('Producer not signed in');
-		}
-
+				// if (typeof req.body.ingredients === "string" && req.body.ingredients.length > 0) {
+	// 				req.body.ingredients = req.body.ingredients.split(/,\s*/);
+	// 			}
+	// 			else if (req.body.ingredients instanceof Array) {
+	// 				req.body.ingredients = req.body.ingredients.join(', ');
+	// 				req.body.ingredients = req.body.ingredients.split(/,\s*/);
+	// 			}
+				res.status(201).end('New Product Being Created');
+				models.Product.create({
+					dateUploaded: Date(),
+					img: req.body.img,
+					category: req.body.category,
+					productName: req.body.productName,
+					variety: req.body.variety,
+					price: req.body.price,
+					quantity: req.body.quantity,
+					units: req.body.units,
+					refrigeration: req.body.refrigeration,
+					ingredients: req.body.ingredients,
+					description: req.body.description,
+					certification: req.body.certification,
+					producer_ID: req.user._id,
+					cycle: scheduler.currentCycle || -1
+				}, function(err, product) {
+					if (err) log.warn(err);
+					log.info('%s just uploaded', product.productName + " " + product.variety || '');
+				});
+			} else res.status(400).send("You can't create new products right now.");
+		} else res.status(401).send("You are not allowed to upload products.");
 	});
 
 	// this request will delete a product from the database. First we find the
@@ -457,39 +513,44 @@ exports.configAPI = function configAPI(app) {
 							.populate('customer', 'name email')
 							.populate('product', 'productName variety fullName')
 							.exec(function(e, orders){
-								var mailData, mailOptions, update
 								if (e) return next(e);
 								
+								function sendProductNotAvailableEmail(order) {
+									var mailOptions, mailData, update;
+									mailOptions = {
+										template: 'product-delete',
+										subject: product.productName + ' has been removed from the NNFC store',
+										to: {
+											email: order.customer.email,
+											name: order.customer.name
+										}
+									};
+									mailData = {
+										name: order.customer.name, 
+										productName: order.product.fullName
+									};
+									update = new Emailer(mailOptions, mailData);
+									
+									update.send(function(err, result) {
+										if (err) log.warn(err);
+										log.info('message sent about item deletion to %s', order.customer.email);
+									});
+								}
+								
 								if (orders.length > 0) {
-									(function repeat(i) {
-										if (i < orders.length) {
-											mailOptions = {
-												template: 'product-delete',
-												subject: 'Product you are Ordering is no Longer Available',
-												to: {
-													email: orders[i].customer.email,
-													name: orders[i].customer.name
-												}
-											};
-											mailData = {name: orders[i].customer.name, productName: orders[i].product.fullName};
-											deleteMail = new Emailer(mailOptions, mailData);
-										
-											deleteMail.send(function(err, result) {
-												if (err) return next(err);
-												log.info(result);
-											});
-											repeat(i + 1);
-										}
-										else { //done sending emails now delete the product and orders
-											models.Order.remove({cycle: scheduler.currentCycle, product: new ObjectId(product._id)}, function(err, orders) {
-												if (err) log.warn(err);
-											});
-											product.remove(function(err, product){
-												if (err) return next(err);
-												res.status(200).send('product deleted');
-											});
-										}
-									}(0));
+									async.each(orders, function(order, done) {
+										sendProductNotAvailableEmail(order);
+										models.Order.findByIdAndRemove(order._id, function(err, order) {
+											if (err) return done(err);
+											done(null);
+										});
+									}, function(err) {
+										if (err) return next(err);
+										product.remove(function(err, product){
+											if (err) return next(err);
+											res.status(200).send('product deleted');
+										});
+									});
 								} else { // no orders for that product
 									product.remove(function(err, product){
 										if (err) return next(err);
@@ -497,8 +558,7 @@ exports.configAPI = function configAPI(app) {
 									});
 								}
 							});
-						}
-						else { // don't even bother looking for orders just delete the product
+						} else { // don't even bother looking for orders just delete the product
 							product.remove(function(err, product){
 								if (err) return next(err);
 								else res.status(200).send('product deleted');
@@ -531,7 +591,7 @@ exports.configAPI = function configAPI(app) {
 		if (req.user) {
 			models.Product.find({
 				producer_ID : new ObjectId(req.user._id),
-				cycle: scheduler.currentCycle || 0
+				cycle: scheduler.currentCycle
 			}, 'productName variety dateUploaded price quantity amountSold units', { sort: {datePlaced: 1} }, function(e, products) {
 				if (e) return next(e);
 				res.json(products);
@@ -543,7 +603,7 @@ exports.configAPI = function configAPI(app) {
 		if (req.user) {
 			models.Product.find({
 				producer_ID : new ObjectId(req.user._id),
-				cycle: scheduler.currentCycle - 1 || 0
+				cycle: scheduler.currentCycle - 1
 			}, 'productName variety dateUploaded price quantity amountSold units', { sort: {datePlaced: 1} },
 				function(e, products) {
 					if (e) return next(e);
@@ -560,9 +620,9 @@ exports.configAPI = function configAPI(app) {
 		if (req.user) {
 			// finds all the orders requested by the query from the url query.
 			models.Order.find(req.query).sort({datePlaced: 1})
-			.populate('product', 'fullName price units producer_ID productName variety cycle')
+			.populate('product', 'fullName price units producer_ID productName variety cycle refrigeration')
 			.populate('customer', 'name')
-			.populate('product.producer_ID', 'name email producerData.companyName')
+			.populate('supplier', 'name email producerData.companyName')
 			.exec( function(e, orders) {
 				if (e) return next(e);
 				res.json(orders);
@@ -745,10 +805,10 @@ exports.configAPI = function configAPI(app) {
 						models.Product.findByIdAndUpdate(order.product, { $inc: {amountSold : order.quantity * -1}}, function(e, product) {
 							if (!e) {
 								// delete the requested order
+								// respond with a basic HTML message
+								res.status(200).send('Product removed from cart');
 								order.remove(function(e) {
 									if (e) log.info(e);
-									// respond with a basic HTML message
-									res.status(200).send('Product removed from cart');
 								});
 							}
 						});
@@ -826,8 +886,7 @@ exports.configAPI = function configAPI(app) {
 					if (error.message === 'you can\'t buy that many. Insufficient quantity available.') res.status(400).send("That product is sold out");
 					else next(err) 
 				});
-			}
-			else res.status(403).send("Sorry, you can't try to buy your own products");
+			} else res.status(403).send("Sorry, you can't try to buy your own products");
 		} else { // error handling 
 			if (!scheduler.canShop) res.status(403).send("It's not shopping time yet");
 			else res.status(401).send("Not logged in");
@@ -886,13 +945,16 @@ exports.configAPI = function configAPI(app) {
 	
 	// get a query of one specific invoice by id
 	app.get("/api/invoice/:id", function(req, res, next) {
-		models.Invoice.findById(req.params.id, function(e, invoice) {
-			models.Invoice.populate(invoice, {path:'invoicee', select: 'name address phone email -_id'}, function(e, invoice) {
-				if (e) return errorHandler(e);
-				res.json(invoice);
-			});
+		models.Invoice.findById(req.params.id)
+		.populate('invoicee', 'name address phone email -_id')
+		.populate('items.customer', 'name email routeTitle')
+		.populate('items.product', 'fullName variety productName priceWithMarkup price units')
+		.exec(function(e, invoice) {
+			if (e) return next(e);
+			res.json(invoice);
 		});
 	});
+	
 	
 	//Forward producer application to standards committee.
 	app.post("/api/producer-applicaiton", function(req, res, next) {
@@ -937,33 +999,27 @@ exports.configAPI = function configAPI(app) {
 	//admin to look at all users.
 	app.get("/api/user", function(req, res, next) {
 		// search for users. if the req.query is blank, all users will be returned.
-		models.User.find(req.query, null, {
-			sort: {
-				_id: 1
-			}
-		}, function(e, results) {
-			if (!e) { // if no errors
-				// The transform is called to remove the password data before sending to the client.
-				results.forEach(function(user) {
-					var userObject = user.toObject();
-					delete userObject.hash;
-					delete userObject.salt;
-					if ( userObject.producerData.hasOwnProperty('logo') ) {
-						delete userObject.producerData.logo;
-					}
-				});
-				log.info('User just requested from api/user/');
-				res.json(results);
-			} else {
-				log.info(e); // log the error
-			}
+		models.User.find(req.query).select('-hash -salt -producerData.logo').sort('_id').exec(function(e, results) {
+			if (e) return next(e);
+			log.info('User just requested from api/user/');
+			res.json(results);
+		});
+	});
+	
+	app.get("/api/user/route", function(req, res, next) {
+		// search for users. if the req.query is blank, all users will be returned.
+		models.User.find({$or: [ {routeTitle: {$exists: true} }, {'routeManager.pickupLocation': {$exists: true} } ]}).find(req.query).select('name email routeTitle routeManager address user_type').exec(function(e, results) {
+			if (e) return next(e);
+			// if no errors
+			log.info('Route Users just requested from api/user/route');
+			res.json(results);
 		});
 	});
 	
 	
 	//Get list of producer users for directory
 	app.get('/api/user/producer-list', function(req, res, next) {
-		models.User.find({'user_type.name' : 'Producer'}).select('producerData.logo producerData.companyName name address addressPermission dateJoined')
+		models.User.find({'user_type.name' : 'Producer'}).select('producerData.logo producerData.companyName producerData.thumbnail name address addressPermission dateJoined')
 		.lean().exec(function(err, producers){
 			if (err) next(err);
 			else {
@@ -1113,88 +1169,107 @@ exports.configAPI = function configAPI(app) {
 		var mailOptions, mailData, emailToSend, changeOptions, changeData, changeEmail, canSell, message;
 		//log.info(req.user);
 		if (req.user._id == req.params.id || req.user.user_type.isAdmin) {
-			models.User.findById(new ObjectId(req.params.id), function(e, user) {
-				if (!e) {
-					var userData = user.toJSON();
-					
-					// email the user that their account details were changed
-					if ( !_.isEqual(req.body.user_type, userData.user_type) ) {
-						canSell = (req.body.user_type.canSell) ? "can sell products through the co-op website" : "no longer sell products through the co-op website";
-						if (req.body.user_type.name !== userData.user_type.name) {
-							message = 'Your new membership type is ' + req.body.user_type.name + ' member.'
-						}
-						mailOptions = {template: "user-rights-change", subject: "Your NNFC membership has changed", to: [{name: req.body.name, email: req.body.email}, mail.companyEmail]};
-						mailData = {name: user.name, canSell: canSell, message: message};
-						emailToSend = new Emailer(mailOptions, mailData);
-						emailToSend.send(function(err, result) {
-							if (err) log.info(err);
-						});
+			models.User.findById(req.params.id, function(e, user) {
+				if (e) return next(e);
+				var userData = user.toJSON();
+				
+				// email the user that their account details were changed
+				if ( !_.isEqual(req.body.user_type, userData.user_type) ) {
+					canSell = (req.body.user_type.canSell) ? "can sell products through the co-op website" : "no longer sell products through the co-op website";
+					if (req.body.user_type.name !== userData.user_type.name) {
+						message = 'Your new membership type is ' + req.body.user_type.name + ' member.'
 					}
-					
-					// update the database with the user's changes
-					for (var key in req.body) {
-						if (userData[key] !== req.body[key] && key !== 'password' && key !== 'oldPassword') {
-							// rule out strings and numbers so we know to do a deep comparison
-							if (_.isObject(req.body[key]) && _.isObject(userData[key]) ) { 
-								// deep comparison
-								if ( !_.isEqual(userData[key], req.body[key]) ) {
-									user[key] = req.body[key];
-								}
-							}
-							// most likely string or number so this operation is safe
-							else user[key] = req.body[key];
-							
-						}
-					}
-					
-					
-
-					// if the user is attempting to change their password, this checks if the user
-					// remembers their old password and if they do will change it to their requested
-					// new password. Admins reset passwords by sending the user a password reset
-					// email.
-					if (req.body.password && req.body.oldPassword) {
-						user.authenticate(req.body.oldPassword, function(e, checksOut) {
-							if (checksOut) {
-								user.setPassword(req.body.password, function() {
-									user.save(function(e) {
-										if (!e) {
-											changeOptions = { template: "password-change", subject: 'Food Co-op Password Changed', to: { email: user.email, name: user.name }};
-											changeData = {name: user.name};
-											changeEmail = new Emailer(changeOptions, changeData);
-											changeEmail.send(function(err, result) {
-												if (err) {
-													return log.info(err);
-												}
-												// a response is sent so the client request doesn't timeout and get an error.
-												log.info("Message sent to user confirming password change");
-											});
-										}
-									});
-								});
-							} else {
-								log.info('Old password does not match current password.');
-								res.status(400).send('Old password does not match current password.');
-							}
-						
-							delete user.password;
-							delete user.oldPassword;
-						
-						});
-					}
-					
-
-					// save changes to the user and send OK back to the app.
-					user.save();
-					res.status(200).end();
-				} else {
-					log.info(e);
-					res.status(401).send("You must be logged in to change data about a user");
+					mailOptions = {template: "user-rights-change", subject: "Your NNFC membership has changed", to: [{name: req.body.name, email: req.body.email}, mail.companyEmail]};
+					mailData = {name: user.name, canSell: canSell, message: message};
+					emailToSend = new Emailer(mailOptions, mailData);
+					emailToSend.send(function(err, result) {
+						if (err) log.info(err);
+					});
 				}
 				
+				// update the database with the user's changes
+				async.each(Object.keys(req.body), function(key, done) {
+					if (userData[key] !== req.body[key] && key !== 'password' && key !== 'oldPassword') {
+						// rule out strings and numbers so we know to do a deep comparison
+						if (_.isObject(req.body[key]) && _.isObject(userData[key]) ) { 
+							// deep comparison
+							if ( !_.isEqual(userData[key], req.body[key]) ) {
+								user[key] = req.body[key];
+							}
+						}
+						// most likely string or number so this operation is safe
+						else user[key] = req.body[key];
+					}
+					// do nothing
+					done();
+				}, function(err) {
+					if (err) return next(err);
+					user.save();
+					if (req.body.password && req.body.oldPassword) {
+						req.userPasswordChange = user;
+						next();
+					}
+					else { // save changes to the user and send OK back to the app.
+						res.status(200).end();
+					}
+				});
+				
+				// update the database with the user's changes
+				/*
+				for (var key in req.body) {
+										if (userData[key] !== req.body[key] && key !== 'password' && key !== 'oldPassword') {
+											// rule out strings and numbers so we know to do a deep comparison
+											if (_.isObject(req.body[key]) && _.isObject(userData[key]) ) { 
+												// deep comparison
+												if ( !_.isEqual(userData[key], req.body[key]) ) {
+													user[key] = req.body[key];
+												}
+											}
+											// most likely string or number so this operation is safe
+											else user[key] = req.body[key];
+											
+										}
+									}*/
 			});
 		}
-		else res.status(401).end();
+		else res.status(401).send("You must be logged in to change data about a user");
+		
+	});
+	
+	// change a user's password
+	app.put("/api/user/:id", function(req, res, next) {
+		// if the user is attempting to change their password, this checks if the user
+		// remembers their old password and if they do will change it to their requested
+		// new password. Admins reset passwords by sending the user a password reset
+		// email.
+		models.User.findById(req.params.id, function(err, user) {
+			if (err) return next(err);
+			if (req.body.password && req.body.oldPassword) {
+				user.authenticate(req.body.oldPassword, function(e, checksOut) {
+					if (checksOut) {
+						user.setPassword(req.body.password, function() {
+							user.save();
+							res.status(200).end();
+						
+							changeOptions = { template: "password-change", subject: 'Food Co-op Password Changed', to: { email: user.email, name: user.name }};
+							changeData = {name: user.name};
+							changeEmail = new Emailer(changeOptions, changeData);
+							changeEmail.send(function(err, result) {
+								if (err) {
+									log.info(err);
+								}
+								// a response is sent so the client request doesn't timeout and get an error.
+								log.info("Message sent to user confirming password change");
+							});
+						});
+					} else {
+						log.info('Old password does not match current password.');
+						res.status(400).send('Old password does not match your current password.');
+					}
+				});
+			}
+		});
+		
 		
 	});
 
@@ -1202,19 +1277,15 @@ exports.configAPI = function configAPI(app) {
 	// he is wanting to change permissions of a user.
 	app.get("/api/user/:id", function(req, res, next) {
 		models.User.findById(req.params.id, function(e, results) {
-			if (!e) {
-				if (results) {
-					var userObject = results.toObject();
-					delete userObject.hash;
-					delete userObject.salt;
-					res.send(results);
-				}
-				else {
-					res.status(404).end();
-				}
-				
-			} else {
-				log.info(e);
+			if (e) return next(e) 
+			if (results) {
+				var userObject = results.toObject();
+				delete userObject.hash;
+				delete userObject.salt;
+				res.json(results);
+			}
+			else {
+				res.status(404).end();
 			}
 		});
 	});
@@ -1225,7 +1296,6 @@ exports.configAPI = function configAPI(app) {
 		if (req.params.producerName) {
 			nameParam = req.params.producerName.replace(/^-/,'').split("+");
 			nameParam = nameParam.join(' ');
-			
 		}
 		if (req.query.company) {
 			companyQuery = req.query.company.split("+");
@@ -1255,19 +1325,22 @@ exports.configAPI = function configAPI(app) {
 
 	// updates a producer by ID. This id is generally the logged in user.
 	app.put("/api/user/:id/producer", function(req, res, next) {
-		if (req.user) {
+		if (req.user && req.user._id == req.params.id) {
 			log.info('about to search database to update details on %s', req.user.name);
-			models.User.findByIdAndUpdate(req.params.id, {
-				producerData: req.body.producerData,
-				addressPermission: req.body.addressPermission
-			}, function(err, user) {
+			models.User.findById(req.params.id).select('producerData addressPermission user_type.name').exec(function(err, user) {
+				if (err) return next(err);
 				
-				if (err) next(err);
-
-				else {
-					log.info('%s successfully updated', user.name);
-					res.status(200).end();
-				}
+				user.producerData = req.body.producerData;
+				user.addressPermission = req.body.addressPermission;
+				
+				user.save(function(err, user) {
+					if (err) log.info(err);
+					console.log('user saved!')
+					//console.log(user.producerData.logo);
+				});
+				
+				res.status(200).end();
+				
 			});
 		} else {
 			res.status(401).end();

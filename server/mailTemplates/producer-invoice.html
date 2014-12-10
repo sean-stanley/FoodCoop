@@ -22,7 +22,7 @@
 				   <th><strong>Customer</strong></th>
 				   <th><strong>Unit Price</strong></th>
 				   <th><strong>Quantity</strong></th>
-				   <th><strong>Cost</strong></th>
+				   <th><strong>Revenue</strong></th>
                </tr>
            </thead>
            <tbody>
@@ -32,17 +32,22 @@
                      <td>{{item.product.refrigeration}}</td>
 					 <td>{{item.product.fullName}} </td>
 					 <td>{{item.customer.name}}</td>
-					 <td>{{item.product.price}} / {{item.product.units}}</td>
+					 <td>${{item.product.price}} / {{item.product.units}}</td>
 					 <td>{{item.quantity}}</td>
-                     <td>${{item.product.price * item.quantity}}</td>
+                     <td>${{ (item.product.price * item.quantity).toFixed(2)}}</td>
                  </tr>
 			<% }); %>
            </tbody>
-           <tfooter>
-               <tr>
-                   <td colspan="5"> Total: ${{total}}</td>
+           <tfoot>
+             <tr style="display: {{showCredit}}">
+							 <td colspan="6" style="text-align:right"> Subtotal: ${{subtotal}}</td>
+						 <tr>
+               <tr style="display: {{showCredit}}">
+								 <td colspan="6"> CR: {{credit()}}</td>
+							 <tr>
+                   <td colspan="6"> Total: ${{total}}</td>
                </tr>
-           </tfooter>
+           </tfoot>
        </table>
 	   
 	   <p>You can expect payment to the account {{account}}. If this is incorrect, please contact us immediately and update your bank account details from your producer profile page on our website.</p>

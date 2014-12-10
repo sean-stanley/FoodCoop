@@ -61,7 +61,15 @@
 		<tr><th colspan='2'>Invoice #{{invoice._id}} {{invoice.title}}</th></tr>
 	</thead>
 	<tfoot>
-		<tr><td colspan='2'><strong>Total: {{invoice.total | currency}}</strong></td></tr>
+		<tr ng-show="invoice.credit" class="text-right">
+			<td colspan="2"><strong>Subtotal: {{invoice.subtotal | currency}}</strong></td>
+		</tr>
+		<tr ng-show="invoice.credit">
+			<td colspan="2"><strong>CR: {{invoice.credit | currency}}</strong></td>
+		</tr>
+		<tr>
+			<td colspan="2"><strong>Total: {{invoice.total | currency}}</strong></td>
+		</tr>
 	</tfoot>
 	<tbody>
 		<tr ng-repeat="item in invoice.items">
@@ -82,6 +90,16 @@
 			<td><strong>Cost</strong></td>
 		</tr>
 	</thead>
+	<tfoot>
+		<tr ng-show="invoice.credit" class="text-right">
+			<td colspan="2"><strong>Subtotal: {{invoice.subtotal | currency}}</strong></td>
+		</tr>
+		<tr ng-show="invoice.credit">
+			<td colspan="2"><strong>CR: {{invoice.credit | currency}}</strong></td>
+		</tr>
+		<tr>
+			<td colspan="2"><strong>Total: {{invoice.total | currency}}</strong></td>
+	</tfoot>
 	<tbody>
 		<tr ng-repeat="item in invoice.items">
 			<td>{{item.product.fullName}}</td>
@@ -90,11 +108,6 @@
 			<td>{{item.product.priceWithMarkup * item.quantity | currency}}</td>
 		</tr>
 	</tbody>
-	<tfooter>
-		<tr>
-			<td colspan="4"><strong>Total: {{invoice.total | currency}}</strong></td>
-		</tr>
-	</tfooter>
 </table>
 <table class="table" ng-if="invoice.items[0].product && invoice.toCoop">
 	<thead>
@@ -109,6 +122,16 @@
 			<th><strong>Cost</strong></th>
 		</tr>
 	</thead>
+	<tfoot>
+			<tr ng-show="invoice.credit" class="text-right">
+				<td colspan="2"><strong>Subtotal: {{invoice.subtotal | currency}}</strong></td>
+			</tr>
+			<tr ng-show="invoice.credit">
+				<td colspan="2"><strong>CR: {{invoice.credit | currency}}</strong></td>
+			</tr>
+			<tr>
+				<td colspan="2"><strong>Total: {{invoice.total | currency}}</strong></td>
+	</tfoot>
 	<tbody>
 		<tr ng-repeat="item in invoice.items">
 			<td>{{item.product.fullName}} </td>
@@ -118,14 +141,10 @@
 			<td>{{item.product.price * item.quantity | currency}}</td>
 		</tr>
 	</tbody>
-	<tfooter>
-		<tr>
-			<td colspan="4"> <strong>Total: {{invoice.total | currency}}</strong></td>
-		</tr>
-	</tfooter>
+	
 
 </table>
-<p ng-show="!invoice.toCoop">Payment is to be sent to <strong>{{invoice.bankAccount}}</strong></p>
+<p ng-hide="invoice.toCoop">Payment is to be sent to <strong>{{invoice.bankAccount}}</strong>. Please include your invoice number as a code and your name as a reference.</p>
 <hr>
 </section>
 </div>

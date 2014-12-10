@@ -1,27 +1,51 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<url>
-		<loc>http://foodcoop.org.nz/login-page</loc>
+		<loc>http://foodcoop.org.nz/producer/Northland+Naturals-Matt+Stanley</loc>
+	</url>
+	<url>
+		<loc>http://foodcoop.org.nz/store?sort=price</loc>
+	</url>
+	<url>
+		<loc>http://foodcoop.org.nz/store?category=Baked%2520Goods</loc>
+	</url>
+	<url>
+		<loc>http://foodcoop.org.nz/store?sort=price&amp;reverse</loc>
+	</url>
+	<url>
+		<loc>http://foodcoop.org.nz/store?category=Dairy%2520%2526%2520Eggs</loc>
+	</url>
+	<url>
+		<loc>http://foodcoop.org.nz/store?sort=fullName&amp;reverse</loc>
+	</url>
+	<url>
+		<loc>http://foodcoop.org.nz/store?sort=fullName</loc>
+	</url>
+	<url>
+		<loc>http://foodcoop.org.nz/store?sort=producer</loc>
+	</url>
+	<url>
+		<loc>http://foodcoop.org.nz/store?sort=producer&amp;reverse</loc>
+	</url>
+	<url>
+		<loc>http://foodcoop.org.nz/store?category=Processed-Goods</loc>
+	</url>
+	<url>
+		<loc>http://foodcoop.org.nz/store?category=Meat</loc>
+	</url>
+	<url>
+		<loc>http://foodcoop.org.nz/store?category=Produce</loc>
+	</url>
+	<url>
+		<loc>http://foodcoop.org.nz/store</loc>
+	</url>
+	<url>
+		<loc>http://foodcoop.org.nz/about</loc>
 	</url>
 	<url>
 		<loc>http://foodcoop.org.nz/contact</loc>
 	</url>
 	<url>
-		<loc>http://foodcoop.org.nz/volunteer</loc>
-	</url>
-	<url>
-		<loc>http://foodcoop.org.nz/delivery</loc>
-	</url>
-	<url>
 		<loc>http://foodcoop.org.nz/faq</loc>
-	</url>
-	<url>
-		<loc>http://foodcoop.org.nz/producer-list</loc>
-	</url>
-	<url>
-		<loc>http://foodcoop.org.nz/forgot</loc>
-	</url>
-	<url>
-		<loc>http://foodcoop.org.nz/store</loc>
 	</url>
 	<url>
 		<loc>http://foodcoop.org.nz/</loc>
@@ -30,12 +54,21 @@
 		<loc>http://foodcoop.org.nz/calendar</loc>
 	</url>
 	<url>
-		<loc>http://foodcoop.org.nz/about</loc>
+		<loc>http://foodcoop.org.nz/volunteer</loc>
+	</url>
+	<url>
+		<loc>http://foodcoop.org.nz/login-page</loc>
+	</url>
+	<url>
+		<loc>http://foodcoop.org.nz/forgot</loc>
+	</url>
+	<url>
+		<loc>http://foodcoop.org.nz/delivery</loc>
+	</url>
+	<url>
+		<loc>http://foodcoop.org.nz/producer-list</loc>
 	</url>
 	<url>
 		<loc>http://foodcoop.org.nz/signup</loc>
-	</url>
-	<url>
-		<loc>http://foodcoop.org.nz</loc>
 	</url>
 </urlset>

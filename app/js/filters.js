@@ -10,6 +10,14 @@ angular.module('co-op.filters', []).
     };
   }])
   
+	.filter('currency', function() {
+		return function(num) {
+			if (Number(num) >= 0) return '$' + Number(num).toFixed(2);
+			else if (Number(num) < 0) return "-" + '$' + Math.abs(Number(num)).toFixed(2);
+			else return;
+		};
+	})
+	
   .filter('blurb', function() {
 	  return function(blurb) {
 		  if (blurb) {

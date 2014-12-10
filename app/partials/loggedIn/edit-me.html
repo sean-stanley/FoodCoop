@@ -4,6 +4,7 @@
 			{{currentUser.name}} <small>{{currentUser.user_type.name}}</small>
 			<a href="/" class="btn btn-primary pull-right" ng-click="logOut()"><span class="glyphicon glyphicon-lock"></span> Logout</a>
 		</h1>
+		<h3 ng-show="currentUser.balance">Account Balance: {{currentUser.balance | currency}}</h3>
 	</div>
 	
 

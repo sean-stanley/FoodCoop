@@ -5,6 +5,9 @@
 	<span class="pull-left">
 		<h4><a href="/product-manager"><span class="glyphicon glyphicon-book"></span> To Product Manager</a></h4>
 	</span>
+	<span class="pull-right">
+		<h4><a href="/product-upload" class="label label-success" ng-click="reset()"> New Product</a></h4>
+	</span>
 </div>
 
 <div class="col-xs-12">
@@ -71,9 +74,9 @@ min-width: inherit;">
 		<div ng-controller="productHistoryCtrl">
 			<accordion id="product-history-list" close-others="false">
 				<accordion-group heading="This Month's Products">
-					<ul class="list-unstyled">
+					<ul class="list-unstyled fa-ul">
 						<li ng-repeat="i in currentProducts">
-							<button type="button" class="close" aria-hidden="true" ng-click="delete($index, i._id)">&times;</button>
+							<i class="fa fa-li fa-times" ng-click="delete($index, i._id)" style="cursor: pointer"></i>
 							<a ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a>
 						</li>
 					</ul>
@@ -120,12 +123,14 @@ min-width: inherit;">
 			<fieldset>
 					<div class="row">
 						<div class="form-group col-md-8">
-                            <div class="btn-group">
+							<div class="btn-group">
 								<button type="button"
 								class="btn btn-primary"
-								ng-model="category"
+								ng-model="productData.category"
+								btn-radio="category._id"
+								uncheckable
 								ng-repeat="category in productManager.productCategories"
-								ng-click=" setCategory(category._id) ">
+								>
 									{{category.name}}
 								</button>
 							</div>
@@ -133,10 +138,10 @@ min-width: inherit;">
 					    <div class="form-group col-md-4">
 							<div class="btn-group pull-right">
 								<label type="button"
-								ng-disabled="!productData.hasOwnProperty('category')" 
+								ng-disabled="!productData.category" 
 								class="btn btn-primary" ng-model="productData.refrigeration" btn-radio="'refrigeration'" uncheckable>Refrigerated</label>
 								<label type="button"
-								ng-disabled="!productData.hasOwnProperty('category')"
+								ng-disabled="!productData.category"
 								class="btn btn-primary" ng-model="productData.refrigeration" btn-radio="'frozen'" uncheckable>Frozen</label>
 							</div>
 						</div>
@@ -144,20 +149,20 @@ min-width: inherit;">
 				<div class="row">
 					<div class="form-group col-md-12">
 						<br>
-						<label ng-disabled="!productData.hasOwnProperty('category')"
+						<label ng-disabled="!productData.category"
 						type="button" class="btn btn-default btn-lg" ng-click="open()">Upload an image <span class="glyphicon glyphicon-cloud-upload"></span></label>
 					</div>
 				</div>
 					<div class="row">
 						<div class="form-group col-md-6">
 							<label for="inputName">Product Name</label>
-							<input ng-disabled="!productData.hasOwnProperty('category')" 
+							<input ng-disabled="!productData.category" 
 							ng-model="productData.productName" type="text" class="form-control" id="inputName" maxlength="25" 
 							placeholder="e.g. {{ productManager.categoryByID(productData.category).placeholderName }}" autofocus required>
 						</div>
 						<div class="form-group col-md-6">
 							<label for="inputVariety" ng-model="variety">Variety</label>
-							<input ng-disabled="!productData.hasOwnProperty('category')" 
+							<input ng-disabled="!productData.category" 
 							ng-model="productData.variety" type="text" class="form-control" id="inputVariety" maxlength="25" 
 							placeholder="e.g. {{ productManager.categoryByID(productData.category).placeholderVariety }}">
 						</div>
@@ -168,35 +173,35 @@ min-width: inherit;">
 							<label for="inputVariety">Price</label>
 							<div class="input-group">
 								<div class="input-group-addon">$</div>
-								<input ng-disabled="!productData.hasOwnProperty('category')"
+								<input ng-disabled="!productData.category"
 							ng-model="productData.price" name="price" type="number" class="form-control" id="inputPrice" min="0" placeholder="e.g. $2.50" required>
 							</div>
 						</div>
 						
 					    <div class="form-group col-md-4">
 							<label for="units">Quantity Units</label>
-							<input ng-disabled="!productData.hasOwnProperty('category')" type="text" ng-model="productData.units" name="units" id="units" class="form-control" 
+							<input ng-disabled="!productData.category" type="text" ng-model="productData.units" name="units" id="units" class="form-control" 
 							typeahead="unit for unit in productManager.categoryByID(productData.category).availableUnits | filter:$viewValue"
 							placeholder ="e.g. kg or L or whole beast" required>
 					    </div>
 					    
 					    <div class="form-group col-md-4">
 							<label for="quantity">Quantity Available</label>
-							<input ng-disabled="!productData.hasOwnProperty('category')"
+							<input ng-disabled="!productData.category"
 							ng-model="productData.quantity" name="quantity" type="number" max="1000" class="form-control" id="quantity" placeholder="e.g. 27" required>
 					    </div>
 				   </div>
 			     <div id="ingredients" class="form-group">
 					<label for="ingredients">Ingredients</label> 
 					<textarea class="form-control" 
-					ng-disabled="!productData.hasOwnProperty('category')"
+					ng-disabled="!productData.category"
 					ng-model="productData.ingredients" id="ingredients" maxlength="1000" placeholder="Please list all ingredients of this product in a format like follows: rice flour, organic sugar, raw milk butter, salt." rows="9" style="width: 100%;"></textarea>  
 			    </div>
 			    
 				<div class="form-group">
 					<label for="description">Description</label> 
 					<text-angular
-					ng-disabled="!productData.hasOwnProperty('category')" 
+					ng-disabled="!productData.category" 
 					ng-model="productData.description"
 					placeholder="Write a couple paragraphs about how special your product is."
 					name="description"
@@ -210,8 +215,8 @@ min-width: inherit;">
 					</select>
 			    </div>
 			    <div class="form-group">
-			    	<button type="reset" class="btn btn-default">Reset</button>    
-			    	<button type="submit" class="btn btn-default" ng-disabled="productUpload.$invalid" 
+			    	<button type="button" ng-click="reset()" class="btn btn-default">Reset</button>    
+			    	<button type="submit" class="btn btn-default" ng-disabled="productUpload.$invalid || hideSave" 
 						ng-click="submitForm();"
 						analytics-on="click" analytics-event="Upload Product">Save</button>
 				</div>

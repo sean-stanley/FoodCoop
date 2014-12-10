@@ -23,23 +23,17 @@
 	    </div>
 
 	<div class="media producer-box" ng-repeat="i in producerList | orderBy:predicate:reverse | filter:search">
-		<img ng-show="i.producerData.logo" class="producer-img-small pull-left" ng-src="{{i.producerData.logo}}" height="150px"/>
+		<img ng-show="i.producerData.thumbnail" class="producer-img-small pull-left" ng-src="{{i.producerData.thumbnail}}"/>
 
 		<div class="media-body">
-			<h3><a class="pull-right btn btn-default" ng-href="/producer/{{i.producerData.companyName || i._id + '/' | forURL}}-{{i.name | forURL}}">More Details</a></h3>
+			<h3><a class="pull-right btn btn-default" ng-href="/producer/{{i.producerData.companyName || i._id + '/' | forURL}}-{{i.name | forURL}}">Producer Page</a></h3>
 			<h3>{{i.producerData.companyName || i.name}} <small ng-show="i.producerData.companyName">{{i.name}}</small></h3>
 			<ul class="list-unstyled">
+				<li><span class="glyphicon glyphicon-envelope"></span> <a ng-href="/contact/{{i._id}}">Email this Producer</a></li>
 				<li ng-if="i.addressPermission"><span class="glyphicon glyphicon-map-marker"></span> 
 					<a ng-href="//mapof.it/{{currentUser.address | forURL}}/{{i.address | forURL}}">{{i.address}}</a>
 				</li>
 			</ul>
-			
-		
-<!--
-			<article ta-bind ng-model="i.producerData.description"></article>
--->
-			
-		
 		</div>
 	</div>
 </div>
