@@ -21,6 +21,11 @@ exports.region = "Northland";
 exports.customerMembership = 30;
 exports.producerMembership = 60;
 
+// DISCOUNT CODES
+// -----------------
+exports.discounts = ['WHOLEFOODHUB15'];
+
+
 // set the co-op's markup as a whole number e.g. 20 for 20%
 exports.markup = 20;
 

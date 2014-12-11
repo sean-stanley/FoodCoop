@@ -249,13 +249,14 @@ angular.module('co-op.controllers', [])
 		$scope.nextRoute = ($scope.data === "Producer") ? "/apply" : "/welcome";
 		console.log($scope.nextRoute);
 		
-		$scope.submitForm = function() {
-			UserManager.createUser($scope.userData).then(function() {
-				$modalInstance.close($scope.nextRoute);
-			}, function(error) {
-				$scope.message = error;
-			});
-			
+		$scope.submitForm = function(isValid) {
+			if (isValid) {
+				UserManager.createUser($scope.userData).then(function() {
+					$modalInstance.close($scope.nextRoute);
+				}, function(error) {
+					$scope.message = error;
+				});
+			} else $scope.submitted = true;
 		};
 		
 		$scope.cancel = function() {

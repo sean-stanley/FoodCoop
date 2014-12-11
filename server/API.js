@@ -19,6 +19,7 @@ var util = require('util'),
 	geocoder = require('geocoder'), // for geocoding user addresses.
 	mongoose = require('mongoose'), // used to connect to MongoDB and perform common CRUD operations with the API.
 	ObjectId = require('mongoose').Types.ObjectId,
+	
 	models = require('./models.js'), // this file stores the mongoose schema data for our MongoDB database.
 	mail = require('./staticMail.js'), // this file stores some common mail settings.
 	Emailer = require('./emailer.js'), // this is a custom class expanded upon nodemailer to allow html templates to be used for the emails.
@@ -26,6 +27,7 @@ var util = require('util'),
 	config = require('./coopConfig.js'), // static methods of important configuration info
 	scheduler = require('./scheduler.js'), // contains scheduled functions and their results
 	//oboe = require('oboe'); //JSON streaming and parsing
+	discount = require('./discount'),
 	
 	passport = require('passport'), // middleware that provides authentication tools for the API.
 	LocalStrategy = require('passport-local').Strategy; // the passport strategy employed by this API.
@@ -1029,7 +1031,7 @@ exports.configAPI = function configAPI(app) {
 	});
 	// This registers a new user and if no error occurs the user is logged in 
 	// A new email is sent to them as well.
-	app.post("/api/user", function(req, res, next) {
+	app.post("/api/user", discount.checkForDiscount, function(req, res, next) {
 		var memberEmailOptions, memberEmailData, memberEmail, dueDate, invoice;
 		async.waterfall([
 			// create the new user and pass the user to the next function
@@ -1086,6 +1088,8 @@ exports.configAPI = function configAPI(app) {
 					items: [{name:itemName, cost:cost}],
 					dueDate: Date.today().addDays(30)
 				});
+				if (req.body.discount && user.user_type.name === "Customer") invoice.credit = req.body.discount.customer;
+				if (req.body.discount && user.user_type.name === "Producer") invoice.credit = req.body.discount.producer;
 				// save the invoice made for the user;
 				invoice.save(function(err, invoice) {
 					if (err) log.info(err);
@@ -1107,8 +1111,11 @@ exports.configAPI = function configAPI(app) {
 						cost: invoice.total,
 						account: config.bankAccount,
 						email: user.email,
-						password: req.body.password
+						password: req.body.password,
+						discountCode: req.body.discountCode || '', 
+						discount: invoice.credit || ''
 					};
+					
 					memberEmail = new Emailer(memberEmailOptions, memberEmailData);
 					memberEmail.send(function(err, result) {
 						if (err) {
