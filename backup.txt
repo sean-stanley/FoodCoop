@@ -1,0 +1,2 @@
+MAILTO=sean@foodcoop.org.nz
+0 0,12 * * * mongodump >/dev/null

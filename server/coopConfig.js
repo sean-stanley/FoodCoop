@@ -37,7 +37,7 @@ exports.standardsEmail = [
 {name: 'Sean Stanley', email: 'sean@maplekiwi.com'},
 {name: 'Klaus Lotz', email: 'klotz@northtec.ac.nz'}
 ];
-exports.adminEmail = {name: 'Sean Stanley', email: 'sean@maplekiwi.com'};
+exports.adminEmail = {name: 'Sean Stanley', email: 'sean@foodcoop.org.nz'};
 
 // CALENDAR CYCLE
 

@@ -131,42 +131,9 @@ angular.module('co-op.controllers', [])
 	}
 ])
 
-
-.controller('userEditCtrl', ['$scope', '$rootScope', 'Restangular', 'LoginManager', 'flash', 'UserManager',
-	function($scope, $rootScope, Restangular, LoginManager, flash, UserManager) {
-
-		$scope.destroy = function() {
-			var lastChance = confirm('Are you sure you want to delete the profile of ' + $rootScope.currentUser.name +'?');
-			if (lastChance) {
-				UserManager.delCurrentUser(function() {
-					LoginManager.logout();
-					flash.setMessage('Account successfully Deleted');
-				});
-			}
-		};
-		
-		$scope.$watch('currentUser.user_type.name', function(newValue) {
-			console.log(newValue);
-			if (newValue === 'Customer') {
-				$rootScope.currentUser.user_type.canSell = false;
-			}
-		});
-		
-		// sends a request for a password reset email to be sent to this user's email.
-		$scope.passwordReset = function() {
-			Restangular.all('api/forgot').post({email: $rootScope.currentUser.email});
-		};
-		
-		$scope.save = function() {
-			UserManager.save();
-		};
-	}
-])
-
 .controller('resetCtrl', ['$scope', 'Restangular', '$location', 'user', 'LoginManager', 
 	function($scope, Restangular, $location, user, LoginManager){
 		$scope.user = Restangular.copy(user);
-				
 		$scope.save = function() {
 			Restangular.one('reset', $scope.user.resetPasswordToken).customPOST({password: $scope.user.password}).then(function(result) {
 				LoginManager.login('local', {
@@ -178,122 +145,38 @@ angular.module('co-op.controllers', [])
 		};
 }])
 
-.controller('userInvoiceCtrl', ['$scope', 'Restangular', '$rootScope', function($scope, Restangular, $rootScope){
-	$scope.now = Date();
-	$scope.invoices = Restangular.all('api/invoice').getList({invoicee : $rootScope.currentUser._id}).$object;
-	$scope.soon = function(invoice) {
-		if (invoice.status === 'un-paid') {
-			if ( Date.parse(invoice.dueDate).between( Date.today(), Date.today().addWeeks(1) ) ) {
-				return true;
-				}
-		}
+.controller('MessageBoardCtrl', ['$scope', 'socket', '$rootScope',
+	function($scope, socket, $rootScope){
+		$scope.messages = [];
 		
-		return false;
-	};
-	$scope.unPaid = function() {
-		var match;
-		match = _.where($scope.invoices, {status: 'un-paid'});
-		return match.length;
-	};
-	
-	$scope.overdue = function() {
-		var match;
-		match = _.where($scope.invoices, {status: 'OVERDUE'});
-		return match.length;
-	};
-}])
-
-.controller('userCtrl', ['$scope', '$modal', '$location', 
-	function($scope, $modal, $location) {
-		$scope.open = function(application_type) {
-			var modalInstance = $modal.open({
-				templateUrl: 'partials/signup-form.html',
-				controller: 'userModalCtrl',
-				size: 'md',
-				resolve: {
-					data: function() {
-						return application_type;
-					}
-				}
-			});
-			
-			modalInstance.result.then(function (nextRoute) {
-				console.log(nextRoute);
-				$location.path(nextRoute);	
-				
-			}, function () {
-				console.log('Modal dismissed at: ' + new Date());
-			});
-		};
-	}
-])
-
-// signup form control
-.controller('userModalCtrl', ['$scope', 'UserManager', '$modalInstance', 'data',
-	function($scope, UserManager, $modalInstance, data) {
+		socket.on('connection', function(s) {
+			console.log('successfully connected to server');
+		});
 		
-		$scope.data = data;
+		socket.on('message', function(msg){
+			$scope.messages.push(msg);
+		});
 		
-		$scope.userData = {
-			password: '',
-			email: '',
-			name: '',
-			address: '',
-			user_type: {
-				name 	: $scope.data, 
-				canBuy	: true, 
-				canSell	: false
-			}
-		};
+		socket.on('remove message', function(m) {
+			$scope.messages = _.remove($scope.messages, m);
+		});
 		
-		$scope.nextRoute = ($scope.data === "Producer") ? "/apply" : "/welcome";
-		console.log($scope.nextRoute);
-		
-		$scope.submitForm = function(isValid) {
-			if (isValid) {
-				UserManager.createUser($scope.userData).then(function() {
-					$modalInstance.close($scope.nextRoute);
-				}, function(error) {
-					$scope.message = error;
-				});
+		$scope.send = function(isValid, message) {
+			if (isValid && $rootScope.currentUser) {
+				message.date = new Date();
+				message.author = $rootScope.currentUser.name;
+				message.authorID = $rootScope.currentUser._id;
+				socket.emit('message', message);
 			} else $scope.submitted = true;
 		};
 		
-		$scope.cancel = function() {
-			$modalInstance.dismiss('cancel');
-		};
-	}
-])
-// used on the sign up page for address finding.
-.controller('geoCtrl', ['$scope',
-	function($scope) {
-		$scope.addressOptions = {
-			country: 'nz',
-		};
-		$scope.details = {};
-	}
-])
-
-.controller('producerApplicationCtrl', ['$scope', 'flash','certifications', '$http', "$location",
-	function ($scope, flash, certifications, $http, $location) {
-		certifications.getList().then(function(result) {
-			$scope.certifications = result;
-			$scope.producerApplication = {
-				certification : $scope.certifications[0].name, // none
-			};
-		});
-		
-		$scope.submitForm = function(form) {
-			$http.post('/api/producer-applicaiton', $scope.producerApplication).success(function(result) {
-				flash.setMessage({type: 'success', message: 'Thank you for your application. We\'ll be in touch shortly.'});
-				$location.path("welcome");
-			}).error(function(error) {
-				flash.setMessage({type: 'danger', message: "Error: " + (error.status || "") + " " + (error.message || error)});
-			});
+		$scope.remove = function(m) {
+			if (_.contains($scope.messages, m)) {
+				socket.emit('remove message', m);
+			}
 		};
 		
-	}
-])
+}])
 
 .controller('producerListCtrl', ['$scope', '$filter', 'ProducerList',
 	function($scope, $filter, ProducerList) {

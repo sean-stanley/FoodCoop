@@ -1,4 +1,7 @@
-var emailer = require('../emailer.js')
+/* jshint -W079 */ 
+'use strict';
+
+var emailer = require('../emailer');
 
 describe('jasmine-node-flat', function(){
   it('should pass', function(){

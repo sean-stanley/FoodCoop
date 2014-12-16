@@ -6,7 +6,7 @@
         <p> Hi {{name}},</p>
 		<p>Please keep this email for your reference.</p>
         <p> Shopping is now closed for this month so we tallied up everything ordered from you and sent you this list. We've also tallied up the cost of those products.</p>
-        <p> Assuming all your customers pay us promptly, we will transfer payment by <strong>{{dueDate}}</strong></p>
+        <p> Assuming all your customers pay us promptly, your payment should arrive by <strong>{{dueDate}}</strong></p>
 		
 		<p>Below is the invoice we generated for us to pay you. You'll find it also contains the details of what you are required to deliver to us on delivery day which is <strong>{{deliveryDay}}</strong></p>
        
@@ -29,7 +29,7 @@
                
 			  <% _.each(items, function(item) { %> 
                  <tr>
-                     <td>{{item.product.refrigeration}}</td>
+                     <td>{{item.product.refrigeration || 'none'}}</td>
 					 <td>{{item.product.fullName}} </td>
 					 <td>{{item.customer.name}}</td>
 					 <td>${{item.product.price}} / {{item.product.units}}</td>
@@ -63,8 +63,8 @@
 					<td style="padding: 15px 10px 0 10px"><strong>{{item.product.fullName}}</strong> <br/>
 						Customer: {{item.customer.name}}
 					</td>
-					<td style="padding: 15px 10px 0 10px">Quantity: {{item.quantity}}<br/>
-					Total: ${{item.product.price * item.quantity}}</td>
+					<td style="padding: 15px 10px 0 10px">Quantity: <strong>{{item.quantity}}</strong><br/>
+					Total: ${{item.product.priceWithMarkup * item.quantity}}</td>
                 </tr>
 				<tr>
 					<td style="padding: 0 10px 15px 10px">Route: {{item.customer.routeTitle}}</td>

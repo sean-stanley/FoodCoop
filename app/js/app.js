@@ -108,6 +108,14 @@ angular.module('co-op', [
 		.when('/volunteer', {templateUrl: 'partials/volunteers.html', reloadOnSearch: false, title: "Volunteer Jobs", 
 			description: 'The NNFC, Northland\'s local food coop, needs volunteers to help maintain the service. Volunteers are usually members and have jobs such as sorting orders, delivering orders and managing a delivery route.'
 		})
+		
+		.when('/message-board', {
+			templateUrl: 'partials/message-board.html', 
+			reloadOnSearch: false, 
+			title:"Member Message Board", 
+			descrpiption: 'Post Messages for all members to see.',
+			controller: 'MessageBoardCtrl'
+	})
 
 		.when('/contact', {templateUrl: 'partials/contact.html', controller: 'contactCtrl', reloadOnSearch: false})
 		.when('/contact/:userId', {

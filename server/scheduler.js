@@ -79,9 +79,9 @@ function checkConfig() {
 				case 'ShoppingStop':
 					exports.canShop = false;
 					// checkout everyone's purchases
-					checkout();
+					//checkout();
 					// send order requests to producers
-					orderGoods();
+					//orderGoods();
 					break;
 				case 'volunteerRecruitment':
 					// send messages asking for sorters and drivers.
@@ -103,8 +103,8 @@ function checkConfig() {
 			
 		}
 	}
-	
-	
+
+
 }
 
 // looks for all the orders of the cycle and groups them by customer
@@ -114,7 +114,7 @@ function checkout() {
 			console.log('beginning checkout process');
 			models.Order
 			.aggregate()
-			//.match({cycle: exports.currentCycle})
+			.match({cycle: exports.currentCycle})
 			.group({ _id: "$customer", orders: { $push : {product: "$product", quantity: "$quantity"} }})
 			.exec(function(e, customers) {
 				// customers is a plain javascript object not a special mongoose document.
@@ -159,21 +159,17 @@ function invoiceCustomer(customer, callback) {
 				cycle: exports.currentCycle,
 				deliveryRoute: customer._id.routeTitle || "Whangarei"
 			});
-			console.log(customer._id.balance);
 			
-			if (customer._id.user_type.name === 'Customer') {
+			if (customer._id.user_type.name === 'Customer' && customer._id.balance) {
 				invoice.credit = customer._id.balance
 				console.log('%s credited on shopping Bill', customer._id.name);
 			}
 			
-			
 			invoice.save(function(e, invoice){
-							console.log(invoice.total);
-							if (e) done(e);
-							else done(null, invoice);
-						});
-			
-			
+				console.log('Invoice #%s saved for %s and has a total of %s', invoice._id, customer._id.name, invoice.total);
+				if (e) done(e);
+				else done(null, invoice);
+			});
 		},
 		function(invoice, done) {
 			invoice.populate('items.product', 'price priceWithMarkup', function(e, invoice) {
@@ -214,11 +210,11 @@ function invoiceCustomer(customer, callback) {
 
 			
 			mail.send(function(err, result) {
-										if (err) done(err);
-										// a response is sent so the client request doesn't timeout and get an error.
-										console.log("Message sent to customer " + customer._id.name);
-										done(null);
-									});
+				if (err) done(err);
+				// a response is sent so the client request doesn't timeout and get an error.
+				console.log("Message sent to customer " + customer._id.name);
+				done(null);
+			});
 		}
 		
 	], function(error) {
@@ -227,11 +223,12 @@ function invoiceCustomer(customer, callback) {
 }
 
 function orderGoods() {
+	console.log('orderGoods called');
 	async.waterfall([
 		function(done) {
 			models.Order
 			.aggregate()
-			//.match({cycle: exports.currentCycle})
+			.match({cycle: exports.currentCycle})
 			.group({ _id: "$supplier", orders: { $push : {product: "$product", customer: '$customer', quantity: "$quantity"} }})
 			
 			.exec(function(e, producers) {
@@ -281,17 +278,18 @@ function invoiceFromProducer(producer, callback) {
 	async.waterfall([
 		function(done) {
 			var invoice = new models.Invoice({
-				dueDate: config.cycle.DeliveryDay.toString("ddd dd MMMM yyyy"),
+				dueDate: config.cycle.DeliveryDay.addDays(4).toString("ddd dd MMMM yyyy"),
 				invoicee: producer._id._id,
 				title: "Products Requested for " + Date.today().toString("MMMM"),
 				items: producer.orders,
 				cycle: exports.currentCycle,
-				credit: -producer._id.balance,
 				toCoop: true,
 				bankAccount: producer._id.producerData.bankAccount || "NO ACCOUNT ON RECORD"
 			});
 			
-			console.log(invoice.credit)
+			if (producer._id.balance) {
+				invoice.credit = -producer._id.balance
+			}
 			
 			invoice.save(function(e, invoice) {
 				if (e) return done(e);
@@ -373,7 +371,7 @@ function incrementCycle() {
 	});
 }
 
-function findCycle() {
+function findCycle(callback) {
 	models.Cycle.findById('orderCycle', function(e, cycle) {
 		if (e) {
 			console.log(e);
@@ -382,6 +380,7 @@ function findCycle() {
 		} else {
 			exports.currentCycle = cycle.seq;
 			console.log("the current cycle is #" + exports.currentCycle);
+			if (callback) callback();
 		}
 	});
 }
@@ -421,7 +420,6 @@ function writeProducerImgToDisk() {
 
 exports.findCycle = findCycle;
 
-findCycle();
 checkConfig();
 //disableCycle();
 //writeProductImgToDisk();

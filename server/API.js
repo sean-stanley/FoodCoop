@@ -28,6 +28,7 @@ var util = require('util'),
 	scheduler = require('./scheduler.js'), // contains scheduled functions and their results
 	//oboe = require('oboe'); //JSON streaming and parsing
 	discount = require('./discount'),
+	auth = require('./auth'), // convenience authentication middleware for the app
 	
 	passport = require('passport'), // middleware that provides authentication tools for the API.
 	LocalStrategy = require('passport-local').Strategy; // the passport strategy employed by this API.
@@ -128,8 +129,6 @@ exports.configAPI = function configAPI(app) {
 				}
 			};
 			
-			
-
 			toClientData = {
 				name: req.body.name,
 				message: req.body.message
@@ -234,21 +233,16 @@ exports.configAPI = function configAPI(app) {
 	});
 	
 	// return just one product for editing or use as a template for another product
-	app.get("/api/product/:id", function(req, res, next) {
-		if (req.user) {
-			models.Product.findById(req.params.id, function(err, product) {
-				if (err) return next(err);
-				log.info('%s requested by current user', product.fullName);
-				res.json(product);
-			});
-		}
-		else res.status(401).end();
-		
+	app.get("/api/product/:id", auth.isLoggedIn, function(req, res, next) {
+		models.Product.findById(req.params.id, function(err, product) {
+			if (err) return next(err);
+			log.info('%s requested by current user', product.fullName);
+			res.json(product);
+		});		
 	});
 	
-	app.put("/api/product", function(req, res, next) {
+	app.put("/api/product", auth.canSell, function(req, res, next) {
 		// if the product is from this cycle, edit all changes else give it a new _id before saving
-		if (req.user && req.user.user_type.canSell) {
 			if (scheduler.canUpload) {
 				models.Product.findById(req.body._id, function(err, product) { // first find the right product by it's ID
 					if (err) return next(err);
@@ -455,16 +449,13 @@ exports.configAPI = function configAPI(app) {
 					});
 				} else res.status(403).send("It's not the right time of the month to upload products");
 			
-		} else res.status(401).end() // not authorized to edit product
 		
 	});	
 
 	// this creates a new product. It is
 	// usually only called from the product-upload page of the app.
-	app.post("/api/product", function(req, res, next) {
+	app.post("/api/product", auth.canSell, function(req, res, next) {
 		var productObject, needsSave = false, newProduct;
-		// this tests if a user is authenticated.
-		if (req.user && req.user.user_type.canSell) {
 			if (scheduler.canUpload) {
 				// convert ingredients string to an array
 				// if (typeof req.body.ingredients === "string" && req.body.ingredients.length > 0) {
@@ -484,7 +475,7 @@ exports.configAPI = function configAPI(app) {
 					price: req.body.price,
 					quantity: req.body.quantity,
 					units: req.body.units,
-					refrigeration: req.body.refrigeration,
+					refrigeration: req.body.refrigeration || 'none',
 					ingredients: req.body.ingredients,
 					description: req.body.description,
 					certification: req.body.certification,
@@ -495,15 +486,14 @@ exports.configAPI = function configAPI(app) {
 					log.info('%s just uploaded', product.productName + " " + product.variety || '');
 				});
 			} else res.status(400).send("You can't create new products right now.");
-		} else res.status(401).send("You are not allowed to upload products.");
 	});
 
 	// this request will delete a product from the database. First we find the
 	// requested product.
-	app.delete("/api/product/:id", function(req, res, next) {
+	app.delete("/api/product/:id", auth.isLoggedIn, function(req, res, next) {
 		var mailData, mailOptions, deleteMail;
 		// ensure user is logged in to perform this request.		
-		if ( req.user && (scheduler.canUpload || scheduler.canChange) ) {
+		if ( scheduler.canUpload || scheduler.canChange ) {
 			// delete the product based on it's id
 			models.Product.findById(req.params.id, function(err, product) {
 				if (err) return next(err);
@@ -570,73 +560,61 @@ exports.configAPI = function configAPI(app) {
 				} else res.status(403).send('You aren\'t authorized to delete that product');
 			});
 		}
-		else if (!scheduler.canUpload && !scheduler.canChange) res.status(403).send("Drat! Wrong time of the ordering cycle to delete products.");
-		else res.status(401).send('Not logged in');
+		else res.status(403).send("Drat! Wrong time of the ordering cycle to delete products.");
 	});
 
 	// return a compact list of all the current user's products.
-	app.get("/api/product-list", function(req, res, next) {
-		if (req.user) {
-			models.Product.find(req.query)
-			.where('producer_ID').equals(new ObjectId(req.user._id))
-			.select('productName variety dateUploaded price quantity amountSold units')
-			.sort('datePlaced')
-			.exec(function(e, products){
-				if (e) return next(e);
-				res.json(products);
-			});
-		}
-		else res.status(401).end();
+	app.get("/api/product-list", auth.isLoggedIn, function(req, res, next) {
+		models.Product.find(req.query)
+		.where('producer_ID').equals(new ObjectId(req.user._id))
+		.select('productName variety dateUploaded price quantity amountSold units')
+		.sort('datePlaced')
+		.exec(function(e, products){
+			if (e) return next(e);
+			res.json(products);
+		});
 	});
 	// return a compact list of all the current user's products for the current month.
-	app.get("/api/product-list/current", function(req, res, next) {
-		if (req.user) {
-			models.Product.find({
-				producer_ID : new ObjectId(req.user._id),
-				cycle: scheduler.currentCycle
-			}, 'productName variety dateUploaded price quantity amountSold units', { sort: {datePlaced: 1} }, function(e, products) {
-				if (e) return next(e);
-				res.json(products);
-			});
-		} else res.status(401).end();
+	app.get("/api/product-list/current", auth.isLoggedIn, function(req, res, next) {
+		models.Product.find({
+			producer_ID : new ObjectId(req.user._id),
+			cycle: scheduler.currentCycle
+		}, 'productName variety dateUploaded price quantity amountSold units', { sort: {datePlaced: 1} }, function(e, products) {
+			if (e) return next(e);
+			res.json(products);
+		});
 	});
 	// return a compact list of all the current user's products for the last month.
-	app.get("/api/product-list/recent", function(req, res, next) {
-		if (req.user) {
-			models.Product.find({
-				producer_ID : new ObjectId(req.user._id),
-				cycle: scheduler.currentCycle - 1
-			}, 'productName variety dateUploaded price quantity amountSold units', { sort: {datePlaced: 1} },
-				function(e, products) {
-					if (e) return next(e);
-					res.json(products);
-			});
-		}
-		else res.status(401).end();
+	app.get("/api/product-list/recent", auth.isLoggedIn, function(req, res, next) {
+		models.Product.find({
+			producer_ID : new ObjectId(req.user._id),
+			cycle: scheduler.currentCycle - 1
+		}, 'productName variety dateUploaded price quantity amountSold units', { sort: {datePlaced: 1} },
+			function(e, products) {
+				if (e) return next(e);
+				res.json(products);
+		});
 	});
 
 	// this request will return orders based on a query. Generally this is used to
 	// return all of a month's orders.
-	app.get("/api/order", function(req, res, next) {
-		// check if the current user is logged in
-		if (req.user) {
-			// finds all the orders requested by the query from the url query.
-			models.Order.find(req.query).sort({datePlaced: 1})
-			.populate('product', 'fullName price units producer_ID productName variety cycle refrigeration')
-			.populate('customer', 'name')
-			.populate('supplier', 'name email producerData.companyName')
-			.exec( function(e, orders) {
-				if (e) return next(e);
-				res.json(orders);
-			});
-		} else res.status(401).end();
+	app.get("/api/order", auth.isLoggedIn, function(req, res, next) {
+
+		// finds all the orders requested by the query from the url query.
+		models.Order.find(req.query).sort({datePlaced: 1})
+		.populate('product', 'fullName price units producer_ID productName variety cycle refrigeration')
+		.populate('customer', 'name')
+		.populate('supplier', 'name email producerData.companyName')
+		.exec( function(e, orders) {
+			if (e) return next(e);
+			res.json(orders);
+		});
 
 	});
 	// get the orders made to the currently authenticated producer/supplier
-	app.get("/api/order/me", function(req, res, next) {
+	app.get("/api/order/me", auth.isLoggedIn, function(req, res, next) {
 		var opts, orderObject;
-		// check if the current user is authenticated
-		if (req.user) {
+
 			// get all cart orders for the current user.
 			// optional query params will select a cycle to sort from
 			models.Order.find(req.query).find({supplier: req.user._id}).sort({datePlaced: 1})
@@ -646,31 +624,10 @@ exports.configAPI = function configAPI(app) {
 			.exec( function(e, orders) {
 				if (e) return next(e);
 				res.json(orders);
-				
-				// define options for replacing ID's in the order with the appropriate data from
-				// other collections. The other collections are specified with the 'ref'
-				// property in the collections' Schema object.
-				
-
-				// replace the ID's in an order with proper values before sending to the app.
-				// @results is the results returned from the Order Query
-				// @opts is the array of options for the populate method to use.
-				// @e is the error
-				// @cart is the returned array or object of order data
-			/*
-				models.Order.populate(results, opts, function(e, orders) {
-								// send the results to the app if no error occurred.
-								if (e) return next(e);
-								res.json(orders);
-							});*/
-			
 			});
-		}
-		else res.status(401).end();
 	});
 	// get a suppliers orders for the current cycle grouped by customer
-	app.get("/api/order/cycle", function(req,res, next){
-		if (req.user) {
+	app.get("/api/order/cycle", auth.isLoggedIn, function(req,res, next){
 			async.waterfall([
 				function(done) {
 					models.Order
@@ -703,12 +660,9 @@ exports.configAPI = function configAPI(app) {
 				if (e) return next(e);
 				else res.json(result);
 			});	
-		}
-		else res.status(401).end();
 	});
 	
-	app.get("/api/cart/:user/length", function(req, res, next) {
-		if (req.user && req.user._id == req.params.user) {
+	app.get("/api/cart/:user/length", auth.isMe, function(req, res, next) {
 			models.Order.count({customer: req.user._id, cycle: scheduler.currentCycle}, function(e, count) {
 				if (!e) {
 					log.info('the count is %s', count);
@@ -716,15 +670,10 @@ exports.configAPI = function configAPI(app) {
 				}
 				else return next(e);
 			});
-		}
-		else res.status(403).end();
 	});
 	// get a customer's cart items by using their customer ID as a request parameter.
-	app.get("/api/cart/:user", function(req, res, next) {
+	app.get("/api/cart/:user", auth.isMe, function(req, res, next) {
 		var opts, cartObject;
-		// check if the current user is logged in and is requesting his or her own cart.
-		// Server-side validation.
-		if (req.user && req.user._id == req.params.user) {
 			// get the cart orders for the current user.
 			// req.query is used for finding orders from a specific cycle
 			models.Order.find(req.query).find({customer: req.user._id}).sort({datePlaced: 1})
@@ -736,12 +685,10 @@ exports.configAPI = function configAPI(app) {
 					res.json(cart);
 				} else next(e);
 			});
-		}
-		else res.status(401).end();
 	});
 	// update an order from a user's perspective. Only allowed to change quantity
-	app.post("/api/cart", function(req, res, next) {
-		if (req.user && scheduler.canShop) {
+	app.post("/api/cart", auth.isLoggedIn, function(req, res, next) {
+		if (scheduler.canShop) {
 			async.waterfall([
 				function(callback) {
 					models.Order.findById(req.body._id, 'quantity product cycle', function(e, order) {
@@ -773,14 +720,10 @@ exports.configAPI = function configAPI(app) {
 								else {
 									res.status(403).send("Sorry! Insufficient inventory to add more than " + (product.quantity - product.amountSold) + " to your cart" );
 								}
-							}
-							else {
+							} else {
 								res.status(403).send("Sorry! That product cannot be changed at this time. Contact technical support for assistance");
 							}
-						}
-						else {
-							callback(e);
-						}
+						} else callback(e);
 					});
 				}
 				], 
@@ -788,17 +731,16 @@ exports.configAPI = function configAPI(app) {
 					log.info(err);
 					next(err)
 			});
-		}
-		else res.status(403).send("Sorry! It's not the right time of the month to add items to your cart.");
+		} else res.status(403).send("Sorry! It's not the right time of the month to add items to your cart.");
 		
 	});
 	// Deletes a specific item from a users own cart and increases the quantity
 	// available of that product again.
-	app.delete("/api/cart/:id", function(req, res, next) {
+	app.delete("/api/cart/:id", auth.isLoggedIn, function(req, res, next) {
 		// Check if the current user is logged in and their ID in the params matches the
 		// id of their user data. If it does, delete that order from the database. Items
 		// entered after the end of ordering week can't be changed.
-		if (req.user && scheduler.canShop) {
+		if (scheduler.canShop) {
 			models.Order.findById(req.params.id, function(e, order) {
 				if (!e) {
 					// make sure only recent orders are being deleted
@@ -821,18 +763,14 @@ exports.configAPI = function configAPI(app) {
 					}
 				}
 			});
-		}
-		else if (!scheduler.canShop) {
-			res.status(403).send('Sorry! You can\'t make changes to your cart after Shopping Week Closes');
-		}
-		else res.status(401).end();
+		} else res.status(403).send('Sorry! You can\'t make changes to your cart after Shopping Week Closes');
 	});
 	
 	// Creates a new order from the 'add to cart' buttons in the app. Returns the
 	// populated order. It creates the order object and subtracts the quantity from
 	// the product being purchased inventory.
-	app.post("/api/order", function(req, res, next) {
-		if (req.user && scheduler.canShop) {
+	app.post("/api/order", auth.isLoggedIn, function(req, res, next) {
+		if (scheduler.canShop) {
 			if (req.body.customer !== req.body.supplier) {
 				async.waterfall([
 					function(callback) {
@@ -889,64 +827,50 @@ exports.configAPI = function configAPI(app) {
 					else next(err) 
 				});
 			} else res.status(403).send("Sorry, you can't try to buy your own products");
-		} else { // error handling 
-			if (!scheduler.canShop) res.status(403).send("It's not shopping time yet");
-			else res.status(401).send("Not logged in");
-		}
+		} else res.status(403).send("It's not shopping time yet");
 	});
 	
 	app.route('/api/invoice')
 	// get all the invoices or a query. Called in the app from the invoices page
-	.get(function(req, res, next) {
-		
-		if (req.user) {
-			models.Invoice.find(req.query)
-			//.sort({_id:1})
-			.populate('invoicee', 'name address phone email -_id')
-			.populate('items.customer', 'name email routeTitle')
-			.populate('items.product', 'fullName variety productName priceWithMarkup price units')
-			.exec(function(e, invoices) {
-				if (e) {
-					log.info(e);
-					res.status(404).send();
-				}
-				else {
-					log.info('sending invoices');
-					res.send(invoices);
-				}
-			});
-		}
+	.get(auth.isLoggedIn, function(req, res, next) {
+		models.Invoice.find(req.query)
+		.sort({_id:-1})
+		.populate('invoicee', 'name address phone email -_id')
+		.populate('items.customer', 'name email routeTitle')
+		.populate('items.product', 'fullName variety productName priceWithMarkup price units')
+		.exec(function(e, invoices) {
+			if (e) {
+				log.info(e);
+				res.status(404).send(e);
+			}
+			else {
+				log.info('sending invoices');
+				res.json(invoices);
+			}
+		});
 	})
 	
 	// update an invoice's status
-	.put(function(req, res, next) {
-		if (req.user && req.user.user_type.isAdmin) {
-			models.Invoice.findByIdAndUpdate(req.body._id, {status: req.body.status}, function(e, invoice){
-				if (e) return next(e);
-			
-				// Save the time the invoice was modified
-				invoice.dateModified = Date();
-				invoice.save();
-				res.status(200).end();
-			});
-		}
-		else res.status(401).end()
+	.put(auth.isAdmin, function(req, res, next) {
+		models.Invoice.findByIdAndUpdate(req.body._id, {status: req.body.status}, function(e, invoice){
+			if (e) return next(e);
+			// Save the time the invoice was modified
+			invoice.dateModified = Date();
+			invoice.save();
+			res.status(200).end();
+		});
 	})
-	
 	// delete an invoice. The invoice to delete is found in the query param. Ideally only delete cancelled invoices.
-	.delete(function(req, res, next) {
-		if (req.user && req.user.user_type.isAdmin) {
-			models.Invoice.findByIdAndRemove(req.query.id, function(e, invoice) {
-				if (e) return next(e);
-				if (invoice) res.status(200).end();
-				else res.status(404).end();
-			})
-		}
-		else res.status(401).end()
+	.delete(auth.isAdmin, function(req, res, next) {
+		models.Invoice.findByIdAndRemove(req.query.id, function(e, invoice) {
+			if (e) return next(e);
+			if (invoice) res.status(200).end();
+			else res.status(404).end();
+		});
 	});
 	
 	// get a query of one specific invoice by id
-	app.get("/api/invoice/:id", function(req, res, next) {
+	app.get("/api/invoice/:id", auth.isAdmin, function(req, res, next) {
 		models.Invoice.findById(req.params.id)
 		.populate('invoicee', 'name address phone email -_id')
 		.populate('items.customer', 'name email routeTitle')
@@ -959,42 +883,35 @@ exports.configAPI = function configAPI(app) {
 	
 	
 	//Forward producer application to standards committee.
-	app.post("/api/producer-applicaiton", function(req, res, next) {
-		var application, mailData, mailOptions, email;
-		//if (req.user && !req.user.user_type.canSell) {
-		if (req.user) {
-			application = req.body;
-			mailOptions = {template: 'producer-application-form', subject: 'Application form for member '+ req.user.name, 
-				to: [
-						{name: config.standardsEmail[0].name, email: config.standardsEmail[0].email}, 
-						{name: config.standardsEmail[1].name, email: config.standardsEmail[1].email}
-				]
-			};
-			mailData = {
-				name: req.user.name,
-				email: req.user.email,
-				phone: req.user.phone,
-				address: req.user.address,
-				certification: application.certification,
-				chemicals: application.chemicals,
-				products: application.products
-			};
-			
-			req.user.producerData.certification = application.certification;
-			req.user.producerData.chemicalDisclaimer = application.chemicals;
-			req.user.save();
-			
-			
-			email = new Emailer(mailOptions, mailData);
-			email.send(function(err, result) {
-				if (err) {
-					log.info(err);
-				}
-			});
-			res.status(200).end();
-		}
-		//else if (req.user.user_type.canSell) res.status(403).send('You are already approved to sell through the food co-op');
-		else res.status(401).end();
+	app.post("/api/producer-applicaiton", auth.isLoggedIn, function(req, res, next) {
+		var application = req.body, mailData, mailOptions, email;
+
+		mailOptions = {template: 'producer-application-form', subject: 'Application form for member '+ req.user.name, 
+			to: [
+					{name: config.standardsEmail[0].name, email: config.standardsEmail[0].email}, 
+					{name: config.standardsEmail[1].name, email: config.standardsEmail[1].email}
+			]
+		};
+		mailData = {
+			name: req.user.name,
+			email: req.user.email,
+			phone: req.user.phone,
+			address: req.user.address,
+			certification: application.certification,
+			chemicals: application.chemicals,
+			products: application.products
+		};
+		
+		req.user.producerData.certification = application.certification;
+		req.user.producerData.chemicalDisclaimer = application.chemicals;
+		req.user.save();
+		
+		
+		email = new Emailer(mailOptions, mailData);
+		email.send(function(err, result) {
+			if (err) log.info(err);
+		});
+		res.status(200).end();
 	});
 	
 	//Get and return users as JSON data based on a query. Only really used for the
@@ -1008,7 +925,7 @@ exports.configAPI = function configAPI(app) {
 		});
 	});
 	
-	app.get("/api/user/route", function(req, res, next) {
+	app.get("/api/user/route", auth.isAdmin, function(req, res, next) {
 		// search for users. if the req.query is blank, all users will be returned.
 		models.User.find({$or: [ {routeTitle: {$exists: true} }, {'routeManager.pickupLocation': {$exists: true} } ]}).find(req.query).select('name email routeTitle routeManager address user_type').exec(function(e, results) {
 			if (e) return next(e);
@@ -1025,7 +942,7 @@ exports.configAPI = function configAPI(app) {
 		.lean().exec(function(err, producers){
 			if (err) next(err);
 			else {
-				res.send(producers);
+				res.json(producers);
 			}
 		})
 	});
@@ -1126,9 +1043,7 @@ exports.configAPI = function configAPI(app) {
 				});
 				
 				done(null, user);
-			}
-			],
-			function(err, user){
+			}], function(err, user){
 				var userObject;
 				if (user) {
 					var params = {
@@ -1149,10 +1064,8 @@ exports.configAPI = function configAPI(app) {
 					// authenticate the newly created user
 					passport.authenticate('local', function(err, user, info){
 						if (!user) {
-							log.info(err);
 							return next(err);
-						}
-						else {
+						} else {
 							req.logIn(user, function(err){
 								// req.user should now be assigned
 								if (err) log.info(err);
@@ -1163,20 +1076,16 @@ exports.configAPI = function configAPI(app) {
 							});
 						}
 					})(req, res, next);
-				}
-				else {
-					next(err);
-				}
+				} else next(err);
 			}
 		);
 	});
 
 	// edit changes to a user including updates their password if they submitted a change.
-	app.put("/api/user/:id", function(req, res, next) {
+	app.put("/api/user/:user", auth.isMe, function(req, res, next) {
 		var mailOptions, mailData, emailToSend, changeOptions, changeData, changeEmail, canSell, message;
-		//log.info(req.user);
-		if (req.user._id == req.params.id || req.user.user_type.isAdmin) {
-			models.User.findById(req.params.id, function(e, user) {
+		//might be able to use req.user rather than db lookup here
+			models.User.findById(req.params.user, function(e, user) {
 				if (e) return next(e);
 				var userData = user.toJSON();
 				
@@ -1193,7 +1102,6 @@ exports.configAPI = function configAPI(app) {
 						if (err) log.info(err);
 					});
 				}
-				
 				// update the database with the user's changes
 				async.each(Object.keys(req.body), function(key, done) {
 					if (userData[key] !== req.body[key] && key !== 'password' && key !== 'oldPassword') {
@@ -1215,36 +1123,15 @@ exports.configAPI = function configAPI(app) {
 					if (req.body.password && req.body.oldPassword) {
 						req.userPasswordChange = user;
 						next();
-					}
-					else { // save changes to the user and send OK back to the app.
+					} else { // save changes to the user and send OK back to the app.
 						res.status(200).end();
 					}
 				});
-				
-				// update the database with the user's changes
-				/*
-				for (var key in req.body) {
-										if (userData[key] !== req.body[key] && key !== 'password' && key !== 'oldPassword') {
-											// rule out strings and numbers so we know to do a deep comparison
-											if (_.isObject(req.body[key]) && _.isObject(userData[key]) ) { 
-												// deep comparison
-												if ( !_.isEqual(userData[key], req.body[key]) ) {
-													user[key] = req.body[key];
-												}
-											}
-											// most likely string or number so this operation is safe
-											else user[key] = req.body[key];
-											
-										}
-									}*/
 			});
-		}
-		else res.status(401).send("You must be logged in to change data about a user");
-		
 	});
 	
 	// change a user's password
-	app.put("/api/user/:id", function(req, res, next) {
+	app.put("/api/user/:user", auth.isMe, function(req, res, next) {
 		// if the user is attempting to change their password, this checks if the user
 		// remembers their old password and if they do will change it to their requested
 		// new password. Admins reset passwords by sending the user a password reset
@@ -1282,8 +1169,8 @@ exports.configAPI = function configAPI(app) {
 
 	// return a specific user by ID. This call is made by the admin generally when
 	// he is wanting to change permissions of a user.
-	app.get("/api/user/:id", function(req, res, next) {
-		models.User.findById(req.params.id, function(e, results) {
+	app.get("/api/user/:user", auth.isMe, function(req, res, next) {
+		models.User.findById(req.params.user, function(e, results) {
 			if (e) return next(e) 
 			if (results) {
 				var userObject = results.toObject();
@@ -1331,201 +1218,187 @@ exports.configAPI = function configAPI(app) {
 	});
 
 	// updates a producer by ID. This id is generally the logged in user.
-	app.put("/api/user/:id/producer", function(req, res, next) {
-		if (req.user && req.user._id == req.params.id) {
-			log.info('about to search database to update details on %s', req.user.name);
-			models.User.findById(req.params.id).select('producerData addressPermission user_type.name').exec(function(err, user) {
-				if (err) return next(err);
-				
-				user.producerData = req.body.producerData;
-				user.addressPermission = req.body.addressPermission;
-				
-				user.save(function(err, user) {
-					if (err) log.info(err);
-					console.log('user saved!')
-					//console.log(user.producerData.logo);
-				});
-				
-				res.status(200).end();
-				
+	app.put("/api/user/:id/producer", auth.isMe, function(req, res, next) {
+		log.info('about to search database to update details on %s', req.user.name);
+		models.User.findById(req.params.id).select('producerData addressPermission user_type.name').exec(function(err, user) {
+			if (err) return next(err);
+			
+			user.producerData = req.body.producerData;
+			user.addressPermission = req.body.addressPermission;
+			
+			user.save(function(err, user) {
+				if (err) log.info(err);
+				console.log('user saved!')
+				//console.log(user.producerData.logo);
 			});
-		} else {
-			res.status(401).end();
-		}
+			
+			res.status(200).end();
+		});
+
 	});
 	
 	// delete a user and all their products and their cart. A user can only delete
 	// themself. An admin can delete any user. An email is sent to the user thanking
 	// them for their membership and to expect a refund soon. Another email is sent
 	// to the NNFC admin to arrange refunds.
-	app.delete("/api/user/:id", function(req, res, next) {
+	app.delete("/api/user/:id", auth.isMe, function(req, res, next) {
 		var toUser, toUserOptions, toUserData, toAdmin, toAdminOptions, toAdminData;
-		if (req.user._id == req.params.id || req.user.user_type.isAdmin) {
-			async.waterfall([
-				// look up the user and their membership invoice
-				function(done) {
-					models.User.findById(req.params.id, function(e, user) {
-						if (e) done(e);
-						log.info('preparing to delete user %s', user.name);
-						if (user) {
-							models.Invoice.findOne({ invoicee: new ObjectId(user._id), title: 'Membership'}, function(e, invoice){
-								if (e) done(e);
-								done(null, user, invoice);
-							});
-						}
-					});
-				},
+		async.waterfall([
+			// look up the user and their membership invoice
+			function(done) {
+				models.User.findById(req.params.id, function(e, user) {
+					if (e) done(e);
+					log.info('preparing to delete user %s', user.name);
+					if (user) {
+						models.Invoice.findOne({ invoicee: new ObjectId(user._id), title: 'Membership'}, function(e, invoice){
+							if (e) done(e);
+							done(null, user, invoice);
+						});
+					}
+				});
+			},
+			
+			// next send an email to the admin saying this user is being deleted
+			function(user, invoice, done) {
+				log.info('preparing to send email to admin');
+				toAdminOptions = {
+					template: 'member-leaving',
+					subject: user.name + ' wants to leave the NNFC',
+					to: mail.companyEmail
+				};
 				
-				// next send an email to the admin saying this user is being deleted
-				function(user, invoice, done) {
-					log.info('preparing to send email to admin');
-					toAdminOptions = {
-						template: 'member-leaving',
-						subject: user.name + ' wants to leave the NNFC',
-						to: mail.companyEmail
+				toAdminData = {name: user.name};
+				
+				toAdmin = new Emailer(toAdminOptions, toAdminData);
+				
+				toAdmin.send(function(err, result){
+					if (err) {
+						log.info(err);
+					}
+					// a response is sent so the client request doesn't timeout and get an error.
+					log.info("Message sent to admin about %s leaving the NNFC", user.name);
+				});
+				done(null, user, invoice);
+			},
+			
+			// next we send an email notifying the user they will be re-imbursed for their membership fee
+			function(user, invoice, done) {
+				log.info('preparing to send email to user');
+				if (invoice) {
+					toUserOptions = {
+						template: "goodbye",
+						subject: 'Leaving the NNFC',
+						to: {
+							email: user.email,
+							name: user.name
+						}
 					};
 					
-					toAdminData = {name: user.name};
+					toUserData = {name: user.name, code: invoice._id, items: invoice.items, cost: invoice.total};
 					
-					toAdmin = new Emailer(toAdminOptions, toAdminData);
-					
-					toAdmin.send(function(err, result){
+					toUser = new Emailer(toUserOptions, toUserData);
+					toUser.send(function(err, result) {
 						if (err) {
-							log.info(err);
+							return log.info(err);
 						}
 						// a response is sent so the client request doesn't timeout and get an error.
-						log.info("Message sent to admin about %s leaving the NNFC", user.name);
+						log.info("Message sent to %s about leaving the NNFC", user.name);
+						
 					});
 					done(null, user, invoice);
-				},
-				
-				// next we send an email notifying the user they will be re-imbursed for their membership fee
-				function(user, invoice, done) {
-					log.info('preparing to send email to user');
-					if (invoice) {
-						toUserOptions = {
-							template: "goodbye",
-							subject: 'Leaving the NNFC',
-							to: {
-								email: user.email,
-								name: user.name
-							}
-						};
-						
-						toUserData = {name: user.name, code: invoice._id, items: invoice.items, cost: invoice.total};
-						
-						toUser = new Emailer(toUserOptions, toUserData);
-						toUser.send(function(err, result) {
-							if (err) {
-								return log.info(err);
-							}
-							// a response is sent so the client request doesn't timeout and get an error.
-							log.info("Message sent to %s about leaving the NNFC", user.name);
-							
-						});
-						done(null, user, invoice);
-					}
-					else {
-						//invoice not found
-						done(null, user, invoice);
-					}
-				},
-				// make changes to the membership invoice
-				function(user, invoice, done) {
-					if (invoice) {
-						log.info('cancelling %s membership invoice', user.name);
-						
-						invoice.exInvoicee = 'ex-member ' + user.name;
+				}
+				else {
+					//invoice not found
+					done(null, user, invoice);
+				}
+			},
+			// make changes to the membership invoice
+			function(user, invoice, done) {
+				if (invoice) {
+					log.info('cancelling %s membership invoice', user.name);
+					
+					invoice.exInvoicee = 'ex-member ' + user.name;
+					invoice.save();
+					
+					switch (invoice.status) {
+					case 'PAID':
+						invoice.status = 'To Refund';
 						invoice.save();
-						
-						switch (invoice.status) {
-						case 'PAID':
-							invoice.status = 'To Refund';
-							invoice.save();
-							break;
-						case 'OVERDUE':
-							//continue to next case
-						case 'un-paid':
-							invoice.status = 'CANCELLED';
-							invoice.save();
-							break;
-						default:
-						}
-						done(null, user);
+						break;
+					case 'OVERDUE':
+						//continue to next case
+					case 'un-paid':
+						invoice.status = 'CANCELLED';
+						invoice.save();
+						break;
+					default:
 					}
-					else done(null, user);
-				}, function(user, done) { // remove the user from mailing lists
-					log.info('attempting to remove %s from mailchimp list', user.name);
-					var params = {
-						id: 'e481a3338d',
-						email: {email: user.email},
-					};
+					done(null, user);
+				}
+				else done(null, user);
+			}, function(user, done) { // remove the user from mailing lists
+				log.info('attempting to remove %s from mailchimp list', user.name);
+				var params = {
+					id: 'e481a3338d',
+					email: {email: user.email},
+				};
+				mc.lists.unsubscribe(params, function(data) {log.info({result: data});}, function(error) {
+					log.info(error);
+				});
+				done(null, user, params);
+				
+			}, function (user, params, done) {
+				if (user.user_type.name === 'Producer') {
+					log.info('attempting to remove user from producer mailchimp list');
+					// remove the user from producer list as well;
+					params.id = 'f379285252';
 					mc.lists.unsubscribe(params, function(data) {log.info({result: data});}, function(error) {
 						log.info(error);
 					});
-					done(null, user, params);
-					
-				}, function (user, params, done) {
-					if (user.user_type.name === 'Producer') {
-						log.info('attempting to remove user from producer mailchimp list');
-						// remove the user from producer list as well;
-						params.id = 'f379285252';
-						mc.lists.unsubscribe(params, function(data) {log.info({result: data});}, function(error) {
-							log.info(error);
-						});
-						done(null, user);
-					}
-					else {
-						done(null, user);
-					}
-				},
-				// delete the user from the database
-				function(user, done) {
-					//remove an account's cart first
-					models.Order.remove({customer: user._id}, function(e) {
-						if (e) done(e);
-					});
-					// then remove an account's products 
-					models.Product.remove({producer_ID: user._id}, function(e) {
-						if (e) done(e);
-					});
-					// finally remove the user itself
-					models.User.remove({_id: user.id}, function(e) {
-						if (e) done(e);
-					});	
-					log.info('The user and their products and orders are deleted');
-					done(null);
+					done(null, user);
 				}
-				
-				], 
-				// if the email sent successfully, delete the user's data
-				function(e, result) {
-					if (!e) {
-						res.status(200).end();
-					}
-					else {
-						next(e);
-					}
+				else {
+					done(null, user);
+				}
+			},
+			// delete the user from the database
+			function(user, done) {
+				//remove an account's cart first
+				models.Order.remove({customer: user._id}, function(e) {
+					if (e) done(e);
 				});
-		}
-		else {
-			res.status(401).send("You are not authorized to remove that user");
-		}
+				// then remove an account's products 
+				models.Product.remove({producer_ID: user._id}, function(e) {
+					if (e) done(e);
+				});
+				// finally remove the user itself
+				models.User.remove({_id: user.id}, function(e) {
+					if (e) done(e);
+				});	
+				log.info('The user and their products and orders are deleted');
+				done(null);
+			}
+			
+			], 
+			// if the email sent successfully, delete the user's data
+			function(e, result) {
+				if (!e) {
+					res.status(200).end();
+				}
+				else {
+					next(e);
+				}
+			});
 	});
 	
 	app.route('/auth/session')
 	// check to see if the user is logged in
-	.get(function(req, res, next) {
-		if (req.user) {
+	.get(auth.isLoggedIn, function(req, res, next) {
 			var userObject = req.user.toObject();
 			delete userObject.salt;
 			delete userObject.hash;
 			res.send(userObject);
 			log.info('user %s just logged in', req.user.name);
-		} else {
-			log.info('failed login attempt');
-			res.status(401).send('Not logged in');
-		}
 	})
 	// attempt to log the user in
 	.post(function(req, res, next) {
@@ -1568,38 +1441,32 @@ exports.configAPI = function configAPI(app) {
 		else res.send("No session saved");
 	});
 	
-	app.route('/api/admin/cycle')
+	app.route('/api/admin/cycle', auth.isAdmin)
 	.get(function(req, res, next) {
-		if (req.user && req.user.user_type.isAdmin) {
-			models.Cycle.findById('orderCycle', function(e, cycle) {
-				if (e) log.warn(e);
-				else {
-					res.status(200).send(cycle.seq.toString());
-					log.info("the current cycle is #" + cycle.seq);
-				}
-			});
-			scheduler.findCycle();
-		}
-		else res.status(401).end();
+		models.Cycle.findById('orderCycle', function(e, cycle) {
+			if (e) log.warn(e);
+			else {
+				res.status(200).send(cycle.seq.toString());
+				log.info("the current cycle is #" + cycle.seq);
+			}
+		});
+		scheduler.findCycle();
 	})
 	.post(function(req, res, next) {
-		if (req.user && req.user.user_type.isAdmin) {
-			models.Cycle.findById("orderCycle").exec(function(e, cycle) {
-				if (e) return next(e);
-				
-				if ( cycle && Date.equals(Date.today(), Date.parse(cycle.dateModified).clearTime()) ) res.send("cycle already incremented today");
-				else {
-					models.Cycle.findOneAndUpdate({_id: 'orderCycle'},{ dateModified: Date.now(), $inc: {seq: 1} }, function(err, cycle){
-						if (err) return next(err);
-						res.status(200).send(cycle.seq.toString());
-						config.cycleReset('today');
-						scheduler.findCycle();
-					});	
-				}
-			});
-		}
-		else res.status(401).end();
-	})
+		models.Cycle.findById("orderCycle").exec(function(e, cycle) {
+			if (e) return next(e);
+			
+			if ( cycle && Date.equals(Date.today(), Date.parse(cycle.dateModified).clearTime()) ) res.send("cycle already incremented today");
+			else {
+				models.Cycle.findOneAndUpdate({_id: 'orderCycle'},{ dateModified: Date.now(), $inc: {seq: 1} }, function(err, cycle){
+					if (err) return next(err);
+					res.status(200).send(cycle.seq.toString());
+					config.cycleReset('today');
+					scheduler.findCycle();
+				});	
+			}
+		});
+	});
 	
 	// Sends an email for resetting a user's password. Token will expires in 1 hour.
 	app.post('/api/forgot', function(req, res) {

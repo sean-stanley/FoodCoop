@@ -12,7 +12,7 @@ angular.module('co-op.services', [])
 		return Restangular.all('auth/session');
 	}])
 	
-	.factory('socketAPI', function (socketFactory) {
+	.factory('socket', function (socketFactory) {
 	  return socketFactory();
 	})
 	
