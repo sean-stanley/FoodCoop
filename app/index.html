@@ -58,17 +58,17 @@
 	
 </head>
 
-<body ng-controller="navCtrl" ng-init="cartPanel = {open: false};"  ng-swipe-right="panelDisplay = true">
+<body ng-controller="navCtrl" ng-init="cartPanel = {open: false};"  ng-swipe-right="panelLeftDisplay = true" ng-swipe-left="panelRightDisplay = true">
 	<div ng-cloak="" class='splash text-center'>
 		<h1 style="font-size: 6em">Loading your Co-op</h1>
 		<i class="fa fa-cog fa-spin" style='font-size: 10em'></i>
 	</div>	
-	<div id="sidebar" class="sidebar" 
-	ng-swipe-left="panelDisplay = false" 
-	ng-show="panelDisplay" 
+	<div class="sidebar sidebar-left" 
+	ng-swipe-left="panelLeftDisplay = false" 
+	ng-show="panelLeftDisplay" 
 	ng-class="{'wide-sidebar':cartPanel.open, 'narrow-sidebar':!cartPanel.open}" ng-cloak>
 		<div class="sidebar-main">
-			<a href="" id="close-sidebar-button" class="panel-btn panel-btn-lg" ng-click="panelDisplay = false">&times;</a>
+			<a href="" class="panel-btn panel-btn-lg close-sidebar-button close-sidebar-button-left" ng-click="panelLeftDisplay = false">&times;</a>
 			<div ng-show="storePage()">
 				<div class="input-group">
 					<label class="sr-only" for="storeSearch">Search the store</label>
@@ -176,12 +176,12 @@
 					<span class="icon-bar"></span> 
 				</button> 
 				<a class="navbar-brand" href="/">NNFC</a>
-				<a class="navbar-brand" ng-click="panelDisplay = !panelDisplay">
+				<a class="navbar-brand" ng-click="panelLeftDisplay = !panelLeftDisplay">
 					<small class="hidden-sm hidden-xs"><span class="glyphicon glyphicon-cog"></span> Member Tools</small>
 				</a>
 				<!--
 				<ul class="nav navbar-nav pull-left">
-									<li ng-click="panelDisplay = !panelDisplay">
+									<li ng-click="panelLeftDisplay = !panelLeftDisplay">
 										<span class="glyphicon glyphicon-cog"></span> Member Tools</li>
 								</ul>-->
 				
@@ -208,17 +208,15 @@
 			</div>
 		</div>
 	</nav>
-	
-	
 		
 	<div class="page-wrap">
 	
 	<div 
 	class="visible-sm visible-xs mobile-arrow" 
 	 
-	ng-class="{'mobile-arrow-menu-open': panelDisplay}"
-	ng-show="!panelDisplay">
-		<i class="fa fa-chevron-circle-right fa-3x" ng-click="panelDisplay = true"></i>
+	ng-class="{'mobile-arrow-menu-open': panelLeftDisplay}"
+	ng-show="!panelLeftDisplay">
+		<i class="fa fa-chevron-circle-right fa-3x" ng-click="panelLeftDisplay = true"></i>
 	</div>
 
 		<div class="container-fluid alert-box" ng-cloak>
@@ -227,13 +225,16 @@
 			</alert>
 		</div> 
 			
-		<!--  This is where the partials go for the forms and information pages.  ng-swipe-right="panelDisplay = true"/-->    
+		<!--  This is where the partials go for the forms and information pages.  ng-swipe-right="panelLeftDisplay = true"/-->    
 		<div id="view"
 		ng-cloak
 		ng-view
 		autoscroll="true" 
 		class="template-container app-body clearfix" 
-		ng-class="{'menu-open-narrow' : panelDisplay && !cartPanel.open, 'menu-open-wide': panelDisplay && cartPanel.open}">
+		ng-class="{'menu-open-narrow' : panelLeftDisplay && !cartPanel.open,
+							'menu-open-wide': panelLeftDisplay && cartPanel.open,
+							'menu-open-right' : panelRightDisplay
+							}">
 		</div>
 	</div>
 

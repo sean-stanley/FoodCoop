@@ -35,7 +35,7 @@ function checkConfig() {
 	
 	// if the date is between the productUploadStart date and the productUpoad Stop date
 	// double check that canShop is false and canUpload is true;
-	if ( !today.equals(cycle['ProductUploadStop']) && today.between(cycle.ProductUploadStart, cycle.ProductUploadStop) ) {
+	if ( !today.equals(cycle.ProductUploadStop) && today.between(cycle.ProductUploadStart, cycle.ProductUploadStop) ) {
 		console.log('today is between the start of product uploading and the end');
 		exports.canShop = false;
 		exports.canChange = false;
@@ -44,7 +44,7 @@ function checkConfig() {
 
 	// if the date is between the ShoppingStart date and the ShoppingStop Stop date
 	// double check that canShop is true and canUpload is false;
-	if ( !today.equals(cycle['ShoppingStart']) && today.between(cycle.ShoppingStart, cycle.ShoppingStop) ) {
+	if ( !today.equals(cycle.ShoppingStart) && today.between(cycle.ShoppingStart, cycle.ShoppingStop) ) {
 		console.log('today is between the start of shopping uploading and the end');
 		exports.canShop = true;
 		exports.canChange = true;
@@ -97,7 +97,7 @@ function checkConfig() {
 					break;
 				default:
 					// no functions to execute for this day
-					return
+					return;
 				}
 			}
 			
@@ -140,7 +140,7 @@ function checkout() {
 		else {
 			async.each(result, invoiceCustomer, function(error) {
 				if (error) console.log(error);
-			})
+			});
 		}
 	});
 }
@@ -161,7 +161,7 @@ function invoiceCustomer(customer, callback) {
 			});
 			
 			if (customer._id.user_type.name === 'Customer' && customer._id.balance) {
-				invoice.credit = customer._id.balance
+				invoice.credit = customer._id.balance;
 				console.log('%s credited on shopping Bill', customer._id.name);
 			}
 			
@@ -175,7 +175,7 @@ function invoiceCustomer(customer, callback) {
 			invoice.populate('items.product', 'price priceWithMarkup', function(e, invoice) {
 				if (e) return done(e);
 				done(null, invoice);
-			})
+			});
 		},
 		function(invoice, done) {
 			var mailOptions, mailData, mail;
@@ -188,7 +188,7 @@ function invoiceCustomer(customer, callback) {
 				}
 			};
 			
-			var showCredit = 'none'
+			var showCredit = 'none';
 			if (!isNaN(parseFloat(invoice.credit))) showCredit = 'table-row';
 			
 			mailData = {
@@ -262,7 +262,7 @@ function orderGoods() {
 		else {
 			async.each(result, invoiceFromProducer, function(error) {
 				if (error) console.log(error);
-			})
+			});
 		}
 	});
 }
@@ -288,7 +288,7 @@ function invoiceFromProducer(producer, callback) {
 			});
 			
 			if (producer._id.balance) {
-				invoice.credit = -producer._id.balance
+				invoice.credit = -producer._id.balance;
 			}
 			
 			invoice.save(function(e, invoice) {
@@ -300,7 +300,7 @@ function invoiceFromProducer(producer, callback) {
 			invoice.populate('items.product', 'price priceWithMarkup', function(e, invoice) {
 				if (e) return done(e);
 				done(null, invoice);
-			})
+			});
 		},
 		function(invoice, done) {
 			var mailOptions, mailData, mail;
@@ -312,7 +312,7 @@ function invoiceFromProducer(producer, callback) {
 					name: producer._id.name
 				}
 			};
-			var showCredit = 'none'
+			var showCredit = 'none';
 			if (!isNaN(parseFloat(invoice.credit))) showCredit = 'table-row';
 			
 			mailData = {
@@ -395,28 +395,31 @@ function disableCycle() {
 function writeProductImgToDisk() {
 	models.Product.find({}, null, function(err, products){
 		console.log(err);
-
-		for (var i = products.length - 1; i >= 0; i--) {
-			products[i].save(function(err, product, num) {
-				if (err) console.log(err);
-			})
-		}
+		async.each(products, function(product, done) {
+			product.save(function(err) {
+				if (err) return done(err);
+				done();
+			});
+		}, function(err) {
+			console.log(err);
+		});
+		
 	});
 }
 
 function writeProducerImgToDisk() {
 	models.User.find({'user_type.name':'Producer'}, null, function(err, users){
 		console.log(err);
-
-		for (var i = users.length - 1; i >= 0; i--) {
-			users[i].save(function(err, user, num) {
-				if (err) console.log(err);
-			})
-		}
+		async.each(users, function(user, done) {
+			user.save(function(err) {
+				if (err) return done(err);
+				done();
+			});
+		}, function(err) {
+			console.log(err);
+		});
 	});
 }
-
-
 
 exports.findCycle = findCycle;
 

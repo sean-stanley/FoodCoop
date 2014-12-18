@@ -99,58 +99,96 @@ a:hover {
 	-- Sidebar --
 	-------------	*/
 
-#sidebar {
+.sidebar {
 	position: fixed;
 	z-index: 999;
 	height: 100%;
-	background: #222222;
 	overflow: scroll;
+}
+
+.sidebar-left, .sidebar-right {
 	color: #aaa;
+	background: #222222;
 	border-right: 1px solid black;
 }
 
-#sidebar > div {
+.sidebar-right {right:0; top: 0px;}
+
+.sidebar > div, .sidebar > form {
 	padding: 10px;
+}
+
+.sidebar .form-control {
+	color: #fff;
+	background-color: #999;
+	border-color: #111;
+}
+
+.sidebar .form-control:focus {
+	border-color: #642c4a;
+	-webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(100, 44, 74, 0.600);
+	box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(100, 44, 74, 0.600);
+}
+
+.sidebar .ta-root.focussed .ta-scroll-window.form-control {
+border-color: #642c4a;
+outline: 0px;
+-webkit-box-shadow: rgba(0, 0, 0, 0.0745098) 0px 1px 1px inset, rgba(100, 44, 74, 0.600) 0px 0px 8px;
+}
+
+.right-sidebar-flag {
+	position: fixed;
+	top: 25%;
+	right: 0;
+	display: block!important;
 }
 
 #calendar-container, .sidebar-main > ul > li {cursor: pointer; border-left: solid 10px #642c4a; }
 #calendar-container {padding: 0.8em 0;}
 #calendar-container:hover {background: #642c4a; color: white;}
 #calendar-container > p {padding: 10px 15px}
-#sidebar .nav-stacked > li + li {margin-top: 0;}
+.sidebar .nav-stacked > li + li {margin-top: 0;}
 .sidebar-main > ul > li > a, .sidebar-bottom > li a{border-radius:0; color: #aaa;}
-#sidebar .nav > li > a:hover, .nav > li > a:focus {background-color:#642c4a; color: white;}
-#close-sidebar-button {padding: 0 20px; display:block; margin-top: 41px;
-margin-left: -21px;
-line-height: 1em;}
-#close-sidebar-button:hover {color:white;}
+.sidebar-left .nav > li > a:hover, .nav > li > a:focus {background-color:#642c4a; color: white;}
+.close-sidebar-button {
+	display:block; 
+	margin-top: 41px;
+	
+	line-height: 1em;
+}
+.close-sidebar-button-left {
+	margin-left: -21px;
+	padding: 0 20px; 
+}
+	
+.close-sidebar-button:hover {color:white;}
 
 .sidebar-main {margin-bottom: -122px; min-height:100%; }
 .sidebar-main:after {content:"";display:block;}
 .sidebar-bottom, .sidebar-main:after {height: 122px;}
 .sidebar-bottom {width: 100%; border:none;}*/
 
-#calendar-container:hover, #sidebar .panel-heading:hover, #sidebar li:hover {border-color: #ddd; background: #642c4a; color: white;}
+#calendar-container:hover, .sidebar-left .panel-heading:hover, .sidebar-left li:hover {border-color: #ddd; background: #642c4a; color: white;}
 
 /*	------------------
 	-- Sidebar Cart --
 	------------------	*/
-#sidebar .panel-heading {color: #aaa; background-color: #303030; border: none; border-left: solid 10px #642c4a; border-radius: 0;}
-#sidebar .panel-heading a:hover {text-decoration: none;}
-#sidebar .panel-group {margin-bottom: 0;}
-#sidebar .panel-body {border-left: solid 10px #642c4a; border-top: none;}
+.sidebar-left .panel-heading {color: #aaa; background-color: #303030; border: none; border-left: solid 10px #642c4a; border-radius: 0;}
+.sidebar-left .panel-heading a:hover {text-decoration: none;}
+.sidebar-left .panel-group {margin-bottom: 0;}
+.sidebar-left .panel-body {border-left: solid 10px #642c4a; border-top: none;}
 
-#sidebar .panel {background: transparent; border: none;}
+.sidebar-left .panel {background: transparent; border: none;}
 
-#sidebar .panel-open-sidebar .panel-heading {border-color: #ddd; background: #642c4a; color: white;}
-#sidebar .table a {color: #aaa; font-weight: 300;}
-#sidebar tr {position: relative;}
+.sidebar-left .panel-open-sidebar .panel-heading {border-color: #ddd; background: #642c4a; color: white;}
+.sidebar-left .table a {color: #aaa; font-weight: 300;}
+.sidebar-left tr {position: relative;}
 .cart-delete {position: absolute; right: 0; margin-right: 10px;}
 
 .image-drop {
 	display: block;
 	width: 50%;
-	min-width: 300px;
+	min-width: 275px;
 	height: 180px;
 	border: 2px dashed #cbcbcb;
 	text-align: center;
@@ -274,6 +312,9 @@ border-radius: 200px;
 .modal-header section {position: relative}
 .close-top-left {position: absolute; left: 15px; top: 5px; z-index: 99999}
 
+
+/* Message Board */ 
+.message {padding-bottom: 10px;}
 
 /* Store */ 
 

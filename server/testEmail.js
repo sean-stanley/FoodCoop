@@ -38,7 +38,7 @@ serverStart.send(function(err, result) {
   if (err) {
     console.log(err);
   }
-  console.log("Message sent")
+  console.log("Message sent");
 });
 
 

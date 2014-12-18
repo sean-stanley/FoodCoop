@@ -37,7 +37,7 @@ angular.module('co-op.controllers', [])
 			$scope.searchObject = $location.search();
 			
 			if ($scope.searchObject.menu) {
-				$scope.panelDisplay = true;
+				$scope.panelLeftDisplay = true;
 			}
 			
 			if ($scope.searchObject.search) {
@@ -46,7 +46,7 @@ angular.module('co-op.controllers', [])
 			
 			// watches
 			
-			$scope.$watch('panelDisplay', function(newValue) {
+			$scope.$watch('panelLeftDisplay', function(newValue) {
 				if (newValue === true) {
 					$location.search('menu', true);
 				}
@@ -149,34 +149,88 @@ angular.module('co-op.controllers', [])
 	function($scope, socket, $rootScope){
 		$scope.messages = [];
 		
+		function update(event, msg) {
+			var idx = _.findIndex($scope.messages, {_id: msg._id});
+			$scope.messages[idx] = msg;
+		}
+		
+		socket.forward('edit message');
+		
 		socket.on('connection', function(s) {
 			console.log('successfully connected to server');
 		});
 		
-		socket.on('message', function(msg){
-			$scope.messages.push(msg);
+		socket.on('message history', function(messages) {
+			$scope.messages = messages;
 		});
+		
+		socket.on('message', function(msg){
+			$scope.messages.unshift(msg);
+		});
+		
+		socket.on('edit message', update);
+		
+		$scope.$on('MESSAGE_EDIT_DONE', update);
+		
+		$scope.$on('socket:edit message', update);
 		
 		socket.on('remove message', function(m) {
-			$scope.messages = _.remove($scope.messages, m);
+			_.remove($scope.messages, m);
 		});
 		
-		$scope.send = function(isValid, message) {
-			if (isValid && $rootScope.currentUser) {
-				message.date = new Date();
-				message.author = $rootScope.currentUser.name;
-				message.authorID = $rootScope.currentUser._id;
-				socket.emit('message', message);
-			} else $scope.submitted = true;
+		$scope.update = function(m) {
+			$scope.$broadcast('EDIT_MESSAGE', m);
 		};
 		
 		$scope.remove = function(m) {
 			if (_.contains($scope.messages, m)) {
+				_.remove($scope.messages, m);
 				socket.emit('remove message', m);
-			}
+			} else console.log("couldn't find m in messages");
+			console.log(m);
+		};
+}])
+.controller('CreateOrEditMessageCtrl', ['$scope', 'socket', '$rootScope',
+	function($scope, socket, $rootScope){
+		$scope.message = {};
+		
+		$scope.$on('EDIT_MESSAGE', function(event, message) {
+			$scope.message = message;
+		});
+		
+		$scope.send = function(isValid, message) {
+			if (message.hasOwnProperty('_id')) $scope.update(isValid, message);
+			else if (isValid && $rootScope.currentUser) {
+				message.date = new Date();
+				message.author = {
+					_id: $rootScope.currentUser._id,
+					name: $rootScope.currentUser.name
+				};
+				socket.emit('message', message);
+				message.author.name = 'Me';
+				$scope.messages.unshift(message);
+				
+				// reset message fields
+				// $scope.message.img = undefined;
+// 				$scope.message.title = undefined;
+// 				$scope.message.body = undefined;
+				delete $scope.message;
+				
+			} else $scope.submitted = true;
 		};
 		
-}])
+		$scope.update = function(isValid, message) {
+			if (isValid && $rootScope.currentUser) {
+				message.update = new Date();
+				$scope.$emit('MESSAGE_EDIT_DONE', message);
+				socket.emit('edit message', message);
+				delete $scope.message;
+			} else $scope.submitted = true;
+		};
+		
+	}])
+
+
 
 .controller('producerListCtrl', ['$scope', '$filter', 'ProducerList',
 	function($scope, $filter, ProducerList) {

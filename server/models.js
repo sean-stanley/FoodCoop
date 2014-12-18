@@ -17,7 +17,7 @@ function toArray (listString) {
 var RegionSchema = new Schema({
 	dateCreated : {type: Date, required: true},
 	title : {type: String, required: true}
-})
+});
 
 // These are the most common properties that a product will have in our co-op.
 // The img property is to be filled with a base64 encoded png or jpeg from the
@@ -54,7 +54,7 @@ ProductSchema.virtual('priceWithMarkup').get(function () {
 });
 ProductSchema.virtual('fullName').get(function () {
 	if (this.variety) return this.variety + ' ' + this.productName;
-	else return this.productName
+	else return this.productName;
 });
 
 // occurs just before a product is saved. should work with Model.create() shortcut
@@ -70,7 +70,7 @@ ProductSchema.pre('save', function(next) {
 		
 		gm(new Buffer(base64Data, 'base64')).write(destination, function(err) {
 			if (err) return console.log(err);
-			console.log('Yay! successfully wrote new jpeg image')
+			console.log('Yay! successfully wrote new jpeg image');
 		});
 		
 		product.img = path.normalize(path.join('upload', 'products', productName+"+id-"+product._id+".jpg"));
@@ -86,7 +86,7 @@ ProductSchema.post('remove', function(product) {
 		fs.unlink(path.normalize(path.join(__dirname, '../app', product.img)), function(err) {
 			if (err) console.log(err);
 			else console.log('Successfully removed image.');
-		})
+		});
 	}
 });
 
@@ -343,7 +343,7 @@ UserSchema.pre('save', function(next) {
 // 		}
 	}
 	next();
-})
+});
 
 // Produce, Meat, Processed Goods, Dairy, Baked Goods all have properties that
 // modify the UI of product uploading. For example, the ingredients boolean

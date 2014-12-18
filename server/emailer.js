@@ -18,7 +18,7 @@
 		Emailer.prototype.attachments = [
 		{
 			filename: "logo.png",
-			path: "../app/img/email/logo.png",
+			path: path.join(__dirname, "../", "app", "img", "email", "logo.png"),
 			cid: "logo@foodcoop"
 		}
 		];

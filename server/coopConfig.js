@@ -113,7 +113,7 @@ exports.redis = {
 			host: '127.0.0.1',
 			port: '6379',
 			db: 2
-		}
+		};
 
 // SENSITIVE //
 exports.bankAccount = "02-1248-0425752-001";

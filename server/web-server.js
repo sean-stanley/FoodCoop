@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 var util = require('util'),
-    http = require('http')
+    http = require('http'),
     fs = require('fs'),
     path = require('path'),
     url = require('url'),

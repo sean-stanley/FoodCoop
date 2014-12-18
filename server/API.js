@@ -388,7 +388,7 @@ exports.configAPI = function configAPI(app) {
 									log.info({key: key});
 									if (key === 'price') {
 										if (req.body.price <= productObject.price) {
-											product['price'] = req.body.price;
+											product.price = req.body.price;
 											needsSave = true;
 										}
 										// increases in price are ignored
@@ -665,7 +665,6 @@ exports.configAPI = function configAPI(app) {
 	app.get("/api/cart/:user/length", auth.isMe, function(req, res, next) {
 			models.Order.count({customer: req.user._id, cycle: scheduler.currentCycle}, function(e, count) {
 				if (!e) {
-					log.info('the count is %s', count);
 					res.send(count.toString());
 				}
 				else return next(e);

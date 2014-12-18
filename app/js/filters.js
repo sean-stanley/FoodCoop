@@ -21,17 +21,14 @@ angular.module('co-op.filters', []).
   .filter('blurb', function() {
 	  return function(blurb) {
 		  if (blurb) {
-			if (blurb.length > 200) {
-				return blurb.slice(0, 199);
-			}
-			else {
-				return blurb;
-			}
-		  }
-		  else {
+				if (blurb.length > 200) {
+					return blurb.slice(0, 199);
+				} else {
+					return blurb;
+				}
+		  } else {
 			  return "No description has been written yet for this product.";
 		  }
-			  
 	  };
   })
   .filter('forURL', function() {
@@ -47,6 +44,9 @@ angular.module('co-op.filters', []).
   .filter('shortDate', function() {
 	return function(shortDate) {
 		if (shortDate) {
+			if ( Date.parse(shortDate).clearTime().equals(Date.today()) ) {
+				return Date.parse(shortDate).toString('h:mm tt'); 
+			}
 			return Date.parse(shortDate).toString('d/M/yyyy');  
 		}
 	};
