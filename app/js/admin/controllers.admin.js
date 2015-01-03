@@ -112,23 +112,25 @@ angular.module('co-op.admin')
 		};
 		
 		$scope.invoiceDelete = function(invoice) {
-			invoice.remove({id:invoice._id}).then(function(result){
-				flash.setMessage({type:'success', message: "invoice successfully removed: "+ result});
-			},
-			function(error) {
-				flash.setMessage({
-					message: "Sorry! Failed to delete the invoice " + error ,
-					type: "danger"
-				});
-			});
+			var certain = confirm('Are you sure you want to delete invoice #' + invoice._id + "?");
 			
-			$scope.invoices.splice($scope.invoices.indexOf(invoice), 1);
+			if (certain) {
+				invoice.remove({id:invoice._id}).then(function(result){
+					flash.setMessage({type:'success', message: "invoice successfully removed: "+ result || 'Great!'});
+				},
+				function(error) {
+					flash.setMessage({
+						message: "Sorry! Failed to delete the invoice " + error ,
+						type: "danger"
+					});
+				});
+			
+				$scope.invoices.splice($scope.invoices.indexOf(invoice), 1);
+			}
 			
 		};
-		
 	}
 ])
-
 .controller('userCtrl', ['$scope', '$modal', '$location', 
 	function($scope, $modal, $location) {
 		$scope.open = function(application_type) {
@@ -196,7 +198,7 @@ angular.module('co-op.admin')
 	$scope.total = function(orders, property, filter) {
 		var order, total = 0;
 		for (var i=0; i < orders.length; i++) {
-			total += orders[i][property];
+			total += Number(orders[i][property]);
 		}
 		return total;
 	};
