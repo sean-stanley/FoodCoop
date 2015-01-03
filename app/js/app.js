@@ -114,7 +114,12 @@ angular.module('co-op', [
 			reloadOnSearch: false, 
 			title:"Member Message Board", 
 			descrpiption: 'Post Messages for all members to see.',
-			controller: 'MessageBoardCtrl'
+			controller: 'MessageBoardCtrl',
+			resolve: {
+				messageHistory : function(Restangular) {
+					return Restangular.all('api/message-board').getList().$object;
+				}
+			}
 	})
 
 		.when('/contact', {templateUrl: 'partials/contact.html', controller: 'contactCtrl', reloadOnSearch: false})
