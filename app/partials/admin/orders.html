@@ -75,7 +75,7 @@
 				            <a ng-href="/product-upload/{{i.product._id}}">{{i.product.fullName}}</a>
 				        </td>
 				        <td data-title="'Price'">
-				            {{i.unitPrice | currency}} / {{i.product.units}}
+				            {{i.unitPriceWithMarkup | currency}} / {{i.product.units}}
 				        </td>
 						<td data-title="'Quantity'">
 							{{i.quantity}}
@@ -112,7 +112,7 @@
  				<tbody>
  					<tr ng-repeat="i in orders | filter:searchR | orderBy:'product.refrigeration':reverse" ng-class="{'text-disabled' : stored}">
 						<td data-title="'Date Placed'">
- 							<button ng-show="i.product.refrigeration !== 'none' " class="btn btn-primary" ng-click='stored=!stored'>
+ 							<button ng-show="i.product.refrigeration && i.product.refrigeration !== 'none' " class="btn btn-primary" ng-click='stored=!stored'>
 								{{i.product.refrigeration}}
 							</button>
 							<span ng-if="i.product.refrigeration === 'none'">{{i.product.refrigeration}}</span>
