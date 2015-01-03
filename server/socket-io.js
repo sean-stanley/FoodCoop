@@ -1,9 +1,13 @@
 var socketio = require('socket.io'),
+	redis = require('socket.io-redis'),
+	config = require('./config').Config,
 	path = require('path'),
 	_ = require('lodash'),
 	gm = require('gm'),
 	mongoose = require('mongoose'),
 	schema = mongoose.Schema; // mongoose schema object for defining collections.
+	
+
 
 // Models
 var MessageSchema = new schema({
@@ -49,28 +53,24 @@ exports.configSocketIO = function configSocketIO(http) {
 	
 	var io = socketio.listen(http);
 	
+	io.adapter(redis({ host: config.redis.host, port: config.redis.port }));
+	
+	
 	io.on('connection', function(socket){
-		console.log('a user connected');
-		
-		Message.getHistory(function(err, messages) {
-			if (err) console.log(err);
-			io.emit('message history', messages);
-			console.log('message history sent');
-		});
+		//console.log('a user connected');
 		
 		socket.on('disconnect', function(){
-		  console.log('user disconnected');
+		  //console.log('user disconnected');
 		});
 		
 		socket.on('message', function(msg) {
-			console.log('message received');
+			//console.log('message received');
 			socket.broadcast.emit('message', msg);
 			
 			msg.author = msg.author._id; // undo built-in population of author for saving to db
 			var message = new Message(msg);
 			message.save(function(err) {
 				if (err) console.log(err);
-				else console.log('message saved to db');
 			});
 		});
 		
@@ -84,7 +84,6 @@ exports.configSocketIO = function configSocketIO(http) {
 					_.merge(message, msg);
 					message.save(function(err) {
 						if (err) console.log(err);
-						else console.log('message saved');
 					});
 				}
 			});
@@ -94,13 +93,13 @@ exports.configSocketIO = function configSocketIO(http) {
 			io.emit('remove message', msg);
 			Message.findByIdAndRemove(msg._id, function(err, message) {
 				if (err) console.log(err);
-				else console.log('message removed');
+				//else console.log('message removed');
 			});
 		});
 		
+		
 	});
 	
-	// message board
 	return io;
 	
 };

@@ -14,7 +14,7 @@ var util = require('util'),
 	LocalStrategy = require('passport-local').Strategy,
 	bunyan = require('bunyan'),
 	mcapi = require('mailchimp-api'),
-  config = require('./config').Config,
+	config = require('./config').Config,
 	SOCKETIO = require('./socket-io');
 
 	
@@ -51,7 +51,6 @@ mc = new mcapi.Mailchimp('106c008a4dda3fa2fe00cae070e178b9-us9');
 API.configAPI(app);
 
 SOCKETIO.configSocketIO(server);
-
 
 // app options
 //app.set('etag', false);

@@ -14,13 +14,14 @@
 		<img ng-show="m.img" ng-src="{{m.img}}" class="img-responsive center-block">
 		<div ta-bind ng-model="m.body"></div>
 		<a class="pull-right" ng-if="m.author._id === currentUser._id" ng-click="remove(m)" ><i class="fa fa-times"></i></a>
-		<a class="pull-right" ng-if="m.author._id === currentUser._id" ng-click="update(m); panelRightDisplay = true;" style="margin-right: 5px;"><i class="fa fa-pencil"></i></a>
+		<a class="pull-right" ng-if="m.author._id === currentUser._id" ng-click="openRight(); update(m);" style="margin-right: 5px;"><i class="fa fa-pencil"></i></a>
 	</div>
 </div>
 
 	<button class="btn btn-primary right-sidebar-flag"
 	ng-class="{'right-flag-open' : panelRightDisplay}"
-	ng-click="panelRightDisplay = !panelRightDisplay"><i class="fa fa-gear fa-3x"></i></button>
+	ng-click="panelRightDisplay = !panelRightDisplay"
+	ng-show="currentUser._id"><i class="fa fa-gear fa-3x"></i></button>
 
 <div class="sidebar sidebar-right narrow-sidebar"
 	ng-swipe-right="panelRightDisplay = false" 
@@ -30,7 +31,7 @@
 	<div>
 		<a href="" class="panel-btn panel-btn-lg close-sidebar-button close-sidebar-button-right" ng-click="panelRightDisplay = false">&times;</a>
 	
-		<form name="messageMaker" ng-controller="CreateOrEditMessageCtrl">
+		<form name="messageMaker" ng-controller="CreateOrEditMessageCtrl" ng-disabled="!currentUser._id">
 
 			<br>
 			<div class="form-group" ng-class="{'has-warning': selected && messageMaker.title.$invalid}">
