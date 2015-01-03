@@ -1,4 +1,4 @@
-var config = require('./coopConfig');
+var config = require('../coopConfig');
  
 exports.checkForDiscount = function(req, res, next) {
 	if (req.body.hasOwnProperty('discountCode') && config.discounts.indexOf(req.body.discountCode) > -1) {

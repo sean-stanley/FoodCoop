@@ -145,9 +145,13 @@ angular.module('co-op.controllers', [])
 		};
 }])
 
-.controller('MessageBoardCtrl', ['$scope', 'socket', '$rootScope',
-	function($scope, socket, $rootScope){
-		$scope.messages = [];
+.controller('MessageBoardCtrl', ['$scope', 'socket', '$rootScope', 'messageHistory',
+	function($scope, socket, $rootScope, messageHistory){
+		$scope.messages = messageHistory;
+		
+		$scope.openRight = function() {
+			$scope.panelRightDisplay = true;
+		};
 		
 		function update(event, msg) {
 			var idx = _.findIndex($scope.messages, {_id: msg._id});
@@ -160,9 +164,9 @@ angular.module('co-op.controllers', [])
 			console.log('successfully connected to server');
 		});
 		
-		socket.on('message history', function(messages) {
-			$scope.messages = messages;
-		});
+		// socket.on('message history', function(messages) {
+// 			$scope.messages = messages;
+// 		});
 		
 		socket.on('message', function(msg){
 			$scope.messages.unshift(msg);
@@ -389,16 +393,21 @@ angular.module('co-op.controllers', [])
 			};
 		});
 
-		$scope.submitForm = function() {
-			// disable the save button if a product is new or an update of an old month
-			if ($scope.productData._id === undefined || $rootScope.cycle !== $scope.productData.cycle ) {
-				$scope.hideSave = true;
-			}
+		$scope.submitForm = function(isValid) {
+			if (isValid) {
+				$scope.submitted = false;
+				flash.setMessage({type: 'warning', message: 'Beginning upload of '+ $scope.productData.productName});
+				// disable the save button if a product is new or an update of an old month
+				if ($scope.productData._id === undefined || $rootScope.cycle !== $scope.productData.cycle ) {
+					$scope.hideSave = true;
+				}
 			
-			ProductManager.registerProduct($scope.productData, function(message) {
-				$scope.$broadcast('REFRESHCURRENT');
-				//$location.path('product-upload/'+id);
-			});
+				ProductManager.registerProduct($scope.productData, function(product) {
+					$scope.$broadcast('REFRESHCURRENT');
+					$scope.productData = product;
+				});
+			} else $scope.submitted = true;
+			
 		};
 		
 		$scope.imageChoices = ['image1', 'image2', 'image3'];

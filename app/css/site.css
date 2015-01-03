@@ -140,7 +140,7 @@ outline: 0px;
 	position: fixed;
 	top: 25%;
 	right: 0;
-	display: block!important;
+	display: block;
 }
 
 #calendar-container, .sidebar-main > ul > li {cursor: pointer; border-left: solid 10px #642c4a; }

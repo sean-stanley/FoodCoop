@@ -80,6 +80,7 @@
     "passport-local-mongoose": "^1.0.0",
     "password-reset": "~0.1.4",
     "prerender-node": "latest",
-    "socket.io": "^1.2.1"
+    "socket.io": "^1.2.1",
+    "socket.io-redis": "^0.1.4"
   }
 }

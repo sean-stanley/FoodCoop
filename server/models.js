@@ -23,7 +23,7 @@ var RegionSchema = new Schema({
 // The img property is to be filled with a base64 encoded png or jpeg from the
 // app.
 var ProductSchema = new Schema({
-			dateUploaded: {type: Date, required: true},
+			dateUploaded: {type: Date, required: true, default: new Date()},
 			img: {},
 			category: {type: Schema.ObjectId, required: false, ref: 'Category'},
 			productName: {type: String, required: true},
@@ -34,7 +34,7 @@ var ProductSchema = new Schema({
 			refrigeration: {type: String, required: false},
 			ingredients: {type: Array, required: false, set: toArray},
 			description: {type: String, required: false},
-			certification: {type: Schema.ObjectId, required: false, ref: 'Certification'},
+			certification: {type: Schema.ObjectId, ref: 'Certification'},
 			producer_ID: {type: Schema.ObjectId, required: true, ref: 'User'},
 			cycle: {type: Number, required: true},
 			amountSold: Number,

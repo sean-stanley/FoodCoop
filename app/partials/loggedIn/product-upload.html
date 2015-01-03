@@ -134,15 +134,18 @@ min-width: inherit;">
 									{{category.name}}
 								</button>
 							</div>
+							<alert type="danger" ng-show="submitted && !productData.category && !categoryError" close="categoryError = true">
+								Please select a category for your product
+							</alert>
 						</div>
 					    <div class="form-group col-md-4">
 							<div class="btn-group pull-right">
-								<label type="button"
+								<button type="button"
 								ng-disabled="!productData.category" 
-								class="btn btn-primary" ng-model="productData.refrigeration" btn-radio="'refrigeration'" uncheckable>Refrigerated</label>
-								<label type="button"
+								class="btn btn-primary" ng-model="productData.refrigeration" btn-radio="'refrigeration'" uncheckable>Refrigerated</button>
+								<button type="button"
 								ng-disabled="!productData.category"
-								class="btn btn-primary" ng-model="productData.refrigeration" btn-radio="'frozen'" uncheckable>Frozen</label>
+								class="btn btn-primary" ng-model="productData.refrigeration" btn-radio="'frozen'" uncheckable>Frozen</button>
 							</div>
 						</div>
 					</div>
@@ -155,10 +158,13 @@ min-width: inherit;">
 				</div>
 					<div class="row">
 						<div class="form-group col-md-6">
-							<label for="inputName">Product Name</label>
-							<input ng-disabled="!productData.category" 
+							<label for="name">Product Name</label>
+							<input ng-disabled="!productData.category" name="name"
 							ng-model="productData.productName" type="text" class="form-control" id="inputName" maxlength="25" 
 							placeholder="e.g. {{ productManager.categoryByID(productData.category).placeholderName }}" autofocus required>
+			        <div ng-show="submitted && productUpload.name.$invalid" class="help-block">
+			          <alert type="danger" ng-show="productUpload.name.$error.required && !nameError" close="nameError = true">Sorry! A product name is required</alert>
+			        </div>
 						</div>
 						<div class="form-group col-md-6">
 							<label for="inputVariety" ng-model="variety">Variety</label>
@@ -176,6 +182,9 @@ min-width: inherit;">
 								<input ng-disabled="!productData.category"
 							ng-model="productData.price" name="price" type="number" class="form-control" id="inputPrice" min="0" placeholder="e.g. $2.50" required>
 							</div>
+			        <div ng-show="submitted && productUpload.price.$invalid" class="help-block">
+			          <alert type="danger" ng-show="productUpload.price.$error.required && !priceError" close="priceError = true">Please set a price</alert>
+			        </div>
 						</div>
 						
 					    <div class="form-group col-md-4">
@@ -183,12 +192,18 @@ min-width: inherit;">
 							<input ng-disabled="!productData.category" type="text" ng-model="productData.units" name="units" id="units" class="form-control" 
 							typeahead="unit for unit in productManager.categoryByID(productData.category).availableUnits | filter:$viewValue"
 							placeholder ="e.g. kg or L or whole beast" required>
+			        <div ng-show="submitted && productUpload.units.$invalid" class="help-block">
+			          <alert type="danger" ng-show="productUpload.units.$error.required && !unitError" close="unitError = true">Please specify the unit of sale</alert>
+			        </div>
 					    </div>
 					    
 					    <div class="form-group col-md-4">
 							<label for="quantity">Quantity Available</label>
 							<input ng-disabled="!productData.category"
 							ng-model="productData.quantity" name="quantity" type="number" max="1000" class="form-control" id="quantity" placeholder="e.g. 27" required>
+			        <div ng-show="submitted && productUpload.quantity.$invalid" class="help-block">
+			          <alert type="danger" ng-show="productUpload.quantity.$error.required && !quantityError" close="quantityError = true">Please set the quantity you are selling</alert>
+			        </div>
 					    </div>
 				   </div>
 			     <div id="ingredients" class="form-group">
@@ -216,8 +231,8 @@ min-width: inherit;">
 			    </div>
 			    <div class="form-group">
 			    	<button type="button" ng-click="reset()" class="btn btn-default">Reset</button>    
-			    	<button type="submit" class="btn btn-default" ng-disabled="productUpload.$invalid || hideSave" 
-						ng-click="submitForm();"
+			    	<button type="submit" class="btn btn-default"
+						ng-click="submitForm(productUpload.$valid);"
 						analytics-on="click" analytics-event="Upload Product">Save</button>
 				</div>
 			  </fieldset>

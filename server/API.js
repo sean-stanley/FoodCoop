@@ -27,8 +27,8 @@ var util = require('util'),
 	config = require('./coopConfig.js'), // static methods of important configuration info
 	scheduler = require('./scheduler.js'), // contains scheduled functions and their results
 	//oboe = require('oboe'); //JSON streaming and parsing
-	discount = require('./discount'),
-	auth = require('./auth'), // convenience authentication middleware for the app
+	discount = require('./controllers/discount'),
+	auth = require('./controllers/auth'), // convenience authentication middleware for the app
 	
 	passport = require('passport'), // middleware that provides authentication tools for the API.
 	LocalStrategy = require('passport-local').Strategy; // the passport strategy employed by this API.
@@ -191,14 +191,6 @@ exports.configAPI = function configAPI(app) {
 	// this route looks up products and sends an array of results back to the client.
 	app.get("/api/product", function(req, res, next) {		
 		//
-		log.info('got request for products');
-		if (req.query.hasOwnProperty('cycle') && req.query.cycle === scheduler.currentCycle ) {
-			req.query.cycle = scheduler.currentCycle;
-			log.info(req.query.hasOwnProperty('cycle'));
-			log.info(req.query.cycle != scheduler.currentCycle);
-			log.info('incorrect cycle number requested. what was requested was: %s instead of %s', req.query.cycle, scheduler.currentCycle);
-		}
-		
 		models.Product.find(req.query)
 		.sort({_id: 1})
 		//.select('-img')
@@ -457,17 +449,8 @@ exports.configAPI = function configAPI(app) {
 	app.post("/api/product", auth.canSell, function(req, res, next) {
 		var productObject, needsSave = false, newProduct;
 			if (scheduler.canUpload) {
-				// convert ingredients string to an array
-				// if (typeof req.body.ingredients === "string" && req.body.ingredients.length > 0) {
-	// 				req.body.ingredients = req.body.ingredients.split(/,\s*/);
-	// 			}
-	// 			else if (req.body.ingredients instanceof Array) {
-	// 				req.body.ingredients = req.body.ingredients.join(', ');
-	// 				req.body.ingredients = req.body.ingredients.split(/,\s*/);
-	// 			}
-				res.status(201).end('New Product Being Created');
+				
 				models.Product.create({
-					dateUploaded: Date(),
 					img: req.body.img,
 					category: req.body.category,
 					productName: req.body.productName,
@@ -483,7 +466,8 @@ exports.configAPI = function configAPI(app) {
 					cycle: scheduler.currentCycle || -1
 				}, function(err, product) {
 					if (err) log.warn(err);
-					log.info('%s just uploaded', product.productName + " " + product.variety || '');
+					log.info('%s just uploaded', product.variety + " " +  product.productName || '');
+					res.json(product);
 				});
 			} else res.status(400).send("You can't create new products right now.");
 	});
@@ -568,7 +552,7 @@ exports.configAPI = function configAPI(app) {
 		models.Product.find(req.query)
 		.where('producer_ID').equals(new ObjectId(req.user._id))
 		.select('productName variety dateUploaded price quantity amountSold units')
-		.sort('datePlaced')
+		.sort('dateUploaded')
 		.exec(function(e, products){
 			if (e) return next(e);
 			res.json(products);
@@ -579,7 +563,7 @@ exports.configAPI = function configAPI(app) {
 		models.Product.find({
 			producer_ID : new ObjectId(req.user._id),
 			cycle: scheduler.currentCycle
-		}, 'productName variety dateUploaded price quantity amountSold units', { sort: {datePlaced: 1} }, function(e, products) {
+		}, 'productName variety dateUploaded price quantity amountSold units', { sort: {dateUploaded: 1} }, function(e, products) {
 			if (e) return next(e);
 			res.json(products);
 		});
@@ -589,7 +573,7 @@ exports.configAPI = function configAPI(app) {
 		models.Product.find({
 			producer_ID : new ObjectId(req.user._id),
 			cycle: scheduler.currentCycle - 1
-		}, 'productName variety dateUploaded price quantity amountSold units', { sort: {datePlaced: 1} },
+		}, 'productName variety dateUploaded price quantity amountSold units', { sort: {dateUploaded: 1} },
 			function(e, products) {
 				if (e) return next(e);
 				res.json(products);
@@ -913,6 +897,14 @@ exports.configAPI = function configAPI(app) {
 		res.status(200).end();
 	});
 	
+	app.get('/api/message-board', function(req, res, next) {
+		var Message = mongoose.model('Message');
+		Message.find().populate('author', 'name').exec(function(err, messages) {
+			if (err) return next(err);
+			res.json(messages);
+		})
+	})
+	
 	//Get and return users as JSON data based on a query. Only really used for the
 	//admin to look at all users.
 	app.get("/api/user", function(req, res, next) {
@@ -1012,7 +1004,7 @@ exports.configAPI = function configAPI(app) {
 					log.info('Invoice saved');
 					memberEmailOptions = {
 						template: "new-member",
-						subject: 'Welcome to the NNFC online Store',
+						subject: 'Welcome to the NNFC and Invoice',
 						to: {
 							email: user.email,
 							name: user.name
