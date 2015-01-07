@@ -1210,7 +1210,7 @@ exports.configAPI = function configAPI(app) {
 	});
 
 	// updates a producer by ID. This id is generally the logged in user.
-	app.put("/api/user/:id/producer", auth.isMe, function(req, res, next) {
+	app.put("/api/user/:user/producer", auth.isMe, function(req, res, next) {
 		log.info('about to search database to update details on %s', req.user.name);
 		models.User.findById(req.params.id).select('producerData addressPermission user_type.name').exec(function(err, user) {
 			if (err) return next(err);
@@ -1233,7 +1233,7 @@ exports.configAPI = function configAPI(app) {
 	// themself. An admin can delete any user. An email is sent to the user thanking
 	// them for their membership and to expect a refund soon. Another email is sent
 	// to the NNFC admin to arrange refunds.
-	app.delete("/api/user/:id", auth.isMe, function(req, res, next) {
+	app.delete("/api/user/:user", auth.isMe, function(req, res, next) {
 		var toUser, toUserOptions, toUserData, toAdmin, toAdminOptions, toAdminData;
 		async.waterfall([
 			// look up the user and their membership invoice
