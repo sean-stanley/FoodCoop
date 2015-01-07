@@ -84,7 +84,7 @@ angular.module('co-op.controllers', [])
 		$scope.hash = $scope.hash === hash ? $scope.hash = false : $scope.hash = hash;
 	};
 	
-	var mapURL = 'http://maps.google.com/?q=2+Woods+Rd+Whangarei+New+Zealand&output=embed';
+	var mapURL = 'https://maps.google.com/?q=2+Woods+Rd+Whangarei+New+Zealand&output=embed';
 	$scope.map = $sce.trustAsResourceUrl(mapURL);
 }])
 
@@ -248,7 +248,7 @@ angular.module('co-op.controllers', [])
 .controller('producerPageCtrl', ['$scope', '$sce', 'Restangular', 'producer',
 	function($scope, $sce, Restangular, producer) {
 		$scope.producer = producer.plain();
-		var mapURL = 'http://maps.google.com/?q=' + producer.address + '&output=embed';
+		var mapURL = 'https://maps.google.com/?q=' + producer.address + '&output=embed';
 		$scope.map = $sce.trustAsResourceUrl(mapURL);
 		$scope.mapDirections = $sce.trustAsResourceUrl(mapURL);
 	}
