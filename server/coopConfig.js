@@ -80,8 +80,8 @@ exports.cycleReset = function(date) {
 		ShoppingStart 		: Date.parse(date).second().monday(),
 		ShoppingStop		: Date.parse(date).third().monday(),
 		volunteerRecruitment: Date.parse(date).third().wednesday(),
-		PaymentDueDay		: Date.parse(date).third().friday(),
-		DeliveryDay			: Date.parse(date).fourth().monday(),
+		PaymentDueDay		: Date.parse(date).fourth().monday(),
+		DeliveryDay			: Date.parse(date).final().wednesday(),
 	};
 	return exports.cycle;
 };
