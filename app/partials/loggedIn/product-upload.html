@@ -228,10 +228,11 @@ min-width: inherit;">
 					</select>
 			    </div>
 			    <div class="form-group">
-			    	<button type="button" ng-click="reset()" class="btn btn-default">Reset</button>    
-			    	<button type="submit" class="btn btn-default"
+			    	<button type="submit" class="btn" ng-class="{'btn-success':productUpload.$valid, 'btn-warning':productUpload.$invalid}"
 						ng-click="submitForm(productUpload.$valid);"
 						analytics-on="click" analytics-event="Upload Product">Save</button>
+						<button type="button" ng-click="reset()" class="btn btn-default">Reset</button>    
+			    	
 				</div>
 			  </fieldset>
 		  </form>
