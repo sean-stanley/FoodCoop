@@ -513,7 +513,6 @@ function($scope, $modalInstance, data, ProductManager) {
 	function($scope, $http, ProductHistory, ProductManager) {
 
 		$scope.$on('REFRESHCURRENT', function() {
-			console.log('refresh');
 			ProductHistory.getCurrentProducts(function(result) {
 				$scope.currentProducts = result;
 			});

@@ -447,29 +447,28 @@ exports.configAPI = function configAPI(app) {
 	// this creates a new product. It is
 	// usually only called from the product-upload page of the app.
 	app.post("/api/product", auth.canSell, function(req, res, next) {
-		var productObject, needsSave = false, newProduct;
-			if (scheduler.canUpload) {
-				
-				models.Product.create({
-					img: req.body.img,
-					category: req.body.category,
-					productName: req.body.productName,
-					variety: req.body.variety,
-					price: req.body.price,
-					quantity: req.body.quantity,
-					units: req.body.units,
-					refrigeration: req.body.refrigeration || 'none',
-					ingredients: req.body.ingredients,
-					description: req.body.description,
-					certification: req.body.certification,
-					producer_ID: req.user._id,
-					cycle: scheduler.currentCycle || -1
-				}, function(err, product) {
-					if (err) log.warn(err);
-					log.info('%s just uploaded', product.variety + " " +  product.productName || '');
-					res.json(product);
-				});
-			} else res.status(400).send("You can't create new products right now.");
+		if (scheduler.canUpload) {
+			
+			models.Product.create({
+				img: req.body.img,
+				category: req.body.category,
+				productName: req.body.productName,
+				variety: req.body.variety,
+				price: req.body.price,
+				quantity: req.body.quantity,
+				units: req.body.units,
+				refrigeration: req.body.refrigeration || 'none',
+				ingredients: req.body.ingredients,
+				description: req.body.description,
+				certification: req.body.certification,
+				producer_ID: req.user._id,
+				cycle: scheduler.currentCycle || -1
+			}, function(err, product) {
+				if (err) log.warn(err);
+				log.info('%s just uploaded', product.variety + " " +  product.productName || '');
+				res.json(product);
+			});
+		} else res.status(400).send("You can't create new products right now.");
 	});
 
 	// this request will delete a product from the database. First we find the
@@ -839,8 +838,10 @@ exports.configAPI = function configAPI(app) {
 			if (e) return next(e);
 			// Save the time the invoice was modified
 			invoice.dateModified = Date();
-			invoice.save();
-			res.status(200).end();
+			invoice.save(function(err) {
+				if (err) return next(err);
+				res.status(200).end();
+			});
 		});
 	})
 	// delete an invoice. The invoice to delete is found in the query param. Ideally only delete cancelled invoices.

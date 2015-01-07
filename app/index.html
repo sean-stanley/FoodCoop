@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="co-op" class="angular-app">
+<html lang="en" ng-app="co-op" class="angular-app" ng-strict-di>
 <head>
 	<meta charset="utf-8">
 	<title ng-bind="$root.page_title + ' - Northland Natural Food Co-op' ">NNFC - Northland Natural Food Co-op</title>
@@ -58,7 +58,7 @@
 	
 </head>
 
-<body ng-controller="navCtrl" ng-init="cartPanel = {open: false};"  ng-swipe-right="panelLeftDisplay = true" ng-swipe-left="panelRightDisplay = true">
+<body ng-controller="navCtrl" ng-init="cartPanel = {open: false};"  ng-swipe-right="panelLeftDisplay = true">
 	<div ng-cloak="" class='splash text-center'>
 		<h1 style="font-size: 6em">Loading your Co-op</h1>
 		<i class="fa fa-cog fa-spin" style='font-size: 10em'></i>
@@ -284,7 +284,7 @@
 	<script src="lib/bower_components/datejs/date-en-NZ.min.js" type="text/javascript" charset="utf-8"></script>
 	
 	<!-- SocketIO-Client -->
-<script src="https://cdn.socket.io/socket.io-1.2.1.js"></script>
+	<script src="https://cdn.socket.io/socket.io-1.2.1.js"></script>
 
 		
 	<!-- Include all compiled plugins (below), or include individual files as needed -->
@@ -298,6 +298,7 @@
     
 	<!-- food coop files -->
 	<script src="js/app.js"></script>
+<!--<script src="js/production.js"></script>-->
 	<script src="js/services.js"></script>
 	<script src="js/controllers.js"></script>
 	<script src="js/filters.js"></script>
@@ -306,6 +307,7 @@
 	<script src="js/user/controllers.user.js"></script>
 	<script src="js/admin/app.admin.js"></script>
 	<script src="js/admin/controllers.admin.js"></script>
+	
 	
     
 	<script src="lib/bower_components/angular-loading-bar/build/loading-bar.min.js"></script>

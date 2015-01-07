@@ -217,6 +217,10 @@ module.exports = function(grunt) {
 						{
 							match: /<script src="js\/.*"><\/script>/g,
 							replacement: ''
+						},
+						{
+							match: /disableCycle();/g,
+							replacement: ''
 						}
 					]
 				},
@@ -226,6 +230,12 @@ module.exports = function(grunt) {
 						flatten: true, 
 						src: ['app/index.html'], 
 						dest: 'build/app'
+					},
+					{
+						expand: true,
+						flatten: true,
+						src: ['server/scheduler.js'],
+						dest: 'build/server'
 					}
 				]
 			}

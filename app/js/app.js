@@ -22,7 +22,6 @@ angular.module('co-op', [
 	'angulartics', 'angulartics.google.analytics',
 	'ngTouch'
 	])
-
   .config(['$compileProvider', '$routeProvider', '$locationProvider', 'RestangularProvider', function($compileProvider, $routeProvider, $locationProvider, RestangularProvider) {
 	var oldWhiteList = $compileProvider.imgSrcSanitizationWhitelist();
 	$compileProvider.imgSrcSanitizationWhitelist(/^\s*((https?|ftp|file|blob):|data:image\/)/ );
