@@ -1212,7 +1212,7 @@ exports.configAPI = function configAPI(app) {
 	// updates a producer by ID. This id is generally the logged in user.
 	app.put("/api/user/:user/producer", auth.isMe, function(req, res, next) {
 		log.info('about to search database to update details on %s', req.user.name);
-		models.User.findById(req.params.id).select('producerData addressPermission user_type.name').exec(function(err, user) {
+		models.User.findById(req.params.user).select('producerData addressPermission user_type.name').exec(function(err, user) {
 			if (err) return next(err);
 			
 			user.producerData = req.body.producerData;
@@ -1238,7 +1238,7 @@ exports.configAPI = function configAPI(app) {
 		async.waterfall([
 			// look up the user and their membership invoice
 			function(done) {
-				models.User.findById(req.params.id, function(e, user) {
+				models.User.findById(req.params.user, function(e, user) {
 					if (e) done(e);
 					log.info('preparing to delete user %s', user.name);
 					if (user) {
