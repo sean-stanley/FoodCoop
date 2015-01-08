@@ -130,12 +130,12 @@
 	<button type='button' class="btn btn-default" 
 	ng-model="invoice.status" 
 	btn-radio=" 'un-paid' " 
-	ng-click="invoiceSave(invoice)">Un-paid</button>
-	<button type='button' class="btn btn-success" ng-model="invoice.status" btn-radio=" 'PAID' " ng-click="invoiceSave(invoice)">PAID</button>
-	<button type='button' class="btn btn-danger"  ng-model="invoice.status" btn-radio=" 'OVERDUE' " ng-click="invoiceSave(invoice)">OVERDUE</button>
-	<button type='button' class="btn btn-default" ng-model="invoice.status" btn-radio=" 'To Refund' " ng-click="invoiceSave(invoice)">To Refund</button>
-	<button type='button' class="btn btn-default" ng-model="invoice.status" btn-radio=" 'Refunded' " ng-click="invoiceSave(invoice)">Refunded</button>
-	<button type='button' class="btn btn-default" ng-model="invoice.status" btn-radio=" 'CANCELLED' " ng-click="invoiceSave(invoice)">CANCELLED</button>
+	ng-change="invoiceSave(invoice)">Un-paid</button>
+	<button type='button' class="btn btn-success" ng-model="invoice.status" btn-radio=" 'PAID' " ng-change="invoiceSave(invoice)">PAID</button>
+	<button type='button' class="btn btn-danger"  ng-model="invoice.status" btn-radio=" 'OVERDUE' " ng-change="invoiceSave(invoice)">OVERDUE</button>
+	<button type='button' class="btn btn-default" ng-model="invoice.status" btn-radio=" 'To Refund' " ng-change="invoiceSave(invoice)">To Refund</button>
+	<button type='button' class="btn btn-default" ng-model="invoice.status" btn-radio=" 'Refunded' " ng-change="invoiceSave(invoice)">Refunded</button>
+	<button type='button' class="btn btn-default" ng-model="invoice.status" btn-radio=" 'CANCELLED' " ng-change="invoiceSave(invoice)">CANCELLED</button>
 </div>
 <button type='button' class="btn btn-danger" ng-click="invoiceDelete(invoice)"> Delete Invoice</button>
 <hr>

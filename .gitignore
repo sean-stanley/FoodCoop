@@ -6,3 +6,5 @@ build
 app/videos
 app/lib/bower_components
 app/upload
+
+*.rdb

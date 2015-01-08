@@ -166,10 +166,8 @@ InvoiceSchema.virtual('subtotal').get(function () {
 	var total = 0;
 	for (var i = 0; i < this.items.length; i++) {
 		// works for membership invoices
-		console.log(this.items[i]);
 		if (this.items[i].cost) {
 			total += this.items[i].cost;
-			console.log('added cost');
 		}
 		
 		else if (this.items[i].product) {
@@ -179,10 +177,8 @@ InvoiceSchema.virtual('subtotal').get(function () {
 			else {
 				total += this.items[i].product.priceWithMarkup * this.items[i].quantity;
 			}
-			console.log('added product cost');
 		}
 	}
-	console.log(total);
 	return total.toFixed(2);
 });
 
