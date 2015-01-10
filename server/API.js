@@ -256,6 +256,7 @@ exports.configAPI = function configAPI(app) {
 						if (needsSave) {
 							if (product.cycle !== scheduler.currentCycle) {
 								product.cycle = scheduler.currentCycle;
+								product.amountSold = 0;
 								var updatedProduct = product.toObject();
 								delete updatedProduct._id
 								models.Product.create(updatedProduct, function(err) {log.info(err)});
@@ -462,6 +463,7 @@ exports.configAPI = function configAPI(app) {
 				description: req.body.description,
 				certification: req.body.certification,
 				producer_ID: req.user._id,
+				amountSold: 0,
 				cycle: scheduler.currentCycle || -1
 			}, function(err, product) {
 				if (err) log.warn(err);
@@ -1159,16 +1161,12 @@ exports.configAPI = function configAPI(app) {
 		
 	});
 
-	// return a specific user by ID. This call is made by the admin generally when
-	// he is wanting to change permissions of a user.
-	app.get("/api/user/:user", auth.isMe, function(req, res, next) {
-		models.User.findById(req.params.user, function(e, results) {
+	// return a specific user by ID. This call is made for contacting a user as well as by the admin
+	app.get("/api/user/:user", function(req, res, next) {
+		models.User.findById(req.params.user, '-hash -salt', function(e, user) {
 			if (e) return next(e) 
-			if (results) {
-				var userObject = results.toObject();
-				delete userObject.hash;
-				delete userObject.salt;
-				res.json(results);
+			if (user) {
+				res.json(user);
 			}
 			else {
 				res.status(404).end();

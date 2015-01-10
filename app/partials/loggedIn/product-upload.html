@@ -12,7 +12,7 @@
 
 <div class="col-xs-12">
 	<div id="product-upload-preview-column" class="col-sm-5 col-md-4" >
-		<section ng-show="productData.category">
+		<section ng-show="productData.category || productData.img || productData.productName">
 			<h2>Preview <small>Live</small></h2>
 			<div class="product-container center-block" ng-controller="productUICtrl" ng-mouseleave="detailsVisible = false" 
 			style="width:100%; max-width: 430px">

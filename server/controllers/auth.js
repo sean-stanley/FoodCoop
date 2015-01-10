@@ -16,6 +16,6 @@ exports.canSell = function canSell(req, res, next) {
 };
 
 exports.isMe = function isMe(req, res, next) {
-	if (req.user && req.user._id == req.params.user || req.user.user_type.isAdmin) next();
+	if (req.user && req.user._id == req.params.user || req.user && req.user.user_type.isAdmin) next();
 	else res.status(401).end(); 
 };

@@ -358,11 +358,10 @@ angular.module('co-op.controllers', [])
 		
 		$scope.reset = function() {
 			var path = $location.path();
-			// console.log(path);
+			$scope.productData = angular.copy($scope.newProduct);
 			if (path !== '/product-upload') {
 				$location.path('product-upload');
 			}
-			else $scope.productData = angular.copy($scope.newProduct);
 		};
 		
 		$scope.productData = product || angular.copy($scope.newProduct);
