@@ -98,17 +98,17 @@
 
 .wide-sidebar {width: 100%;}
 .narrow-sidebar {width: 320px;}
-.menu-open-wide {margin-left: 100%;}
+.menu-open-wide {margin-left: 0;}
 .menu-open-narrow {margin-left: 320px;}
 .menu-open-right {margin-right: 320px;}
 .right-flag-open {right: 320px;}
 
 @media (min-width: 768px) {
-	.wide-sidebar {width:35%; min-width: 390px;}
-	.narrow-sidebar {width: 20%; min-width: 320px;}
-	.menu-open-wide {margin-left: 35%;}
-	.menu-open-narrow {margin-left: 20%;}
-	.menu-open-right {margin-right: 20%;}
+	.wide-sidebar {width: 390px;}
+	.narrow-sidebar {width: 320px;}
+	.menu-open-wide {margin-left: 390px;}
+	.menu-open-narrow {margin-left: 320px;}
+	.menu-open-right {margin-right: 320px;}
 	
 }
  
