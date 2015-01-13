@@ -21,7 +21,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="i in orders | filter:search | orderBy:predicateP:reverse" ng-class="{'text-disabled' : arrived}">
+					<tr ng-repeat="i in orders | filter:search | orderBy:predicateP:reverse " ng-class="{'text-disabled' : arrived}">
 				        <td data-title="'Date Placed'">
 							<button class="btn btn-primary" ng-click='arrived=!arrived'>Arrived</button>
 						</td>
@@ -46,7 +46,7 @@
 				<tfoot>
 					<tr>
 						<td colspan="5"></td>
-						<td>Total: {{total(orders, 'orderPrice') | currency}}</td>
+						<td>Total: {{total(orders, 'orderPrice', search) | currency}}</td>
 					</tr>
 				</tfoot>
 			</table>
@@ -64,7 +64,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="i in orders | filter:search | orderBy:predicate:reverse" ng-class="{'text-disabled' : collected}">
+					<tr ng-repeat="i in orders | filter:search | orderBy:predicate:reverse " ng-class="{'text-disabled' : collected}">
 				        <td data-title="'Date Placed'">
 							<button class="btn btn-primary" ng-click='collected=!collected'>Collected</button>
 						</td>
@@ -88,7 +88,7 @@
 				<tfoot>
 					<tr>
 						<td colspan="5"></td>
-						<td>Total: {{total(orders, 'orderPriceWithMarkup') | currency}}</td>
+						<td>Total: {{total(orders, 'orderPriceWithMarkup', search) | currency}}</td>
 					</tr>
 				</tfoot>
 			</table>

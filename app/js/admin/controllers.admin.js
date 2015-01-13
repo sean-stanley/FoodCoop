@@ -196,11 +196,14 @@ angular.module('co-op.admin')
 	$scope.predicate = 'customer.name';
 	$scope.orders = orders.getList({cycle: $scope.cycle}).$object;
 	$scope.total = function(orders, property, filter) {
-		var order, total = 0;
-		for (var i=0; i < orders.length; i++) {
-			total += Number(orders[i][property]);
+		var total = 0;
+		
+		if (_.isArray(orders)) {
+			for (var i=0; i < orders.length; i++) {
+				total += Number(orders[i][property]);
+			}
+			return total;
 		}
-		return total;
 	};
 	
 	$scope.$watch('search', function() {
