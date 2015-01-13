@@ -12,3 +12,5 @@ app/upload
 *.rdb
 
 *.rdb
+
+dump.rdb
