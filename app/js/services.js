@@ -404,6 +404,9 @@ angular.module('co-op.services', [])
 					}
 				}
 			}
+			if ($rootScope.canUpload && $rootScope.canShop && $rootScope.canChange) {
+				console.log('WARNING: the co-op is currently running without schedule enforcing');
+			}
 			$rootScope.$broadcast('CALENDAR-LOADED');
 			$rootScope.$broadcast('GET_CART');
 		});
