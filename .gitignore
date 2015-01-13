@@ -8,3 +8,5 @@ app/lib/bower_components
 app/upload
 
 *.rdb
+
+*.rdb

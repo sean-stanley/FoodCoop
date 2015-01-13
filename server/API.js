@@ -258,8 +258,8 @@ exports.configAPI = function configAPI(app) {
 								product.cycle = scheduler.currentCycle;
 								product.amountSold = 0;
 								var updatedProduct = product.toObject();
-								delete updatedProduct._id
-								models.Product.create(updatedProduct, function(err) {log.info(err)});
+								delete updatedProduct._id;
+								models.Product.create(updatedProduct, function(err) {log.info(err);});
 							}
 							else {
 								product.increment();
@@ -363,7 +363,7 @@ exports.configAPI = function configAPI(app) {
 											log.info('changed quantity of %s\'s order to be %s', order.customer.name, order.quantity);
 										
 											order.save(function(err, order) {
-												if (err) return done(err)
+												if (err) return done(err);
 												sendProductChangeAmountEmail(order);
 												if (amountToRemove > 0) done();
 												else done('complete');
@@ -387,7 +387,6 @@ exports.configAPI = function configAPI(app) {
 										// increases in price are ignored
 									} else {
 										product[key] = req.body[key]; // update the product's properties
-										log.info('%s just had it\'s %s changed to %s', product.fullName, key, product[key]);
 										needsSave = true;
 									}
 								}
@@ -437,7 +436,7 @@ exports.configAPI = function configAPI(app) {
 						
 						} else {
 							log.info('Failed to edit product. Current cycle: %s and product cycle: %s', scheduler.currentCycle, product.cycle);
-							res.status(403).send('Only products from this month can be modified right now.')
+							res.status(403).send('Only products from this month can be modified right now.');
 						}
 					});
 				} else res.status(403).send("It's not the right time of the month to upload products");
@@ -713,7 +712,7 @@ exports.configAPI = function configAPI(app) {
 				], 
 				function(err) {
 					log.info(err);
-					next(err)
+					next(err);
 			});
 		} else res.status(403).send("Sorry! It's not the right time of the month to add items to your cart.");
 		
@@ -792,7 +791,7 @@ exports.configAPI = function configAPI(app) {
 							}
 							else {
 								log.info(e);
-								next(err)
+								next(err);
 								callback(e);
 							}
 						});
@@ -808,7 +807,7 @@ exports.configAPI = function configAPI(app) {
 				], function(error) { 
 					log.info(error); 
 					if (error.message === 'you can\'t buy that many. Insufficient quantity available.') res.status(400).send("That product is sold out");
-					else next(err) 
+					else next(err);
 				});
 			} else res.status(403).send("Sorry, you can't try to buy your own products");
 		} else res.status(403).send("It's not shopping time yet");
@@ -905,8 +904,8 @@ exports.configAPI = function configAPI(app) {
 		Message.find().populate('author', 'name').exec(function(err, messages) {
 			if (err) return next(err);
 			res.json(messages);
-		})
-	})
+		});
+	});
 	
 	//Get and return users as JSON data based on a query. Only really used for the
 	//admin to look at all users.
@@ -938,7 +937,7 @@ exports.configAPI = function configAPI(app) {
 			else {
 				res.json(producers);
 			}
-		})
+		});
 	});
 	// This registers a new user and if no error occurs the user is logged in 
 	// A new email is sent to them as well.
@@ -1087,7 +1086,7 @@ exports.configAPI = function configAPI(app) {
 				if ( !_.isEqual(req.body.user_type, userData.user_type) ) {
 					canSell = (req.body.user_type.canSell) ? "can sell products through the co-op website" : "no longer sell products through the co-op website";
 					if (req.body.user_type.name !== userData.user_type.name) {
-						message = 'Your new membership type is ' + req.body.user_type.name + ' member.'
+						message = 'You\'re now a ' + req.body.user_type.name + ' member.';
 					}
 					mailOptions = {template: "user-rights-change", subject: "Your NNFC membership has changed", to: [{name: req.body.name, email: req.body.email}, mail.companyEmail]};
 					mailData = {name: user.name, canSell: canSell, message: message};
@@ -1164,7 +1163,7 @@ exports.configAPI = function configAPI(app) {
 	// return a specific user by ID. This call is made for contacting a user as well as by the admin
 	app.get("/api/user/:user", function(req, res, next) {
 		models.User.findById(req.params.user, '-hash -salt', function(e, user) {
-			if (e) return next(e) 
+			if (e) return next(e);
 			if (user) {
 				res.json(user);
 			}
@@ -1209,7 +1208,7 @@ exports.configAPI = function configAPI(app) {
 
 	// updates a producer by ID. This id is generally the logged in user.
 	app.put("/api/user/:user/producer", auth.isMe, function(req, res, next) {
-		log.info('about to search database to update details on %s', req.user.name);
+		//log.info('about to search database to update details on %s', req.user.name);
 		models.User.findById(req.params.user).select('producerData addressPermission user_type.name').exec(function(err, user) {
 			if (err) return next(err);
 			
@@ -1218,7 +1217,7 @@ exports.configAPI = function configAPI(app) {
 			
 			user.save(function(err, user) {
 				if (err) log.info(err);
-				console.log('user saved!')
+				//console.log('user saved!');
 				//console.log(user.producerData.logo);
 			});
 			
@@ -1633,7 +1632,7 @@ exports.configAPI = function configAPI(app) {
 		calendar.push(scheduler.currentCycle); // 3
 		calendar.push(scheduler.canUpload); // 4
 		calendar.push(scheduler.canShop); // 5
-		calendar.push(scheduler.canChange) // 6
+		calendar.push(scheduler.canChange); // 6
 		delete calendar[0].cycleIncrementDay;
 		delete calendar[1].cycleIncrementDay;
 		delete calendar[2].cycleIncrementDay;

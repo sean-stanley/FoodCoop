@@ -27,7 +27,7 @@ var ProductSchema = new Schema({
 			img: {},
 			category: {type: Schema.ObjectId, required: false, ref: 'Category'},
 			productName: {type: String, required: true},
-			variety: String,
+			variety: {type: String, default: ''},
 			price: {type: Number, required: true},
 			quantity: {type: Number, required: true},
 			units: {type: String, required: true},
@@ -61,8 +61,10 @@ ProductSchema.virtual('fullName').get(function () {
 ProductSchema.pre('save', function(next) {
 	var product=this;
 	var b64reg = /^data:image\/png;base64,/;
+	
 
 	if (b64reg.test(product.img) ) {
+		product.variety = !!product.variety ? product.variety : '';
 		
 		var productName = product.productName.replace(/\.+|\/+|\?+|=+/, "") + "+" + product.variety.replace(/\.+|\/+|\?+|=+/, "");
 		var destination = path.normalize(path.join(__dirname, '../app', 'upload', 'products', productName+"+id-"+product._id+".jpg"));
@@ -70,11 +72,9 @@ ProductSchema.pre('save', function(next) {
 		
 		gm(new Buffer(base64Data, 'base64')).write(destination, function(err) {
 			if (err) return console.log(err);
-			console.log('Yay! successfully wrote new jpeg image');
 		});
 		
 		product.img = path.normalize(path.join('upload', 'products', productName+"+id-"+product._id+".jpg"));
-		console.log(product.img);
 	}
 	next();
 });
