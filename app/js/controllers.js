@@ -612,7 +612,7 @@ function($scope, $modalInstance, data, ProductManager) {
 			$scope.total = 0;
 			if (Object.prototype.toString.call( cart ) === '[object Array]') {
 				for(var i=0; i < cart.length; i++) {
-				$scope.total += (cart[i].unitPriceWithMarkup * cart[i].quantity); 
+					$scope.total += (cart[i].unitPriceWithMarkup * cart[i].quantity); 
 				}
 			}
 			return $scope.total;
@@ -628,10 +628,8 @@ function($scope, $modalInstance, data, ProductManager) {
 
 				// for the store page:
 				$rootScope.$broadcast('CART_IDS', $scope.cartProduct_ids);
-				$scope.cartTotal();
+				$scope.cartTotal($scope.cart);
 			}, err);
-			
-			
 		};
 		
 		// only for the store.html page use of this controller

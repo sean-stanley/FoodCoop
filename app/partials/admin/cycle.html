@@ -2,3 +2,9 @@
 <h1>Cycle #{{cycle}}</h1>
 <p>If something went wrong and the cycle needs to be manually incremented, click the button below.</p>
 <button ng-click="next()" class="btn btn-primary btn-large">Next Cycle</button>
+<hr>
+<h1>Sending Invoices Manually</h1>
+<p>If invoices were not automatically generated for a particular cycle and need to be manually triggered. The safest way to do that is from here.</p>
+<p>Simply click the button below to generate the invoices.</p>
+<alert type="warning">If invoices successfully generated for this cycle do not click this button!</alert>
+<button ng-click="invoice()" class="btn btn-primary btn-large">Invoice members for the current cycle (#{{cycle}})</button>

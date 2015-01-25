@@ -173,6 +173,16 @@ angular.module('co-op.admin')
 				}
 			});
 		};
+		
+		$scope.invoice = function() {
+			$http.post('api/admin/send-invoices', {}).success(function() {
+				flash.setMessage({type: 'success', message:'sending invoices manually'});
+			}).error(function(error) {
+				flash.setMessage({type: 'danger', message: 'Oh no! Something went wrong!'});
+				console.log(error);
+			});
+		};
+		
 	}])
 
 .controller('routeAdminCtrl', ['$scope', 'UserManager', function($scope, UserManager) {

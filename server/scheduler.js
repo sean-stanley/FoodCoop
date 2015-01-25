@@ -44,7 +44,7 @@ function checkConfig() {
 
 	// if the date is between the ShoppingStart date and the ShoppingStop Stop date
 	// double check that canShop is true and canUpload is false;
-	if ( !today.equals(cycle.ShoppingStart) && today.between(cycle.ShoppingStart, cycle.ShoppingStop) ) {
+	if ( !today.equals(cycle.ShoppingStart) && !today.equals(cycle.ShoppingStop) && today.between(cycle.ShoppingStart, cycle.ShoppingStop) ) {
 		console.log('today is between the start of shopping uploading and the end');
 		exports.canShop = true;
 		exports.canChange = true;
@@ -62,7 +62,7 @@ function checkConfig() {
 				switch (cycleDay) {
 				case 'cycleIncrementDay':
 					incrementCycle();
-					//mailChimp.mailSchedule();
+					mailChimp.mailSchedule();
 					break;
 				case 'ProductUploadStart':
 					exports.canUpload = true;
@@ -79,9 +79,9 @@ function checkConfig() {
 				case 'ShoppingStop':
 					exports.canShop = false;
 					// checkout everyone's purchases
-					//checkout();
+					exports.checkout();
 					// send order requests to producers
-					//orderGoods();
+					exports.orderGoods();
 					break;
 				case 'volunteerRecruitment':
 					// send messages asking for sorters and drivers.
@@ -108,7 +108,7 @@ function checkConfig() {
 }
 
 // looks for all the orders of the cycle and groups them by customer
-function checkout() {
+exports.checkout = function () {
 	async.waterfall([
 		function(done) {
 			console.log('beginning checkout process');
@@ -138,7 +138,7 @@ function checkout() {
 			console.log(e);
 		}
 		else {
-			async.each(result, invoiceCustomer, function(error) {
+			async.each(result, exports.invoiceCustomer, function(error) {
 				if (error) console.log(error);
 			});
 		}
@@ -147,8 +147,7 @@ function checkout() {
 
 // called by checkout() for each customer. Creates invoices for customers to pay
 // and emails them a copy
-function invoiceCustomer(customer, callback) {
-	console.log('beginning invoicing of customer ' + customer._id.name);
+exports.invoiceCustomer = function(customer, callback) {
 	async.waterfall([
 		function (done) {
 			var invoice = new models.Invoice({
@@ -181,7 +180,7 @@ function invoiceCustomer(customer, callback) {
 			var mailOptions, mailData, mail;
 			mailOptions = {
 				template: 'shopping-invoice',
-				subject: Date.today().toString("MMM") + ' Shopping Bill for ' + customer._id.name,
+				subject: 'Thank you for shopping locally this ' + Date.today().toString("MMM"),
 				to: {
 					email: customer._id.email,
 					name: customer._id.name
@@ -212,8 +211,10 @@ function invoiceCustomer(customer, callback) {
 			mail.send(function(err, result) {
 				if (err) done(err);
 				// a response is sent so the client request doesn't timeout and get an error.
-				console.log("Message sent to customer " + customer._id.name);
-				done(null);
+				else {
+					console.log("Message sent to customer " + customer._id.name);
+					done(null);
+				}
 			});
 		}
 		
@@ -222,8 +223,7 @@ function invoiceCustomer(customer, callback) {
 	});
 }
 
-function orderGoods() {
-	console.log('orderGoods called');
+exports.orderGoods = function() {
 	async.waterfall([
 		function(done) {
 			models.Order
@@ -260,7 +260,7 @@ function orderGoods() {
 			console.log(e);
 		}
 		else {
-			async.each(result, invoiceFromProducer, function(error) {
+			async.each(result, exports.invoiceFromProducer, function(error) {
 				if (error) console.log(error);
 			});
 		}
@@ -271,8 +271,7 @@ function orderGoods() {
 // be paid. Creates invoices for producers to know what to deliver and emails
 // them a copy of the invoice. This function is for the producer's 
 // convenience and is as a way of invoicing the co-op for orders requested.
-function invoiceFromProducer(producer, callback) {
-	console.log('beginning invoicing of producer ' + producer._id.name);
+exports.invoiceFromProducer = function (producer, callback) {
 	var order, items = [];
 	
 	async.waterfall([
@@ -335,12 +334,12 @@ function invoiceFromProducer(producer, callback) {
 			
 			
 			mail.send(function(err, result) {
-										if (err) done(err);
-										else {
-											console.log("Message sent to producer " + producer._id.name);
-											done(null);
-										}
-									});
+				if (err) done(err);
+				else {
+					console.log("Message sent to producer " + producer._id.name);
+					done(null);
+				}
+			});
 			
 			
 		}
@@ -429,9 +428,9 @@ checkConfig();
 //writeProducerImgToDisk();
 
 // checkout everyone's purchases
-// checkout();
+// exports.checkout();
 // send order requests to producers
-// orderGoods();
+// exports.orderGoods();
 
 // checkOut and orderGoods don't run on initial server launch because exports.currentCycle is undefined by the time they get called. Convenient for now but a more elegant solution should be implemented.
 

@@ -1444,7 +1444,6 @@ exports.configAPI = function configAPI(app) {
 	.post(function(req, res, next) {
 		models.Cycle.findById("orderCycle").exec(function(e, cycle) {
 			if (e) return next(e);
-			
 			if ( cycle && Date.equals(Date.today(), Date.parse(cycle.dateModified).clearTime()) ) res.send("cycle already incremented today");
 			else {
 				models.Cycle.findOneAndUpdate({_id: 'orderCycle'},{ dateModified: Date.now(), $inc: {seq: 1} }, function(err, cycle){
@@ -1455,6 +1454,13 @@ exports.configAPI = function configAPI(app) {
 				});	
 			}
 		});
+	});
+	
+	app.post('/api/admin/send-invoices', auth.isAdmin, function(req, res) {
+		// to do: convert these controller functions to use route error handling.
+		scheduler.checkout();
+		scheduler.orderGoods();
+		res.status(200).end();
 	});
 	
 	// Sends an email for resetting a user's password. Token will expires in 1 hour.

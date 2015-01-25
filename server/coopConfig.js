@@ -64,7 +64,7 @@ exports.cycle = {
 	ShoppingStop		: Date.today().third().monday(),
 	volunteerRecruitment: Date.today().third().wednesday(),
 	PaymentDueDay		: Date.today().fourth().monday(),
-	DeliveryDay			: Date.today().fourth().monday(),
+	DeliveryDay			: Date.today().final().wednesday(),
 };
 
 
