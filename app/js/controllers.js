@@ -352,7 +352,7 @@ angular.module('co-op.controllers', [])
 		$scope.newProduct = {
 			refrigeration: 'none',
 			img: null,
-			priceWithMarkup: this.price * 1.2,
+			priceWithMarkup: this.price * 1.1,
 			price: undefined
 		};
 		
@@ -368,10 +368,10 @@ angular.module('co-op.controllers', [])
 		$scope.selectedImg = $scope.productData.img || null;
 		$scope.productManager = ProductManager;
 		$scope.ingredients = false;
-		//$scope.productData.priceWithMarkup = $scope.productData.price * 1.2;
+		//$scope.productData.priceWithMarkup = $scope.productData.price * 1.1;
 		
 		$scope.$watch('productData.price', function(newValue) {
-			$scope.productData.priceWithMarkup = newValue * 1.2;
+			$scope.productData.priceWithMarkup = newValue * 1.1;
 		});
 		
 		$scope.setCategory = function(categoryId) {

@@ -28,12 +28,12 @@ angular.module('co-op', [
 	
     $routeProvider
 		.when('/', {templateUrl: 'partials/index-content.html', reloadOnSearch: false})
-		.when('/signup', {templateUrl: 'partials/signup.html', controller: 'userCtrl', reloadOnSearch: false, title: 'Signup',
+		.when('/signup', {templateUrl: 'partials/signup/signup.html', controller: 'userCtrl', reloadOnSearch: false, title: 'Signup',
 		description: 'Signup to be a member of the NNFC. Northland\'s first food co-op.'
 		})
-		.when('/welcome', {templateUrl: 'partials/welcome.html', loggedInOnly: true, reloadOnSearch: false, title: 'Welcome New Member'})
+		.when('/welcome', {templateUrl: 'partials/signup/welcome.html', loggedInOnly: true, reloadOnSearch: false, title: 'Welcome New Member'})
 		.when('/apply', {
-			templateUrl: 'partials/producer-application.html', 
+			templateUrl: 'partials/signup/producer-application.html', 
 			controller: 'producerApplicationCtrl', 
 			reloadOnSearch: false,
 			loggedInOnly: true, title: 'Apply to Sell',
@@ -47,10 +47,10 @@ angular.module('co-op', [
 		.when('/terms-cons', {templateUrl: 'partials/legal/terms-cons.html', reloadOnSearch: false, title: 'Terms and Conditions'})
 		.when('/priv-pol', {templateUrl: 'partials/legal/priv-pol.html', reloadOnSearch: false, title: 'Privacy Policy'})
 		.when('/policy', {templateUrl: 'partials/legal/policy.html', reloadOnSearch: false, title: 'Policy Handbook'})
-		.when('/forgot', {templateUrl: 'partials/forgot-password.html', controller: 'forgotCtrl', reloadOnSearch: false, title: 'Forgotten Password'})
+		.when('/forgot', {templateUrl: 'partials/auth/forgot-password.html', controller: 'forgotCtrl', reloadOnSearch: false, title: 'Forgotten Password'})
 		.when('/reset/:token', {
 			controller: 'resetCtrl',
-			templateUrl:'partials/reset-password.html', reloadOnSearch: false,
+			templateUrl:'partials/auth/reset-password.html', reloadOnSearch: false,
 			resolve: {
 				user: function(Restangular, $route) {
 					return Restangular.one('api/reset', $route.current.params.token).get();
@@ -134,11 +134,11 @@ angular.module('co-op', [
 			}
 		})
 	
-    .when('/login', {templateUrl: 'partials/login.html', isLogin: true, reloadOnSearch: false})
-    .when('/must-login', {templateUrl: 'partials/must-login.html', isLogin: true, reloadOnSearch: false, title: 'Must Login'})
-    .when('/login-failed', {templateUrl: 'partials/login-failed.html', reloadOnSearch: false, title: 'Login Failed'})
-    .when('/login-page', {templateUrl: 'partials/login-page.html', reloadOnSearch: false, title: 'Login'})
-    .when('/login-failed/attempts=:tries', {templateUrl: 'partials/login-failed.html', reloadOnSearch: false})
+    .when('/login', {templateUrl: 'partials/auth/login.html', isLogin: true, reloadOnSearch: false})
+    .when('/must-login', {templateUrl: 'partials/auth/must-login.html', isLogin: true, reloadOnSearch: false, title: 'Must Login'})
+    .when('/login-failed', {templateUrl: 'partials/auth/login-failed.html', reloadOnSearch: false, title: 'Login Failed'})
+    .when('/login-page', {templateUrl: 'partials/auth/login-page.html', reloadOnSearch: false, title: 'Login'})
+    .when('/login-failed/attempts=:tries', {templateUrl: 'partials/auth/login-failed.html', reloadOnSearch: false})
     
     // store routes
 	.when('/store', {templateUrl: 'partials/store/store-template.html', controller: 'storeCtrl', reloadOnSearch: false, title: 'Store'})

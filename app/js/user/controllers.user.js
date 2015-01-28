@@ -62,7 +62,7 @@ angular.module('co-op.user')
 	function($scope, $modal, $location) {
 		$scope.open = function(application_type) {
 			var modalInstance = $modal.open({
-				templateUrl: 'partials/signup-form.html',
+				templateUrl: 'partials/signup/signup-form.html',
 				controller: 'userModalCtrl',
 				size: 'md',
 				resolve: {
