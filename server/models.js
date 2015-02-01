@@ -50,7 +50,7 @@ function convertToArray (value) {
 }
 
 ProductSchema.virtual('priceWithMarkup').get(function () {
-	return (this.price * (markup/100 + 1)).toFixed(2);
+	return (this.price * (markup/100 + 1));
 });
 ProductSchema.virtual('fullName').get(function () {
 	if (this.variety) return this.variety + ' ' + this.productName;
