@@ -145,7 +145,7 @@ module.exports = function(grunt) {
 			linode: {
 				options: {
 					src: ["app", "server", "package.json"],
-					dest: "Deploy/foodcoop.org.nz",
+					dest: "Deploy/foodcoop.nz",
 					syncDest: true,
 					args: "-z",
 					host: config.deploy.username + '@' + config.deploy.server
@@ -154,9 +154,9 @@ module.exports = function(grunt) {
 			linodeOpt: {
 				options: {
 					src: ["build/"],
-					dest: "Deploy/foodcoop.org.nz",
+					dest: "Deploy/foodcoop.nz",
 					syncDest: false,
-					args: "-z",
+					args: "-z -v",
 					host: config.deploy.username + '@' + config.deploy.server
 				}
 			},
