@@ -27,7 +27,7 @@
                  <tr>
                      <td>{{item.product.refrigeration}}</td>
 					 <td>{{item.product.fullName}}</td>
-					 <td>${{item.product.priceWithMarkup}} / {{item.product.units}}</td>
+					 <td>${{item.product.priceWithMarkup.toFixed(2)}} / {{item.product.units}}</td>
 					 <td>{{item.quantity}}</td>
                      <td>${{ (item.product.priceWithMarkup * item.quantity).toFixed(2)}}</td>
                  </tr>
@@ -35,13 +35,13 @@
            </tbody>
            <tfoot>
 	             <tr style="display: {{showCredit}}">
-								 <td colspan="6" style="text-align:right"> Subtotal: ${{subtotal}}</td>
+								 <td colspan="6" style="text-align:right"> Subtotal: ${{subtotal.toFixed(2)}}</td>
 							 <tr>
 							 <tr style="display: {{showCredit}}">
 								 <td colspan="6"> CR:{{credit()}}</td>
 							 <tr>
 							 <tr>
-                   <td colspan="6"> Total: ${{total}}</td>
+                   <td colspan="6"> Total: ${{total.toFixed(2)}}</td>
                </tr>
            </tfoot>
        </table>

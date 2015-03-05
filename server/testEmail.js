@@ -10,21 +10,21 @@ function currentTime() {
 	  if (min < 10) {
 		 min = '0' + min.toString();
 	  }
-	  return hour + ":" + min;
+	  return hour + ':' + min;
   }
   
 var currentTimeString = currentTime();
 
 var options = {
-	template: "server-start",
-	subject: "Server up and running",
+	template: 'server-start',
+	subject: 'Server up and running',
 	to: companyEmail
 };
 
 var data = {
-  name: "Sean Stanley",
-  AngularVersion: "1.2.26",
-  expressVersion: "4.9.1",
+  name: 'Sean Stanley',
+  AngularVersion: '1.2.26',
+  expressVersion: '4.9.1',
   currentTime: currentTimeString,
   data: [1, 2, 3, 4, 5]
   };
@@ -38,7 +38,7 @@ serverStart.send(function(err, result) {
   if (err) {
     console.log(err);
   }
-  console.log("Message sent");
+  console.log('Message sent');
 });
 
 

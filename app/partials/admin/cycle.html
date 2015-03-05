@@ -1,10 +1,68 @@
-<div class="col-xs-12 col-sm-8 col-md-6 col-lg-4 col-sm-offset-2 col-md-offset-3 col-lg-offset-4">
-<h1>Cycle #{{cycle}}</h1>
-<p>If something went wrong and the cycle needs to be manually incremented, click the button below.</p>
-<button ng-click="next()" class="btn btn-primary btn-large">Next Cycle</button>
+<div class="col-xs-12">
+	<h1>Cycle #{{currentCycle._id}}</h1>
+<div class="col-sm-3">
+	<ul class="nav nav-pills nav-stacked">
+		<li ng-repeat="cycle in cycles track by cycle._id"><a href="" ng-click="edit($index)">{{cycle._id}}</a></li>
+	</ul>
+</div>
+<div class="col-sm-9">
+	<form class="form-horizontal">
+		<legend>Editing Cycle #{{cycleToEdit._id}}</legend>
+		<div class="form-group">
+			<label for="start" class="col-sm-2 control-label">Start</label>
+			<div class="col-sm-10" ng-controller="adminCalendarCtrl">
+				<input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="cycleToEdit.start" is-open="opened" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" />
+				<span class="input-group-btn">
+					<button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+				</span>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="shoppingStart" class="col-sm-2 control-label">Shopping Start</label>
+			<div class="col-sm-10" ng-controller="adminCalendarCtrl">
+				<input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="cycleToEdit.shoppingStart" is-open="opened" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" />
+				<span class="input-group-btn">
+					<button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+				</span>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="shoppingEnd" class="col-sm-2 control-label">Shopping End</label>
+			<div class="col-sm-10" ng-controller="adminCalendarCtrl">
+				<input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="cycleToEdit.shoppingStop" is-open="opened" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" />
+				<span class="input-group-btn">
+					<button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+				</span>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="deliveryDay" class="col-sm-2 control-label">Delivery Day</label>
+			<div class="col-sm-10" ng-controller="adminCalendarCtrl">
+				<input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="cycleToEdit.deliveryDay" is-open="opened" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" />
+				<span class="input-group-btn">
+					<button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+				</span>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="start" class="col-sm-2 control-label"></label>
+			<div class="col-sm-10">
+				<button class="btn btn-success" ng-click="save(cycleToEdit)">Save as New Cycle</button>
+				<button ng-if="cycleToEdit._id" class="btn btn-info" ng-click="update(cycleToEdit)">Update</button>
+			</div>
+		</div>
+	</form>
+	<article>
+		<h3>IMPORTANT</h3>
+		<p>If you change the shopping period to include today, you must restart the server for the site to know it is shopping day.</p>
+		<p>Other changes will require a browser refresh to take effect.</p>
+</div>
+
+
+
 <hr>
 <h1>Sending Invoices Manually</h1>
 <p>If invoices were not automatically generated for a particular cycle and need to be manually triggered. The safest way to do that is from here.</p>
 <p>Simply click the button below to generate the invoices.</p>
 <alert type="warning">If invoices successfully generated for this cycle do not click this button!</alert>
-<button ng-click="invoice()" class="btn btn-primary btn-large">Invoice members for the current cycle (#{{cycle}})</button>
+<button ng-click="invoice()" class="btn btn-primary btn-large">Invoice members for the current cycle (#{{cycle}})</button></div>

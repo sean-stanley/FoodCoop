@@ -8,9 +8,16 @@
 
 <div class="col-md-6">
 
-<h2>{{month}} Products <div class="btn-group"><a href="/product-upload" class="btn btn-success"><span style="display: inline-block">
+<h2>Products For Sale 
+	<div class="btn-group">
+		<a href="/product-upload" class="btn btn-success">
+			<span style="display: inline-block">
 				+ Product
-			</span></a><button class="btn btn-info" ng-click="getCurrentProducts()"><i class="fa fa-refresh"></i></button></div></h2>
+			</span>
+		</a>
+		<button class="btn btn-info" ng-click="getCurrentProducts()"><i class="fa fa-refresh"></i></button>
+	</div>
+</h2>
 <table class="table">
 <thead>
 	<tr>
@@ -44,22 +51,56 @@
 </table>
 
 <accordion>
-	<accordion-group heading="{{lastMonth}} Products">
+	<accordion-group>
+		<accordion-heading>Past Products <span class="badge" style="margin-left: 10px">{{stats.pastAmount}}</span></accordion-heading>
 		[ <a href="" ng-click="predicate=''">unsorted</a> ]
 		<table class="table">
 			<thead>
 				<tr>
+					<th><a href="" ng-click="predicate = 'cycle.deliveryDay'; reverse=!reverse ">Sale Date</a></th>
 					<th><a href="" ng-click="predicate = 'productName'; reverse=!reverse ">Product</a></th>
 					<th><a href="" ng-click="predicate = 'price'; reverse=!reverse ">Price</a></th>
 					<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Ordered Amount</a></th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="i in recentProducts | orderBy:predicate:reverse " >
-			        <td data-title="'Product'" >
-			             <a ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a>
+				<tr ng-repeat="i in pastProducts | orderBy:predicate:reverse " >
+			        <td data-title="'cycle'" >
+			            {{i.cycle.deliveryDay | shortDate}}
 			        </td>
-	       
+							<td data-title="'Product'" >
+			            <a ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a>
+			        </td>
+			        <td data-title="'Price'">
+			            {{i.price | currency}} / {{i.units}}
+			        </td>
+					<td data-title="'times Ordered'">
+						{{i.amountSold || 0}}
+					</td>
+			    </tr>
+			</tbody>
+		</table>
+	</accordion-group>
+	<accordion-group>
+		<accordion-heading>Future Products <span class="badge" style="margin-left: 10px">{{stats.futureAmount}}</span></accordion-heading>
+		[ <a href="" ng-click="predicate=''">unsorted</a> ]
+		<table class="table">
+			<thead>
+				<tr>
+					<th><a href="" ng-click="predicate = 'cycle.deliveryDay'; reverse=!reverse ">Sale Date</a></th>
+					<th><a href="" ng-click="predicate = 'productName'; reverse=!reverse ">Product</a></th>
+					<th><a href="" ng-click="predicate = 'price'; reverse=!reverse ">Price</a></th>
+					<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Ordered Amount</a></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="i in futureProducts | orderBy:predicate:reverse " >
+			        <td data-title="'cycle'" >
+			            {{i.cycle.deliveryDay | shortDate}}
+			        </td>
+							<td data-title="'Product'" >
+			            <a ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a>
+			        </td>
 			        <td data-title="'Price'">
 			            {{i.price | currency}} / {{i.units}}
 			        </td>
@@ -75,6 +116,7 @@
 		<table class="table">
 			<thead>
 				<tr>
+					<th><a href="" ng-click="predicate = 'cycle.deliveryDay'; reverse=!reverse ">Sale Date</a></th>
 					<th><a href="" ng-click="predicate = 'productName'; reverse=!reverse ">Product</a></th>
 					<th><a href="" ng-click="predicate = 'price'; reverse=!reverse ">Price</a></th>
 					<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Ordered Amount</a></th>
@@ -82,7 +124,10 @@
 			</thead>
 			<tbody>
 				<tr ng-repeat="i in products | orderBy:predicate:reverse " >
-			        <td data-title="'Product'" >
+			        <td data-title="'cycle'" >
+			            {{i.cycle.deliveryDay | shortDate}}
+			        </td>
+							<td data-title="'Product'" >
 			            <a ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a>
 			        </td>
 			        <td data-title="'Price'">
@@ -124,41 +169,9 @@
 			</tr>
 		</tbody>
 	</table>
-	<h4>Total for the month: <strong>{{orderTotal(currentOrders) | currency}}</strong></h4>
+	<h4>Total so far: <strong>{{sortedOrderTotal(sortedOrders) | currency}}</strong></h4>
 	
 	<accordion>
-		<accordion-group heading="Last Month's Orders - Total: {{orderTotal(recentOrders) | currency}}">
-			<table class="table">
-				<thead>
-					<tr>
-						<th><a href="" ng-click="predicate = 'customer.name'; reverse=!reverse ">customer</a></th>
-						<th><a href="" ng-click="predicate = 'product.productName'; reverse=!reverse ">Product</a></th>
-						<th><a href="" ng-click="predicate = 'producerPrice'; reverse=!reverse ">Unit Price</a></th>
-						<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Ordered Amount</a></th>
-						<th><a href="" ng-click="predicate = 'orderPrice'; reverse=!reverse ">Price</a></th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr ng-repeat="i in recentOrders | orderBy:predicate:reverse" >
-				        <td data-title="'Customer'">
-							<a ng-href="/contact/{{i.customer._id}}">{{i.customer.name}}</a>
-						</td>
-						<td data-title="'Product'" >
-				            <a ng-href="/product-upload/{{i.product._id}}">{{i.product.fullName}}</a>
-				        </td>
-				        <td data-title="'Price'">
-				            {{i.unitPrice | currency}} / {{i.product.units}}
-				        </td>
-						<td data-title="'Quantity'">
-							{{i.quantity}}
-						</td>
-						<td data-title="'times Ordered'">
-							{{i.orderPrice | currency}}
-						</td>
-				    </tr>
-				</tbody>
-			</table>
-		</accordion-group>
 		<accordion-group heading="Order History - Total: {{orderTotal(orders) | currency}}">
 			<table class="table">
 				<thead>
@@ -196,5 +209,75 @@
 			</table>
 		</accordion-group>
 	</accordion>
-		
 </div>
+
+<div class="col-md-12">
+	<h1 class="text-center">Your Sale Stats</h1>
+	
+  <form class="form-inline well" role="filter">
+		<legend>Get statistics for certain time period</legend>
+		<div class="form-group" ng-controller="calendarPopupCtrl">
+			<label>Date Start</label>
+			<input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="dateParams.start" is-open="opened" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close"/>
+			<span class="input-group-btn">
+				<button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+			</span>
+		</div>
+		<div class="form-group" ng-controller="calendarPopupCtrl">
+			<label>Date End</label>
+			<input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="dateParams.end" is-open="opened" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close"/>
+			<span class="input-group-btn">
+				<button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+			</span>
+		</div>
+  </form>
+	
+</div>
+
+<div class="col-md-6">
+	<div class="center-block circle-box bg-info">
+		<div class="circle-content">
+			<div>
+				<span>{{stats.currentAmount}}</span>
+			</div>
+		</div>
+	</div>
+	<p class="text-center">Total number of products sold</p>
+	
+	<h3>Product Sale Stats 
+		<span ng-show="dateParams.start">from {{dateParams.start | date: "EEEE dd/MM/yy"}}</span>
+		<span ng-show="dateParams.start && dateParams.end"> and </span>
+		<span ng-show="dateParams.end">before {{dateParams.end | date: "EEEE dd/MM/yy"}}</span>
+	</h3>
+	
+			
+	<h4>Most Popular Product: <strong>{{stats.bestSeller.fullName}} sold {{stats.bestSeller.amountSold}} times</strong></h4>
+	<h4>Highest Earning Product: <strong>{{stats.topEarner.fullName}} earned you {{stats.topEarner.price * stats.topEarner.amountSold | currency }}</strong></h4>
+	<h4>Best sale cycle: <strong>{{stats.bestSellingCycle | date:'MMMM dd yyyy'}}</strong></h4>	
+	
+</div>
+<div class="col-md-6">
+	
+	<div class="center-block circle-box bg-info">
+		<div class="circle-content">
+			<div>
+				<span>{{stats.orderTotal | currency}}</span>
+			</div>
+		</div>
+	</div>
+	<p class="text-center">Total Sold through Co-op</p>
+	
+	<h3>Customer Sale Stats 
+		<span ng-show="dateParams.start">from {{dateParams.start | date: "EEEE dd/MM/yy"}}</span>
+		<span ng-show="dateParams.start && dateParams.end"> and </span>
+		<span ng-show="dateParams.end">before {{dateParams.end | date: "EEEE dd/MM/yy"}}</span>
+	</h3>
+	<h4>Total number of sales: <strong>{{stats.saleAmount}}</strong></h4>
+	<h4>Customer who Ordered Most Often: <strong>{{stats.frequentCustomer}}</strong></h4>
+	<h4>Customer who Spent the Most: <strong>{{stats.valueCustomer}} spent {{stats.maxAmount | currency}}</strong></h4>
+	
+</div>
+<div class="col-md-12">
+	<p class="text-danger">Disclaimer: These statistics are a new feature and may not show completely accurate data for orders before March 2015. Feel free to notify me if you find any problems.</p>
+</div>
+

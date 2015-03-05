@@ -1,9 +1,7 @@
 <div id="calendar-container" ng-controller="calendarCtrl">
 	<h1 class="text-center"><i class="fa fa-calendar" style='font-size:1.5em'></i></h1>
 	<p>
-		<i class="fa fa-cloud-upload fa-fw"></i> Product Uploading: {{inDateRange(countDown[0].ProductUploadStart, countDown[0].ProductUploadStop)}}.<br>
-		<i class="fa fa-shopping-cart fa-fw"></i> Shopping: {{inDateRange(countDown[0].ShoppingStart, countDown[0].ShoppingStop)}}.<br>
-		<i class="fa fa-gift fa-fw"></i> Delivery Day: <span class="label label-default">{{daysBeforeDeliveryDay}}</span> days<br>
-		<span ng-if="daysBeforeDeliveryDay < 1">Next delivery day in {{countDown[1].DeliveryDay.daysUntil}} days</span>
+		<i class="fa fa-shopping-cart fa-fw"></i> Shopping <strong>{{shoppingTime()}}</strong><br>
+		<i class="fa fa-gift fa-fw"></i> Delivery Day is <strong>{{deliveryDayFromNow}}</strong><br>
 	</p>
 </div>

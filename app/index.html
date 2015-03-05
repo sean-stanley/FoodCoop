@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="co-op" class="angular-app" ng-strict-di>
+<html lang="en" ng-app="co-op" class="angular-app">
 <head>
 	<meta charset="utf-8">
+	<!-- <title>NNFC - Northland Natural Food Co-op</title> -->
 	<title ng-bind="$root.page_title + ' - Northland Natural Food Co-op' ">NNFC - Northland Natural Food Co-op</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.00"/>
 	<script type="text/javascript">
@@ -16,6 +17,8 @@
 	    };
 	</script>
 	<meta name="fragment" content="!">
+	
+	<meta name="google-site-verification" content="PWN_NnwZNR-kE040IR0OxaKzqakhtPZeVFDGhrWZ8Yw" />
 	
 	<meta name="description" content="{{page_description}}">
 	
@@ -40,15 +43,15 @@
 	
 	<!-- Google Font -->
 	<link href='https://fonts.googleapis.com/css?family=Raleway:700,500' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" href="css/font-awesome.min.css" type="text/css" media="screen" title="no title" charset="utf-8">
+	<link rel="stylesheet" href="lib/bower_components/font-awesome/css/font-awesome.min.css" type="text/css" media="screen" title="no title" charset="utf-8">
 	
 	<link rel="stylesheet" href="lib/bower_components/angular-loading-bar/build/loading-bar.css" type="text/css">
 	
-	<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link href="css/banner.css" rel="stylesheet" media="screen">
+	<link href="lib/bower_components/textAngular/src/textAngular.css" rel="stylesheet" type="text/css">
+	<link href="lib/bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css">
+	
+	<link href="css/banner.css" rel="stylesheet" media="screen">
 	<link href="css/site.css" rel="stylesheet" type="text/css" media="screen">
-	
-	
 	<link href="css/animations.css" rel="stylesheet">
 	
 	<!--[if lt IE 9]>
@@ -58,15 +61,12 @@
 	
 </head>
 
-<body ng-controller="navCtrl" ng-init="cartPanel = {open: false};"  ng-swipe-right="panelLeftDisplay = true">
+<body ng-controller="navCtrl"  ng-swipe-right="panelLeftDisplay = true">
 	<div ng-cloak="" class='splash text-center'>
 		<h1 style="font-size: 6em">Loading your Co-op</h1>
 		<i class="fa fa-cog fa-spin" style='font-size: 10em'></i>
 	</div>	
-	<div class="sidebar sidebar-left" 
-	ng-swipe-left="panelLeftDisplay = false" 
-	ng-show="panelLeftDisplay" 
-	ng-class="{'wide-sidebar':cartPanel.open, 'narrow-sidebar':!cartPanel.open}" ng-cloak>
+	<div class="sidebar sidebar-left" ng-swipe-left="panelLeftDisplay = false" ng-show="panelLeftDisplay" ng-class="{'wide-sidebar':cartPanel.open, 'narrow-sidebar':!cartPanel.open}" ng-cloak>
 		<div class="sidebar-main">
 			<a href="" class="panel-btn panel-btn-lg close-sidebar-button close-sidebar-button-left" ng-click="panelLeftDisplay = false">&times;</a>
 			<div ng-show="storePage()">
@@ -167,44 +167,31 @@
 	<nav class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container-fluid">
 			<div class="navbar-header" ng-init="mobileMenu = true">
-				<button type="button" 
-				class="navbar-toggle collapsed" 
-				ng-click="mobileMenu = !mobileMenu"
-				data-target="#bs-example-navbar-collapse-1"> 
-					<span class="sr-only">Toggle navigation</span> 
-					<span class="icon-bar"></span> 
-					<span class="icon-bar"></span> 
-					<span class="icon-bar"></span> 
-				</button> 
+				<button type="button" class="navbar-toggle collapsed" ng-click="mobileMenu = !mobileMenu">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
 				<a class="navbar-brand" href="/">NNFC</a>
 				<a class="navbar-brand" ng-click="panelLeftDisplay = !panelLeftDisplay">
 					<small class="hidden-sm hidden-xs"><span class="glyphicon glyphicon-cog"></span> Member Tools</small>
 				</a>
-				<!--
-				<ul class="nav navbar-nav pull-left">
-									<li ng-click="panelLeftDisplay = !panelLeftDisplay">
-										<span class="glyphicon glyphicon-cog"></span> Member Tools</li>
-								</ul>-->
-				
-			</div> 
-			<div class="collapse navbar-collapse" collapse="mobileMenu" ng-touch="mobileMenu = true"> <!-- change ng-touch to ng-click if not working on test site -->
+			</div>
+			<div class="collapse navbar-collapse" collapse="mobileMenu" ng-click="mobileMenu = true">
 				<ul class="nav navbar-nav navbar-right">
 					<li class="hidden-md hidden-lg" ng-if="currentUser == null">
 						<a href="/login-page"><span class="glyphicon glyphicon-lock"></span>Login</a>
 					</li>
-					<li ng-class="{active:isActive('/store')}"><a ng-click="href('/store')" href="store"><span class="glyphicon glyphicon-shopping-cart"></span> Store</a></li>
+					<li ng-class="{active:isActive('/store')}"><a href="/store"><span class="glyphicon glyphicon-shopping-cart"></span> Store</a></li>
 					<li ng-class="{active:isActive('/')}"><a href="/">Home</a></li>
-					<li ng-class="{active:isActive('/signup')}" ng-hide="currentUser != null"><a href="/signup">Sign Up</a></li>
+					<li ng-class="{active:isActive('/signup')}" ng-show="!currentUser"><a href="/signup">Sign Up</a></li>
 					<li ng-class="{active:isActive('/about')}"><a href="/about">About</a></li>
 					<li ng-class="{active:isActive('/faq')}"><a href="/faq">FAQ</a></li>
 					<li ng-class="{active:isActive('/contact')}"><a href="/contact">Contact</a></li>
-					
-					<li class="hidden-sm hidden-xs" ng-if="currentUser == null"><ng-include src=" 'partials/login.html' "></ng-include></li>
-					<li ng-if="currentUser" ng-class="{active:isActive('/me')}">
-						<a href="/me">
-							<span class="glyphicon glyphicon-user"></span>
-						</a>
-					</li>
+
+					<li class="hidden-sm hidden-xs" ng-if="currentUser == null"><ng-include src=" 'partials/auth/login.html' "></ng-include></li>
+					<li ng-if="currentUser" ng-class="{active:isActive('/me')}"><a href="/me"><span class="glyphicon glyphicon-user"></span></a></li>
 				</ul>
 			</div>
 		</div>
@@ -212,11 +199,7 @@
 		
 	<div class="page-wrap">
 	
-	<div 
-	class="visible-sm visible-xs mobile-arrow" 
-	 
-	ng-class="{'mobile-arrow-menu-open': panelLeftDisplay}"
-	ng-show="!panelLeftDisplay">
+	<div class="visible-sm visible-xs mobile-arrow" ng-class="{'mobile-arrow-menu-open': panelLeftDisplay}" ng-show="!panelLeftDisplay">
 		<i class="fa fa-chevron-circle-right fa-3x" ng-click="panelLeftDisplay = true"></i>
 	</div>
 
@@ -271,6 +254,7 @@
 							<li><a  href="https://twitter.com/NorthlandNFC"><i class="fa fa-twitter-square fa-fw fa-2x"></i></a></li>
 							<li><a  href="https://plus.google.com/105941223701197922003" rel="publisher"><i class="fa fa-google-plus-square fa-fw fa-2x"></i></a></li>
 						</ul>
+						<a ng-hide="1" href="https://plus.google.com/105941223701197922003" rel="publisher">Google+</a>
 					</section>
 				</div>
 			</div>
@@ -280,21 +264,20 @@
 		</div>
 	</div>
 	
-	<!-- DateJS -->
-	<script src="lib/bower_components/datejs/date-en-NZ.min.js" type="text/javascript" charset="utf-8"></script>
+	
+	
 	
 	<!-- SocketIO-Client -->
 	<script src="https://cdn.socket.io/socket.io-1.2.1.js"></script>
 
 		
-	<!-- Include all compiled plugins (below), or include individual files as needed -->
-	<!-- universal angular data here -->
+	<!-- Include all compiled plugins (below) -->
+	<script src="lib/aggregated.min.js"></script>
 	
-	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
 	
 	<!-- project-specific angular data here -->
-	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular-animate.min.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular-route.min.js" ></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular-animate.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular-touch.js"></script>
     
 	<!-- food coop files -->
 	<script src="js/app.js"></script>
@@ -310,30 +293,17 @@
 	
 	
     
-	<script src="lib/bower_components/angular-loading-bar/build/loading-bar.min.js"></script>
+
 		
-	<script src="lib/bower_components/angular-bootstrap/ui-bootstrap-tpls.js" type="text/javascript" charset="utf-8"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.compat.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.compat.min.js"></script>
 	<!--lodash: Restangular Dependency-->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/restangular/1.4.0/restangular.min.js"></script>
-	<script src="lib/bower_components/angular-socket-io/socket.min.js"></script>
 	
-	<!-- textAngular -->
-	<script src='https://cdnjs.cloudflare.com/ajax/libs/textAngular/1.2.2/textAngular-sanitize.min.js'></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/textAngular/1.2.2/textAngular.min.js" type="text/javascript" charset="utf-8"></script>
 	
-		<!-- Angulartics for Analytics dependencies -->
-	<script src="lib/bower_components/angulartics/dist/angulartics.min.js" type="text/javascript" charset="utf-8"></script>	
-	<script src="lib/bower_components/angulartics/dist/angulartics-ga.min.js" type="text/javascript" charset="utf-8"></script>
 	
-	<script src="lib/oboe-browser.min.js" type="text/javascript" charset="utf-8"></script>
-	
-	<!-- cropme dependencies -->
 
-<!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular-sanitize.min.js"></script>-->
-<!-- <script src="lib/bower_components/angular-superswipe/superswipe.js"></script> -->
-	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular-touch.js"></script>
-	<script src="lib/bower_components/angular-cropme/cropme.js"></script>
+	
+
 	
 	<!-- Other plugins here -->	
 	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?&libraries=places&sensor=true"></script>
@@ -364,4 +334,4 @@
 <image-preload src="/img/originals/cropped-Agricultural_grass.jpg"></image-preload>
 
 	</body>
-	</html>
+</html>

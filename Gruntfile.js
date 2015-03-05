@@ -6,6 +6,24 @@ var os = require('os');
 var path = require('path');
 var config = require('./server/config').Config;
 
+var bower_components = [
+	'app/lib/bower_components/angular/angular.js',
+	'app/lib/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
+	'app/lib/bower_components/angular-cropme/cropme.js',
+	'app/lib/bower_components/angular-loading-bar/build/loading-bar.js',
+	'app/lib/bower_components/angular-route/angular-route.js',
+	'app/lib/bower_components/angular-sanitize/angular-sanitize.js',
+	'app/lib/bower_components/angular-socket-io/socket.js',
+	'app/lib/bower_components/angulartics/src/angulartics.js',
+	'app/lib/bower_components/angulartics/src/angulartics-ga.js',
+	'app/lib/bower_components/datejs/build/date-en-NZ.js',
+	'app/lib/bower_components/momentjs/moment.js',
+	'app/lib/bower_components/textAngular/dist/textAngular-rangy.min.js',
+	'app/lib/bower_components/textAngular/dist/textAngular-sanitize.min.js',
+	'app/lib/bower_components/textAngular/dist/textAngular.min.js',
+	'app/lib/oboe-browser.min.js'
+];
+
 module.exports = function(grunt) {
         
 	// Project configuration.
@@ -19,10 +37,11 @@ module.exports = function(grunt) {
 			},
 			nodejs: {
 				files: {
-					src: ['*.js', 'server/*.js']
+					src: ['*.js', 'server/*.js', 'server/*/*.js'],
 				},
 				options: {
 					node: true,
+					jasmine: true,
 					globalstrict: false,
 					browser: false
 				}
@@ -74,7 +93,7 @@ module.exports = function(grunt) {
 		},
 		watch: {
 			scripts: {
-				files: ['*.js', 'app/js/*.js', 'app/js/*/*.js', 'test/unit/*.js'],
+				files: ['*.js', 'app/js/*.js', 'app/js/*/*.js', 'test/unit/*.js', '!server/spec/*'],
 				tasks: ['concurrent:continuous'],
 				options: {
 					spawn: false,
@@ -139,7 +158,7 @@ module.exports = function(grunt) {
 		rsync: {
 			options: {
 				args: ["--verbose"],
-				exclude: [".git*","*.scss","node_modules", "app/uploads"],
+				exclude: [".git*","*.scss","node_modules", "app/upload"],
 				recursive: true
 			},
 			linode: {
@@ -204,7 +223,24 @@ module.exports = function(grunt) {
 					'app/js/admin/app.admin.annotated.js',
 					'app/js/admin/controllers.admin.annotated.js',]
 				}
-			}
+			},
+			bowerServer: {
+				options: {
+					mangle: true,
+				},
+				files: {
+					'build/app/lib/aggregated.min.js': bower_components
+				}
+			},
+			bowerDev: {
+				options: {
+					beautify: true,
+				},
+				files: {
+					'app/lib/aggregated.min.js': bower_components
+				}
+			},
+			
 		},
 		replace: {
 			dist: {
@@ -217,10 +253,6 @@ module.exports = function(grunt) {
 						{
 							match: /<script src="js\/.*"><\/script>/g,
 							replacement: ''
-						},
-						{
-							match: /disableCycle();/g,
-							replacement: ''
 						}
 					]
 				},
@@ -230,12 +262,6 @@ module.exports = function(grunt) {
 						flatten: true, 
 						src: ['app/index.html'], 
 						dest: 'build/app'
-					},
-					{
-						expand: true,
-						flatten: true,
-						src: ['server/scheduler.js'],
-						dest: 'build/server'
 					}
 				]
 			}
@@ -243,6 +269,7 @@ module.exports = function(grunt) {
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-jshint');
+	grunt.loadNpmTasks('grunt-contrib-csslint');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-karma');
@@ -257,8 +284,8 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
     
 	// Default task(s).
-	grunt.registerTask('dev', ['concurrent:dev']);
-	grunt.registerTask('build', ['concurrent:build', 'replace', 'clean:annotations', 'ngAnnotate', 'uglify']);
+	grunt.registerTask('dev', ['uglify:bowerDev', 'concurrent:dev']);
+	grunt.registerTask('build', ['concurrent:build', 'replace', 'clean:annotations', 'ngAnnotate', 'uglify:app', 'uglify:bowerServer']);
 	grunt.registerTask('serve-opt', ['build', 'nodemon:opt']);
 	grunt.registerTask('debug', ['concurrent:debug']);
 	grunt.registerTask('deploy-debug', ['rsync:linode', 'shell:updateServer']);
@@ -267,6 +294,6 @@ module.exports = function(grunt) {
 	grunt.registerTask('encrypt-config', ['shell:encryptConfig']);
 	  
 	//Test task.
-	grunt.registerTask('test', ['jshint:nodejs', 'karma:unit']);
+	grunt.registerTask('test', ['jshint:browser', 'karma:unit']);
 	//	grunt.registerTask('test', ['concurrent:test']);
 };

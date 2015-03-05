@@ -3,6 +3,15 @@
 	<h1>Invoices <small>Current Date: {{now | shortDate}}</h1>
 </div>
 
+<div class="jumbotron">
+	<h2>New Feature!</h2>
+	<p>Pay your invoices by credit card with TXTPAY. To get started <a class="btn btn-primary" href="https://www.txtpay.co.nz/VPos/VPos.aspx?merchant=NNFC&type=Payment" target="_blank">Click here</a></p>
+	
+	<p>If you'd like to continue paying by internet banking, that's great and our account number is: <strong>02-1248-0425752-001</strong></p>
+	<p>Powered By <a href="https://txtpay.co.nz"><img src="/img/txtpay-logo-trans.png" height="40" alt="Txtpay Logo Trans"></p>
+</div>
+	
+
 <h3>Search</h3>
 <input type="search" ng-model="searchbar" class="form-control">
 
@@ -64,10 +73,10 @@
 		<tr ng-show="invoice.credit" class="text-right">
 			<td colspan="2"><strong>Subtotal: {{invoice.subtotal | currency}}</strong></td>
 		</tr>
-		<tr ng-show="invoice.credit">
+		<tr ng-show="invoice.credit" class="text-right">
 			<td colspan="2"><strong>CR: {{invoice.credit | currency}}</strong></td>
 		</tr>
-		<tr>
+		<tr class="text-right">
 			<td colspan="2"><strong>Total: {{invoice.total | currency}}</strong></td>
 		</tr>
 	</tfoot>
@@ -92,13 +101,14 @@
 	</thead>
 	<tfoot>
 		<tr ng-show="invoice.credit" class="text-right">
-			<td colspan="2"><strong>Subtotal: {{invoice.subtotal | currency}}</strong></td>
+			<td colspan="4"><strong>Subtotal: {{invoice.subtotal | currency}}</strong></td>
 		</tr>
-		<tr ng-show="invoice.credit">
-			<td colspan="2"><strong>CR: {{invoice.credit | currency}}</strong></td>
+		<tr ng-show="invoice.credit" class="text-right">
+			<td colspan="4"><strong>CR: {{invoice.credit | currency}}</strong></td>
 		</tr>
-		<tr>
-			<td colspan="2"><strong>Total: {{invoice.total | currency}}</strong></td>
+		<tr class="text-right">
+			<td colspan="4"><strong>Total: {{invoice.total | currency}}</strong></td>
+		</tr>
 	</tfoot>
 	<tbody>
 		<tr ng-repeat="item in invoice.items">
@@ -112,7 +122,7 @@
 <table class="table" ng-if="invoice.items[0].product && invoice.toCoop">
 	<thead>
 		<tr>
-			<td colspan="4"><strong>Invoice #{{invoice._id}} {{invoice.title}}</strong></td>
+			<td colspan="5"><strong>Invoice #{{invoice._id}} {{invoice.title}}</strong></td>
 		</tr>
 		<tr>
 			<th><strong>Product</strong></th>
@@ -124,13 +134,14 @@
 	</thead>
 	<tfoot>
 			<tr ng-show="invoice.credit" class="text-right">
-				<td colspan="2"><strong>Subtotal: {{invoice.subtotal | currency}}</strong></td>
+				<td colspan="5"><strong>Subtotal: {{invoice.subtotal | currency}}</strong></td>
 			</tr>
-			<tr ng-show="invoice.credit">
-				<td colspan="2"><strong>CR: {{invoice.credit | currency}}</strong></td>
+			<tr ng-show="invoice.credit" class="text-right">
+				<td colspan="5"><strong>CR: {{invoice.credit | currency}}</strong></td>
 			</tr>
-			<tr>
-				<td colspan="2"><strong>Total: {{invoice.total | currency}}</strong></td>
+			<tr class="text-right">
+				<td colspan="5"><strong>Total: {{invoice.total | currency}}</strong></td>
+			</tr>
 	</tfoot>
 	<tbody>
 		<tr ng-repeat="item in invoice.items">

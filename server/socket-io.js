@@ -21,13 +21,13 @@ var MessageSchema = new schema({
 
 MessageSchema.pre('save', function(next) {
 	var b64reg = /^data:image\/(jpeg|png|gif|tiff|webp);base64,/;
-	//	imgName = 'msg-' + this.title + " " + this.author; 
+	//	imgName = 'msg-' + this.title + ' ' + this.author; 
 	if (b64reg.test(this.img) ) {
 		// var format = b64reg.exec(this.producerData.logo);
-// 		format = "." + format[1];
+// 		format = '.' + format[1];
 // 		if (format === '.jpeg') format = '.jpg';
 //
-		var base64Data = this.img.replace(/^data:image\/(jpeg|png|gif|tiff|webp);base64,/, ""),
+		var base64Data = this.img.replace(/^data:image\/(jpeg|png|gif|tiff|webp);base64,/, ''),
 		//	destination = path.normalize(path.join(__dirname, '../app', 'upload', 'message-board', imgName+format)),
 			buff = new Buffer(base64Data, 'base64');
 		

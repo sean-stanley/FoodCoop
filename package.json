@@ -1,6 +1,6 @@
 {
   "name": "FoodCoop",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "Food Coop",
   "main": "index.js",
   "directories": {
@@ -27,6 +27,7 @@
     "grunt-bunyan": "^0.5.0",
     "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-concat": "^0.5.0",
+    "grunt-contrib-csslint": "^0.4.0",
     "grunt-contrib-uglify": "^0.6.0",
     "grunt-ng-annotate": "^0.4.0",
     "grunt-ngmin": "0.0.3",
@@ -55,7 +56,7 @@
     "express-session": "^1.8.1",
     "geocoder": "^0.2.0",
     "gm": "^1.17.0",
-    "grunt": "~0.4.4",
+    "grunt": "~0.4.5",
     "grunt-concurrent": "^0.5.0",
     "grunt-contrib-copy": "~0.5.0",
     "grunt-contrib-jshint": "~0.10.0",
@@ -68,6 +69,7 @@
     "lodash": "^2.4.1",
     "mailchimp-api": "^2.0.6",
     "method-override": "^2.2.0",
+    "moment": "^2.9.0",
     "mongodb": "^1.4.10",
     "mongojs": "^0.12.1",
     "mongoose": "^3.8.16",
@@ -80,6 +82,7 @@
     "passport-local-mongoose": "^1.0.0",
     "password-reset": "~0.1.4",
     "prerender-node": "latest",
+    "serve-favicon": "^2.2.0",
     "socket.io": "^1.2.1",
     "socket.io-redis": "^0.1.4"
   }

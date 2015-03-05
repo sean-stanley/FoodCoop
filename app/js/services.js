@@ -212,26 +212,26 @@ angular.module('co-op.services', [])
 	
 	// collects and maps category id's with their names. 
 	.factory('ProductManager', ['$http', 'Restangular', '$rootScope', 'flash', function($http, Restangular, $rootScope, flash) {
-        var module, productCategoryPromise, 
+		var module, productCategoryPromise, 
 		categoryIdMapping = {}, 
 		categoryNameMapping = {}, 
 		certificationNameMapping = {},
 		certificationIdMapping = {},
 		unitSuggestions = [];
-        
-        productCategoryPromise = Restangular.all("api/category");
-        
-        // When the categories are all loaded, cache a mapping from 
-        // the id and the name to the object
-        productCategoryPromise.getList().then(function (categories) {
-            var i, category, unit;
+		
+		productCategoryPromise = Restangular.all("api/category");
+		
+		// When the categories are all loaded, cache a mapping from 
+		// the id and the name to the object
+		productCategoryPromise.getList().then(function (categories) {
+			var i, category, unit;
 			categories = categories.plain();
-            for (i in categories) {
-                if (categories.hasOwnProperty(i)) {
-                    category = categories[i];
-                    if (category) {
-                        categoryIdMapping[category._id] = category;
-                        categoryNameMapping[category.name] = category;
+			for (i in categories) {
+				if (categories.hasOwnProperty(i)) {
+					category = categories[i];
+					if (category) {
+						categoryIdMapping[category._id] = category;
+						categoryNameMapping[category.name] = category;
 						for (unit in category.availableUnits) {
 							if (category.availableUnits.hasOwnProperty(unit)) {
 								unitSuggestions.push(category.availableUnits[unit]);
@@ -276,21 +276,9 @@ angular.module('co-op.services', [])
 		module = {
 			registerProduct : function(productData, callback) {
 				var cb = callback || angular.noop, message;
-				if (productData.hasOwnProperty('save')) {
-					message = productData.variety + " " + productData.productName + ' successfully updated';
-					productData.save().then(function(response) {
-						flash.setMessage({type: 'success', 
-						message: message
-						});
-						cb(response);
-					}, failedToUpload);
-				}
-				else Restangular.all('api/product').post(productData).then(function(response) {
-					
-					if (productData.hasOwnProperty('_id')) {
-						message = productData.variety + " " + productData.productName + ' successfully updated';
-					}
-					message = 'Congratulations ' + $rootScope.currentUser.name + '! Your ' + productData.variety + " " + productData.productName + ' was successfully added to the store.';
+				
+				Restangular.all('api/product').post(productData).then(function(response) {
+					message = 'Congratulations ' + $rootScope.currentUser.name + '! Your ' + productData.variety + " " + productData.productName + ' are now added to the store.';
 					flash.setMessage({type: 'success', 
 					message: message
 					});
@@ -307,6 +295,8 @@ angular.module('co-op.services', [])
 				});
 			},
 			
+			cycles: Restangular.all('api/admin/cycle/future').getList().$object,
+			
 			unitSuggestions : unitSuggestions,
 			
 			productCategoryPromise : productCategoryPromise,
@@ -318,7 +308,7 @@ angular.module('co-op.services', [])
 			getUserProducts: function(callback){
 				$http.get("api/product?producer_ID=:currentUser._id");
 			},
-            
+			
 			categoryByID: function (id) {
 				return categoryIdMapping[id];
 			},
@@ -331,12 +321,12 @@ angular.module('co-op.services', [])
 				return certificationIdMapping[id];
 			},
 			
-            certificationByName: function (name) {
-                return certificationNameMapping[name];
-            },
+			certificationByName: function (name) {
+				return certificationNameMapping[name];
+			},
 		};
-        
-        return module;
+
+		return module;
 	}])
 	
 	.factory('ProducerManager', ['Restangular', '$rootScope', 'flash', function(Restangular, $rootScope, flash) {
@@ -378,35 +368,24 @@ angular.module('co-op.services', [])
 		}
 		
 		$http.get('/api/calendar').success(function(result) {
-			module.significantDays = result[0];
-			module.nextMonth = result[1];
-			module.twoMonth = result[2];
-			$rootScope.cycle = result[3];
-			$rootScope.canUpload = result[4];
-			$rootScope.canShop = result[5];
-			$rootScope.canChange = result[6];
+			module.cycle = result.currentCycle;
+			module.nextCycle = result.nextCycle;
+			//module.twoMonth = results.cycles[2];
+			$rootScope.cycle = result.currentCycle._id;
+			$rootScope.deliveryDay = result.currentCycle.deliveryDay;
+			// $rootScope.canUpload = result[4];
+			$rootScope.canShop = result.canShop;
+			// $rootScope.canChange = result[6];
 			
-			module.daysBeforeOrderingStops = daysUntil(module.significantDays.ProductUploadStop);
-			module.daysBeforeDeliveryDay = daysUntil(module.significantDays.DeliveryDay);
+			module.daysBeforeOrderingStops = daysUntil(module.cycle.shoppingStop);
+			module.daysBeforeDeliveryDay = daysUntil(module.cycle.deliveryDay);
 			
-			var key;
-			module.countDown = [];
-			for (var i=0; i < 3; i ++) {
-				module.countDown.push([]);
-				for(key in result[i]) {
-					if (result[i].hasOwnProperty(key)) {
-						module.countDown[i][key] = {
-							string: key.replace(/(?=[A-Z])/g, " $&"),
-							date: Date.parse(result[i][key]).toString("ddd d MMM yyyy"),
-							daysUntil: daysUntil(result[i][key]),
-							future: Date.today().compareTo(Date.parse(result[i][key])) == -1 
-						};
-					}
-				}
-			}
-			if ($rootScope.canUpload && $rootScope.canShop && $rootScope.canChange) {
-				console.log('WARNING: the co-op is currently running without schedule enforcing');
-			}
+			module.calendar = _.groupBy(result.cycles, function(c) {
+				return Date.parse(c.deliveryDay).toString('MMMM'); 
+			});
+			
+			module.cycles = result.cycles;
+			
 			$rootScope.$broadcast('CALENDAR-LOADED');
 			$rootScope.$broadcast('GET_CART');
 		});
@@ -415,13 +394,13 @@ angular.module('co-op.services', [])
 		lastMonthStart = Date.today().addMonths(-1).moveToFirstDayOfMonth();
 						
 		var module = {
-			daysUntil: function(date) {				
+			daysUntil : function(date) {				
 				return daysUntil(date);
 			},
 			// This method filters an array to only contain stuff from the 
 			// current cycle. @group must be an array of objects with a property called
 			// cycle. used for orders mainly
-			currentMonth : function(group, callback) {
+			currentCycle : function(group, callback) {
 				var cb = callback || angular.noop;
 				var list = _.filter(group, function(item) {
 					if (item.hasOwnProperty('cycle') && item.cycle === $rootScope.cycle) {
@@ -434,7 +413,7 @@ angular.module('co-op.services', [])
 			// This method filters an array to only contain stuff from the 
 			// previous cycle. @group must be an array of objects with a property called
 			// cycle. used for orders mainly
-			lastMonth : function(group, callback) {
+			lastCycle : function(group, callback) {
 				var cb = callback || angular.noop;
 				var list = _.filter(group, function(item) {
 					if (item.hasOwnProperty('cycle') && item.cycle === $rootScope.cycle - 1) {
@@ -549,9 +528,6 @@ angular.module('co-op.services', [])
 			},
 			getAllProducts : function(callback) {
 				this.recentProducts = $http.get("/api/product-list").success(callback);
-			},
-			getRecentProducts : function(callback) {
-				this.allProducts = $http.get("/api/product-list/recent").success(callback);
 			}
 		};
 		return module;

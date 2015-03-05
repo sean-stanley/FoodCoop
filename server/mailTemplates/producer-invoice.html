@@ -5,32 +5,31 @@
     <body>
         <p> Hi {{name}},</p>
 		<p>Thank you for selling with the Northland Natural Food Co-op. Local commerce reduces environmental impact and increases Northland's food security. Our customers thank you for sharing your fantastic products with them.</p>
-        <p> Below is a summary of the products you have sold this month, along with the amount you can expect to be paid. Please bring all the products which have been ordered from you to the Woods Centre on delivery day, which is <strong>{{deliveryDay}}</strong> ></p>
+        <p> Below is a summary of the products you have sold this cycle, along with the amount you can expect to be paid. Please bring all the products which have been ordered from you to the Woods Centre on delivery day, which is <strong>{{deliveryDay}}</strong>. If you want to make other arrangements to drop off your goods please contact <a href="mailto:sean@foodcoop.nz">me</a></p>
 		
-       
-       <table border="0" cellspacing="10" cellpadding="10">
-           <thead>
-               <tr>
-                   <th><strong>Invoice #{{code}}</strong></th>
-				   <th colspan="5"></td><strong>{{name}}'s Requested Products</strong></th>
-               </tr>
-               <tr>
-                   <th><strong>Refrigeration</strong></th>
-				   <th><strong>Product</strong></th>
-				   <th><strong>Customer</strong></th>
-				   <th><strong>Unit Price</strong></th>
-				   <th><strong>Quantity</strong></th>
-				   <th><strong>Revenue</strong></th>
-               </tr>
-           </thead>
-           <tbody>
+				<table border="0" cellspacing="10" cellpadding="10">
+				 <thead>
+					 <tr>
+						 <th><strong>Invoice #{{code}}</strong></th>
+						 <th colspan="5"></td><strong>{{name}}'s Requested Products</strong></th>
+					 </tr>
+					 <tr>
+						 <th><strong>Refrigeration</strong></th>
+						 <th><strong>Product</strong></th>
+						 <th><strong>Customer</strong></th>
+						 <th><strong>Unit Price</strong></th>
+						 <th><strong>Quantity</strong></th>
+						 <th><strong>Revenue</strong></th>
+					 </tr>
+				 </thead>
+				 <tbody>
                
 			  <% _.each(items, function(item) { %> 
                  <tr>
                      <td>{{item.product.refrigeration || 'none'}}</td>
 					 <td>{{item.product.fullName}} </td>
 					 <td>{{item.customer.name}}</td>
-					 <td>${{item.product.price}} / {{item.product.units}}</td>
+					 <td>${{item.product.price.toFixed(2)}} / {{item.product.units}}</td>
 					 <td>{{item.quantity}}</td>
                      <td>${{ (item.product.price * item.quantity).toFixed(2)}}</td>
                  </tr>
@@ -38,12 +37,12 @@
            </tbody>
            <tfoot>
              <tr style="display: {{showCredit}}">
-							 <td colspan="6" style="text-align:right"> Subtotal: ${{subtotal}}</td>
+							 <td colspan="6" style="text-align:right"> Subtotal: ${{subtotal.toFixed(2)}}</td>
 						 <tr>
                <tr style="display: {{showCredit}}">
 								 <td colspan="6"> CR: {{credit()}}</td>
 							 <tr>
-                   <td colspan="6"> Total: ${{total}}</td>
+                   <td colspan="6"> Total: ${{total.toFixed(2)}}</td>
                </tr>
            </tfoot>
        </table>
@@ -52,7 +51,7 @@
        
 			
 		<h1>Product Labels</h1>
-		<p>These labels detail which customers purchased each of your products, along with the quantity they have ordered. Some producers like to attach these labels to their products. This is not a requirement. However, we do ask that you keep track of which products belong to which customers, as this makes things much easier for our sorting team on delivery day.</p>
+		<p>These labels detail which customers purchased each of your products, along with the quantity they have ordered. Some producers like to attach these labels to their products. This is not a requirement but mearly a helpful aid for making sure all products are brought in the right quantites for each individual.</p>
 		  <% _.each(items, function(item) { %> 
 			<table style="width: 500px; border: 1px dotted #333;">
                 <tr>
@@ -60,7 +59,7 @@
 						Customer: {{item.customer.name}}
 					</td>
 					<td style="padding: 15px 10px 0 10px">Quantity: <strong>{{item.quantity}}</strong><br/>
-					Total: ${{item.product.priceWithMarkup * item.quantity}}</td>
+					Price: ${{(item.product.priceWithMarkup * item.quantity).toFixed(2)}}</td>
                 </tr>
 				<tr>
 					<td style="padding: 0 10px 15px 10px">Route: {{item.customer.routeTitle}}</td>

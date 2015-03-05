@@ -34,9 +34,9 @@
 	</accordion-group>
 	
 	<accordion-group heading="How do I know when to upload my products?" ng-click="hashFunction('upload-products')" is-open="hash === 'upload-products'">
-		<p>Payment deadlines are marked on our <a href="/calendar">calendar</a>. If we have not received your payment by this date, we will send you a reminder.</p>
-		<h4>Why only have a set time?</h4>
-		<p>A set time for uploading is used to seperate uploading from ordering. It's analogous to the time spent setting up your booth at a farmer's market. If people tried to setup while customers were browsing for products, slow producers might miss out on customers and customers might miss things they want.df</p>
+		<p>You can upload products any time. When you upload a product you pick which Delivery Days to sell that product for. Then your product will appear in the store during the shopping time for that delivery day.</p>
+		<p>For example, if you regularly sell a product, you can upload it once and set it to sell repeatedly for the dates you choose. Alternatively if you expect your animals to be butchered and ready for sale by a certain date, you can upload them significantly in advance.</p>
+		<p>Should you need to make changes to your products, you can make changes on a cycle-per-cycle basis. For example if you regularly sell apples in autumn but then unexpectedly have less available midway through the season, you can edit the apples in the store to reduce the quantity available for each delivery day to represent your reduced crop.</p>
 	</accordion-group>
 
 	<accordion-group heading="What kind of food can I sell?">
@@ -48,22 +48,22 @@
 	</accordion-group>
 	<accordion-group heading="When can I shop?" ng-click="hashFunction('shopping-start')" is-open="hash === 'shopping-start'">
 		<p>Check the <a href="/calendar">calendar</a> on our website to find out what days you can shop. All memebers will receive emails notifying them that ordering is now open.</p>
-		<p>No webpages are restricted outside of shopping time but there will be no products in the store until the producers begin uploading products again.</p>
+		<p>If you don't see many products in the store, check back later as producers may not have uploaded all they plan to sell yet.</p>
 		<h4>Why only have a set time?</h4>
 		<p>A set time for shopping is used because the co-op is technically not a store. We have no inventory and no way to ship orders on our own. We do show you what other producers are selling and facilitate a convenient and efficient distribution system via volunteer sorters and drivers.</p>
 	</accordion-group>
 	<accordion-group heading="After shopping, how long do I have to pay?" ng-click="hashFunction('how-long-to-pay')" is-open="hash === 'how-long-to-pay'">
-		<p>Check the <a href="/calendar">calendar</a> on our website to find out when you must have paid your shopping invoice to us. All memebers who our records have not confirmed as having paid will receive a reminder on this day.</p>
-		<h4>Why can't I pay by credit card?</h4>
-		<p>There is a large number of reasons we don't accept credit cards. The main one being we are trying to keep costs down for the time being. If you'd like a feature for paying directly online please give us that feedback in an <a href="/contact">email</a>.</p>
+		<p>Check the <a href="/calendar">calendar</a> on our website to find out when you must have paid your shopping invoice to us. Ideally we like to have received payment before delivery day so we can pay the producers after they've delivered member's orders.</p>
+		<p>
 	</accordion-group>
 
 	<accordion-group heading="Where do I collect my food once I’ve paid for it?" ng-click="hashFunction('delivery-day')" is-open="hash === 'delivery-day'">
-		<p>Member's orders are collected and sorted on <a href="/calendar">Delivery Day</a>. Delivery day is generally the last Wednesday of every month.</p>
+		<p>Member's orders are collected and sorted on <a href="/calendar">Delivery Day</a>. Delivery day is usually the second and last Wednesday's of each month.</p>
 		
 		<p>If you live in Whangarei, or want to collect your food while you’re in town, you can pick up your order from The Woods (1 Woods Road), in central Whangarei. We are behind Chipmunks. Orders are avaible for collection from 3:00 p.m. onwards on Delivery Day. You can find out when the next Delivery Day is by checking the <a href="/calendar">calendar </a>on our wesite.</p>
 
 		<p>If Whangarei is too far for you to travel, you can pick up your goods from a collection point closer to home. To find out times and places for community collection points, you’ll need to join a <a href="/delivery">delivery route</a>. Please also get in touch with your local Route Manager. Contact details for our Route Managers in communities all over Northland can be found <a href="/delivery">here.</a></p>
+		<p>If there is no delivery route to your area, please feel free to shop anyway and the co-op will arrange your delivery.</p>
 		<br> 
 		<div class="btn-group">
 			<a  class="btn btn-default" ng-href="https://www.google.com/maps/place/2+Woods+Rd,+Whangarei,+0110,+New+Zealand/"><span class="glyphicon glyphicon-map-marker"></span> See Map</a>
@@ -72,13 +72,13 @@
 	</accordion-group>
 	<accordion-group heading="Where do I take the products I’ve sold?">
 
-		<p>Producers should bring the goods their customers have ordered to The Woods, our sorting facility in Central Whangarei. You should also bring a copy of your order list with you, as this makes it much easier for our volunteers to make sure the right customers receive your goods in the right quantities.</p>
+		<p>Producers should bring the goods their customers have ordered to The Woods, our sorting facility in Central Whangarei. You should also make sure your products are labelled with those provided you so as to help us and our vounteers sort orders.</p>
 
 		<p>All goods need to be dropped off at The Woods by 3:00 p.m. on Delivery Day. You can find out when the next Delivery day is by checking the calendar on our wesite.</p>
-		<p>If you wish to make other arrangements to deliver your goods please <a href="/contact">contact us</a> and we'll help you organise transport of your goods.</p>
+		<p>We are open to making other arrangements to deliver your goods. Feel free to <a href="/contact">contact us</a> and we'll help you organise delivery of your goods.</p>
 	</accordion-group>
 	<accordion-group heading="How can I get a refund on a faulty product?" ng-click="hashFunction('refund')" is-open="hash === 'refund'">
-		<p>If you are unsatisfied with the quality of a purchase please <a href="/contact?subject=problem%20with%20product">contact us</a> right away. We will contact the producer and arrange for you to receive a complete refund for that product you purchased.</p>
+		<p>If you are unsatisfied with the quality of a purchase please <a href="/contact?subject=problem%20with%20product">contact us</a> right away. We will contact the producer and negotiate a refund or similar satisfactory solution for you.</p>
 	</accordion-group>
 </accordion>
 </div>

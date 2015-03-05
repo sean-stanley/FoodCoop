@@ -226,6 +226,7 @@ ProducerList Page
 Content Pages
 */
 #cropme-cancel, #cropme-ok { display: none; }
+.cropme {float:none; box-sizing: content-box;}
 .article-img{ margin: 1em; }
 
 /*file upload button*/
@@ -290,6 +291,59 @@ img.certification-img {
 	right:15px;	
 }
 
+.btn-default.selector:active, .btn-default.selector.active {
+	color: #fff;
+	background-color: #2a121f;
+	border-color: #11070c;
+}
+
+.btn-default.selector:hover {
+	color: #fff;
+	background-color: #4d2239;
+	border-color: #3b1a2c;
+}
+
+
+/*	---- Order Manager Page ----	*/
+.input-group-btn {
+	display: inline-block;
+	margin-left: -2px;
+	margin-right: 15px;
+}
+
+.circle-box {
+	position: relative;
+	width: 33%;
+	overflow: hidden;
+	border-radius: 200px;
+}
+
+.circle-box:before{
+	content: "";
+	display: block;
+	padding-top: 100%;
+}
+
+.circle-content{
+    position:  absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+.circle-content div {
+   display: table;
+   width: 100%;
+   height: 100%;
+}
+.circle-content span {
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+		font-size: 250%;
+}
+
+
 /*	---- Producer Application Page ----	*/
 .step {
 	display: inline-block;
@@ -315,6 +369,14 @@ border-radius: 200px;
 
 /* Message Board */ 
 .message {padding-bottom: 10px;}
+
+/* User Profile */ 
+.jumbo-link {
+	color: #ddd;
+}
+.jumbo-link:hover {
+	text-decoration: none;
+}
 
 /* Store */ 
 

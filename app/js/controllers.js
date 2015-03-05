@@ -1,5 +1,5 @@
 'use strict';
-/*global angular, _, Date, oboe*/
+/*global angular, _, Date, oboe, moment*/
 
 /* Controllers */
 
@@ -10,6 +10,8 @@ angular.module('co-op.controllers', [])
 			// init			
 			$scope.predictiveSearch = [];
 			$scope.flash = flash;
+			
+			$scope.cartPanel = {open: false};
 			
 			// Date info for use in the app
 			$scope.today = Date.today().toString("ddd d MMM yyyy");
@@ -336,24 +338,28 @@ angular.module('co-op.controllers', [])
 
 
 // main controller for product upload page
-.controller('productUploadCtrl', ['$scope', '$rootScope', '$modal', '$sce', '$location', 'ProductManager', 'Restangular', 'product', 'flash',
-	function($scope, $rootScope, $modal, $sce, $location, ProductManager, Restangular, product, flash) {
+.controller('productUploadCtrl', ['$scope', '$rootScope', '$sce', '$location', '$modal', 'ProductManager', 'Restangular', 'product', 'flash',
+	function($scope, $rootScope, $sce, $location, $modal, ProductManager, Restangular, product, flash) {
 		// init
+		$scope.productManager = ProductManager;
+		console.log($rootScope.cycle);
 		
 		$scope.$on('CALENDAR-LOADED', function() {
-			if (!$rootScope.canUpload && !$rootScope.canChange) {
-				flash.setMessage({type: 'warning', message: 'Uploading is not allowed yet sorry. Please check the calendar for when uploading is open next.'});
-			}
-			else if ($rootScope.canChange && !$rootScope.canUpload) {
-				flash.setMessage({type: 'warning', message: 'Uploading new products is not allowed right now. This month\'s products can have some properties edited though. Editable properties are enabled.'});
-			}
+			$scope.productData.cycle = $scope.productData.hasOwnProperty('_id') ? $scope.productData.cycle : $rootScope.cycle;
 		});
-		
+			// if (!$rootScope.canUpload && !$rootScope.canChange) {
+// 				flash.setMessage({type: 'warning', message: 'Uploading is not allowed yet sorry. Please check the calendar for when uploading is open next.'});
+// 			}
+// 			else if ($rootScope.canChange && !$rootScope.canUpload) {
+// 				flash.setMessage({type: 'warning', message: 'Uploading new products is not allowed right now. This month\'s products can have some properties edited though. Editable properties are enabled.'});
+// 			}
+			
 		$scope.newProduct = {
 			refrigeration: 'none',
 			img: null,
 			priceWithMarkup: this.price * 1.1,
-			price: undefined
+			price: undefined,
+			producer_ID: $rootScope.currentUser._id
 		};
 		
 		$scope.reset = function() {
@@ -366,17 +372,35 @@ angular.module('co-op.controllers', [])
 		
 		$scope.productData = product || angular.copy($scope.newProduct);
 		$scope.selectedImg = $scope.productData.img || null;
-		$scope.productManager = ProductManager;
+		var originalCycle = (!!product && product.hasOwnProperty('cycle') ) ? product.cycle : undefined;
+		
 		$scope.ingredients = false;
-		//$scope.productData.priceWithMarkup = $scope.productData.price * 1.1;
+		
+		$scope.selectAllCycles = function() {
+			$scope.productData.cycle = [];
+			for (var i = 0; i < ProductManager.cycles.length; i++) {
+				$scope.productData.cycle.push(ProductManager.cycles[i]._id);
+			}
+		};
+		
+		$scope.$watch('multiCycle', function(newValue) {
+			if (!newValue) {
+				$scope.productData.cycle = $scope.productData.hasOwnProperty('_id') ? originalCycle : $rootScope.cycle;
+			} else $scope.productData.cycle = [];
+		});
 		
 		$scope.$watch('productData.price', function(newValue) {
 			$scope.productData.priceWithMarkup = newValue * 1.1;
 		});
 		
-		$scope.setCategory = function(categoryId) {
-			$scope.productData.category = categoryId;
-		};
+		$scope.categoryError = true;
+		$scope.$watch('productData.category', function(newValue) {
+			if (newValue) {
+				$scope.categoryError = false;
+			}
+		});
+		
+		
 
 		var certifications = Restangular.all('api/certification');
 		
@@ -385,20 +409,28 @@ angular.module('co-op.controllers', [])
 				certification[i].plain();
 			}
 			$scope.certifications = certification;
-			$scope.productData.certification = product.certification || $scope.certifications[0]._id;
+			$scope.productData.certification = (product.hasOwnProperty('certification')) ? product.certification : $scope.certifications[0]._id;
 			$scope.certificationImg = function(id) {
 				var el = _.findWhere($scope.certifications, {_id: $scope.productData.certification});
 				return el.img;
 			};
 		});
 
-		$scope.submitForm = function(isValid) {
-			if (isValid) {
+		$scope.save = function(isValid, categoryError) {
+			if (isValid && !categoryError) {
 				$scope.submitted = false;
 				flash.setMessage({type: 'warning', message: 'Beginning upload of '+ $scope.productData.productName});
 				// disable the save button if a product is new or an update of an old month
-				if ($scope.productData._id === undefined || $rootScope.cycle !== $scope.productData.cycle ) {
-					$scope.hideSave = true;
+				
+				// if ($scope.productData._id === undefined ) {
+// 					$scope.hideSave = true;
+// 				}
+				
+				if (_.isArray($scope.productData.cycle) ) {
+					$scope.productData.cycle = _.compact($scope.productData.cycle); // removes false, null, 0 and other falsey values
+					if ($scope.productData.cycle.length === 1) $scope.productData.cycle = $scope.productData.cycle[0];
+				} else {
+					$scope.productData.cycle = $rootScope.cycle;
 				}
 			
 				ProductManager.registerProduct($scope.productData, function(product) {
@@ -406,38 +438,57 @@ angular.module('co-op.controllers', [])
 					$scope.productData = product;
 				});
 			} else $scope.submitted = true;
-			
+			if (categoryError) {
+				flash.setMessage({type:'warning', message: 'Please select a category for your product'});
+			}
 		};
 		
-		$scope.imageChoices = ['image1', 'image2', 'image3'];
-		
-		$scope.open = function() {
-			var modalInstance = $modal.open({
-				templateUrl: 'partials/cropme-modal.html',
-				controller: 'imageModalEditorCtrl',
-				size: 'md',
-				resolve: {
-					data: function() {
-						return $scope.imageChoices;
-					}
-				}
-			});
+		$scope.update = function(isValid, categoryError) {
+			if( _.isArray($scope.productData.cycle) ) {
+				$scope.productData.cycle = _.compact($scope.productData.cycle);
+				if ($scope.productData.cycle.length === 1) $scope.productData.cycle = $scope.productData.cycle[0];
+				else flash.setMessage({type: 'danger', message: 'Sorry! Please select just one delivery date when trying to update a product. Use the "Save" button to upload a product for more than one date at a time.'});
+			}
 			
-			modalInstance.result.then(function (selectedImg) {
-				console.log(selectedImg);
-				var fileURL = URL.createObjectURL(selectedImg);
-				$scope.selectedImg = $sce.trustAsResourceUrl(fileURL);
-				var reader = new window.FileReader();
-				reader.readAsDataURL(selectedImg);
-				reader.onloadend = function() {
-					console.log(reader.result);
-					$scope.productData.img = reader.result;
-				};				
+			if (isValid && !categoryError && !_.isArray($scope.productData.cycle) ) {
 				
-			}, function () {
-				console.log('Modal dismissed at: ' + new Date());
-			});
+				$scope.submitted = false;
+				flash.setMessage({type: 'warning', message: 'Beginning update of '+ $scope.productData.productName});
+				
+				$scope.productData.save().then(function(response) {
+					flash.setMessage({type: 'success', 
+					message: $scope.productData.variety + " " + $scope.productData.productName + ' successfully updated'
+					});
+					$scope.$broadcast('REFRESHCURRENT');
+				}, function(err) {
+					console.log(err);
+					flash.setMessage({type:'danger', message: 'Oops! Something went wrong: ' + err});
+				});
+			} else $scope.submitted = true;
+			if (categoryError) {
+				flash.setMessage({type:'warning', message: 'Please select a category for this product'});
+			}
 		};
+				
+		$scope.crop = function() {
+			$rootScope.$broadcast("cropme:ok");
+		};
+
+		$scope.cancel = function() {
+			$rootScope.$broadcast("cropme:cancel");
+		};
+
+		$scope.$on("cropme:done", function(e, result, canvasEl) {
+			console.log(result.croppedImage);
+			var fileURL = URL.createObjectURL(result.croppedImage);
+			$scope.selectedImg = $sce.trustAsResourceUrl(fileURL);
+			var reader = new window.FileReader();
+			reader.readAsDataURL(result.croppedImage);
+			reader.onloadend = function() {
+				console.log(reader.result);
+				$scope.productData.img = reader.result;
+			};
+		});
 		
 		$scope.preview = function(product) {
 			var modalInstance = $modal.open({
@@ -460,29 +511,6 @@ angular.module('co-op.controllers', [])
 			});
 		};
 		
-	}
-])
-
-.controller('imageModalEditorCtrl', ['$scope', '$modalInstance', 'data', '$rootScope',
-	function($scope, $modalInstance, data, $rootScope) {
-		$scope.imageChoices = data;
-
-		$scope.selected = {
-			image: $scope.imageChoices[0]
-		};
-
-		$scope.ok = function() {
-			$rootScope.$broadcast("cropme:ok");
-		};
-
-		$scope.cancel = function() {
-			$rootScope.$broadcast("cropme:cancel");
-			$modalInstance.dismiss('never mind');
-		};
-
-		$scope.$on("cropme:done", function(e, result, canvasEl) {
-            $modalInstance.close(result.croppedImage);
-		});
 	}
 ])
 
@@ -521,15 +549,11 @@ function($scope, $modalInstance, data, ProductManager) {
 			$scope.currentProducts = result;
 		});
 		
-		ProductHistory.getRecentProducts(function(result) {
-			$scope.lastMonthProducts = result;
-		});
-		
 		ProductHistory.getAllProducts(function(result) {
 			$scope.allProducts = result;
 		});
 
-		$scope.predicate = 'dateUploaded';
+		$scope.predicate = 'cycle';
 
 		$scope.delete = function(idx, id) {
 			var itemToDelete = $scope.currentProducts[idx];
@@ -546,34 +570,45 @@ function($scope, $modalInstance, data, ProductManager) {
 		};
 	}
 ])
-
-.controller('productOrderCtrl', ['$scope', 'myOrders', 'products', 'unfullfilledOrders', 'Calendar', 'ProductHistory', 'ProductManager',
-	function($scope, myOrders, products, unfullfilledOrders, Calendar, ProductHistory, ProductManager) {
+.controller('calendarPopupCtrl', ['$scope', function ($scope) {
+	$scope.format = 'dd/MM/yyyy';
+	
+	$scope.open = function($event) {
+		$event.preventDefault();
+		$event.stopPropagation();
+		$scope.opened = true;
+	};
+}])
+.controller('productOrderCtrl', ['$scope', '$rootScope', 'myOrders', 'products', 'unfullfilledOrders', 'Calendar', 'ProductHistory', 'ProductManager',
+	function($scope, $rootScope, myOrders, products, unfullfilledOrders, Calendar, ProductHistory, ProductManager) {
+		$scope.dateParams = {start: null, end: null};
+		$scope.stats = {};
+		
 		myOrders.getList().then(function(orders) {
 			$scope.orders = orders.plain();
-			
-			Calendar.currentMonth($scope.orders, function(result) {
-				$scope.currentOrders = result;
-			});
-			
-			Calendar.lastMonth($scope.orders, function(result) {
-				$scope.recentOrders = result;
-			});
-						
-			$scope.orderTotal = function(list) {
-				var total = 0;
-				for (var i = 0; i < list.length; i++) {
-					total += list[i].orderPrice ? list[i].orderPrice : list[i].product.price * list[i].quantity;
-				}
-				return total;
-			};			
+			$scope.currentOrders = _.filter($scope.orders, {cycle: $rootScope.cycle});
+			$scope.sortedOrders = unfullfilledOrders.getList().$object;
+			getStats();
 		});
 		
-		$scope.sortedOrders = unfullfilledOrders.getList().$object;
+		$scope.orderTotal = function(list) {
+			if (angular.isArray(list) ) {
+				return _.reduce(list, function(sum, order) {
+					return sum + order.product.price * order.quantity;
+				}, 0);
+			} return 0;
+		};
 		
-		ProductHistory.getRecentProducts(function(products) {
-			$scope.recentProducts = products;
-		});
+		$scope.sortedOrderTotal = function(list) {
+			if (angular.isArray(list)) {
+				return _.reduce(list, function(sum, customer) {
+					var total = _.reduce(customer.orders, function(sum, order) {
+						return sum + order.product.price * order.quantity;
+					}, 0);
+					return sum + total;
+				}, 0);
+			} return 0;
+		};
 		
 		$scope.getCurrentProducts = function() {
 			ProductHistory.getCurrentProducts(function(products) {
@@ -582,8 +617,23 @@ function($scope, $modalInstance, data, ProductManager) {
 		};
 		
 		$scope.getCurrentProducts();
-				
-		$scope.products = products.getList().$object; 
+		
+		products.getList().then(function(result) {
+			 $scope.products = result;
+			 $scope.futureProducts = _.filter($scope.products, function(product) {
+				 return moment($rootScope.deliveryDay).isBefore( moment(product.cycle.deliveryDay) );
+			 });
+			 
+			 $scope.stats.futureAmount = $scope.futureProducts.length;
+			 
+			 $scope.pastProducts = _.filter($scope.products, function(product) {
+			 	return product.cycle === null || moment($rootScope.deliveryDay).isAfter( moment(product.cycle.deliveryDay) ); 
+			 });
+			 
+			 $scope.stats.pastAmount = $scope.pastProducts.length;
+			 getStats();
+			 
+		});
 		
 		$scope.delete = function(idx, id) {
 			var itemToDelete = $scope.currentProducts[idx];
@@ -593,6 +643,113 @@ function($scope, $modalInstance, data, ProductManager) {
 		
 		$scope.lastMonth = Date.today().add(-1).months().toString('MMMM');
 		$scope.predicate = 'product';
+		
+		function getProductStat(array) {
+			if (_.isArray(array) ) {
+				$scope.stats.currentAmount = _.chain(array)
+				.countBy('amountSold')
+				.invert()
+				.reduce().value();
+				
+				console.log(_.countBy(array, 'amountSold'));
+				
+				$scope.stats.bestSeller =  _.max(array, 'amountSold' );
+			
+				$scope.stats.topEarner = _.max(array, function(product) {
+					return product.amountSold * product.price;
+				});
+			
+				var cycleChain = _.chain(array)
+				.groupBy(function(p) {
+					var cycle = moment(p.dateUploaded).format('MMMM D YYYY');
+					if (p.cycle.deliveryDay) cycle = moment(p.cycle.deliveryDay).format('MMMM D YYYY');
+					return cycle;
+				})
+				.mapValues(function(product) {
+					return _.reduce(product, function(sum, p) {
+						var total = p.amountSold*p.price;
+						return sum + total;
+					}, 0);
+				});
+			
+				var topCycle = cycleChain.max().value();
+				$scope.stats.bestSellingCycle = cycleChain.invert().result(topCycle).value();
+			}
+		}
+		
+		function getOrderStat(array) {
+			if (angular.isArray(array)) {
+				$scope.stats.saleAmount = array.length;
+			
+				$scope.stats.orderTotal = _.reduce(array, function(sum, order) {
+					return sum + order.product.price * order.quantity;
+				}, 0);
+				
+				var customerFrequencyChain = _.chain(array)
+				.countBy(function(order) {
+					return order.customer.name;
+				});
+
+				var maxCustomer = customerFrequencyChain.max().value();
+				$scope.stats.frequentCustomer = customerFrequencyChain.invert().result(maxCustomer).value();
+
+				var customerValueChain = _.chain(array)
+				.groupBy(function(k) {
+					return k.customer.name;
+				})
+				.mapValues(function(customer) {
+					return _.reduce(customer, function(total, order) {
+						return total + order.product.price * order.quantity;
+					}, 0);
+				});
+
+				$scope.stats.maxAmount = customerValueChain.max().value();
+				$scope.stats.valueCustomer = customerValueChain.invert().result($scope.stats.maxAmount).value();
+			}
+		}
+	
+		function getStats(start, end) {
+			if (!start && ! end) {
+				getProductStat($scope.products);
+				getOrderStat($scope.orders);
+			} else {
+				var filteredProducts = $scope.products;
+				var filteredOrders = $scope.orders;
+				if (start) {
+					filteredProducts = _.filter(filteredProducts, function(product) {
+						var date = moment(product.dateUploaded);
+						if (product.cycle) date = moment(product.cycle.deliveryDay);
+						return moment(start).isBefore( date );
+					});
+					filteredOrders = _.filter(filteredOrders, function(order) {
+						return moment(start).isBefore( moment(order.datePlaced) );
+					});
+				}
+				if (end) {
+					filteredProducts = _.filter(filteredProducts, function(product) {
+						var date = moment(product.dateUploaded);
+						if (product.cycle) date = moment(product.cycle.deliveryDay);
+						return moment(end).isAfter( date );
+					});
+					
+					filteredOrders = _.filter(filteredOrders, function(order) {
+						return moment(end).isAfter( moment(order.datePlaced) );
+					});
+				}
+				getOrderStat(filteredOrders);
+				getProductStat(filteredProducts);
+			}
+		}
+	
+		$scope.$watch('dateParams.start', function(n) {
+			getStats(n, $scope.dateParams.end);
+		});
+		$scope.$watch('dateParams.end', function(n) {
+			getStats($scope.dateParams.start, n);
+		});
+		
+		
+		
 	}
 ])
 
@@ -749,7 +906,7 @@ function($scope, $modalInstance, data, ProductManager) {
 				
 		$scope.submitForm = function(message) {
 			MailManager.mail($scope.mail);
-			$location.path("/page");
+			$location.path("/store");
 		};
 	}
 ])
@@ -834,33 +991,6 @@ function($scope, $modalInstance, data, ProductManager) {
 				loadProducts(productURL);
 			}
 		});
-		
-		
-		// $http.get('api/product', {params: {cycle: $rootScope.cycle}}).success(function(products){
-// 			console.log(products);
-// 			$scope.products = products;
-// 			console.log($scope.products);
-//
-// 			// deal with all hash and search on product successful load;
-// 			(function() {
-// 				var hashID, product, key, searchObject;
-// 				// if we need to open a product modal
-// 				if ($location.hash()) {
-// 					hashID = $location.hash().split('&id=');
-// 					hashID = hashID[1];
-// 					product = _.findWhere($scope.products, {_id: hashID});
-// 					$scope.open(product);
-// 				}
-// 			}());
-//
-//
-// 			// this will do nothing if the products are loaded before the cart is ready
-// 			// or no user is logged in
-// 			findCartItems();
-//
-// 			$scope.predictiveSearch = _.map($scope.products, 'fullName');
-// 			$rootScope.$broadcast('PREDICTIVE_SEARCH', $scope.predictiveSearch);
-// 		});
 		
 		$scope.searchFor = function(term) {
 			$location.search('search', term);
@@ -1009,42 +1139,46 @@ function($scope, $modalInstance, data, ProductManager) {
 .controller('calendarCtrl', ['$scope', '$rootScope', '$http', 'Calendar',
 	function($scope, $rootScope, $http, Calendar) {
 		$scope.$on('CALENDAR-LOADED', function() {
-			console.log('loaded!');
-			$scope.countDown = Calendar.countDown;
-			$scope.significantDays = Calendar.significantDays;
-			$scope.nextMonth = Calendar.nextMonth;
-			$scope.twoMonth = Calendar.twoMonth;
+			console.log('Calendar loaded!');
+			// $scope.countDown = Calendar.countDown;
+			$scope.calendar = Calendar.calendar;
+			
+			$scope.significantDays = Calendar.cycle;
+			$scope.nextCycle = Calendar.nextCycle;
+			// $scope.twoMonth = Calendar.twoMonth;
 			$scope.daysBeforeOrderingStops = Calendar.daysBeforeOrderingStops;
 			$scope.daysBeforeDeliveryDay = Calendar.daysBeforeDeliveryDay;
-			//$scope.uploadingTime = $scope.inDateRange($scope.countDown[0].ProductUploadStart, $scope.countDown[0].ProductUploadStop);
-			//$scope.shoppingTime = $scope.inDateRange($scope.countDown[0].ShoppingStart, $scope.countDown[0].ShoppingStop);
+			
+			$scope.deliveryDayFromNow = moment(Calendar.cycle.deliveryDay).fromNow();
+			
+			$scope.shoppingTime = function() {
+				// if now is before start then print days until start happens
+				// if now is after start then print days until end happens
+				// if now is after end then print shopping start of next cycle?
+				if ( moment().isBefore(Calendar.cycle.shoppingStart) ) return 'is ' + moment(Calendar.cycle.shoppingStart).fromNow();
+				if ( moment().isBefore(Calendar.cycle.shoppingStop) ) return 'ends ' + moment(Calendar.cycle.shoppingStop).fromNow();
+				if ( moment().isAfter(Calendar.cycle.shoppingStop) ) return 'is ' + moment(Calendar.nextCycle.shoppingStart).fromNow();
+			};
+			
 		});
 		
-		$scope.inDateRange = function (start, end) {
-			var present, future, plural;
-			if (start && start.hasOwnProperty('daysUntil') && start.hasOwnProperty('future') ) {
-				plural = start.daysUntil != 1 ? 's' : '';
-				future = start.future;
-				if (future) return 'starts in '+ start.daysUntil + ' day'+ plural;
-	
-				else {
-					present = end.future;
-					plural = Math.abs(end.daysUntil) != 1 ? 's' : '';
-					if (present) return 'closes in '+ end.daysUntil + ' day'+ plural;
-					else return "is over for this month";//return 'was '+ Math.abs(end.daysUntil) + ' day'+ plural+ " ago";
-				}
-			}
-			return ':-D';
-		};
+		if (Calendar.cycle) {
+			$scope.deliveryDayFromNow = moment(Calendar.cycle.deliveryDay).fromNow();
+			$scope.shoppingTime = function() {
+				// if now is before start then print days until start happens
+				// if now is after start then print days until end happens
+				// if now is after end then print shopping start of next cycle?
+				if ( moment().isBefore(Calendar.cycle.shoppingStart) ) return 'is ' + moment(Calendar.cycle.shoppingStart).fromNow();
+				if ( moment().isBefore(Calendar.cycle.shoppingStop) ) return 'ends ' + moment(Calendar.cycle.shoppingStop).fromNow();
+				if ( moment().isAfter(Calendar.cycle.shoppingStop) ) return 'is ' + moment(Calendar.nextCycle.shoppingStart).fromNow();
+			};
+		}
 		
-		$scope.countDown = Calendar.countDown;
-		$scope.significantDays = Calendar.significantDays;
-		$scope.nextMonth = Calendar.nextMonth;
-		$scope.twoMonth = Calendar.twoMonth;
+		$scope.calendar = Calendar.calendar;
+		$scope.significantDays = Calendar.cycle;
+		$scope.nextCycle = Calendar.nextCycle;
 		$scope.daysBeforeOrderingStops = Calendar.daysBeforeOrderingStops;
 		$scope.daysBeforeDeliveryDay = Calendar.daysBeforeDeliveryDay;
-	//	$scope.uploadingTime = $scope.inDateRange($scope.countDown[0].ProductUploadStart, $scope.countDown[0].ProductUploadStop);
-	//	$scope.shoppingTime = $scope.inDateRange($scope.countDown[0].ShoppingStart, $scope.countDown[0].ShoppingStop);
 		
 	}	
 ]);

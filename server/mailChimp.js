@@ -20,7 +20,7 @@ exports.scheduleCampaign = function () {
 // new function at payment reminder day.
 // find original payment reminder campaign
 // replicate it
-// segment it by users who have unpaid invoices with title[0] = "S"
+// segment it by users who have unpaid invoices with title[0] = 'S'
 // schedule the campaign for today.
 
 // when a new user signs up add him to the Member list
@@ -70,7 +70,7 @@ exports.mailSchedule = function() {
 		// find originals
 		function(done) { 
 			mc.campaigns.list({ filters: { folder_id: '7865'} }, function(originals) {
-				console.log("successfully imported campaigns list.");
+				console.log('successfully imported campaigns list.');
 				var dateTitleMap = {};
 				for (var i = 0; i < originals.data.length; i++) {
 					dateTitleMap[originals.data[i].title] = titleDateMatcher(originals.data[i].title);

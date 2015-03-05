@@ -7,126 +7,95 @@ var config = require('./coopConfig.js'),
 	mongoose = require('mongoose'),
 	ObjectId = require('mongoose').Types.ObjectId, 
 	models = require('./models.js'),
-	fs = require("fs"),
+	fs = require('fs'),
 	_ = require('lodash'),
-	schedule = require("node-schedule"),
-	mailChimp = require("./mailChimp.js");
+	schedule = require('node-schedule'),
+	mailChimp = require('./mailChimp.js');
 	
 	require('datejs');
 	
 var dailyRule = new schedule.RecurrenceRule();
 dailyRule.minute = 0;
 dailyRule.hour = 0;
+
+function checkCycle(date, done) {
+	if (!date) date = Date.today().toISOString();
+	//console.log(date);
 	
-// check for events in the order cycle every day at 1am
-var orderCycleChecker = schedule.scheduleJob({hour:0, minute: 0}, checkConfig);
+	models.Cycle.findOne({
+		start: {$lte: new Date(date).toISOString()},
+		deliveryDay: {$gte: new Date(date).toISOString()}
+	})
+	//.min({start: date}).max({start: Date.today().addMonths(1).toString()})
+	.lean().exec(function(err, cycle) {
+		
+		if (err) {
+			done(new Error('WARNING FAILED TO FIND CYCLE', err));
+			exports.currentCycle = -1;
+		} else if (!cycle) done(new Error('WARNING CYCLE DOES NOT EXIST FOR DATE: ' + new Date(date).toISOString()));
+		else exports.currentCycle = cycle;
+		done(err, cycle);
+	});
+}
+
+exports.checkCycle = checkCycle;
+	
+// check for events in the order cycle every day at 2am
+
+var orderCycleChecker = schedule.scheduleJob({hour:2, minute: 0}, checkConfig);
 
 // schedule emails to send alerting members that it is delivery day.
 // To be executed at 9:15am Wednesday;
 function checkConfig() {
-	console.log(Date() + ". Checking if today is a significant day");
-	var today = Date.today(), cycle = config.cycleReset('today'), key;
+	var today = new Date();
 	
-	findCycle();
-	
-	exports.canShop = false;
-	exports.canUpload = false;
-	exports.canChange = true;
-	
-	// if the date is between the productUploadStart date and the productUpoad Stop date
-	// double check that canShop is false and canUpload is true;
-	if ( !today.equals(cycle.ProductUploadStop) && today.between(cycle.ProductUploadStart, cycle.ProductUploadStop) ) {
-		console.log('today is between the start of product uploading and the end');
-		exports.canShop = false;
-		exports.canChange = false;
-		exports.canUpload = true;
-	}
-
-	// if the date is between the ShoppingStart date and the ShoppingStop Stop date
-	// double check that canShop is true and canUpload is false;
-	if ( !today.equals(cycle.ShoppingStart) && !today.equals(cycle.ShoppingStop) && today.between(cycle.ShoppingStart, cycle.ShoppingStop) ) {
-		console.log('today is between the start of shopping uploading and the end');
-		exports.canShop = true;
-		exports.canChange = true;
-		exports.canUpload = false;
-	}
-
-	// test for an exact day match and run reminder email functions if it is.
-	for (key in cycle) {
-		if (cycle.hasOwnProperty(key) && cycle[key] instanceof Date) {
-			// check if today is a special day
-			if ( today.equals(cycle[key]) ) {
-				console.log('Woohoo! Today is %s day', key);
-				// find what day it is
-				var cycleDay = key;
-				switch (cycleDay) {
-				case 'cycleIncrementDay':
-					incrementCycle();
-					mailChimp.mailSchedule();
-					break;
-				case 'ProductUploadStart':
-					exports.canUpload = true;
-					exports.canChange = false;
-					break;
-				case 'ProductUploadStop':
-					exports.canUpload = false;
-					exports.canChange = true;
-					break;
-				case 'ShoppingStart':
-					exports.canShop = true;
-					exports.canChange = true;
-					break;
-				case 'ShoppingStop':
-					exports.canShop = false;
-					// checkout everyone's purchases
-					exports.checkout();
-					// send order requests to producers
-					exports.orderGoods();
-					break;
-				case 'volunteerRecruitment':
-					// send messages asking for sorters and drivers.
-					break;
-				case 'PaymentDueDay':
-					// send reminders to those with unpaid invoices
-					break;
-				case 'DeliveryDay':
-					exports.canChange = false;
-					// send reminder emails
-					break;
-				case 'testDay':
-					break;
-				default:
-					// no functions to execute for this day
-					return;
-				}
-			}
-			
+	checkCycle(today, function(err, cycle) {
+		if (err) {
+			console.log(err);
 		}
-	}
-
-
+		console.log(Date() + '. Constructing cycle object from DB results');
+		var shoppingStart = Date.parse(cycle.shoppingStart);
+		var shoppingStop = Date.parse(cycle.shoppingStop);
+		var deliveryDay = Date.parse(cycle.deliveryDay);
+		
+		exports.canShop = false;
+		
+		if ( today.equals( shoppingStart ) || today.between( shoppingStart, shoppingStop) ) {
+			console.log('today is a shopping day');
+			exports.canShop = true;
+		} else if (today.equals(cycle.shoppingStop) ) {
+			console.log('Today everyone is invoiced');
+			// checkout everyone's purchases
+			exports.checkout();
+			// send order requests to producers
+			exports.orderGoods();
+		} else if (today.equals(deliveryDay) ) {
+			console.log('Today is Delivery Day!');
+		}
+		
+	});
 }
-
-// looks for all the orders of the cycle and groups them by customer
+exports.checkConfig = checkConfig;
+	
 exports.checkout = function () {
 	async.waterfall([
 		function(done) {
 			console.log('beginning checkout process');
 			models.Order
 			.aggregate()
-			.match({cycle: exports.currentCycle})
-			.group({ _id: "$customer", orders: { $push : {product: "$product", quantity: "$quantity"} }})
+			.match({cycle: exports.currentCycle._id})
+			.group({ _id: '$customer', orders: { $push : {product: '$product', quantity: '$quantity'} }})
 			.exec(function(e, customers) {
 				// customers is a plain javascript object not a special mongoose document.
 				done(e, customers);
 			});
 		},
-		function(customers, done) {
-			models.Product.populate(customers, {path: 'orders.product', select: 'fullName variety productName priceWithMarkup price units refrigeration'}
-			, function(e, result){
-				done(null, result);
-			});
-		},
+		// function(customers, done) {
+// 			models.Product.populate(customers, {path: 'orders.product', select: 'fullName variety productName priceWithMarkup price units refrigeration'}
+// 			, function(e, result){
+// 				done(null, result);
+// 			});
+// 		},
 		function(customers, done) {
 			models.User.populate(customers, {path: '_id', select: 'name email routeTitle balance user_type.name'}
 			, function(e, result){
@@ -143,7 +112,7 @@ exports.checkout = function () {
 			});
 		}
 	});
-}
+};
 
 // called by checkout() for each customer. Creates invoices for customers to pay
 // and emails them a copy
@@ -151,12 +120,12 @@ exports.invoiceCustomer = function(customer, callback) {
 	async.waterfall([
 		function (done) {
 			var invoice = new models.Invoice({
-				dueDate: config.cycle.PaymentDueDay.toString(),
+				dueDate: Date.parse(exports.currentCycle.shoppingStop).addDays(7).toString(),
 				invoicee: customer._id._id,
-				title: "Shopping Order for " + Date.today().toString("MMMM"),
+				title: 'Shopping Order for ' + Date.today().toString('MMMM'),
 				items: customer.orders,
-				cycle: exports.currentCycle,
-				deliveryRoute: customer._id.routeTitle || "Whangarei"
+				cycle: exports.currentCycle._id,
+				deliveryRoute: customer._id.routeTitle || 'Whangarei'
 			});
 			
 			if (customer._id.user_type.name === 'Customer' && customer._id.balance) {
@@ -180,7 +149,7 @@ exports.invoiceCustomer = function(customer, callback) {
 			var mailOptions, mailData, mail;
 			mailOptions = {
 				template: 'shopping-invoice',
-				subject: 'Thank you for shopping locally this ' + Date.today().toString("MMM"),
+				subject: 'Thank you for shopping locally this ' + Date.today().toString('MMM'),
 				to: {
 					email: customer._id.email,
 					name: customer._id.name
@@ -192,13 +161,13 @@ exports.invoiceCustomer = function(customer, callback) {
 			
 			mailData = {
 				name: customer._id.name,
-				dueDate: invoice.dueDate.toString("ddd dd MMMM yyyy"),
+				dueDate: Date.parse(exports.currentCycle.shoppingStop).addDays(5).toString('ddd dd MMMM yyyy'),
 				code: invoice._id,
-				items: customer.orders,
+				items: invoice.items,
 				showCredit: showCredit,
 				credit: function() {
 					if (invoice.credit >= 0) return '$' + invoice.credit.toFixed(2);
-					else return "-" + '$' + Math.abs(invoice.credit).toFixed(2);
+					else if(invoice.credit < 0) return '-' + '$' + Math.abs(invoice.credit).toFixed(2);
 				},
 				subtotal: invoice.subtotal,
 				total: invoice.total,
@@ -212,7 +181,7 @@ exports.invoiceCustomer = function(customer, callback) {
 				if (err) done(err);
 				// a response is sent so the client request doesn't timeout and get an error.
 				else {
-					console.log("Message sent to customer " + customer._id.name);
+					console.log('Message sent to customer ' + customer._id.name);
 					done(null);
 				}
 			});
@@ -221,36 +190,36 @@ exports.invoiceCustomer = function(customer, callback) {
 	], function(error) {
 		callback(error);
 	});
-}
+};
 
 exports.orderGoods = function() {
 	async.waterfall([
 		function(done) {
 			models.Order
 			.aggregate()
-			.match({cycle: exports.currentCycle})
-			.group({ _id: "$supplier", orders: { $push : {product: "$product", customer: '$customer', quantity: "$quantity"} }})
+			.match({cycle: exports.currentCycle._id})
+			.group({ _id: '$supplier', orders: { $push : {product: '$product', customer: '$customer', quantity: '$quantity'} }})
 			
 			.exec(function(e, producers) {
 				// producers is a plain javascript document not a special mongoose document.
 				done(e, producers);
 			});
 		},
+		//function(producers, done) {
+			// models.Product.populate(producers, {path: 'orders.product', select: 'fullName variety productName price units refrigeration'}
+// 			, function(e, result){
+//
+// 				_.map(result, function(producer) {
+// 					producer.orders = _.sortBy(producer.orders, function(order) {
+// 						return order.product.fullName.toLowerCase();
+// 					});
+// 					return producer;
+// 				});
+// 				done(null, result);
+// 			});
+// 		},
 		function(producers, done) {
-			models.Product.populate(producers, {path: 'orders.product', select: 'fullName variety productName price units refrigeration'}
-			, function(e, result){
-				
-				_.map(result, function(producer) {
-					producer.orders = _.sortBy(producer.orders, function(order) {
-						return order.product.fullName.toLowerCase();
-					});
-					return producer;
-				});
-				done(null, result);
-			});
-		},
-		function(producers, done) {
-			models.User.populate(producers, [{path: '_id', select: 'name email producerData.bankAccount balance'}, {path: 'orders.customer', select: 'name email routeTitle balance'}]
+			models.User.populate(producers, {path: '_id', select: 'name email producerData.bankAccount balance'}
 			, function(e, result){
 				done(null, result);
 			});
@@ -265,7 +234,7 @@ exports.orderGoods = function() {
 			});
 		}
 	});
-}
+};
 
 // called by orderGoods() for each customer. Creates invoices for producers to
 // be paid. Creates invoices for producers to know what to deliver and emails
@@ -277,13 +246,13 @@ exports.invoiceFromProducer = function (producer, callback) {
 	async.waterfall([
 		function(done) {
 			var invoice = new models.Invoice({
-				dueDate: config.cycle.DeliveryDay.addDays(4).toString("ddd dd MMMM yyyy"),
+				dueDate: Date.parse(exports.currentCycle.deliveryDay).addDays(4).toString('ddd dd MMMM yyyy'),
 				invoicee: producer._id._id,
-				title: "Products Requested for " + Date.today().toString("MMMM"),
+				title: 'Products Requested for ' + Date.today().toString('MMMM'),
 				items: producer.orders,
-				cycle: exports.currentCycle,
+				cycle: exports.currentCycle._id,
 				toCoop: true,
-				bankAccount: producer._id.producerData.bankAccount || "NO ACCOUNT ON RECORD"
+				bankAccount: producer._id.producerData.bankAccount || 'NO ACCOUNT ON RECORD'
 			});
 			
 			if (producer._id.balance) {
@@ -296,7 +265,8 @@ exports.invoiceFromProducer = function (producer, callback) {
 			});
 		},
 		function(invoice, done) {
-			invoice.populate('items.product', 'price priceWithMarkup', function(e, invoice) {
+			invoice.populate('items.customer', 'name email routeTitle balance').populate('items.product', 'fullName variety productName price units refrigeration',
+			 function(e, invoice) {
 				if (e) return done(e);
 				done(null, invoice);
 			});
@@ -305,7 +275,7 @@ exports.invoiceFromProducer = function (producer, callback) {
 			var mailOptions, mailData, mail;
 			mailOptions = {
 				template: 'producer-invoice',
-				subject: Date.today().toString("MMMM") + ' Products Requested for ' + config.coopName,
+				subject: Date.today().toString('MMMM') + ' Products Requested for ' + config.coopName,
 				to: {
 					email: producer._id.email,
 					name: producer._id.name
@@ -316,14 +286,14 @@ exports.invoiceFromProducer = function (producer, callback) {
 			
 			mailData = {
 				name: producer._id.name,
-				dueDate: invoice.dueDate.toString("ddd dd MMMM yyyy"),
-				deliveryDay: config.cycle.DeliveryDay.toString("ddd dd MMMM yyyy"),
+				dueDate: Date.parse(exports.currentCycle.deliveryDay).addDays(4).toString('ddd dd MMMM yyyy'),
+				deliveryDay: Date.parse(exports.currentCycle.deliveryDay).toString('ddd dd MMMM yyyy'),
 				code: invoice._id,
-				items: producer.orders,
+				items: invoice.items,
 				showCredit: showCredit,
 				credit: function() {
-					if ( invoice.credit*-1 >= 0) return '$' + Math.abs(invoice.credit).toFixed(2);
-					else return "-" + '$' + Math.abs(invoice.credit).toFixed(2);
+					if (invoice.credit >= 0) return '$' + invoice.credit.toFixed(2);
+					else if(invoice.credit < 0) return '-' + '$' + Math.abs(invoice.credit).toFixed(2);
 				},
 				subtotal: invoice.subtotal,
 				total: invoice.total,
@@ -336,102 +306,53 @@ exports.invoiceFromProducer = function (producer, callback) {
 			mail.send(function(err, result) {
 				if (err) done(err);
 				else {
-					console.log("Message sent to producer " + producer._id.name);
+					console.log('Message sent to producer ' + producer._id.name);
 					done(null);
 				}
 			});
-			
-			
 		}
 		
 	],function(error) {
 		callback(error);
 	});
-}
-
-// increment the number of cycles by 1 and set the ID to the total +1 (just like with invoices);
-// use Cycle number 0 for testing stuff
-function incrementCycle() {
-	models.Cycle.findById("orderCycle").exec(function(e, cycle) {
-		if (e) console.log(e);
-		else {
-			if ( cycle && Date.equals(Date.today(), Date.parse(cycle.dateModified).clearTime()) ) console.log("cycle already incremented today");
-			else {
-				models.Cycle.findOneAndUpdate({_id: 'orderCycle'},{ dateModified: Date.now(), $inc: {seq: 1} }, function(err, cycle){
-					console.log(cycle);
-					if (!err) {
-						config.cycleReset('today');
-						exports.currentCycle = cycle.seq;
-					}
-					else console.log(err);
-				});	
-			}
-		}
-	});
-}
-
-function findCycle(callback) {
-	models.Cycle.findById('orderCycle', function(e, cycle) {
-		if (e) {
-			console.log(e);
-			// Set the CurrentCycle to Something Even if Looking up the Cycle Goes Wrong. That way any Data Created During This Time can be Saved and Changed to the Correct Cycle Later.
-			exports.currentCycle = -1; 
-		} else {
-			exports.currentCycle = cycle.seq;
-			console.log("the current cycle is #" + exports.currentCycle);
-			if (callback) callback();
-		}
-	});
-}
+};
 
 function disableCycle() {
 	exports.canShop = true;
-	exports.canUpload = true;
-	exports.canChange = true;
 }
 
 
-function writeProductImgToDisk() {
-	models.Product.find({}, null, function(err, products){
-		console.log(err);
-		async.each(products, function(product, done) {
-			product.save(function(err) {
-				if (err) return done(err);
-				done();
-			});
-		}, function(err) {
-			console.log(err);
-		});
-		
-	});
-}
-
-function writeProducerImgToDisk() {
-	models.User.find({'user_type.name':'Producer'}, null, function(err, users){
-		console.log(err);
-		async.each(users, function(user, done) {
-			user.save(function(err) {
-				if (err) return done(err);
-				done();
-			});
-		}, function(err) {
-			console.log(err);
-		});
-	});
-}
-
-exports.findCycle = findCycle;
+// function writeProductImgToDisk() {
+// 	models.Product.find({}, null, function(err, products){
+// 		console.log(err);
+// 		async.each(products, function(product, done) {
+// 			product.save(function(err) {
+// 				if (err) return done(err);
+// 				done();
+// 			});
+// 		}, function(err) {
+// 			console.log(err);
+// 		});
+//
+// 	});
+// }
+//
+// function writeProducerImgToDisk() {
+// 	models.User.find({'user_type.name':'Producer'}, null, function(err, users){
+// 		console.log(err);
+// 		async.each(users, function(user, done) {
+// 			user.save(function(err) {
+// 				if (err) return done(err);
+// 				done();
+// 			});
+// 		}, function(err) {
+// 			console.log(err);
+// 		});
+// 	});
+// }
 
 checkConfig();
 //disableCycle();
-//writeProductImgToDisk();
-//writeProducerImgToDisk();
 
-// checkout everyone's purchases
-// exports.checkout();
-// send order requests to producers
-// exports.orderGoods();
-
-// checkOut and orderGoods don't run on initial server launch because exports.currentCycle is undefined by the time they get called. Convenient for now but a more elegant solution should be implemented.
 
 

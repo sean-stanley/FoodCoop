@@ -1,3 +1,17 @@
+<div class="row bg-primary">
+	<div ng-class="{'col-sm-3': currentUser.user_type.canSell, 'col-sm-6': !currentUser.user_type.canSell}">
+		<a href="my-cart" class="text-center jumbo-link"><h3 class="text-center"><i class="fa fa-shopping-cart fa-4x"></i><span class="badge">{{cartTally}}</span><small><br>Cart</small></h3></a>
+	</div>
+	<div ng-class="{'col-sm-3': currentUser.user_type.canSell, 'col-sm-6': !currentUser.user_type.canSell}">
+		<a href="message-board" class="text-center jumbo-link"><h3 class="text-center"><i class="fa fa-envelope-o fa-4x"></i><small><br>Message Board</small></h3></a>
+	</div>
+	<div class="col-sm-3" ng-show="currentUser.user_type.canSell">
+		<a href="product-manager" class="text-center jumbo-link"><h3 class="text-center"><i class="fa fa-home fa-4x"></i><small><br>My Products</small></h3></a>
+	</div>
+	<div class="col-sm-3" ng-show="currentUser.user_type.canSell">
+		<a href="product-upload" class="text-center jumbo-link"><h3 class="text-center"><i class="fa fa-cloud-upload fa-4x"></i><small><br>Upload Product</small></h3></a>
+	</div>
+</div>
 <div class="col-md-12">
 	<div class="page-header">
 		<h1 ng-controller="logoutCtrl">
@@ -6,6 +20,8 @@
 		</h1>
 		<h3 ng-show="currentUser.balance">Account Balance: {{currentUser.balance | currency}}</h3>
 	</div>
+	
+	
 	
 
 <form name="editMe" novalidate ng-class="{'col-sm-4': currentUser.user_type.name === 'Producer', 'col-sm-12': currentUser.user_type.name === 'Customer'}">
@@ -104,7 +120,7 @@
 						<div>
 							<p class="text-muted" ng-if="currentUser.producerData.logo">Drop a new photo here</p>
 							<p class="text-muted" ng-if="!currentUser.producerData.logo">Drop a photo here</p>
-								<h1 class="text-muted"><span class="glyphicon glyphicon-cloud-upload"></span></h1>
+								<h1 class="text-muted"><i class="fa fa-cloud-upload"></i></h1>
 							<span class="btn btn-default btn-sm upload">
 								<input type="file" class="opacity" 
 								fileread="currentUser.producerData.logo" 

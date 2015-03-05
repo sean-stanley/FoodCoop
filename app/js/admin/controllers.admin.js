@@ -155,22 +155,50 @@ angular.module('co-op.admin')
 		};
 	}
 ])
-
+.controller('adminCalendarCtrl', ['$scope', function ($scope) {
+	$scope.format = 'EEEE MMMM dd yyyy Z';
+	
+	$scope.open = function($event) {
+		$event.preventDefault();
+		$event.stopPropagation();
+		$scope.opened = true;
+	};
+}])
 // admin cycle control
-.controller('cycleCtrl', ['$scope', '$http', 'flash', 'cycle',
-	function($scope, $http, flash, cycle){
-		$scope.cycle = cycle.data;
-		console.log(cycle.data);
+.controller('cycleCtrl', ['$scope', 'Restangular', '$http', 'flash', 'Calendar',
+	function($scope, Restangular, $http, flash, Calendar){
 		
-		$scope.next = function() {
-			$http.post('api/admin/cycle', {}).success(function(cycle) {
+		$http.get('/api/admin/cycle').success(function(cycles) {
+			$scope.cycles = cycles;
+		});
+				
+		$scope.$on('CALENDAR-LOADED', function() {
+			$scope.currentCycle = Calendar.cycle;
+		});
+		
+		$scope.cycleToEdit = {};
+		
+		$scope.edit = function(index) {
+			$scope.cycleToEdit = $scope.cycles[index];
+		};
+		
+		$scope.save = function(cycle) {
+			$http.post('/api/admin/cycle/', cycle).success(function(cycle) {
 				console.log(cycle);
-				if (!isNaN(cycle)) {
-					$scope.cycle = cycle;
-				}
-				else {
-					flash.setMessage({type:'warning', message: cycle});
-				}
+				flash.setMessage({type: 'success', message: 'Yay! Cycle '+ cycle._id + ' was created'});
+			}).error(function(err) {
+				console.log(err);
+				flash.setMessage({type: 'danger', message: 'Drat! Something went wrong: '+ err.data || err});
+			});
+		};
+		
+		$scope.update = function(cycle) {
+			$http.put('/api/admin/cycle/' + cycle._id, cycle).success(function(cycle) {
+				flash.setMessage({type: 'success', message: 'Yay! Cycle '+ cycle._id + ' was updated'});
+				console.log(cycle);
+			}).error(function(err) {
+				console.log(err);
+				flash.setMessage({type: 'danger', message: 'Drat! Something went wrong: '+ err.data || err});
 			});
 		};
 		
@@ -189,9 +217,9 @@ angular.module('co-op.admin')
 	$scope.ruralUsers = UserManager.users.all('route').getList().$object;
 }])
 
-.controller('orderAdminCtrl', ['$scope', 'orders', function($scope, orders) {
+.controller('orderAdminCtrl', ['$scope', '$rootScope', 'orders', function($scope, $rootScope, orders) {
 	
-	$scope.cycle = 4;
+	$scope.cycle = $rootScope.cycle || 12;
 	
 	$scope.next = function() {
 		$scope.cycle += 1;

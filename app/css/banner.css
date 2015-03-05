@@ -1,3 +1,10 @@
+#slideCow {background: url('/img/slides/raw-milk-sm.jpg') no-repeat center center fixed; 
+-webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
 #slide1 {background: url('/img/cheese-wine-meat-sm.jpg') no-repeat center center fixed; 
 -webkit-background-size: cover;
   -moz-background-size: cover;
@@ -30,6 +37,13 @@
 }
 
 @media (min-width: 769px) {
+	#slideCow {background: url('/img/slides/raw-milk-comp.jpg') no-repeat top center fixed;
+	-webkit-background-size: cover;
+	  -moz-background-size: cover;
+	  -o-background-size: cover;
+	  background-size: cover;
+}
+	
 	#slide1 {background: url('/img/originals/cheese-wine-meat.jpg') no-repeat top center fixed;
 	-webkit-background-size: cover;
 	  -moz-background-size: cover;
@@ -96,6 +110,11 @@
 	margin: auto;
 	position: relative;
 }
+
+#slideCow h1, #slideCow h2 {
+	text-shadow: 1px 1px 1px rgba(255,255,255,0.5);
+}
+
 h1.logo {
 	font-family: 'Nevis', sans-serif;
 	font-weight: 500;

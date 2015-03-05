@@ -3,7 +3,7 @@
 
 angular.module('co-op.user', ['ngRoute']).config(['$routeProvider', function($routeProvider) {
 	
-    $routeProvider
+	$routeProvider
 	.when('/product-upload-401', {templateUrl: 'partials/loggedIn/upload401.html', reloadOnSearch: false, title:'401 - Unauthorized to Sell'})
 	
 	.when('/product-upload', {
@@ -11,19 +11,22 @@ angular.module('co-op.user', ['ngRoute']).config(['$routeProvider', function($ro
 		controller: 'productUploadCtrl',
 		loggedInOnly: true, canSell: true, reloadOnSearch: false,
 		title : 'Upload Products to Sell',
-		resolve: { product: function() { return {}; } }
+		resolve: { product: function() { return false; } }
 	})
+	
 	.when('/product-upload/:productId', {
 		controller: 'productUploadCtrl',
 		templateUrl: 'partials/loggedIn/product-upload.html',
-		loggedInOnly: true, reloadOnSearch: false,
+		loggedInOnly: true, canSell: true, reloadOnSearch: false,
 		title : 'Edit Product',
 		resolve: {
-			product: function(Restangular, $route) {
+			product: ['Restangular', '$route', function(Restangular, $route) {
 				return Restangular.one('api/product', $route.current.params.productId).get();
-			}
+			}]
 		}
 	})
+	
+	
 	//.when('/producer-profile', {templateUrl: 'partials/loggedIn/edit-producer-profile.html', controller: 'producerCtrl', loggedInOnly: true, reloadOnSearch: false})
 	.when('/my-cart', {templateUrl: 'partials/loggedIn/my-cart.html', controller: 'cartPageCtrl', loggedInOnly: true, reloadOnSearch: false})
 	.when('/product-manager', {
@@ -57,6 +60,9 @@ angular.module('co-op.user', ['ngRoute']).config(['$routeProvider', function($ro
 		loggedInOnly: true, reloadOnSearch: false,
 		title : 'My Settings',
 		
-	});
+	})
+	
+	
+	;
 }]);
 	

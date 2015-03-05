@@ -26,12 +26,12 @@ angular.module('co-op.admin', ['ngRoute']).config(['$routeProvider', function($r
 			}
 		})
 		.when('/admin/invoices', { controller: 'invoiceCtrl', templateUrl: 'partials/admin/invoices.html', adminOnly: true, reloadOnSearch: false, title: 'Admin' })
-		.when('/admin/cycle', { controller: 'cycleCtrl', templateUrl: 'partials/admin/cycle.html', adminOnly: true, reloadOnSearch: false, title: 'Cycle Manager Page',
-			resolve: {
-				cycle: function($http) {
-					return $http.get('api/admin/cycle');
-				}
-			}
+		.when('/admin/cycle', { 
+			controller: 'cycleCtrl', 
+			templateUrl: 'partials/admin/cycle.html', 
+			adminOnly: true, 
+			reloadOnSearch: false, 
+			title: 'Cycle Manager Page'
 		})
 		.when('/admin/orders', { controller: 'orderAdminCtrl', templateUrl: 'partials/admin/orders.html', adminOnly: true, reloadOnSearch: false, title: 'Order Manager Page',
 			resolve: {

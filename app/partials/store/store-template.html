@@ -7,10 +7,8 @@
 		<div ng-controller="calendarCtrl" class="clearfix">
 			<a href="/calendar"><i class="fa fa-calendar pull-left fa-4x"></i></a>
 			<p>
-				<i class="fa fa-cloud-upload fa-fw"></i> Product Uploading: {{inDateRange(countDown[0].ProductUploadStart, countDown[0].ProductUploadStop)}}.<br>
-				<i class="fa fa-shopping-cart fa-fw"></i> Shopping: {{inDateRange(countDown[0].ShoppingStart, countDown[0].ShoppingStop)}}.<br>
-				<i class="fa fa-gift fa-fw"></i> Delivery Day: <span class="label label-default">{{daysBeforeDeliveryDay}}</span> days<br>
-				<span ng-if="daysBeforeDeliveryDay < 1">Next delivery day in {{countDown[1].DeliveryDay.daysUntil}} days</span>
+				<i class="fa fa-shopping-cart fa-fw"></i> Shopping <strong>{{shoppingTime()}}</strong><br>
+				<i class="fa fa-gift fa-fw"></i> Delivery Day is <strong>{{deliveryDayFromNow}}</strong><br>
 			</p>
 		</div>
 		<br>
@@ -112,7 +110,7 @@
 					<span class="glyphicon glyphicon-user"></span> 
 					 {{product.producer_ID.producerData.companyName || product.producer_ID.name}}</a></h4>
 					<h3>{{product.fullName}}</h3>
-					<p>{{1.2 * product.price|currency}} / {{product.units}}</p>
+					<p>{{product.priceWithMarkup|currency}} / {{product.units}}</p>
 					
 					<!--<div ta-bind ng-model='product.description'></div>-->
 					<hr>

@@ -1,38 +1,51 @@
 <div class="col-md-12">
-<div class="page-header">
-	<h1 class="text-center">Co-op Calendar</h1>
-</div>
-  <h1 class="text-center big-icons">
-	  <i class="fa fa-cloud-upload fa-fw fa-2x"></i> <span class="glyphicon glyphicon-arrow-right"></span> 
-	  <i class="fa fa-shopping-cart fa-fw fa-2x"></i> <span class="glyphicon glyphicon-arrow-right"></span> 
-	  <i class="fa fa-gift fa-fw fa-2x"></i>
-  </h1>
-  <p><strong>{{today}}</strong></p>
-<div class="col-md-4">
-	<h2>Events for {{month}}</h2>
-	<table class="table col-lg-11" border="0" cellspacing="5" cellpadding="5">
-		<tr><th><a href="/faq#upload-products">Product Uploading</a></th><td>{{significantDays.ProductUploadStart | longDate}} - {{significantDays.ProductUploadStop | longDate}}</td></tr>
-		<tr><th><a href="/faq#shopping-start">Shopping</th><td>{{significantDays.ShoppingStart | longDate}} - {{significantDays.ShoppingStop | longDate}}</td></tr>
-		<tr><th><a href="/faq#how-long-to-pay">Payment Due Date</a></th><td>{{significantDays.PaymentDueDay | longDate}}</td></tr>
-		<tr><th><a href="/faq#delivery-day">Delivery Day</a></th><td>{{significantDays.DeliveryDay | longDate}}</td></tr>
-	</table>
-</div>
-<div class="col-md-4">
-	<h2>Events for {{monthPlusOne}}</h2>
-	<table class="table col-lg-11" border="0" cellspacing="5" cellpadding="5">
-		<tr><th><a href="/faq#upload-products">Product Uploading</a></th><td>{{nextMonth.ProductUploadStart | longDate}} - {{nextMonth.ProductUploadStop | longDate}}</td></tr>
-		<tr><th><a href="/faq#shopping-start">Shopping</th><td>{{nextMonth.ShoppingStart | longDate}} - {{nextMonth.ShoppingStop | longDate}}</td></tr>
-		<tr><th><a href="/faq#how-long-to-pay">Payment Due Date</a></th><td>{{nextMonth.PaymentDueDay | longDate}}</td></tr>
-		<tr><th><a href="/faq#delivery-day">Delivery Day</a></th><td>{{nextMonth.DeliveryDay | longDate}}</td></tr>
-	</table>
-</div>
-<div class="col-md-4">
-	<h2>Events for {{monthPlusTwo}}</h2>
-	<table class="table col-lg-11" border="0" cellspacing="5" cellpadding="5">
-		<tr><th><a href="/faq#upload-products">Product Uploading</a></th><td>{{twoMonth.ProductUploadStart | longDate}} - {{twoMonth.ProductUploadStop | longDate}}</td></tr>
-		<tr><th><a href="/faq#shopping-start">Shopping</th><td>{{twoMonth.ShoppingStart | longDate}} - {{twoMonth.ShoppingStop | longDate}}</td></tr>
-		<tr><th><a href="/faq#how-long-to-pay">Payment Due Date</a></th><td>{{twoMonth.PaymentDueDay | longDate}}</td></tr>
-		<tr><th><a href="/faq#delivery-day">Delivery Day</a></th><td>{{twoMonth.DeliveryDay | longDate}}</td></tr>
-	</table>
-</div>
+	<div class="page-header">
+		<h1 class="text-center">Co-op Calendar</h1>
+	</div>
+	<h1 class="text-center big-icons">
+		<i class="fa fa-cloud-upload fa-fw fa-2x"></i> <span class="glyphicon glyphicon-arrow-right"></span> 
+		<i class="fa fa-shopping-cart fa-fw fa-2x"></i> <span class="glyphicon glyphicon-arrow-right"></span> 
+		<i class="fa fa-gift fa-fw fa-2x"></i>
+	</h1>
+	<p><strong>{{today}}</strong></p>
+	
+	<div class="col-md-4">
+		<h2>Events for {{month}}</h2>
+		<table class="table col-lg-11" border="0" cellspacing="5" cellpadding="5">
+			<tr ng-repeat-start="cycle in calendar[month]">
+				<th><a href="/faq#shopping-start">Shopping</th>
+				<td>{{cycle.shoppingStart | longDate}} - {{cycle.shoppingStop | longDate}}</td>
+			</tr>
+			<tr ng-repeat-end>
+				<th><a href="/faq#delivery-day">Delivery Day</a></th>
+				<td>{{cycle.deliveryDay | longDate}}</td>
+			</tr>
+		</table>
+	</div>
+	<div class="col-md-4">
+		<h2>Events for {{monthPlusOne}}</h2>
+		<table class="table col-lg-11" border="0" cellspacing="5" cellpadding="5">
+			<tr ng-repeat-start="cycle in calendar[monthPlusOne]">
+				<th><a href="/faq#shopping-start">Shopping</th>
+				<td>{{cycle.shoppingStart | longDate}} - {{cycle.shoppingStop | longDate}}</td>
+			</tr>
+			<tr ng-repeat-end>
+				<th><a href="/faq#delivery-day">Delivery Day</a></th>
+				<td>{{cycle.deliveryDay | longDate}}</td>
+			</tr>
+		</table>
+	</div>
+	<div class="col-md-4">
+		<h2>Events for {{monthPlusTwo}}</h2>
+		<table class="table col-lg-11" border="0" cellspacing="5" cellpadding="5">
+			<tr ng-repeat-start="cycle in calendar[monthPlusTwo]">
+				<th><a href="/faq#shopping-start">Shopping</th>
+				<td>{{cycle.shoppingStart | longDate}} - {{cycle.shoppingStop | longDate}}</td>
+			</tr>
+			<tr ng-repeat-end>
+				<th><a href="/faq#delivery-day">Delivery Day</a></th>
+				<td>{{cycle.deliveryDay | longDate}}</td>
+			</tr>
+		</table>
+	</div>
 </div>

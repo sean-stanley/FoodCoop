@@ -32,7 +32,6 @@ min-width: inherit;">
 						</div>
 						<h5>{{productData.variety}} {{productData.productName}}</h5>
 						<p>{{productData.priceWithMarkup|currency}} / {{productData.units}}</p>
-						
 					</figcaption>
 				</figure>
 				<section class="details-layer" ng-class="{ 'details-layer-visible' : detailsVisible}" ng-mouseleave="detailsVisible = false" ng-swipe-left="preview(productData)">
@@ -58,12 +57,6 @@ min-width: inherit;">
 							<button class="btn btn-warning" ng-click="preview(productData)">
 								Details
 							</button>
-
-							<!--
-<button class="btn btn-primary" disabled>
-								Add to Cart
-							</button>
--->
 						</div>
 					</article>
 				</section>
@@ -73,7 +66,7 @@ min-width: inherit;">
 		<h2>View an Old Product</h2>
 		<div ng-controller="productHistoryCtrl">
 			<accordion id="product-history-list" close-others="false">
-				<accordion-group heading="This Month's Products">
+				<accordion-group heading="This Cycle's Products">
 					<ul class="list-unstyled fa-ul">
 						<li ng-repeat="i in currentProducts">
 							<i class="fa fa-li fa-times" ng-click="delete($index, i._id)" style="cursor: pointer"></i>
@@ -81,34 +74,23 @@ min-width: inherit;">
 						</li>
 					</ul>
 				</accordion-group>
-				<accordion-group heading="Last Month's Products">
-					<table class="table table-hover">
-						<thead>
-							<tr>
-								<th><a href="" ng-click="predicate = 'name'; reverse=!reverse ">Name</th>
-								<th><a href="" ng-click="predicate = 'dateUploaded'; reverse=!reverse ">Date Added</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr ng-repeat="i in lastMonthProducts | orderBy:predicate:reverse ">
-								<td><a ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a></td>
-								<td>{{i.dateUploaded|shortDate}}</td>
-							</tr>
-						</tbody>
-					</table>
-				</accordion-group>
+				
 				<accordion-group heading="All Products">
+					Current Cycle: {{currentCycle}}
 					<table class="table table-hover">
 						<thead>
 							<tr>
-								<th><a href="" ng-click="predicate = 'name'; reverse=!reverse ">Name</th>
 								<th><a href="" ng-click="predicate = 'dateUploaded'; reverse=!reverse ">Date Added</th>
+								<th><a href="" ng-click="predicate = 'name'; reverse=!reverse ">Name</th>
+									<th><a href="" ng-click="predicate = 'cycle'; reverse=!reverse ">Sale Date</th>
+								
 							</tr>
 						</thead>
 						<tbody>
 							<tr ng-repeat="i in allProducts | orderBy:predicate:reverse ">
-								<td><a ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a></td>
 								<td>{{i.dateUploaded|shortDate}}</td>
+								<td><a ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a></td>
+								<td>{{i.cycle.deliveryDay|shortDate}}</td>
 							</tr>
 						</tbody>
 					</table>
@@ -121,37 +103,62 @@ min-width: inherit;">
 	<div id="product-upload-form-container" class="col-sm-7 col-md-8" >
 		<form name="productUpload" autocomplete="off" novalidate>
 			<fieldset>
-					<div class="row">
-						<div class="form-group col-md-8">
-							<div class="btn-group">
-								<button type="button"
-								class="btn btn-primary"
-								ng-model="productData.category"
-								btn-radio="category._id"
-								uncheckable
-								ng-repeat="category in productManager.productCategories"
-								>
-									{{category.name}}
+				<div class="row">
+					<div class="form-group col-md-8">
+						<div class="btn-group">
+							<button type="button" class="btn btn-default selector" ng-model="productData.category" btn-radio="category._id" uncheckable ng-repeat="category in productManager.productCategories">
+								{{category.name}}
+							</button>
+						</div>
+						<alert type="danger" ng-show="submitted && !productData.category && !categoryError" close="categoryError = true">
+							Please select a category for your product
+						</alert>
+					</div>
+					<div class="form-group col-md-4">
+							<div class="btn-group pull-right">
+								<button type="button" class="btn btn-default selector" ng-model="productData.refrigeration" btn-radio="'refrigeration'" uncheckable>
+									Refrigerated
+								</button>
+								<button type="button" class="btn btn-default selector" ng-model="productData.refrigeration" btn-radio="'frozen'" uncheckable>
+									Frozen
 								</button>
 							</div>
-							<alert type="danger" ng-show="submitted && !productData.category && !categoryError" close="categoryError = true">
-								Please select a category for your product
-							</alert>
 						</div>
-					    <div class="form-group col-md-4">
-							<div class="btn-group pull-right">
-								<button type="button"
-								class="btn btn-primary" ng-model="productData.refrigeration" btn-radio="'refrigeration'" uncheckable>Refrigerated</button>
-								<button type="button"
-								class="btn btn-primary" ng-model="productData.refrigeration" btn-radio="'frozen'" uncheckable>Frozen</button>
+				</div>
+				
+				<div class="row">
+					<div class="form-group col-md-12">
+						Next Delivery Day: {{deliveryDay | date:'EEEE dd/MM/yyyy'}}<br>
+						Sell repeatedly? Or Sell for A different Delivery Day?
+						<button class="btn" ng-click="multiCycle = !multiCycle" ng-class="{'btn-success': multiCycle, 'btn-default': !multiCycle}">
+							<span ng-hide="!multiCycle" class="glyphicon glyphicon-menu-down"></span><span ng-hide="multiCycle" class="glyphicon glyphicon-menu-up"></span>
+						</button>
+						<div collapse="!multiCycle">
+							<button class="btn btn-default" ng-click="selectAllCycles()">Select All</button>
+							<div class="btn-group">
+								<button type="button" class="btn btn-default selector" ng-repeat="cycle in productManager.cycles" ng-model="productData.cycle[$index]" btn-checkbox btn-checkbox-true="cycle._id">{{cycle.deliveryDay | date:'EEE MMM dd yyyy'}}</button>
 							</div>
 						</div>
 					</div>
+				</div>
+				
 				<div class="row">
 					<div class="form-group col-md-12">
 						<br>
 						<label 
-						type="button" class="btn btn-default btn-lg" ng-click="open()">Upload an image <span class="glyphicon glyphicon-cloud-upload"></span></label>
+						type="button" class="btn btn-default btn-lg" ng-click="uploadImage = !uploadImage">Upload an image <span class="glyphicon glyphicon-cloud-upload"></span></label>
+						<div collapse="!uploadImage">
+							<cropme width="420" height="300" icon-class="" ratio="0.75" destination-width="400">
+							</cropme>
+
+							<hr>
+							<alert type="info">Please note that your chosen image must be a minimum of <strong>420px by 300px</strong></alert>
+							<p>Please be aware of our image <a href="/policy">policies</a></p>
+							<div class="btn-group">
+								<button class="btn btn-info" ng-click="crop()">Crop Image</button>
+								<button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+							</div>
+						</div>
 					</div>
 				</div>
 					<div class="row">
@@ -213,28 +220,25 @@ min-width: inherit;">
 			    
 				<div class="form-group">
 					<label for="description">Description</label> 
-					<text-angular
-					 
+					<div text-angular
 					ng-model="productData.description"
 					placeholder="Write a couple paragraphs about how special your product is."
-					name="description"
-					rows="9">
-					</text-angular>
+					name="description">
+					</div>
 				</div>
 				<div class="form-group">
 					<label for="certification">Certification</label>
 					<select ng-model="productData.certification" ng-selected="productData.certification" ng-options="c._id as c.name for c in certifications" name="certification" class="form-control">
 					</select>
-			    </div>
-			    <div class="form-group">
-			    	<button type="submit" class="btn" ng-class="{'btn-success':productUpload.$valid, 'btn-warning':productUpload.$invalid}"
-						ng-click="submitForm(productUpload.$valid);"
-						analytics-on="click" analytics-event="Upload Product">Save</button>
-						<button type="button" ng-click="reset()" class="btn btn-default">Reset</button>    
-			    	
 				</div>
+				<div class="form-group">
+					<div class="btn-group">
+						<button type="submit" class="btn" ng-class="{'btn-success':productUpload.$valid, 'btn-warning':productUpload.$invalid}" ng-click="save(productUpload.$valid, categoryError);" analytics-on="click" analytics-event="Upload Product">Create New</button>
+						<button ng-if="productData._id" type="submit" class="btn" ng-class="{'btn-success': productUpload.$valid, 'btn-warning':productUpload.$invalid}" ng-click="update(productUpload.$valid, categoryError);" analytics-on="click" analytics-event="Upload Product">Update Current</button>
+						<button type="button" ng-click="reset()" class="btn btn-default">Reset Form</button>
+						</div>
+					</div>
 			  </fieldset>
 		  </form>
-	
 	</div>
 </div>

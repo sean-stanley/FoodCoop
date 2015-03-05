@@ -36,8 +36,8 @@ angular.module('co-op.directives', [])
    *
    *
    */
-  .directive('ngAutocomplete', [ '$parse', function($parse) {
-      return {
+	.directive('ngAutocomplete', [ '$parse', function($parse) {
+		return {
 
         scope: {
           details: '=',
@@ -97,7 +97,7 @@ angular.module('co-op.directives', [])
           }, true);
         }
       };
-    }])
+	}])
 	/*
 	.directive("nnfcScroll", function ($window, $document) {
 		    return function(scope, element, attrs) {
@@ -151,44 +151,45 @@ angular.module('co-op.directives', [])
 			var timer;
 			
 			var resizeBG = function () {
-			            var bgwidth = element[0].offsetWidth;
-			            var bgheight = element[0].offsetHeight;
+				var bgwidth = element[0].offsetWidth;
+				var bgheight = element[0].offsetHeight;
 
-			            var winwidth = $window.innerWidth;
-			            var winheight = $window.innerHeight;
+				var winwidth = $window.innerWidth;
+				var winheight = $window.innerHeight;
 
-			            var widthratio = winwidth / bgwidth;
-			            var heightratio = winheight / bgheight;
+				var widthratio = winwidth / bgwidth;
+				var heightratio = winheight / bgheight;
 
-			            var widthdiff = heightratio * bgwidth;
-			            var heightdiff = widthratio * bgheight;
+				var widthdiff = heightratio * bgwidth;
+				var heightdiff = widthratio * bgheight;
 
-			            if (heightdiff > winheight) {
-			                element.css({
-			                    width: winwidth + 'px',
-			                    height: heightdiff + 'px'
-			                });
-			            } else {
-			                element.css({
-			                    width: widthdiff + 'px',
-			                    height: winheight + 'px'
-			                });
-			            }
-						scope.$apply();
+				if (heightdiff > winheight) {
+					element.css({
+						width: winwidth + 'px',
+						height: heightdiff + 'px'
+					});
+				} else {
+					element.css({
+						width: widthdiff + 'px',
+						height: winheight + 'px'
+					});
+				}
+				scope.$apply();
 			};
 						
 			function fullSize() {
-				element.css({
-					'min-height' : $window.innerHeight + 'px'
+				scope.$apply(function() {
+					element.css({
+						'min-height' : $window.innerHeight + 'px'
+					});
 				});
-				scope.$apply();
 			}
 			
-	        angular.element($document).ready(function() {
-	        	fullSize();
+			angular.element($document).ready(function() {
+				fullSize();
 				angular.element($window).bind("resize", fullSize);
-	        });
-	    };
+			});
+		};
 	}])
 	
 	.directive("stickyFooter", ['$window', '$document', '$timeout', function($window, $document, $timeout) {

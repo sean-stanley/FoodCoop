@@ -1,6 +1,6 @@
 {
   "name": "DateJS",
-  "version": "1.0.0-rc1",
+  "version": "1.0.0-rc3",
   "homepage": "https://github.com/abritinthebay/datejs",
   "authors": [
     "Gregory Wild-Smith"
@@ -22,14 +22,13 @@
     "tests",
     "specs"
   ],
-  "_release": "1.0.0-rc1",
+  "_release": "1.0.0-rc3",
   "_resolution": {
     "type": "version",
-    "tag": "v1.0.0-rc1",
-    "commit": "81386c518a7ea72bd79a471fffd80e4e90a14930"
+    "tag": "v1.0.0-rc3",
+    "commit": "a173b13c148b8b257c0ca58dea90cb7ad616f35b"
   },
   "_source": "git://github.com/abritinthebay/datejs.git",
   "_target": "~1.0.0-rc1",
-  "_originalSource": "datejs",
-  "_direct": true
+  "_originalSource": "datejs"
 }

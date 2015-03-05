@@ -2,12 +2,12 @@
 (function() {
 	var Emailer, emailer, smtpTransport, exports, config, fs, _, path, coopConfig;
 
-	emailer = require("nodemailer");
+	emailer = require('nodemailer');
 	smtpTransport = require('nodemailer-smtp-transport');
 	config = require('./config').Config;
-	fs = require("fs");
+	fs = require('fs');
 	_ = require('lodash');
-	path = require("path");
+	path = require('path');
 	coopConfig = require('./coopConfig');
 
 	Emailer = (function() {
@@ -17,9 +17,9 @@
 
 		Emailer.prototype.attachments = [
 		{
-			filename: "logo.png",
-			path: path.join(__dirname, "../", "app", "img", "email", "logo.png"),
-			cid: "logo@foodcoop"
+			filename: 'logo.png',
+			path: path.join(__dirname, '../', 'app', 'img', 'email', 'logo.png'),
+			cid: 'logo@foodcoop'
 		}
 		];
 
@@ -36,21 +36,21 @@
 				from: 'Northland Natural Food Co-op',
 				to: '',
 				subject: this.options.subject,
-				//replyTo: "'" + this.options.replyTo.name + "' <" + this.options.replyTo.email + ">",
+				//replyTo: ''' + this.options.replyTo.name + '' <' + this.options.replyTo.email + '>',
 				html: html,
 				attachments: attachments
 			};
 			if (this.options.hasOwnProperty('replyTo') ) {
-				messageData.replyTo = "'" + this.options.replyTo.name + "' <" + this.options.replyTo.email + ">";
+				messageData.replyTo = '"' + this.options.replyTo.name + '" <' + this.options.replyTo.email + '>';
 			}
 			
 			if (_.isArray(this.options.to) ) {
 				//send message to more than one person.
 				for (var i = 0; i < this.options.to.length; i++) {
-					messageData.to += "'" + this.options.to[i].name + "' <" + this.options.to[i].email + ">, ";
+					messageData.to += '"' + this.options.to[i].name + '" <' + this.options.to[i].email + '>, ';
 				}
 			}
-			else messageData.to = "'" + this.options.to.name + "' <" + this.options.to.email + ">";
+			else messageData.to = '"' + this.options.to.name + '" <' + this.options.to.email + '>';
 			
 			transport = this.getTransport();
 			return transport.sendMail(messageData, callback);
@@ -59,15 +59,15 @@
 		Emailer.prototype.getTransport = function() {
 			var opts;
 			return emailer.createTransport(smtpTransport({
-				service: "gmail",
+				service: 'gmail',
 				auth: config.gmailCredentials
 			}));
 		};
 
 		Emailer.prototype.getHtml = function(templateName, data) {
 			var encoding, templateContent, templatePath;
-			templatePath = path.join(__dirname, "mailTemplates", templateName + ".html");
-			templateContent = fs.readFileSync(templatePath, encoding = "utf8");
+			templatePath = path.join(__dirname, 'mailTemplates', templateName + '.html');
+			templateContent = fs.readFileSync(templatePath, encoding = 'utf8');
 			return _.template(templateContent, data, {
 				interpolate: /\{\{(.+?)\}\}/g
 			});
@@ -79,7 +79,7 @@
 			_ref = this.attachments;
 			for (_i = 0, _len = _ref.length; _i < _len; _i++) {
 				attachment = _ref[_i];
-				if (html.search("cid:" + attachment.cid) > -1) {
+				if (html.search('cid:' + attachment.cid) > -1) {
 					attachments.push(attachment);
 				}
 			}
