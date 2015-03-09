@@ -1,39 +1,40 @@
-var util = require('util'),
-	http = require('http'),
-	fs = require('fs'), // file system
-	url = require('url'),
-	path = require('path'),
-	async = require('async'),
-	_ = require('lodash'),
-	bunyan = require('bunyan'),
-	crypto = require('crypto'),
-	events = require('events'),
-	compression = require('compression'),
-	express = require('express'), // handles routing and such
-	bodyParser = require('body-parser'), // creates a req.body object to allow easy access of request data in the api.
-	methodOverride = require('method-override'), // an express module for overriding default http methods
-	cookieParser = require('cookie-parser'), // an express module for reading, writing and parsing cookies. In the app it is used for session cookies.
-	session = require('express-session'), // an express module for creating browser sessions.
+var util = require('util')
+	, http = require('http')
+	, fs = require('fs') // file system
+	, url = require('url')
+	, path = require('path')
+	, async = require('async')
+	, _ = require('lodash')
+	, bunyan = require('bunyan')
+	, crypto = require('crypto')
+	, events = require('events')
+	, compression = require('compression')
+	, express = require('express')// handles routing and such
+	, bodyParser = require('body-parser') // creates a req.body object to allow easy access of request data in the api.
+	, methodOverride = require('method-override') // an express module for overriding default http methods
+	, cookieParser = require('cookie-parser') // an express module for reading, writing and parsing cookies. In the app it is used for session cookies.
+	, session = require('express-session') // an express module for creating browser sessions.
 	//errorHandler = require('express-error-handler'), // an express module for handling errors in the app.
-	RedisStore = require('connect-redis')(session),
-	geocoder = require('geocoder'), // for geocoding user addresses.
-	mongoose = require('mongoose'), // used to connect to MongoDB and perform common CRUD operations with the API.
-	ObjectId = require('mongoose').Types.ObjectId,
+	, RedisStore = require('connect-redis')(session)
+	, favicon = require('serve-favicon')
+	, geocoder = require('geocoder') // for geocoding user addresses.
+	, mongoose = require('mongoose') // used to connect to MongoDB and perform common CRUD operations with the API.
+	, ObjectId = require('mongoose').Types.ObjectId
 	
-	models = require('./models.js'), // this file stores the mongoose schema data for our MongoDB database.
-	mail = require('./staticMail.js'), // this file stores some common mail settings.
-	Emailer = require('./emailer.js'), // this is a custom class expanded upon nodemailer to allow html templates to be used for the emails.
-	mailChimp = require('./mailChimp.js'),
-	config = require('./coopConfig.js'), // static methods of important configuration info
-	scheduler = require('./scheduler.js'), // contains scheduled functions and their results
+	, models = require('./models') // this file stores the mongoose schema data for our MongoDB database.
+	, mail = require('./staticMail') // this file stores some common mail settings.
+	, Emailer = require('./emailer') // this is a custom class expanded upon nodemailer to allow html templates to be used for the emails.
+	, mailChimp = require('./mailChimp')
+	, config = require('./coopConfig') // static methods of important configuration info
+	, scheduler = require('./scheduler') // contains scheduled functions and their results
 	//oboe = require('oboe'); //JSON streaming and parsing
-	discount = require('./controllers/discount'),
-	auth = require('./controllers/auth'), // convenience authentication middleware for the app
-	cycle = require('./controllers/cycle'),
-	product = require('./controllers/product'),
+	, discount = require('./controllers/discount')
+	, auth = require('./controllers/auth') // convenience authentication middleware for the app
+	, cycle = require('./controllers/cycle')
+	, product = require('./controllers/product')
 	
-	passport = require('passport'), // middleware that provides authentication tools for the API.
-	LocalStrategy = require('passport-local').Strategy; // the passport strategy employed by this API.
+	, passport = require('passport') // middleware that provides authentication tools for the API.
+	, LocalStrategy = require('passport-local').Strategy; // the passport strategy employed by this API.
 
 require('datejs'); // provides the best way to do date manipulation.
 
@@ -60,7 +61,8 @@ exports.configAPI = function configAPI(app) {
 	// Middleware
 	// ==========
 	app.use(compression());
-	
+	// serve the favicon
+	app.use(favicon(path.normalize(path.join(__dirname, '../', 'app', 'favicon.ico')) ));
 	// here we load the bodyParser and tell it to parse the requests received as json data.
 	app.use(bodyParser.json({limit: '50mb'})); 
 	// here we initilize the methodOverride middleware for use in the API.
@@ -309,6 +311,7 @@ exports.configAPI = function configAPI(app) {
 		.sort('cycle.deliveryDay')
 		.exec(function(e, products){
 			if (e) return next(e);
+			res.setHeader('Cache-Control', 'private, no-cache, no-store');
 			res.json(products);
 		});
 	});
@@ -319,6 +322,7 @@ exports.configAPI = function configAPI(app) {
 			cycle: scheduler.currentCycle._id
 		}, 'productName variety dateUploaded price quantity amountSold units cycle', { sort: {dateUploaded: 1} }, function(e, products) {
 			if (e) return next(e);
+			res.setHeader('Cache-Control', 'private, no-cache, no-store');
 			res.json(products);
 		});
 	});

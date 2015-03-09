@@ -465,6 +465,7 @@ a.panel-btn-sml {
 	bottom: 0;
 	right: -100%;
 	background: #444;
+	background: rgba(64, 64, 64, 0.66);
 	height: 100%;
 	width: 100%;
 	visibility: hidden;

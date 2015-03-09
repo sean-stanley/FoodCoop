@@ -36,6 +36,9 @@ angular.module('co-op.user')
 ])
 .controller('userInvoiceCtrl', ['$scope', 'Restangular', '$rootScope', function($scope, Restangular, $rootScope){
 	$scope.now = Date();
+	
+	$scope.sort = "_id";
+	
 	$scope.invoices = Restangular.all('api/invoice').getList({invoicee : $rootScope.currentUser._id}).$object;
 	$scope.soon = function(invoice) {
 		if (invoice.status === 'un-paid') {

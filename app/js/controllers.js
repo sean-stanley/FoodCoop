@@ -399,8 +399,6 @@ angular.module('co-op.controllers', [])
 				$scope.categoryError = false;
 			}
 		});
-		
-		
 
 		var certifications = Restangular.all('api/certification');
 		
@@ -646,12 +644,9 @@ function($scope, $modalInstance, data, ProductManager) {
 		
 		function getProductStat(array) {
 			if (_.isArray(array) ) {
-				$scope.stats.currentAmount = _.chain(array)
-				.countBy('amountSold')
-				.invert()
-				.reduce().value();
-				
-				console.log(_.countBy(array, 'amountSold'));
+				$scope.stats.currentAmount = _.sum( _.map(array, 'amountSold') );
+
+				console.log(_.map(array, 'amountSold'));
 				
 				$scope.stats.bestSeller =  _.max(array, 'amountSold' );
 			

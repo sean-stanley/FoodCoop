@@ -1,1 +1,1 @@
-{ "indexes" : [ { "v" : 1, "key" : { "_id" : 1 }, "name" : "_id_", "ns" : "mydb.cycles" } ] }
+{ "indexes" : [ { "v" : 1, "key" : { "_id" : 1 }, "name" : "_id_", "ns" : "mydb.cycles" }, { "v" : 1, "unique" : true, "key" : { "start" : 1 }, "name" : "start_1", "ns" : "mydb.cycles", "background" : true, "safe" : null }, { "v" : 1, "unique" : true, "key" : { "deliveryDay" : 1 }, "name" : "deliveryDay_1", "ns" : "mydb.cycles", "background" : true, "safe" : null } ] }
