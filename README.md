@@ -110,9 +110,10 @@ Install the necessary modules:
     npm install -g grunt-cli
     npm install
 
-Run Mongodb
+Run Mongodb and Redis
 
     mongod
+		redis-server
 
 Then install sample data from the database with
 
