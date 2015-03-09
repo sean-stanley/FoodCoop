@@ -162,8 +162,8 @@ angular.module('co-op', [
 			$rootScope.slideInterval = interval;
 			console.log('interval changed to '+ interval);
 		};
-		$rootScope.page_title = 'NNFC';
-		$rootScope.page_description = "We help Whangarei and Northland buy and sell local food through our co-op store. We are a food co-op dedicated to helping our community buy local food. Our member's supply produce, meat, dairy, milk, bread, and home-made goods.";
+		$rootScope.page_title = 'Buy and Sell Local Food';
+		$rootScope.page_description = "We help Whangarei and Northland buy and sell local food through our co-op store. We are a food co-op dedicated to helping our community buy local food. Our member's supply produce, meat, dairy, milk, bread, jams, spreads and sauces.";
 		var originalDescription = $rootScope.page_description;
 		
 		
