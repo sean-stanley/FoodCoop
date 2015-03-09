@@ -140,7 +140,7 @@ exports.invoiceCustomer = function(customer, callback) {
 			});
 		},
 		function(invoice, done) {
-			invoice.populate('items.product', 'price priceWithMarkup', function(e, invoice) {
+			invoice.populate('items.product', 'fullName variety productName priceWithMarkup price units refrigeration', function(e, invoice) {
 				if (e) return done(e);
 				done(null, invoice);
 			});
