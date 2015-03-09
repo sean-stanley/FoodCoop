@@ -7,8 +7,6 @@ var async = require('async'),
 	discount = require('./../controllers/discount'),
 passport = require('passport');
 
-//setup DB connection;
-mongoose.connect('mongodb://localhost/nnfc-test');
 
 	//Globals
 var testUser, invoice, user;

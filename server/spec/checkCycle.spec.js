@@ -12,7 +12,7 @@ var async = require('async')
 	, scheduler = require('./../scheduler');
 	
 	
-	mongoose.connect('mongodb://localhost/nnfc-test');
+	
 	
 	require('datejs');
 	

@@ -10,10 +10,7 @@ var async = require('async')
 	, _ = require('lodash')
 	, moment = require('moment')
 	, scheduler = require('./../scheduler');
-	
-	
-	mongoose.connect('mongodb://localhost/nnfc-test');
-	
+		
 	require('datejs');
 	
 	var customers;

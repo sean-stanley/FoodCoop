@@ -143,4 +143,11 @@ To edit most other options edit the variables in server/coopConfig.
 
 You'll also need to create a config.js file or edit the emailer.js file to use your own gmail credentials.
 
+# Tests
+To run server-side unit tests make sure you have node-jasmine installed.
+
+	npm install -g jasmine-node
+Then run the following command
+
+	jasmine-node server/spec
 
