@@ -1,5 +1,7 @@
 <link rel="stylesheet" href="lib/bower_components/angular-cropme/cropme.css">
 
+
+
 <div class="page-header col-xs-12">
 	<h1 class="text-center">Product Upload <!--<i class="fa fa-question-circle pull-right" ng-click="showHelp = !showHelp" ng-init="showHelp = false"></i>--></h1>
 	<span class="pull-left">
@@ -11,7 +13,15 @@
 </div>
 
 <div class="col-xs-12">
+	
 	<div id="product-upload-preview-column" class="col-sm-5 col-md-4" >
+		<div ng-controller="calendarCtrl" class="">
+			<a href="/calendar"><i class="fa fa-calendar pull-left fa-4x"></i></a>
+			<p>
+				<i class="fa fa-shopping-cart fa-fw"></i> Shopping <strong>{{shoppingTime()}}</strong><br>
+				<i class="fa fa-gift fa-fw"></i> Delivery Day is <strong>{{deliveryDayFromNow}}</strong><br>
+			</p>
+		</div>
 		<section ng-show="productData.category || productData.img || productData.productName">
 			<h2>Preview <small>Live</small></h2>
 			<div class="product-container center-block" ng-controller="productUICtrl" ng-mouseleave="detailsVisible = false" 
@@ -82,7 +92,7 @@ min-width: inherit;">
 							<tr>
 								<th><a href="" ng-click="predicate = 'dateUploaded'; reverse=!reverse ">Date Added</th>
 								<th><a href="" ng-click="predicate = 'name'; reverse=!reverse ">Name</th>
-									<th><a href="" ng-click="predicate = 'cycle'; reverse=!reverse ">Sale Date</th>
+									<th><a href="" ng-click="predicate = 'cycle.deliveryDay'; reverse=!reverse ">Sale Date</th>
 								
 							</tr>
 						</thead>
@@ -233,8 +243,15 @@ min-width: inherit;">
 				</div>
 				<div class="form-group">
 					<div class="btn-group">
-						<button type="submit" class="btn" ng-class="{'btn-success':productUpload.$valid, 'btn-warning':productUpload.$invalid}" ng-click="save(productUpload.$valid, categoryError);" analytics-on="click" analytics-event="Upload Product">Create New</button>
-						<button ng-if="productData._id" type="submit" class="btn" ng-class="{'btn-success': productUpload.$valid, 'btn-warning':productUpload.$invalid}" ng-click="update(productUpload.$valid, categoryError);" analytics-on="click" analytics-event="Upload Product">Update Current</button>
+						<button type="submit" class="btn" ng-class="{'btn-success':productUpload.$valid, 'btn-warning':productUpload.$invalid}" ng-click="save(productUpload.$valid, categoryError);" analytics-on="click" analytics-event="Upload Product">
+							<span ng-show="!!productData._id && productData.cycle < cycle">Relist For Current Cycle</span> 
+							<span ng-show="!!productData._id && productData.cycle === cycle">Duplicate</span>
+							<span ng-show="!!productData._id && productData.cycle > cycle">Duplicate for Future</span>
+							<span ng-show="!!productData._id && productData.cycle.length > 0">Create Across Selected Date(s)</span>
+							<span ng-show="!productData._id && productData.cycle.length > 0">Create Across Selected Date(s)</span>
+							<span ng-show="!productData._id">Save</span>
+						</button>
+						<button ng-if="productData._id" type="submit" class="btn" ng-class="{'btn-success': productUpload.$valid, 'btn-warning':productUpload.$invalid}" ng-click="update(productUpload.$valid, categoryError);" analytics-on="click" analytics-event="Upload Product">Update</button>
 						<button type="button" ng-click="reset()" class="btn btn-default">Reset Form</button>
 						</div>
 					</div>

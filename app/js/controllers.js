@@ -347,12 +347,6 @@ angular.module('co-op.controllers', [])
 		$scope.$on('CALENDAR-LOADED', function() {
 			$scope.productData.cycle = $scope.productData.hasOwnProperty('_id') ? $scope.productData.cycle : $rootScope.cycle;
 		});
-			// if (!$rootScope.canUpload && !$rootScope.canChange) {
-// 				flash.setMessage({type: 'warning', message: 'Uploading is not allowed yet sorry. Please check the calendar for when uploading is open next.'});
-// 			}
-// 			else if ($rootScope.canChange && !$rootScope.canUpload) {
-// 				flash.setMessage({type: 'warning', message: 'Uploading new products is not allowed right now. This month\'s products can have some properties edited though. Editable properties are enabled.'});
-// 			}
 			
 		$scope.newProduct = {
 			refrigeration: 'none',
@@ -394,6 +388,7 @@ angular.module('co-op.controllers', [])
 		});
 		
 		$scope.categoryError = true;
+		
 		$scope.$watch('productData.category', function(newValue) {
 			if (newValue) {
 				$scope.categoryError = false;
