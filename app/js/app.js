@@ -25,6 +25,7 @@ angular.module('co-op', [
   .config(['$compileProvider', '$routeProvider', '$locationProvider', 'RestangularProvider', function($compileProvider, $routeProvider, $locationProvider, RestangularProvider) {
 	var oldWhiteList = $compileProvider.imgSrcSanitizationWhitelist();
 	$compileProvider.imgSrcSanitizationWhitelist(/^\s*((https?|ftp|file|blob):|data:image\/)/ );
+	$compileProvider.aHrefSanitizationWhitelist(/^\s*(|data:application\/csv;charset=utf-8|)/);
 	
     $routeProvider
 		.when('/', {templateUrl: 'partials/index-content.html', reloadOnSearch: false})
@@ -220,6 +221,6 @@ angular.module('co-op', [
 			} else return;
 			
 			
-        });
-  }]);
+		});
+	}]);
   

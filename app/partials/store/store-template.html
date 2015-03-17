@@ -99,7 +99,12 @@
 						tooltip-trigger="click"><i class="fa fa-chevron-circle-left"> swipe</i></span>
 					</div>
 					<h3>{{product.fullName}}</h3>
-					<p>{{product.priceWithMarkup|currency}} / {{product.units}}</p>
+					<div ng-show="product.productName === 'Raw Milk' ">
+						<p>{{0.5*product.priceWithMarkup|currency}} for {{product.units}}<br>
+								({{product.priceWithMarkup|currency}} / 4L Total)
+						</p>
+					</div>
+					<p ng-hide="product.productName === 'Raw Milk' ">{{product.priceWithMarkup|currency}} / {{product.units}}</p>
 				</figcaption>
 			</figure>
 			<section class="details-layer"  ng-class="{ 'details-layer-visible' : detailsVisible}" ng-mouseleave="detailsVisible = false" ng-swipe-right="showHideDetails(false)" ng-swipe-left="open(product)">
@@ -110,7 +115,12 @@
 					<span class="glyphicon glyphicon-user"></span> 
 					 {{product.producer_ID.producerData.companyName || product.producer_ID.name}}</a></h4>
 					<h3>{{product.fullName}}</h3>
-					<p>{{product.priceWithMarkup|currency}} / {{product.units}}</p>
+					<div ng-show="product.productName === 'Raw Milk' ">
+						<p>{{0.5*product.priceWithMarkup|currency}} for {{product.units}}<br>
+								({{product.priceWithMarkup|currency}} / 4L Total)
+						</p>
+					</div>
+					<p ng-hide="product.productName === 'Raw Milk' ">{{product.priceWithMarkup|currency}} / {{product.units}}</p>
 					
 					<!--<div ta-bind ng-model='product.description'></div>-->
 					<hr>
@@ -135,6 +145,7 @@
 						ng-if="!product.AlreadyInCart" ng-hide="product.quantity <= 0">
 							Add to Cart
 						</button>
+						<a ng-href="/contact/{{product.producer_ID._id}}?subject=Question%20about%20{{product.fullName}}" class="btn btn-info" tooltip="Ask a question about this product" tooltip-append-to-body="true"><i class="fa fa-question-circle"></i></a>
 					</div>
 					<div>
 						<br>

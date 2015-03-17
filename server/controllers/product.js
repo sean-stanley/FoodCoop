@@ -39,11 +39,12 @@ exports.fromBody = function(req, res, next) {
 exports.removeID = function(req, res, next) {
 	if (req.body._id) {
 		delete req.body._id;
+		delete req.body.amountSold;
 	} next();
 };
 
 exports.create = function(req, res) {
-	var lastProduct;
+	var lastProduct, p;
 	if (_.isArray(req.body.cycle) ) {
 		async.each(req.body.cycle, function(cycle, done) {
 			var data = req.body;
@@ -61,7 +62,9 @@ exports.create = function(req, res) {
 	} else {
 		if (req.body.cycle < scheduler.currentCycle._id) req.body.cycle = scheduler.currentCycle._id;
 		
-		Product.create(req.body, function(err, product) {
+		p = new Product(req.body);
+		
+		p.save(function(err, product) {
 			if (err) console.log(err);
 			log.info('%s just uploaded', product.variety + ' ' +  product.productName || '');
 			res.json(product);

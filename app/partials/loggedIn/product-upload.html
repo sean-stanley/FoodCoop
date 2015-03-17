@@ -41,7 +41,12 @@ min-width: inherit;">
 							tooltip-trigger="click"><i class="fa fa-chevron-circle-left"> swipe</i></span>
 						</div>
 						<h5>{{productData.variety}} {{productData.productName}}</h5>
-						<p>{{productData.priceWithMarkup|currency}} / {{productData.units}}</p>
+						<div ng-show="productData.productName === 'Raw Milk' ">
+							<p>{{0.5*productData.priceWithMarkup|currency}} for {{productData.units}}<br>
+									({{productData.priceWithMarkup|currency}} / 4L Total)
+							</p>
+						</div>
+						<p ng-hide="productData.productName === 'Raw Milk' ">{{productData.priceWithMarkup|currency}} / {{productData.units}}</p>
 					</figcaption>
 				</figure>
 				<section class="details-layer" ng-class="{ 'details-layer-visible' : detailsVisible}" ng-mouseleave="detailsVisible = false" ng-swipe-left="preview(productData)">
@@ -52,7 +57,12 @@ min-width: inherit;">
 						 {{currentUser.producerData.companyName || currentUser.name}}</a></h4>
 						
 						<h3>{{productData.variety}} {{productData.productName}}</h3>
-						<p>{{productData.priceWithMarkup|currency}} / {{productData.units}}</p>
+						<div ng-show="productData.productName === 'Raw Milk' ">
+							<p>{{0.5*productData.priceWithMarkup|currency}} for {{productData.units}}<br>
+									({{productData.priceWithMarkup|currency}} / 4L Total)
+							</p>
+						</div>
+						<p ng-hide="productData.productName === 'Raw Milk' ">{{productData.priceWithMarkup|currency}} / {{productData.units}}</p>
 						<hr>
 						<p> Category: {{productManager.categoryByID(productData.category).name}} 
 						<span ng-if="product.certification !== 'none' ">
@@ -134,22 +144,6 @@ min-width: inherit;">
 								</button>
 							</div>
 						</div>
-				</div>
-				
-				<div class="row">
-					<div class="form-group col-md-12">
-						Next Delivery Day: {{deliveryDay | date:'EEEE dd/MM/yyyy'}}<br>
-						Sell repeatedly? Or Sell for A different Delivery Day?
-						<button class="btn" ng-click="multiCycle = !multiCycle" ng-class="{'btn-success': multiCycle, 'btn-default': !multiCycle}">
-							<span ng-hide="!multiCycle" class="glyphicon glyphicon-menu-down"></span><span ng-hide="multiCycle" class="glyphicon glyphicon-menu-up"></span>
-						</button>
-						<div collapse="!multiCycle">
-							<button class="btn btn-default" ng-click="selectAllCycles()">Select All</button>
-							<div class="btn-group">
-								<button type="button" class="btn btn-default selector" ng-repeat="cycle in productManager.cycles" ng-model="productData.cycle[$index]" btn-checkbox btn-checkbox-true="cycle._id">{{cycle.deliveryDay | date:'EEE MMM dd yyyy'}}</button>
-							</div>
-						</div>
-					</div>
 				</div>
 				
 				<div class="row">
@@ -241,11 +235,39 @@ min-width: inherit;">
 					<select ng-model="productData.certification" ng-selected="productData.certification" ng-options="c._id as c.name for c in certifications" name="certification" class="form-control">
 					</select>
 				</div>
+				
+				<div class="form-group col-md-12 well">
+				
+					<h3>Sell For:</h3>
+				
+					<div class="btn-group">
+						<button type="button" class="btn btn-default selector" ng-model="productData.cycle" btn-radio="cycle">
+							Current Cycle Ending {{deliveryDay | date:'EEEE dd/MM/yyyy'}}
+						</button>
+						<button type="button" class="btn btn-default selector" ng-model="productData.cycle" btn-radio="cycle + 1">
+							Next Cycle Ending {{nextDeliveryDay | date:'EEEE dd/MM/yyyy'}}
+						</button>
+						<button class="btn" ng-click="multiCycle = !multiCycle" ng-class="{'btn-success': multiCycle, 'btn-default': !multiCycle}">
+							Different or Multiple Cycles <span ng-hide="!multiCycle" class="glyphicon glyphicon-menu-down"></span><span ng-hide="multiCycle" class="glyphicon glyphicon-menu-up"></span>
+						</button>
+					</div>
+				
+					<div collapse="!multiCycle">
+						<button class="btn btn-default" ng-click="selectAllCycles()">Select All</button>
+						<div class="btn-group">
+							<button type="button" class="btn btn-default selector" ng-repeat="cycle in productManager.cycles" ng-model="productData.cycle[$index]" btn-checkbox btn-checkbox-true="cycle._id">{{cycle.deliveryDay | date:'EEE MMM dd yyyy'}}</button>
+						</div>
+					</div>
+				</div>
+				
+				
 				<div class="form-group">
 					<div class="btn-group">
 						<button type="submit" class="btn" ng-class="{'btn-success':productUpload.$valid, 'btn-warning':productUpload.$invalid}" ng-click="save(productUpload.$valid, categoryError);" analytics-on="click" analytics-event="Upload Product">
-							<span ng-show="!!productData._id && productData.cycle < cycle">Relist For Current Cycle</span> 
-							<span ng-show="!!productData._id && productData.cycle === cycle">Duplicate</span>
+							<span ng-show="!!productData._id && productData.cycle < cycle && canShop">Relist For Current Cycle</span>
+							<span ng-show="!!productData._id && productData.cycle < cycle && !canShop">Relist For Next Cycle</span> 
+							<span ng-show="!!productData._id && productData.cycle === cycle && canShop">Duplicate</span>
+							<span ng-show="!!productData._id && productData.cycle === cycle && !canShop">Relist for Next Cycle</span>
 							<span ng-show="!!productData._id && productData.cycle > cycle">Duplicate for Future</span>
 							<span ng-show="!!productData._id && productData.cycle.length > 0">Create Across Selected Date(s)</span>
 							<span ng-show="!productData._id && productData.cycle.length > 0">Create Across Selected Date(s)</span>
@@ -255,6 +277,9 @@ min-width: inherit;">
 						<button type="button" ng-click="reset()" class="btn btn-default">Reset Form</button>
 						</div>
 					</div>
+					
+					
+					
 			  </fieldset>
 		  </form>
 	</div>

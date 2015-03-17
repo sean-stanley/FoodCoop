@@ -40,14 +40,15 @@ function checkCycle(date, done) {
 
 exports.checkCycle = checkCycle;
 	
-// check for events in the order cycle every day at 2am
+// check for events in the order cycle every day at 1am
 
-var orderCycleChecker = schedule.scheduleJob({hour:2, minute: 0}, checkConfig);
+var orderCycleChecker = schedule.scheduleJob({hour:1, minute: 0}, checkConfig);
 
 // schedule emails to send alerting members that it is delivery day.
 // To be executed at 9:15am Wednesday;
 function checkConfig() {
 	var today = new Date();
+	today.setHours(0, 0, 0, 0);
 	
 	checkCycle(today, function(err, cycle) {
 		if (err) {
@@ -60,7 +61,7 @@ function checkConfig() {
 		
 		exports.canShop = false;
 		
-		if ( today.equals( shoppingStart ) || today.between( shoppingStart, shoppingStop) ) {
+		if ( today.equals( shoppingStart ) ) {
 			console.log('today is a shopping day');
 			exports.canShop = true;
 		} else if (today.equals(cycle.shoppingStop) ) {
@@ -69,7 +70,12 @@ function checkConfig() {
 			exports.checkout();
 			// send order requests to producers
 			exports.orderGoods();
-		} else if (today.equals(deliveryDay) ) {
+		} else if (today.between( shoppingStart, shoppingStop) ) {
+			console.log('today is a shopping day');
+			exports.canShop = true;
+		}
+		
+		else if (today.equals(deliveryDay) ) {
 			console.log('Today is Delivery Day!');
 		}
 		
@@ -193,6 +199,7 @@ exports.invoiceCustomer = function(customer, callback) {
 };
 
 exports.orderGoods = function() {
+	console.log('beginning ordering from producers');
 	async.waterfall([
 		function(done) {
 			models.Order
@@ -205,19 +212,7 @@ exports.orderGoods = function() {
 				done(e, producers);
 			});
 		},
-		//function(producers, done) {
-			// models.Product.populate(producers, {path: 'orders.product', select: 'fullName variety productName price units refrigeration'}
-// 			, function(e, result){
-//
-// 				_.map(result, function(producer) {
-// 					producer.orders = _.sortBy(producer.orders, function(order) {
-// 						return order.product.fullName.toLowerCase();
-// 					});
-// 					return producer;
-// 				});
-// 				done(null, result);
-// 			});
-// 		},
+
 		function(producers, done) {
 			models.User.populate(producers, {path: '_id', select: 'name email producerData.bankAccount balance'}
 			, function(e, result){
@@ -351,7 +346,46 @@ function disableCycle() {
 // 	});
 // }
 
+//
+// function consolidateAmountSold () {
+// 	models.Product.find({amountSold: {$gt: 0 } }, 'quantity amountSold productName variety fullName cycle', function(err, products) {
+// 		if (err) return console.log(err);
+//
+// 		async.each(products, function(product, done) {
+// 			var amount;
+// 			models.Order.find({product: product._id}, 'quantity product', function(err, orders) {
+// 				if (err) return done(err);
+//
+// 				if (orders === null) {
+// 					//console.log(product.fullName + ' has never been ordered for cycle #' + product.cycle);
+// 					product.amountSold = 0;
+// 					product.save(function(err) {
+// 						if (err) return console.log(err);
+// 						done();
+// 					});
+// 				} else {
+// 					var total = _.reduce(orders, function(sum, order) {
+// 						return sum + order.quantity;
+// 					}, 0);
+// 					//console.log(product.fullName + ' has been ordered ' + total + ' times for cycle #' + product.cycle);
+//
+// 					product.amountSold = total;
+// 					product.save(function(err) {
+// 						if (err) return console.log(err);
+// 						done();
+// 					});
+// 				}
+// 			});
+// 		}, function(err) {
+// 			if (err) return console.log(err);
+// 			console.log('consolidation complete');
+// 		})
+//
+// 	})
+// }
+
 checkConfig();
+//consolidateAmountSold();
 //disableCycle();
 
 

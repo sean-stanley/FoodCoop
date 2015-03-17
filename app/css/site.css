@@ -440,6 +440,7 @@ a.panel-btn-sml {
 	padding: 15px;
 	overflow:hidden;
 	background:#ddd;
+	margin-top:5px;
 }
 
 .product-container figcaption > h3 {margin-top:10px;}
@@ -455,7 +456,7 @@ a.panel-btn-sml {
 		min-width: 330px;
 	}
 
-	.product-container { max-width: 369px; }
+	.product-container { max-width: 369px; margin-top: 15px; }
 }
 
 

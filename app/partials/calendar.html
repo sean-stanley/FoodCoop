@@ -8,12 +8,13 @@
 		<i class="fa fa-gift fa-fw fa-2x"></i>
 	</h1>
 	<p><strong>{{today}}</strong></p>
+</div>
 	
 	<div class="col-md-4">
 		<h2>Events for {{month}}</h2>
 		<table class="table col-lg-11" border="0" cellspacing="5" cellpadding="5">
 			<tr ng-repeat-start="cycle in calendar[month]">
-				<th><a href="/faq#shopping-start">Shopping</th>
+				<th><a href="/faq#shopping-start">Shopping</a></th>
 				<td>{{cycle.shoppingStart | longDate}} - {{cycle.shoppingStop | longDate}}</td>
 			</tr>
 			<tr ng-repeat-end>
@@ -26,7 +27,7 @@
 		<h2>Events for {{monthPlusOne}}</h2>
 		<table class="table col-lg-11" border="0" cellspacing="5" cellpadding="5">
 			<tr ng-repeat-start="cycle in calendar[monthPlusOne]">
-				<th><a href="/faq#shopping-start">Shopping</th>
+				<th><a href="/faq#shopping-start">Shopping</a></th>
 				<td>{{cycle.shoppingStart | longDate}} - {{cycle.shoppingStop | longDate}}</td>
 			</tr>
 			<tr ng-repeat-end>
@@ -39,7 +40,7 @@
 		<h2>Events for {{monthPlusTwo}}</h2>
 		<table class="table col-lg-11" border="0" cellspacing="5" cellpadding="5">
 			<tr ng-repeat-start="cycle in calendar[monthPlusTwo]">
-				<th><a href="/faq#shopping-start">Shopping</th>
+				<th><a href="/faq#shopping-start">Shopping</a></th>
 				<td>{{cycle.shoppingStart | longDate}} - {{cycle.shoppingStop | longDate}}</td>
 			</tr>
 			<tr ng-repeat-end>
@@ -48,4 +49,23 @@
 			</tr>
 		</table>
 	</div>
-</div>
+
+	<div class="col-sm-6">
+		<h2>Fresh Milk every Week</h2>
+		<p>If you buy Raw Milk from our producers, it is available on a weekly basis though you order it during the bi-weekly shopping time. Milk pick up day is every <strong>Tuesday</strong> from <strong>3pm to 5:30pm</strong> or by prior arrangement.
+		</p>
+		
+		<h2>Delivery Day Pickup Times</h2>
+		<p>Delivery Day Pick Up Times are <strong>3pm to 6pm</strong></p>
+		
+	</div>
+	<div class="col-sm-6">
+		<h2>Pickup Location</h2>
+		<p>Our Pickup Location is 1 Woods Road, Whangarei<br>
+			We are at the back of the warehouse.
+		</p>
+		<a href="https://www.google.co.nz/maps/place/1+Woods+Rd,+Whangarei" class="btn btn-default"><i class="fa fa-map-marker"></i> Map</a>
+		
+		<h2>Shipping</h2>
+		<p>You can have your co-op orders delivered. Simply <a href="/contact">Contact us</a> and we'll arrange it. We prefer to deliver to multiple people in a single area so if you want to order and have delivery, consider asking your neighbours if they'd like to order as well.</p>
+	</div>

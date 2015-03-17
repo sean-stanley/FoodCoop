@@ -1,0 +1,70 @@
+<section id="main-nav-and-sorting" class="col-xs-12 clearfix">
+	<br>
+	<div ng-controller="calendarCtrl" class="clearfix">
+		<a href="/calendar"><i class="fa fa-calendar pull-left fa-4x"></i></a>
+		<p>
+			<i class="fa fa-shopping-cart fa-fw"></i> Shopping <strong>{{shoppingTime()}}</strong><br>
+			<i class="fa fa-gift fa-fw"></i> Delivery Day is <strong>{{deliveryDayFromNow}}</strong><br>
+			<i class="fa fa-recycle fa-fw"></i> The current cycle number is <strong>{{cycle}}</strong><br>
+		</p>
+	</div>
+	<br>
+	<nav class="navbar navbar-default">			
+		<div class="container-fluid">
+			<form class="navbar-form navbar-left" ng-submit="get()">
+				<legend>Get Products</legend>
+				<div class="form-group">
+					<label> Categories </label>
+					<select class="form-control" ng-model="params.category" ng-options="c._id as c.name for c in categories"></select>
+				</div>
+				<div class="form-group">
+					<label> Cycle # </label>
+					<input class="form-control" type='number' min='3' max="1000" ng-model="params.cycle">
+				</div>
+				<!-- <div class="form-group">
+					<label> producer ID </label>
+					<input class="form-control" type='text' ng-model="params.producer_ID">
+				</div> -->
+				<div class="form-group">
+					<label> product name </label>
+					<input class="form-control" type='text' ng-model="params.productName">
+				</div>
+				<button type="submit" class="btn btn-default">Get Products</button>
+			</form>
+		</div>
+	</nav>
+	
+	<input class="form-control" type='search' ng-model="search" placeholder="search">
+           
+</section>
+
+<div id="products-section" class="col-xs-12">
+	<h1 class="text-center">NNFC Catalogue</h1>
+	<table class="table table-hover" border="0" cellspacing="5" cellpadding="5">
+		<tr>
+			<th><a href="" ng-click="sort = 'fullName' || 'productName'; reverse=!reverse">Product Name</a></th>
+			<th><a href="" ng-click="sort = 'producer_ID.producerData.companyName' || 'producer_ID.name'; reverse=!reverse">Producer</a></th>
+			<th><a href="" ng-click="sort = 'quantity'; reverse=!reverse">Amount Available</a></th>
+			<th colspan="2"><a href="" ng-click="sort = 'price'; reverse=!reverse">price</a></th>
+		</tr>
+		<tr ng-repeat="product in products | orderBy:sort:reverse | filter:search">
+			<td><a ng-click="open(product)">{{product.fullName}}</a></td>
+			<td><a ng-href="/producer/{{product.producer_ID.producerData.companyName | forURL}}-{{product.producer_ID.name | forURL}}">
+					<span popover="id: {{product.producer_ID._id}}" popover-trigger="mouseenter"><span class="glyphicon glyphicon-user"></span> 
+					 {{product.producer_ID.producerData.companyName || product.producer_ID.name}}
+				 </a>
+			</td>
+			<td>{{product.quantity - product.amountSold}}</td>
+			<td>{{product.priceWithMarkup|currency}} / {{product.units}}</td>
+			<td>
+				<a ng-href="/contact/{{product.producer_ID._id}}?subject=Question%20about%20{{product.fullName}}"><span class="glyphicon glyphicon-envelope"></a>
+			</td>
+		</tr>
+	</table>
+	<div class="text-center">
+		<a class="btn btn-lg btn-primary" ng-href="{{csv}}" target="_blank" download="products.csv">
+			<i class="fa fa-download"></i> Download Products as CSV
+		</a>
+	</div>
+	
+</div>

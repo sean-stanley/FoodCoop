@@ -178,10 +178,10 @@
 					<small class="hidden-sm hidden-xs"><span class="glyphicon glyphicon-cog"></span> Member Tools</small>
 				</a>
 			</div>
-			<div class="collapse navbar-collapse" collapse="mobileMenu" ng-click="mobileMenu = true">
+			<div class="collapse navbar-collapse" collapse="mobileMenu" >
 				<ul class="nav navbar-nav navbar-right">
 					<li class="hidden-md hidden-lg" ng-if="currentUser == null">
-						<a href="/login-page"><span class="glyphicon glyphicon-lock"></span>Login</a>
+						<a href="/login-page" ><span class="glyphicon glyphicon-lock"></span>Login</a>
 					</li>
 					<li ng-class="{active:isActive('/store')}"><a href="/store"><span class="glyphicon glyphicon-shopping-cart"></span> Store</a></li>
 					<li ng-class="{active:isActive('/')}"><a href="/">Home</a></li>

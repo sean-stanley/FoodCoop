@@ -40,6 +40,16 @@ angular.module('co-op.admin', ['ngRoute']).config(['$routeProvider', function($r
 				}
 			}
 		})
-		.when('/admin/routes', { controller: 'routeAdminCtrl', templateUrl: 'partials/admin/routes.html', adminOnly: true, reloadOnSearch: false, title: 'Route Master Page'});
+		.when('/admin/routes', { controller: 'routeAdminCtrl', templateUrl: 'partials/admin/routes.html', adminOnly: true, reloadOnSearch: false, title: 'Route Master Page'})
+		.when('/catalogue', {
+			controller: 'productAdminCtrl', 
+			templateUrl:'partials/store/catalogue.html', 
+			loggedInOnly: true, reloadOnSearch: false, title: 'Catalogue',
+			resolve: {
+				categories: function($http) {
+					return $http.get('/api/category');
+				}
+			}
+		});
   }]);
 	

@@ -343,10 +343,6 @@ angular.module('co-op.controllers', [])
 		// init
 		$scope.productManager = ProductManager;
 		console.log($rootScope.cycle);
-		
-		$scope.$on('CALENDAR-LOADED', function() {
-			$scope.productData.cycle = $scope.productData.hasOwnProperty('_id') ? $scope.productData.cycle : $rootScope.cycle;
-		});
 			
 		$scope.newProduct = {
 			refrigeration: 'none',
@@ -355,6 +351,7 @@ angular.module('co-op.controllers', [])
 			price: undefined,
 			producer_ID: $rootScope.currentUser._id
 		};
+		$scope.newProduct.cycle = $rootScope.canSell ? $rootScope.cycle : !!$rootScope.cycle ? $rootScope.cycle + 1 : undefined;
 		
 		$scope.reset = function() {
 			var path = $location.path();
@@ -366,7 +363,30 @@ angular.module('co-op.controllers', [])
 		
 		$scope.productData = product || angular.copy($scope.newProduct);
 		$scope.selectedImg = $scope.productData.img || null;
+		
+		/* -----------------------
+		|  Set the product Cycle  |
+		// ----------------------*/
+		
 		var originalCycle = (!!product && product.hasOwnProperty('cycle') ) ? product.cycle : undefined;
+		
+		if ($rootScope.cycle) { 
+			//true if calendar-loaded already fired
+			if ($scope.productData.cycle < $rootScope.cycle || $scope.productData.cycle === undefined) {
+				// old product from a past cycle or new product
+				$scope.productData.cycle = $rootScope.canSell ? $rootScope.cycle : $rootScope.cycle + 1;
+			}
+			// old product from distant future -- do nothing
+		}
+		
+		$scope.$on('CALENDAR-LOADED', function() {
+			if ($scope.productData.cycle < $rootScope.cycle || $scope.productData.cycle === undefined) {
+				// old product from a past cycle or new product
+				$scope.productData.cycle = $rootScope.canSell ? $rootScope.cycle : $rootScope.cycle + 1;
+				// old product from distant future -- do nothing
+			}
+		});
+		
 		
 		$scope.ingredients = false;
 		
@@ -379,7 +399,9 @@ angular.module('co-op.controllers', [])
 		
 		$scope.$watch('multiCycle', function(newValue) {
 			if (!newValue) {
-				$scope.productData.cycle = $scope.productData.hasOwnProperty('_id') ? originalCycle : $rootScope.cycle;
+				if ($rootScope.canShop) {
+					$scope.productData.cycle = $scope.productData.hasOwnProperty('_id') ? originalCycle : $rootScope.cycle;
+				} else $scope.productData.cycle = $scope.productData.hasOwnProperty('_id') ? originalCycle : $rootScope.cycle + 1;
 			} else $scope.productData.cycle = [];
 		});
 		
@@ -413,23 +435,19 @@ angular.module('co-op.controllers', [])
 			if (isValid && !categoryError) {
 				$scope.submitted = false;
 				flash.setMessage({type: 'warning', message: 'Beginning upload of '+ $scope.productData.productName});
-				// disable the save button if a product is new or an update of an old month
-				
-				// if ($scope.productData._id === undefined ) {
-// 					$scope.hideSave = true;
-// 				}
 				
 				if (_.isArray($scope.productData.cycle) ) {
 					$scope.productData.cycle = _.compact($scope.productData.cycle); // removes false, null, 0 and other falsey values
 					if ($scope.productData.cycle.length === 1) $scope.productData.cycle = $scope.productData.cycle[0];
-				} else {
-					$scope.productData.cycle = $rootScope.cycle;
+				} else if ($scope.productData.cycle <= $rootScope.cycle || !$scope.productData.cycle) {
+					$scope.productData.cycle = $rootScope.canShop ? $rootScope.cycle : $rootScope.cycle + 1; //next cycle;
 				}
 			
 				ProductManager.registerProduct($scope.productData, function(product) {
 					$scope.$broadcast('REFRESHCURRENT');
 					$scope.productData = product;
 				});
+				
 			} else $scope.submitted = true;
 			if (categoryError) {
 				flash.setMessage({type:'warning', message: 'Please select a category for your product'});
@@ -903,7 +921,8 @@ function($scope, $modalInstance, data, ProductManager) {
 
 .controller('storeCtrl', ['$scope', '$rootScope', '$location', '$routeParams', '$modal', 'LoginManager', 'flash', '$http', 'Cart',
 	function($scope, $rootScope, $location, $routeParams, $modal, LoginManager, flash, $http, Cart) {
-		var category, sort, reverse, productURL = 'api/product?cycle='+$rootScope.cycle;
+		var category, sort, reverse, productURL;
+		
 		$rootScope.$broadcast('GET_CART');
 		$scope.isProducts = true;
 		
@@ -970,14 +989,18 @@ function($scope, $modalInstance, data, ProductManager) {
 		}
 		
 		if ($rootScope.cycle) {
-			productURL = 'api/product?cycle='+$rootScope.cycle;
+			if (!$rootScope.canShop) {
+				productURL = 'api/product?cycle='+ ($rootScope.cycle + 1);
+			} else productURL = 'api/product?cycle='+$rootScope.cycle;			
 			loadProducts(productURL);
 			productsStarted = true;
 		}
 		
 		$rootScope.$watch('cycle', function(newValue){
 			if ($rootScope.cycle && !productsStarted) {
-				productURL = 'api/product?cycle='+$rootScope.cycle;
+				if (!$rootScope.canShop) {
+					productURL = 'api/product?cycle='+ ($rootScope.cycle + 1);
+				} else productURL = 'api/product?cycle='+$rootScope.cycle;
 				loadProducts(productURL);
 			}
 		});
@@ -1096,11 +1119,11 @@ function($scope, $modalInstance, data, ProductManager) {
 			}
 		});
 		
-		$rootScope.$watch('canShop', function() {
-			if ($rootScope.canShop === false) {
-				flash.setMessage({type: 'warning', message: 'Shopping is not allowed yet sorry. Please check the calendar for when shopping is open next.'});
-			}
-		});
+		// $rootScope.$watch('canShop', function() {
+// 			if ($rootScope.canShop === false) {
+// 				flash.setMessage({type: 'warning', message: 'Shopping is not allowed yet sorry. Please check the calendar for when shopping is open next.'});
+// 			}
+// 		});
 	}
 ])
 

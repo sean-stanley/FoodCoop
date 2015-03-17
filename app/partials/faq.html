@@ -8,7 +8,7 @@
 		<div class="page-header" >
 			<h1>Goat Questions? We goat answers!</h1>
 		</div>
-		<p class="lead">You'll find answers to most common questions about the co-op here. Got a question that's not covered? Please <a href="/contact">contact us</a>.</p>
+		<p class="lead">You'll find answers to most common questions about the co-op here. Goat a question not answered? Please <a href="/contact">contact us</a>.</p>
 	</div>
 </div>
 
@@ -56,9 +56,16 @@
 		<p>Check the <a href="/calendar">calendar</a> on our website to find out when you must have paid your shopping invoice to us. Ideally we like to have received payment before delivery day so we can pay the producers after they've delivered member's orders.</p>
 		<p>
 	</accordion-group>
+	<accordion-group heading="How does buying raw milk work?" ng-click="hashFunction('raw-milk')" is-open="hash === 'raw-milk'">
+		<p>Raw Milk can be added to your cart just like any other product in the store. However, raw milk is delivered fresh to our sorting center (1 Woods Rd, Whangarei) every <strong>Tuesday</strong>.</p>
+		<p>You pay for your milk at the same time as any other products you've ordered as normal.</p>
+		<p>When you order Raw Milk in our store, you are ordering milk for two weeks. Your order is prepaid and the quantity you order is how much you will receive over two weeks.</p>
+		<p>Each week you will receive 1/2 the full amount paid for.</p>
+		<p>Pick up time for Raw Milk is 3-6pm every Tuesday.</p>
+	</accordion-group>
 
 	<accordion-group heading="Where do I collect my food once I’ve paid for it?" ng-click="hashFunction('delivery-day')" is-open="hash === 'delivery-day'">
-		<p>Member's orders are collected and sorted on <a href="/calendar">Delivery Day</a>. Delivery day is usually the second and last Wednesday's of each month.</p>
+		<p>Member's orders are collected and sorted on <a href="/calendar">Delivery Day</a>. Delivery day is usually the second and last Tuesday's of each month.</p>
 		
 		<p>If you live in Whangarei, or want to collect your food while you’re in town, you can pick up your order from The Woods (1 Woods Road), in central Whangarei. We are behind Chipmunks. Orders are avaible for collection from 3:00 p.m. onwards on Delivery Day. You can find out when the next Delivery Day is by checking the <a href="/calendar">calendar </a>on our wesite.</p>
 
@@ -77,8 +84,13 @@
 		<p>All goods need to be dropped off at The Woods by 3:00 p.m. on Delivery Day. You can find out when the next Delivery day is by checking the calendar on our wesite.</p>
 		<p>We are open to making other arrangements to deliver your goods. Feel free to <a href="/contact">contact us</a> and we'll help you organise delivery of your goods.</p>
 	</accordion-group>
+	<accordion-group heading="What time can I collect my order?">
+		<p>Delivery Day Pick Up Times are <strong>3pm to 6pm</strong></p>
+	</accordion-group>
+	
 	<accordion-group heading="How can I get a refund on a faulty product?" ng-click="hashFunction('refund')" is-open="hash === 'refund'">
 		<p>If you are unsatisfied with the quality of a purchase please <a href="/contact?subject=problem%20with%20product">contact us</a> right away. We will contact the producer and negotiate a refund or similar satisfactory solution for you.</p>
 	</accordion-group>
 </accordion>
+<h3>Have a question not answered here? <a href="/contact">Contact Us</a></h3>
 </div>

@@ -412,6 +412,7 @@ exports.configAPI = function configAPI(app) {
 			.populate('supplier', 'name email producerData.companyName')
 			.exec( function(e, cart) {
 				if (!e) {
+					res.setHeader('Cache-Control', 'private, no-cache, no-store');
 					res.json(cart);
 				} else next(e);
 			});

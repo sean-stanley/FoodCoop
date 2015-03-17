@@ -1,34 +1,5 @@
-<div id="fb-root"></div>
-<script></script>
-
-<!--
-<div class="modal-header" id="modal-top">
-	<a href="" class="panel-btn panel-btn-lg" ng-click="cancel()">&times;</a>
-</div>
--->
-
-	
 <div class="modal-body col-xs-12 clearfix">
 	<a href="" class="panel-btn panel-btn-lg close-top-left" ng-click="cancel()">&times;</a>
-	<!--
-	<ul class="list-unstyled pull-right col-sm-2">
-			<li><a href="https://twitter.com/share" class="twitter-share-button" 
-				data-url="http://foodcoop.org.nz/store#{{data.fullName}}+{{data.producer_ID.producerData.companyName}}&id={{data._id}}" 
-				data-text="{{data.fullName}} for sale by {{data.producer_ID.name}} in the NNFC Store"
-				data-via="NorthlandNFC" 
-				data-lang="en" 
-				data-count="none">Tweet</a></li>
-			<li>
-			</li>
-			<li>
-				<a ng-href="https://plus.google.com/share?url=http://foodcoop.org.nz/store#{{data.fullName}}+{{data.producer_ID.producerData.companyName}}&id={{data._id}}" onclick="javascript:window.open(this.href,
-				  '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"><img
-				  src="https://www.gstatic.com/images/icons/gplus-64.png" alt="Share on Google+"/></a>
-			</li>
-			<li>
-				<div class="fb-share-button" data-layout="button" data-href="http://foodcoop.org.nz/store#{{data.fullName}}+{{data.producer_ID.producerData.companyName}}&id={{data._id}}"></div>
-			</li>
-		</ul>-->
 	
 	<div class="col-md-6">
 	<figure class="store-modal center-block"><img ng-if="data.certification.name !== 'none' && data.img && data.certification.img"
@@ -57,15 +28,7 @@
 			<span ng-hide="product.productName === 'Raw Milk' ">
 			<strong>Price:</strong> {{data.priceWithMarkup|currency}} / {{data.units}}</span>
 		</h2>
-		<button class="btn btn-danger btn-lg" disabled ng-if="data.quantity === 0">
-			SOLD OUT
-		</button>
-		<button class="btn btn-primary btn-lg" ng-click="addToCart(data)" ng-if="!data.AlreadyInCart" ng-disabled="!currentUser">
-			Add to Cart
-		</button>
-		<button class="btn btn-primary btn-lg" disabled ng-if="data.AlreadyInCart">
-			Added to Cart
-		</button>
+		
 		
     </div>
 </div>

@@ -247,4 +247,80 @@ angular.module('co-op.admin')
 	$scope.$watch('search', function() {
 		$scope.total($scope.orders);
 	});
+}])
+.controller('productAdminCtrl', ['$scope', '$http', '$modal', '$window', 'categories', function($scope, $http, $modal, $window, categories) {
+	$scope.categories = categories.data;
+	// possible properties are:
+	//    cycle (number or gt, lt value)
+	//    producer_ID
+	//    category
+	//    certification
+	//    productName
+	//    variety
+	//    price (number or gt, lt value)
+	$scope.params = {};
+	
+	$scope.get = function() {
+		$http.get('/api/product', {
+			params: $scope.params
+		}).then(function(result) { 
+			$scope.products = result.data;
+		}, function(error) {console.log(error);});
+	};
+	
+	$scope.open = function(product) {
+		var modalInstance = $modal.open({
+			templateUrl: 'partials/store/catalogue-modal.html',
+			controller: 'modalInstanceCtrl',
+			size: 'lg',
+			resolve: {
+				data: function() {
+					return product;
+				}
+			}
+		});
+		modalInstance.result.then(function(product) {
+			console.log('Modal Closed');
+		}, function() {
+			console.log('Modal dismissed at: ' + new Date());
+		});
+	};
+	
+	$scope.$watch('products', function(n) {
+		makeCsv(n);
+	});
+	
+	function makeCsv(array) {
+		var A = [];
+		A.push(['Product Name', 'Producer', 'Amount Available', 'Price']); // add permanent link to product as well?
+		if(angular.isArray(array)) {
+			angular.forEach(array, function(product) {
+				var producer = product.producer_ID.hasOwnProperty('producerData') ? product.producer_ID.producerData.companyName || product.producer_ID.name : product.producer_ID.name;
+				A.push([product.fullName, producer, product.quantity - product.amountSold, '$' + product.priceWithMarkup.toFixed(2) + ' / ' +  product.units]);
+			});
+		}
+		var csvRows = [];
+
+		for(var i=0, l=A.length; i<l; ++i){
+			csvRows.push(A[i].join(','));
+		}
+		var csvString = csvRows.join("\r\n");
+		
+		$scope.csv = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csvString);
+		//return 'data:application/csv;charset=utf-8,' + encodeURIComponent(csvString);
+	}
+	
+	$scope.download = function(csvString) {
+		
+		if ($window.navigator.msSaveOrOpenBlob) {
+		  var blob = new Blob([decodeURIComponent(encodeURI(csvString))], {
+		    type: "text/csv;charset=utf-8;"
+		  });
+		  navigator.msSaveBlob(blob, 'products.csv');
+		}
+	};
+	
+	
+	
+	
 }]);

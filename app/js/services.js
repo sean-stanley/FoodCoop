@@ -354,6 +354,8 @@ angular.module('co-op.services', [])
 		daysBeforeOrderingStops,
 		daysBeforeDeliveryDay;
 		
+		$rootScope.canShop = true; //default shopping to true until Calendar API confirms this.
+		
 		// counts how many days until @date. Returns @INTEGER or NaN
 		// a negative result means that @date is in the past
 		function daysUntil (date) {				
@@ -373,6 +375,7 @@ angular.module('co-op.services', [])
 			//module.twoMonth = results.cycles[2];
 			$rootScope.cycle = result.currentCycle._id;
 			$rootScope.deliveryDay = result.currentCycle.deliveryDay;
+			$rootScope.nextDeliveryDay = result.nextCycle.deliveryDay;
 			// $rootScope.canUpload = result[4];
 			$rootScope.canShop = result.canShop;
 			// $rootScope.canChange = result[6];
@@ -537,8 +540,8 @@ angular.module('co-op.services', [])
 		var module = {
 						
 			getData : function(callback) {
-	            $http.get("/api/user/producer-list").success(callback);
-	        },
+				$http.get("/api/user/producer-list").success(callback);
+			},
 			
 		};
 		
