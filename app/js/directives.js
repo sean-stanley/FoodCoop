@@ -174,21 +174,24 @@ angular.module('co-op.directives', [])
 						height: winheight + 'px'
 					});
 				}
-				scope.$apply();
 			};
 						
 			function fullSize() {
-				scope.$apply(function() {
-					element.css({
-						'min-height' : $window.innerHeight + 'px'
-					});
+				element.css({
+					'min-height' : $window.innerHeight + 'px'
 				});
+				
+				// scope.$apply(function() {
+//
+// 				});
 			}
 			
-			angular.element($document).ready(function() {
-				fullSize();
-				angular.element($window).bind("resize", fullSize);
-			});
+			fullSize();
+			angular.element($window).bind("resize", fullSize);
+			
+			// angular.element($document).ready(function() {
+			//
+			// });
 		};
 	}])
 	

@@ -341,6 +341,7 @@ angular.module('co-op.controllers', [])
 .controller('productUploadCtrl', ['$scope', '$rootScope', '$sce', '$location', '$modal', 'ProductManager', 'Restangular', 'product', 'flash',
 	function($scope, $rootScope, $sce, $location, $modal, ProductManager, Restangular, product, flash) {
 		// init
+		$rootScope.$broadcast("cropme:cancel");
 		$scope.productManager = ProductManager;
 		console.log($rootScope.cycle);
 			
@@ -354,6 +355,7 @@ angular.module('co-op.controllers', [])
 		$scope.newProduct.cycle = $rootScope.canSell ? $rootScope.cycle : !!$rootScope.cycle ? $rootScope.cycle + 1 : undefined;
 		
 		$scope.reset = function() {
+			$rootScope.$broadcast("cropme:cancel");
 			var path = $location.path();
 			$scope.productData = angular.copy($scope.newProduct);
 			if (path !== '/product-upload') {
@@ -560,8 +562,8 @@ function($scope, $modalInstance, data, ProductManager) {
 			$scope.currentProducts = result;
 		});
 		
-		ProductHistory.getAllProducts(function(result) {
-			$scope.allProducts = result;
+		ProductHistory.getPastProducts(function(result) {
+			$scope.pastProducts = result;
 		});
 
 		$scope.predicate = 'cycle';
@@ -923,6 +925,8 @@ function($scope, $modalInstance, data, ProductManager) {
 	function($scope, $rootScope, $location, $routeParams, $modal, LoginManager, flash, $http, Cart) {
 		var category, sort, reverse, productURL;
 		
+		console.log(Cart);
+		
 		$rootScope.$broadcast('GET_CART');
 		$scope.isProducts = true;
 		
@@ -940,7 +944,7 @@ function($scope, $modalInstance, data, ProductManager) {
 					if ( _.contains($scope.cartProduct_ids, product._id) ) {
 						product.AlreadyInCart = true;
 					}
-					else product.AlreadyInCart = false;
+					else product.AlreadyInCart = 0;
 				});
 			}
 		};

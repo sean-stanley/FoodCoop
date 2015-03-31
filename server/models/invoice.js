@@ -27,7 +27,8 @@ var InvoiceSchema = new Schema({
 	status: {type: String, required: true, default: 'un-paid', validator:validStatus},
 	cycle: {type: Number, ref: 'Cycle'},
 	// only for invoices to customers
-	deliveryRoute: String
+	deliveryRoute: String,
+	notes: String,
 },{
 	toObject: { virtuals : true },
 	toJSON: { virtuals : true }

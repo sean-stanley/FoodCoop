@@ -524,14 +524,18 @@ angular.module('co-op.services', [])
 ])
 
 	
-	.factory('ProductHistory', ['$http', function($http) {
+	.factory('ProductHistory', ['$rootScope', '$http', function($rootScope, $http) {
 		var module = {
 			getCurrentProducts : function(callback) {
 				return $http.get("/api/product-list/current").success(callback);
 			},
+			getPastProducts : function(callback) {
+				return $http.get("/api/product-list/past").success(callback);
+			},
 			getAllProducts : function(callback) {
 				this.recentProducts = $http.get("/api/product-list").success(callback);
 			}
+			
 		};
 		return module;
 	}])

@@ -80,13 +80,14 @@ ProductSchema.pre('save', function(next) {
 
 ProductSchema.post('remove', function(product) {
 	// remove the saved product image from disk asynchronously
-	if (product.img) {
-		console.log('%s was deleted. Now deleting product image saved to disk', product.productName + ' ' + product.variety);
-		fs.unlink(path.normalize(path.join(__dirname, '../../app', product.img)), function(err) {
-			if (err) console.log(err);
-			else console.log('Successfully removed image.');
-		});
-	}
+	// not a good idea as multiple products could share the same original image.
+	// if (product.img) {
+// 		console.log('%s was deleted. Now deleting product image saved to disk', product.productName + ' ' + product.variety);
+// 		fs.unlink(path.normalize(path.join(__dirname, '../../app', product.img)), function(err) {
+// 			if (err) console.log(err);
+// 			else console.log('Successfully removed image.');
+// 		});
+// 	}
 });
 
 module.exports = mongoose.model('Product', ProductSchema);

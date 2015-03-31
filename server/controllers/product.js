@@ -84,7 +84,7 @@ exports.changePrice = function(req, res, next) {
 
 exports.updateValidator = function(req, res, next) {
 	if (_.isArray(req.body.cycle) ) {
-		return res.status(403).send('sorry you can\'t update your product with more than one delivery day specified. Use the "Save" button instead.');
+		return res.status(403).send('sorry you can\'t update your product with more than one delivery day specified.');
 	} next();
 };
 

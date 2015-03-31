@@ -31,7 +31,7 @@
 			To be paid to the NNFC by <span ng-if="invoice.invoicee.name">{{invoice.invoicee.name}}</span><span ng-if="invoice.exInvoicee">{{invoice.exInvoicee}}</span>
 		</li>
 		<li ng-show="invoice.toCoop">
-			The NNFC must pay this invoice to {{invoice.invoicee.name}};
+			The NNFC must pay this invoice to {{invoice.invoicee.name}} <span ng-show="invoice.invoicee.producerData.companyName">of {{invoice.invoicee.producerData.companyName}}</span>
 		</li>
 		<li>Date Placed: {{invoice.datePlaced | shortDate}}</li>
 		<li>Due Date: {{invoice.dueDate | shortDate}}</li>

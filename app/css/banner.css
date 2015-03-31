@@ -3,6 +3,15 @@
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
+	background-position: center;
+}
+
+#slideLamb {background: url('/img/slides/lambs-sm.jpg') no-repeat center center fixed; 
+-webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+	background-position: center;
 }
 
 #slide1 {background: url('/img/cheese-wine-meat-sm.jpg') no-repeat center center fixed; 
@@ -38,6 +47,13 @@
 
 @media (min-width: 769px) {
 	#slideCow {background: url('/img/slides/raw-milk-comp.jpg') no-repeat top center fixed;
+	-webkit-background-size: cover;
+	  -moz-background-size: cover;
+	  -o-background-size: cover;
+	  background-size: cover;
+}
+
+#slideLamb {background: url('/img/slides/lambs-comp.jpg') no-repeat top center fixed;
 	-webkit-background-size: cover;
 	  -moz-background-size: cover;
 	  -o-background-size: cover;
@@ -84,7 +100,7 @@
 .carousel-caption h1 {font-size: 3.5em;}
 .carousel-indicators .active {margin: 2px 4px;}
 .carousel-indicators li {margin:3px;}
-.carousel-indicators {bottom: 15px;}
+.carousel-indicators {bottom: 35px;}
 
 .carousel-inner > .active, .carousel-inner > .next, .carousel-inner > .prev {
     display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
@@ -148,9 +164,6 @@ h2.slogan {
 		font-size: 8em;
 	}
 }
-
-
-
 
 .login {
 	background-color: rgba(255,255,255,0.86);

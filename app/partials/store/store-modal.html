@@ -47,16 +47,16 @@
 		<span ng-repeat="item in data.ingredients track by $index"><a ng-href="/store?search={{item}}">{{item}} </a> </span></p>
 		<p ng-if="data.certification.name !== 'none'"><strong>Certification:</strong> {{data.certification.name}}</p>
 		<p><strong>Produced By:</strong> {{data.producer_ID.producerData.companyName || data.producer_ID.name || 'unknown'}}<br></p>
-		<h3><strong>Quantity left:</strong> {{data.quantity - data.amountSold}}</h3>
+		<h4><strong>Quantity left:</strong> {{data.quantity - data.amountSold}}</h4>
 		<br>
-		<h2>
+		<h3>
 			<span ng-show="data.productName === 'Raw Milk' ">
-				<strong>{{0.5*data.priceWithMarkup|currency}} for {{product.units}}</strong><br>
-				({{product.priceWithMarkup|currency}} / 4L Total)
+				<strong>{{data.priceWithMarkup|currency}} for 4L over two weeks</strong> ({{0.5*data.priceWithMarkup|currency}} / 2L)
 			</span>
-			<span ng-hide="product.productName === 'Raw Milk' ">
+			<span ng-hide="data.productName === 'Raw Milk' ">
 			<strong>Price:</strong> {{data.priceWithMarkup|currency}} / {{data.units}}</span>
-		</h2>
+		</h3>
+		<div class="center-block text-center">
 		<button class="btn btn-danger btn-lg" disabled ng-if="data.quantity === 0">
 			SOLD OUT
 		</button>
@@ -66,6 +66,7 @@
 		<button class="btn btn-primary btn-lg" disabled ng-if="data.AlreadyInCart">
 			Added to Cart
 		</button>
+		</div>
 		
     </div>
 </div>

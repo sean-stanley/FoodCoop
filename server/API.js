@@ -306,7 +306,7 @@ exports.configAPI = function configAPI(app) {
 		models.Product.find(req.query)
 		.where('producer_ID').equals(new ObjectId(req.user._id))
 		.limit(100)
-		.select('productName variety dateUploaded price quantity amountSold units cycle')
+		.select('productName variety price quantity amountSold units cycle')
 		.populate('cycle')
 		.sort('cycle.deliveryDay')
 		.exec(function(e, products){
@@ -315,6 +315,21 @@ exports.configAPI = function configAPI(app) {
 			res.json(products);
 		});
 	});
+	
+	app.get('/api/product-list/past', auth.isLoggedIn, function(req, res, next) {
+		models.Product.find({cycle: {$lt: scheduler.currentCycle._id}})
+		.where('producer_ID').equals(new ObjectId(req.user._id))
+		.limit(100)
+		.select('productName variety price quantity amountSold units cycle')
+		.populate('cycle')
+		.sort('cycle.deliveryDay')
+		.exec(function(e, products){
+			if (e) return next(e);
+			res.setHeader('Cache-Control', 'private, no-cache, no-store');
+			res.json(products);
+		});
+	});
+	
 	// return a compact list of all the current user's products for the current month.
 	app.get('/api/product-list/current', auth.isLoggedIn, function(req, res, next) {
 		models.Product.find({
@@ -833,18 +848,18 @@ exports.configAPI = function configAPI(app) {
 				var userData = user.toJSON();
 				
 				// email the user that their account details were changed
-				if ( !_.isEqual(req.body.user_type, userData.user_type) ) {
-					canSell = (req.body.user_type.canSell) ? 'can sell products through the co-op website' : 'no longer sell products through the co-op website';
-					if (req.body.user_type.name !== userData.user_type.name) {
-						message = 'You\'re now a ' + req.body.user_type.name + ' member.';
-					}
-					mailOptions = {template: 'user-rights-change', subject: 'Your NNFC membership has changed', to: [{name: req.body.name, email: req.body.email}, mail.companyEmail]};
-					mailData = {name: user.name, canSell: canSell, message: message};
-					emailToSend = new Emailer(mailOptions, mailData);
-					emailToSend.send(function(err, result) {
-						if (err) log.info(err);
-					});
-				}
+				// if ( !_.isEqual(req.body.user_type, userData.user_type) ) {
+// 					canSell = (req.body.user_type.canSell) ? 'can sell products through the co-op website' : 'no longer sell products through the co-op website';
+// 					if (req.body.user_type.name !== userData.user_type.name) {
+// 						message = 'You\'re now a ' + req.body.user_type.name + ' member.';
+// 					}
+// 					mailOptions = {template: 'user-rights-change', subject: 'Your NNFC membership has changed', to: [{name: req.body.name, email: req.body.email}, mail.companyEmail]};
+// 					mailData = {name: user.name, canSell: canSell, message: message};
+// 					emailToSend = new Emailer(mailOptions, mailData);
+// 					emailToSend.send(function(err, result) {
+// 						if (err) log.info(err);
+// 					});
+// 				}
 				// update the database with the user's changes
 				async.each(Object.keys(req.body), function(key, done) {
 					if (userData[key] !== req.body[key] && key !== 'password' && key !== 'oldPassword') {
@@ -1102,19 +1117,17 @@ exports.configAPI = function configAPI(app) {
 			},
 			// delete the user from the database
 			function(user, done) {
-				//remove an account's cart first
-				models.Order.remove({customer: user._id}, function(e) {
-					if (e) done(e);
-				});
-				// then remove an account's products 
-				models.Product.remove({producer_ID: user._id}, function(e) {
-					if (e) done(e);
-				});
+				// models.Order.update({customer: user._id}, function(e) {
+// 					if (e) done(e);
+// 				});
+				// models.Product.remove({producer_ID: user._id}, function(e) {
+// 					if (e) done(e);
+// 				});
 				// finally remove the user itself
 				models.User.remove({_id: user.id}, function(e) {
 					if (e) done(e);
 				});	
-				log.info('The user and their products and orders are deleted');
+				log.info('The user is deleted');
 				done(null);
 			}
 			

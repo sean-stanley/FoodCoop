@@ -12,9 +12,18 @@
 			</p>
 		</div>
 		<br>
+		<div class="jumbotron" ng-hide="canShop">
+			<h3><span class="glyphicon glyphicon-tree-deciduous"></span> Our Store is still Growing</h3>
+			<p>Until Shopping opens again producers will be uploading products in real-time to our store. Try checking back later</p>
+			<h3 ng-hide="currentUser"><i class="fa fa-clock-o"></i> Don't Want To Wait?</h3>
+			<p ng-hide="currentUser"><a href="/signup">Sign up and get email notifcations when shopping is open.</p>
+			<a ng-hide="currentUser" href="/signup" class="btn btn-primary">Sign Up Now</a>
+			<h3><i class="fa fa-binoculars"></i> Want more Selection?</h3>
+			<p>Tell us what you'd like to see and we'll start scouting for a local producer of what you're after.</p>
+			<a href="/contact?subject=More%20Products%20%Needed%20In%20The%20Store" class="btn btn-primary">Contact Us</a>
+		</div>
 				
     <div ng-class="{ 'pull-left' : !panelDisplay}" class="hidden-sm hidden-xs">
-    	<label> Categories: </label>
 		<div class="btn-group">
 			<button type='button' class="btn btn-default" ng-model="category" btn-radio="'Produce'" >Produce</button>
 			<button type='button' class="btn btn-default" ng-model="category" btn-radio="'Meat'" >Meat</button>
@@ -27,7 +36,7 @@
 	</div>
 	
 	<div class="btn-group visible-sm visible-xs" dropdown>
-		<button class='btn btn-default dropdown-toggle'>Categories <span class="caret"></span></button>
+		<button class='btn btn-default dropdown-toggle' dropdown-toggle>Categories <span class="caret"></span></button>
 		<ul class="dropdown-menu" role="menu">
 	        <li><a ng-click="category = 'Produce'">Produce</a></li>
 	        <li><a ng-click="category = 'Meat'">Meat</a></li>
@@ -74,7 +83,7 @@
 		ng-mouseleave="detailsVisible = false"
 		ng-swipe-left="detailsVisible = true;"
 		>
-			<figure class="first-layer" ng-mouseover="callDelayed()" ng-mouseleave="callCancelled()">
+			<figure class="first-layer" ng-mouseover="callDelayed()" ng-mouseleave="callCancelled()" ng-class="{'blur':detailsVisible}">
 				<img
 				ng-if="product.certification.name !== 'none' && product.img && product.certification.img"
 				ng-src="img/certification/{{product.certification.img}}" class="certification-img" alt="organic certification">
@@ -86,10 +95,10 @@
 						ng-hide="product.quantity <= 0">
 							Add to Cart
 						</button>
-						<button class="btn btn-primary pull-right" disabled ng-if="product.AlreadyInCart">
-							Added to Cart
+						<button class="btn btn-primary pull-right" ng-if="product.AlreadyInCart" disabled>
+							Already in Cart
 						</button>
-						<button class="btn btn-danger pull-right" disabled ng-if="product.quantity === 0">
+						<button class="btn btn-danger pull-right" disabled ng-if="product.quantity <= 0">
 							SOLD OUT
 						</button>
 						<br>
@@ -98,11 +107,9 @@
 						tooltip="Swipe left for more info"
 						tooltip-trigger="click"><i class="fa fa-chevron-circle-left"> swipe</i></span>
 					</div>
-					<h3>{{product.fullName}}</h3>
+					<h4>{{product.fullName}}</h4>
 					<div ng-show="product.productName === 'Raw Milk' ">
-						<p>{{0.5*product.priceWithMarkup|currency}} for {{product.units}}<br>
-								({{product.priceWithMarkup|currency}} / 4L Total)
-						</p>
+						<p>{{product.priceWithMarkup|currency}} for 4L over two weeks ({{0.5*product.priceWithMarkup|currency}} / 2L)</p>
 					</div>
 					<p ng-hide="product.productName === 'Raw Milk' ">{{product.priceWithMarkup|currency}} / {{product.units}}</p>
 				</figcaption>
@@ -116,9 +123,7 @@
 					 {{product.producer_ID.producerData.companyName || product.producer_ID.name}}</a></h4>
 					<h3>{{product.fullName}}</h3>
 					<div ng-show="product.productName === 'Raw Milk' ">
-						<p>{{0.5*product.priceWithMarkup|currency}} for {{product.units}}<br>
-								({{product.priceWithMarkup|currency}} / 4L Total)
-						</p>
+						<p>{{product.priceWithMarkup|currency}} for 4L over two weeks ({{0.5*product.priceWithMarkup|currency}} / 2L)</p>
 					</div>
 					<p ng-hide="product.productName === 'Raw Milk' ">{{product.priceWithMarkup|currency}} / {{product.units}}</p>
 					

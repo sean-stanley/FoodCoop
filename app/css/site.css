@@ -112,7 +112,7 @@ a:hover {
 	border-right: 1px solid black;
 }
 
-.sidebar-right {right:0; top: 0px;}
+.sidebar-right {right:0; top: 0;}
 
 .sidebar > div, .sidebar > form {
 	padding: 10px;
@@ -437,23 +437,39 @@ a.panel-btn-sml {
 
 .product-container { /*section that is repeated for the store products. Flex items*/
 	position: relative;
-	padding: 15px;
 	overflow:hidden;
-	background:#ddd;
 	margin-top:5px;
+	border: solid 1px #ddd;
 }
 
-.product-container figcaption > h3 {margin-top:10px;}
+.product-container figcaption {text-align: center;}
 
 .product-container figcaption .btn-group {margin-top: 0.8em}
 
-/*
-.product-container figure {background:#ddd;}
-*/
+.product-container figcaption > .btn-group {
+  margin-top: 0.8em;
+  position: absolute;
+  top: 230px;
+  right: 0px;
+  overflow: visible;
+}
+
+.first-layer {
+	-webkit-transition: all 0.4s ease;
+	-moz-transition: all 0.4s ease;
+	-ms-transition: all 0.4s ease;
+	-o-transition: all 0.4s ease;
+	transition: all 0.4s ease;
+}
+
+.blur {
+	 filter: url(blur.svg#blur); -webkit-filter: blur(3px); filter: blur(3px); filter:progid:DXImageTransform.Microsoft.Blur(PixelRadius='3');
+}
+
 @media (min-width: 768px) {
 	.first-layer > img.img-responsive {
-		min-height: 250px;
-		min-width: 330px;
+		min-height: 275px;
+		min-width: 367px;
 	}
 
 	.product-container { max-width: 369px; margin-top: 15px; }

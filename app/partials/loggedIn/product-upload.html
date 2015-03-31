@@ -42,9 +42,7 @@ min-width: inherit;">
 						</div>
 						<h5>{{productData.variety}} {{productData.productName}}</h5>
 						<div ng-show="productData.productName === 'Raw Milk' ">
-							<p>{{0.5*productData.priceWithMarkup|currency}} for {{productData.units}}<br>
-									({{productData.priceWithMarkup|currency}} / 4L Total)
-							</p>
+							<p>{{productData.priceWithMarkup|currency}} for 4L over two weeks ({{0.5*productData.priceWithMarkup|currency}} / 2L)</p>
 						</div>
 						<p ng-hide="productData.productName === 'Raw Milk' ">{{productData.priceWithMarkup|currency}} / {{productData.units}}</p>
 					</figcaption>
@@ -58,9 +56,7 @@ min-width: inherit;">
 						
 						<h3>{{productData.variety}} {{productData.productName}}</h3>
 						<div ng-show="productData.productName === 'Raw Milk' ">
-							<p>{{0.5*productData.priceWithMarkup|currency}} for {{productData.units}}<br>
-									({{productData.priceWithMarkup|currency}} / 4L Total)
-							</p>
+							<p>{{productData.priceWithMarkup|currency}} for 4L over two weeks ({{0.5*productData.priceWithMarkup|currency}} / 2L)</p>
 						</div>
 						<p ng-hide="productData.productName === 'Raw Milk' ">{{productData.priceWithMarkup|currency}} / {{productData.units}}</p>
 						<hr>
@@ -83,10 +79,13 @@ min-width: inherit;">
 			</div>
 		</section>
 	
-		<h2>View an Old Product</h2>
+		
 		<div ng-controller="productHistoryCtrl">
+			<h3 class="text-center">Edit A Product in the Store</h3>
 			<accordion id="product-history-list" close-others="false">
-				<accordion-group heading="This Cycle's Products">
+				<accordion-group>
+				<accordion-heading><span class="badge" style="margin-left: 10px">{{currentProducts.length}}</span>Products This Cycle</accordion-heading>
+				
 					<ul class="list-unstyled fa-ul">
 						<li ng-repeat="i in currentProducts">
 							<i class="fa fa-li fa-times" ng-click="delete($index, i._id)" style="cursor: pointer"></i>
@@ -94,22 +93,21 @@ min-width: inherit;">
 						</li>
 					</ul>
 				</accordion-group>
-				
-				<accordion-group heading="All Products">
-					Current Cycle: {{currentCycle}}
+				<h3 class='text-center'>Re-list an Old Product</h3>
+				<accordion-group>
+					<accordion-heading><span class="badge" style="margin-left: 10px">{{pastProducts.length}}</span> Past Products </accordion-heading>
 					<table class="table table-hover">
 						<thead>
 							<tr>
-								<th><a href="" ng-click="predicate = 'dateUploaded'; reverse=!reverse ">Date Added</th>
-								<th><a href="" ng-click="predicate = 'name'; reverse=!reverse ">Name</th>
-									<th><a href="" ng-click="predicate = 'cycle.deliveryDay'; reverse=!reverse ">Sale Date</th>
-								
+								<th><a href="" ng-click="predicate = 'fullName'; reverse=!reverse ">Name</th>
+								<th><a href="" ng-click="predicate = 'price'; reverse=!reverse ">Price</th>
+								<th><a href="" ng-click="predicate = 'cycle.deliveryDay'; reverse=!reverse ">Sale Date</th>
 							</tr>
 						</thead>
 						<tbody>
-							<tr ng-repeat="i in allProducts | orderBy:predicate:reverse ">
-								<td>{{i.dateUploaded|shortDate}}</td>
+							<tr ng-repeat="i in pastProducts | orderBy:predicate:reverse ">
 								<td><a ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a></td>
+								<td>{{i.price | currency}} / {{i.units}}</a></td>
 								<td>{{i.cycle.deliveryDay|shortDate}}</td>
 							</tr>
 						</tbody>
@@ -264,21 +262,19 @@ min-width: inherit;">
 				<div class="form-group">
 					<div class="btn-group">
 						<button type="submit" class="btn" ng-class="{'btn-success':productUpload.$valid, 'btn-warning':productUpload.$invalid}" ng-click="save(productUpload.$valid, categoryError);" analytics-on="click" analytics-event="Upload Product">
-							<span ng-show="!!productData._id && productData.cycle < cycle && canShop">Relist For Current Cycle</span>
-							<span ng-show="!!productData._id && productData.cycle < cycle && !canShop">Relist For Next Cycle</span> 
+							<span ng-show="!!productData._id && productData.cycle < cycle && canShop">Re-list For Current Cycle</span>
+							<span ng-show="!!productData._id && productData.cycle < cycle && !canShop">Re-list For Next Cycle</span> 
 							<span ng-show="!!productData._id && productData.cycle === cycle && canShop">Duplicate</span>
-							<span ng-show="!!productData._id && productData.cycle === cycle && !canShop">Relist for Next Cycle</span>
+							<span ng-show="!!productData._id && productData.cycle === cycle && !canShop">Re-list for Next Cycle</span>
 							<span ng-show="!!productData._id && productData.cycle > cycle">Duplicate for Future</span>
 							<span ng-show="!!productData._id && productData.cycle.length > 0">Create Across Selected Date(s)</span>
 							<span ng-show="!productData._id && productData.cycle.length > 0">Create Across Selected Date(s)</span>
 							<span ng-show="!productData._id">Save</span>
 						</button>
-						<button ng-if="productData._id" type="submit" class="btn" ng-class="{'btn-success': productUpload.$valid, 'btn-warning':productUpload.$invalid}" ng-click="update(productUpload.$valid, categoryError);" analytics-on="click" analytics-event="Upload Product">Update</button>
+						<button ng-if="productData._id" type="submit" class="btn" ng-class="{'btn-success': productUpload.$valid, 'btn-warning':productUpload.$invalid}" ng-click="update(productUpload.$valid, categoryError);" analytics-on="click" analytics-event="Upload Product" ng-hide="!!productData._id && productData.cycle < cycle">Update</button>
 						<button type="button" ng-click="reset()" class="btn btn-default">Reset Form</button>
 						</div>
 					</div>
-					
-					
 					
 			  </fieldset>
 		  </form>
