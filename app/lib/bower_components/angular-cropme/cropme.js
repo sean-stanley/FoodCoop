@@ -28,30 +28,32 @@
     minHeight = 100;
     borderSensitivity = 8;
     return {
-      template: "<div\n	class=\"step-1\"\n	ng-show=\"state == 'step-1'\"\n	ng-style=\"{'width': width + 'px', 'height': height + 'px'}\">\n	<dropbox ng-class=\"dropClass\"></dropbox>\n	<div class=\"cropme-error\" ng-bind-html=\"dropError\"></div>\n	<div class=\"cropme-file-input\">\n		<input type=\"file\"/>\n		<div\n			class=\"cropme-button\"\n			ng-class=\"{deactivated: dragOver}\"\n			ng-click=\"browseFiles()\">\n				Browse picture\n		</div>\n		<div class=\"cropme-or\">or</div>\n		<div class=\"cropme-label\" ng-class=\"iconClass\">{{dropText}}</div>\n	</div>\n</div>\n<div\n	class=\"step-2\"\n	ng-show=\"state == 'step-2'\"\n	ng-style=\"{'width': width + 'px', cursor: colResizePointer}\"\n	ng-mousemove=\"mousemove($event)\"\n	ng-mouseleave=\"deselect()\">\n	<img ng-src=\"{{imgSrc}}\" ng-style=\"{'width': width + 'px'}\" ng-show=\"imgLoaded\"/>\n	<div class=\"overlay-tile\" ng-style=\"{'top': 0, 'left': 0, 'width': xCropZone + 'px', 'height': yCropZone + 'px'}\"></div>\n	<div class=\"overlay-tile\" ng-style=\"{'top': 0, 'left': xCropZone + 'px', 'width': widthCropZone + 'px', 'height': yCropZone + 'px'}\"></div>\n	<div class=\"overlay-tile\" ng-style=\"{'top': 0, 'left': xCropZone + widthCropZone + 'px', 'right': 0, 'height': yCropZone + 'px'}\"></div>\n	<div class=\"overlay-tile\" ng-style=\"{'top': yCropZone + 'px', 'left': xCropZone + widthCropZone + 'px', 'right': 0, 'height': heightCropZone + 'px'}\"></div>\n	<div class=\"overlay-tile\" ng-style=\"{'top': yCropZone + heightCropZone + 'px', 'left': xCropZone + widthCropZone + 'px', 'right': 0, 'bottom': 0}\"></div>\n	<div class=\"overlay-tile\" ng-style=\"{'top': yCropZone + heightCropZone + 'px', 'left': xCropZone + 'px', 'width': widthCropZone + 'px', 'bottom': 0}\"></div>\n	<div class=\"overlay-tile\" ng-style=\"{'top': yCropZone + heightCropZone + 'px', 'left': 0, 'width': xCropZone + 'px', 'bottom': 0}\"></div>\n	<div class=\"overlay-tile\" ng-style=\"{'top': yCropZone + 'px', 'left': 0, 'width': xCropZone + 'px', 'height': heightCropZone + 'px'}\"></div>\n	<div class=\"overlay-border\" ng-style=\"{'top': (yCropZone - 2) + 'px', 'left': (xCropZone - 2) + 'px', 'width': widthCropZone + 'px', 'height': heightCropZone + 'px'}\"></div>\n</div>\n<div class=\"cropme-actions\" ng-show=\"state == 'step-2'\">\n	<button id=\"cropme-cancel\" ng-click=\"cancel($event)\">Cancel</button>\n	<button id=\"cropme-ok\" ng-click=\"ok($event)\">Ok</button>\n</div>\n<canvas\n	width=\"{{destinationWidth}}\"\n	height=\"{{destinationHeight}}\"\n	ng-style=\"{'width': destinationWidth + 'px', 'height': destinationHeight + 'px'}\">\n</canvas>",
+      template: "<div\n	class=\"step-1\"\n	ng-show=\"checkScopeVariables() && state == 'step-1'\"\n	ng-style=\"{'width': width + 'px', 'height': height + 'px'}\">\n	<dropbox ng-class=\"dropClass\"></dropbox>\n	<div class=\"cropme-error\" ng-bind-html=\"dropError\"></div>\n	<div class=\"cropme-file-input\">\n		<input type=\"file\"/>\n		<div\n			class=\"cropme-button\"\n			ng-class=\"{deactivated: dragOver}\"\n			ng-click=\"browseFiles()\">\n				Browse picture\n		</div>\n		<div class=\"cropme-or\">or</div>\n		<div class=\"cropme-label\" ng-class=\"iconClass\">{{dropText}}</div>\n	</div>\n</div>\n<div\n	class=\"step-2\"\n	ng-show=\"state == 'step-2'\"\n	ng-style=\"{'width': width + 'px', cursor: colResizePointer}\"\n	ng-mousemove=\"mousemove($event)\"\n	ng-mouseleave=\"deselect()\">\n	<img ng-src=\"{{imgSrc}}\" ng-style=\"{'width': width + 'px'}\" ng-show=\"imgLoaded\"/>\n	<div class=\"overlay-tile\" ng-style=\"{'top': 0, 'left': 0, 'width': xCropZone + 'px', 'height': yCropZone + 'px'}\"></div>\n	<div class=\"overlay-tile\" ng-style=\"{'top': 0, 'left': xCropZone + 'px', 'width': widthCropZone + 'px', 'height': yCropZone + 'px'}\"></div>\n	<div class=\"overlay-tile\" ng-style=\"{'top': 0, 'left': xCropZone + widthCropZone + 'px', 'right': 0, 'height': yCropZone + 'px'}\"></div>\n	<div class=\"overlay-tile\" ng-style=\"{'top': yCropZone + 'px', 'left': xCropZone + widthCropZone + 'px', 'right': 0, 'height': heightCropZone + 'px'}\"></div>\n	<div class=\"overlay-tile\" ng-style=\"{'top': yCropZone + heightCropZone + 'px', 'left': xCropZone + widthCropZone + 'px', 'right': 0, 'bottom': 0}\"></div>\n	<div class=\"overlay-tile\" ng-style=\"{'top': yCropZone + heightCropZone + 'px', 'left': xCropZone + 'px', 'width': widthCropZone + 'px', 'bottom': 0}\"></div>\n	<div class=\"overlay-tile\" ng-style=\"{'top': yCropZone + heightCropZone + 'px', 'left': 0, 'width': xCropZone + 'px', 'bottom': 0}\"></div>\n	<div class=\"overlay-tile\" ng-style=\"{'top': yCropZone + 'px', 'left': 0, 'width': xCropZone + 'px', 'height': heightCropZone + 'px'}\"></div>\n	<div class=\"overlay-border\" ng-style=\"{'top': (yCropZone - 2) + 'px', 'left': (xCropZone - 2) + 'px', 'width': widthCropZone + 'px', 'height': heightCropZone + 'px'}\"></div>\n</div>\n<div class=\"cropme-actions\" ng-show=\"state == 'step-2'\">\n	<button id=\"cropme-cancel\" ng-click=\"cancel($event)\">{{cancelLabel}}</button>\n	<button id=\"cropme-ok\" ng-click=\"ok($event)\">{{okLabel}}</button>\n</div>\n<canvas\n	width=\"{{destinationWidth}}\"\n	height=\"{{destinationHeight}}\"\n	ng-style=\"{'width': destinationWidth + 'px', 'height': destinationHeight + 'px'}\">\n</canvas>",
       restrict: "E",
       priority: 99,
       scope: {
-        width: "=?",
-        destinationWidth: "=",
-        height: "=?",
-        destinationHeight: "=?",
-        iconClass: "=?",
-        ratio: "=?",
-        type: "=?",
+        width: "@?",
+        destinationWidth: "@",
+        height: "@?",
+        destinationHeight: "@?",
+        iconClass: "@?",
+        ratio: "@?",
+        type: "@?",
         src: "@?",
         sendOriginal: "@?",
-        sendCropped: "@?"
+        sendCropped: "@?",
+        id: "@?",
+        okLabel: "@?",
+        cancelLabel: "@?"
       },
       link: function(scope, element, attributes) {
-        var $input, canvasEl, checkBounds, checkHRatio, checkScopeVariables, checkVRatio, ctx, dragIt, draggingFn, elOffset, getCropPromise, getOriginalPromise, grabbedBorder, heightWithImage, imageAreaEl, imageEl, isNearBorders, loadImage, moveBorders, moveCropZone, nearHSegment, nearVSegment, sendCropped, sendOriginal, startCropping, zoom;
+        var $input, canvasEl, checkBounds, checkHRatio, checkVRatio, ctx, dragIt, draggingFn, elOffset, getCropPromise, getOriginalPromise, grabbedBorder, heightWithImage, imageAreaEl, imageEl, isNearBorders, loadImage, moveBorders, moveCropZone, nearHSegment, nearVSegment, sendCropped, sendOriginal, startCropping, zoom;
         scope.dropText = "Drop picture here";
         scope.state = "step-1";
         draggingFn = null;
         grabbedBorder = null;
         heightWithImage = null;
         zoom = null;
-        elOffset = null;
         imageEl = element.find('img')[0];
         canvasEl = element.find("canvas")[0];
         ctx = canvasEl.getContext("2d");
@@ -67,40 +69,32 @@
           scope.widthCropZone = Math.round(scope.destinationWidth * zoom);
           scope.heightCropZone = Math.round((scope.destinationHeight || minHeight) * zoom);
           scope.xCropZone = Math.round((scope.width - scope.widthCropZone) / 2);
-          scope.yCropZone = Math.round((scope.height - scope.heightCropZone) / 2);
-          return $timeout(function() {
-            return elOffset = elementOffset(imageAreaEl);
-          });
+          return scope.yCropZone = Math.round((scope.height - scope.heightCropZone) / 2);
         };
-        checkScopeVariables = function() {
+        scope.checkScopeVariables = function() {
           if (!scope.width) {
             scope.width = element[0].offsetWidth;
             if (!(scope.ratio || scope.height)) {
               scope.height = element[0].offsetHeight;
             }
           }
-          if (scope.destinationHeight) {
-            if (scope.ratio) {
-              throw "You can't specify both destinationHeight and ratio, destinationHeight = destinationWidth * ratio";
-            } else {
-              scope.ratio = scope.destinationHeight / scope.destinationWidth;
-            }
+          if (scope.destinationHeight && !scope.ratio) {
+            scope.ratio = scope.destinationHeight / scope.destinationWidth;
           } else if (scope.ratio) {
             scope.destinationHeight = scope.destinationWidth * scope.ratio;
-          }
-          if (scope.ratio && scope.height && scope.destinationHeight > scope.height) {
-            throw "Can't initialize cropme: destinationWidth x ratio needs to be lower than height";
-          }
-          if (scope.destinationWidth > scope.width) {
-            throw "Can't initialize cropme: destinationWidth needs to be lower than width";
           }
           if (scope.ratio && !scope.height) {
             scope.height = scope.width * scope.ratio;
           }
-          return scope.type || (scope.type = "png");
+          scope.type || (scope.type = "png");
+          scope.okLabel || (scope.okLabel = "Ok");
+          scope.cancelLabel || (scope.cancelLabel = "Cancel");
+          return true;
         };
         imageAreaEl = element[0].getElementsByClassName("step-2")[0];
-        checkScopeVariables();
+        elOffset = function() {
+          return elementOffset(imageAreaEl);
+        };
         $input = element.find("input");
         $input.bind("change", function() {
           var file;
@@ -121,6 +115,7 @@
           if (!file.type.match(/^image\//)) {
             return scope.dropError = "Wrong file type, please select an image.";
           }
+          scope.filename = file.name;
           scope.dropError = "";
           reader = new FileReader;
           reader.onload = function(e) {
@@ -131,53 +126,59 @@
           return reader.readAsDataURL(file);
         };
         loadImage = function(src) {
+          var img;
           if (!src) {
             return;
           }
-          imageEl.onerror = function() {
-            return scope.$apply(function() {
-              scope.cancel();
-              return scope.dropError = "Unsupported type of image";
-            });
-          };
-          imageEl.onload = function() {
-            var errors, height, width;
-            width = imageEl.naturalWidth;
-            height = imageEl.naturalHeight;
-            errors = [];
-            if (width < scope.width) {
-              errors.push("The image you dropped has a width of " + width + ", but the minimum is " + scope.width + ".");
-            }
-            minHeight = Math.min(scope.height, scope.destinationHeight);
-            if (height < minHeight) {
-              errors.push("The image you dropped has a height of " + height + ", but the minimum is " + minHeight + ".");
-            }
-            return scope.$apply(function() {
-              if (errors.length) {
-                scope.cancel();
-                return scope.dropError = errors.join("<br/>");
-              } else {
-                scope.imgLoaded = true;
-                $rootScope.$broadcast("cropme:loaded", width, height);
-                return startCropping(width, height);
-              }
-            });
-          };
           scope.state = "step-2";
           if (src !== scope.imgSrc) {
             scope.imgSrc = src;
-            return scope.imgLoaded = false;
+            scope.imgLoaded = false;
+            img = new Image;
+            img.onerror = function() {
+              return scope.$apply(function() {
+                scope.cancel();
+                return scope.dropError = "Unsupported type of image";
+              });
+            };
+            img.onload = function() {
+              var errors, height, width;
+              width = img.width;
+              height = img.height;
+              errors = [];
+              if (width < scope.width) {
+                errors.push("The image you dropped has a width of " + width + ", but the minimum is " + scope.width + ".");
+              }
+              minHeight = Math.min(scope.height, scope.destinationHeight);
+              if (height < minHeight) {
+                errors.push("The image you dropped has a height of " + height + ", but the minimum is " + minHeight + ".");
+              }
+              return scope.$apply(function() {
+                if (errors.length) {
+                  scope.cancel();
+                  return scope.dropError = errors.join("<br/>");
+                } else {
+                  scope.imgLoaded = true;
+                  $rootScope.$broadcast("cropme:loaded", width, height);
+                  return startCropping(width, height);
+                }
+              });
+            };
+            img.crossOrigin = "anonymous";
+            return img.src = src;
           }
         };
         moveCropZone = function(coords) {
-          scope.xCropZone = coords.x - elOffset.left - scope.widthCropZone / 2;
-          scope.yCropZone = coords.y - elOffset.top - scope.heightCropZone / 2;
+          var offset;
+          offset = elOffset();
+          scope.xCropZone = coords.x - offset.left - scope.widthCropZone / 2;
+          scope.yCropZone = coords.y - offset.top - scope.heightCropZone / 2;
           return checkBounds();
         };
         moveBorders = {
           top: function(coords) {
             var y;
-            y = coords.y - elOffset.top;
+            y = coords.y - elOffset().top;
             scope.heightCropZone += scope.yCropZone - y;
             scope.yCropZone = y;
             checkVRatio();
@@ -185,21 +186,21 @@
           },
           right: function(coords) {
             var x;
-            x = coords.x - elOffset.left;
+            x = coords.x - elOffset().left;
             scope.widthCropZone = x - scope.xCropZone;
             checkHRatio();
             return checkBounds();
           },
           bottom: function(coords) {
             var y;
-            y = coords.y - elOffset.top;
+            y = coords.y - elOffset().top;
             scope.heightCropZone = y - scope.yCropZone;
             checkVRatio();
             return checkBounds();
           },
           left: function(coords) {
             var x;
-            x = coords.x - elOffset.left;
+            x = coords.x - elOffset().left;
             scope.widthCropZone += scope.xCropZone - x;
             scope.xCropZone = x;
             checkHRatio();
@@ -248,12 +249,10 @@
           }
         };
         isNearBorders = function(coords) {
-          var bottomLeft, bottomRight, h, topLeft, topRight, w, x, y;
-          if (!elOffset) {
-            return false;
-          }
-          x = scope.xCropZone + elOffset.left;
-          y = scope.yCropZone + elOffset.top;
+          var bottomLeft, bottomRight, h, offset, topLeft, topRight, w, x, y;
+          offset = elOffset();
+          x = scope.xCropZone + offset.left;
+          y = scope.yCropZone + offset.top;
           w = scope.widthCropZone;
           h = scope.heightCropZone;
           topLeft = {
@@ -366,7 +365,9 @@
           }
           scope.dropText = "Drop files here";
           scope.dropClass = "";
-          return scope.state = "step-1";
+          scope.state = "step-1";
+          delete scope.imgSrc;
+          return delete scope.filename;
         };
         scope.ok = function($event) {
           if ($event) {
@@ -380,7 +381,10 @@
               x: scope.xCropZone / zoom,
               y: scope.yCropZone / zoom,
               height: scope.croppedHeight,
-              width: scope.croppedWidth
+              width: scope.croppedWidth,
+              destinationHeight: scope.destinationHeight,
+              destinationWidth: scope.destinationWidth,
+              filename: scope.filename
             };
             if (blobArray[0]) {
               result.croppedImage = blobArray[0];
@@ -388,15 +392,19 @@
             if (blobArray[1]) {
               result.originalImage = blobArray[1];
             }
-            return $rootScope.$broadcast("cropme:done", result, "image/" + scope.type);
+            return $rootScope.$broadcast("cropme:done", result, "image/" + scope.type, scope.id);
           });
         };
         scope.$on("cropme:cancel", scope.cancel);
         scope.$on("cropme:ok", scope.ok);
-        scope.$watch("src", function() {
-          return loadImage(scope.src);
+        return scope.$watch("src", function() {
+          var delimit;
+          if (scope.src) {
+            scope.filename = scope.src;
+            delimit = scope.src.match(/\?/) ? "&" : "?";
+            return loadImage("" + scope.src + delimit + "crossOrigin");
+          }
         });
-        return loadImage(scope.src);
       }
     };
   }]);
