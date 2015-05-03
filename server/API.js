@@ -647,6 +647,13 @@ exports.configAPI = function configAPI(app) {
 		});
 	});
 	
+	app.get('/api/transactions', auth.isAdmin, function(req, res) {
+		models.Transaction.find(req.query).exec(function(err, results) {
+			if (err) return res.status(500).send(err);
+			res.json(results);
+		});
+	});
+	
 	
 	//Forward producer application to standards committee.
 	app.post('/api/producer-applicaiton', auth.isLoggedIn, function(req, res, next) {
