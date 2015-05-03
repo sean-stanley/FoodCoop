@@ -32,6 +32,7 @@ var util = require('util')
 	, auth = require('./controllers/auth') // convenience authentication middleware for the app
 	, cycle = require('./controllers/cycle')
 	, product = require('./controllers/product')
+	, meatOrder = require('./controllers/meatOrder')
 	
 	, passport = require('passport') // middleware that provides authentication tools for the API.
 	, LocalStrategy = require('passport-local').Strategy; // the passport strategy employed by this API.
@@ -194,7 +195,8 @@ exports.configAPI = function configAPI(app) {
 	// this route looks up products and sends an array of results back to the client.
 	app.get('/api/product', function(req, res, next) {		
 		//
-		models.Product.find(req.query)
+		models.Product.find()
+		.or([{permanent: true}, req.query])
 		.sort({_id: 1})
 		.populate('category', 'name')
 		.populate('certification', 'name -_id img')
@@ -231,7 +233,7 @@ exports.configAPI = function configAPI(app) {
 	
 	app.get('/api/product/:productId', auth.isLoggedIn, product.show);
 	
-	app.put('/api/product/', auth.canSell, product.fromBody, product.changePrice, product.updateValidator, product.emailChange, product.quantityChange, product.update);
+	app.put('/api/product/', auth.canSell, product.fromBody, product.changePrice, product.updateValidator, product.quantityChange, product.update);
 
 	// this creates a new product. It is
 	// only called from the product-upload page of the app.
@@ -242,7 +244,11 @@ exports.configAPI = function configAPI(app) {
 	app.delete('/api/product/:productId', auth.isLoggedIn, function(req, res, next) {
 		var mailData, mailOptions, deleteMail;
 		var product = req.product;
-			
+		
+		if (product.cycle < scheduler.currentCycle._id) {
+			res.status(400).send('Products sold in the past can\'t be deleted');
+		}	
+		
 		if (product.cycle == scheduler.currentCycle._id) {
 				
 			models.Order.find({cycle: scheduler.currentCycle._id, product: new ObjectId(product._id)})
@@ -332,10 +338,10 @@ exports.configAPI = function configAPI(app) {
 	
 	// return a compact list of all the current user's products for the current month.
 	app.get('/api/product-list/current', auth.isLoggedIn, function(req, res, next) {
-		models.Product.find({
+		models.Product.find().or([{
 			producer_ID : new ObjectId(req.user._id),
 			cycle: scheduler.currentCycle._id
-		}, 'productName variety dateUploaded price quantity amountSold units cycle', { sort: {dateUploaded: 1} }, function(e, products) {
+		}, {permanent: true, producer_ID : new ObjectId(req.user._id)}]).select('permanent category productName variety dateUploaded price quantity amountSold units cycle').sort({dateUploaded: 1}).exec(function(e, products) {
 			if (e) return next(e);
 			res.setHeader('Cache-Control', 'private, no-cache, no-store');
 			res.json(products);
@@ -576,6 +582,18 @@ exports.configAPI = function configAPI(app) {
 		} else res.status(403).send('It\'s not shopping time yet');
 	});
 	
+	app.route('/api/meat-order', auth.isLoggedIn)
+	.post(meatOrder.create)
+	.put(meatOrder.update)
+	.get(meatOrder.me);
+	
+	app.get('/api/meat-order/cart', auth.isLoggedIn, meatOrder.cart);
+	
+	app.param('meatOrderId', meatOrder.meatOrder);
+	app.route('/api/meat-order/:meatOrderId', auth.isLoggedIn)
+	.get(meatOrder.show)
+	.delete(meatOrder.delete);
+		
 	app.route('/api/invoice')
 	// get all the invoices or a query. Called in the app from the invoices page
 	.get(auth.isLoggedIn, function(req, res, next) {
@@ -598,7 +616,7 @@ exports.configAPI = function configAPI(app) {
 	
 	// update an invoice's status
 	.put(auth.isAdmin, function(req, res, next) {
-		models.Invoice.findByIdAndUpdate(req.body._id, {status: req.body.status}, function(e, invoice){
+		models.Invoice.findByIdAndUpdate(req.body._id, {status: req.body.status, notes: req.body.notes || ''}, function(e, invoice){
 			if (e) return next(e);
 			// Save the time the invoice was modified
 			invoice.dateModified = Date();
@@ -910,7 +928,6 @@ exports.configAPI = function configAPI(app) {
 								if (err) {
 									log.info(err);
 								}
-								// a response is sent so the client request doesn't timeout and get an error.
 								log.info('Message sent to user confirming password change');
 							});
 						});
@@ -958,7 +975,6 @@ exports.configAPI = function configAPI(app) {
 		.lean()
 		.exec(function(e, producer) {
 			if (producer) {
-				log.info('%s of %s\'s page is being requested.', producer.name, producer.producerData.companyName);
 				if (!e && producer.user_type.name === 'Producer') {
 					res.send(producer);
 				} else if (producer.user_type.name !== 'Producer') {
@@ -1150,7 +1166,6 @@ exports.configAPI = function configAPI(app) {
 			delete userObject.salt;
 			delete userObject.hash;
 			res.send(userObject);
-			log.info('user %s just logged in', req.user.name);
 	})
 	// attempt to log the user in
 	.post(function(req, res, next) {
@@ -1219,7 +1234,6 @@ exports.configAPI = function configAPI(app) {
 					} else {
 						user.resetPasswordToken = token;
 						user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
-						log.info('reset token expires in: ' + user.resetPasswordExpires);
 						user.save(function(err) {
 							done(err, token, user);
 						});
@@ -1281,13 +1295,11 @@ exports.configAPI = function configAPI(app) {
 			function(done) {
 				models.User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, '-producerData', function(err, user) {
 					if (!user) {
-						log.info('Password reset token is invalid or has expired');
 						res.status(403).send('Password reset token is invalid or has expired');
 					}
 					else {
 						
 						user.setPassword(req.body.password, function() {
-							log.info({user: user}, '%s is having their password changed', user.name);
 							user.set('resetPasswordToken', undefined);
 							user.set('resetPasswordExpires', undefined);
 

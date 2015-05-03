@@ -1,0 +1,99 @@
+<div class="page-header">
+	<h1 class="text-center">Lamb Order Form <small>Beta</small></h1>
+</div>
+
+<div class="col-sm-4">
+	<img class="img-responsive" ng-src="{{beast.img}}">
+	<h4 class="text-center">{{beast.priceWithMarkup | currency}} / {{beast.units}}</h4>
+	<article ta-bind ng-model="beast.description"></article>
+</div>
+<div class="col-sm-8">
+	<p class="lead">Thank you for deciding to order your {{beast.productName}} through the Northland Natural Food Co-op. Whenever you order a whole <span ng-show="beast.half">or half </span>{{beast.productName}} you'll need to fill out this form. It contains the instructions the butchers need to know how to prepare your meat.</p>
+
+	<h3>How it works</h3>
+	<p>Once you click the 'Place Order' button at the bottom of the page, your instructions and order will be sent directly to the producer. If they need any other details from you the producer will contact you by email. You will receive an email as well to be a record of your order.</p>
+
+	<p>Then the producer will begin work on your order. Once the producer knows the final weight and price for your order, they'll update your order on our website and you'll receive an invoice with delivery/pickup instructions.</p>
+	
+	<form class="form-horizontal" name="meatOrderForm" ng-submit="order(meatOrderForm.$valid)" ng-hide="success">
+		
+		<div class="form-group">
+			<label for="legs" class="col-sm-2 control-label">Legs</label>
+			<div class="col-sm-10">
+				<select ng-model="meatOrder.instructions.legs" name="legs" class="form-control" required>
+					<option value="">-- Choose One --</option>
+					<option value="whole">Whole</option>
+					<option value="halved">Cut in Half</option>
+				</select>
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label for="loin" class="col-sm-2 control-label">Loin</label>
+			<div class="col-sm-10">
+				<select ng-model="meatOrder.instructions.loin" name="loin" class="form-control" required>
+					<option value="">-- Choose One --</option>
+					<option value="Chops" selected>Chops</option>
+					<option value="Racks">Racks</option>
+				</select>
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label for="shoulders" class="col-sm-2 control-label">Shoulders</label>
+			<div class="col-sm-10">
+				<select ng-model="meatOrder.instructions.shoulders" name="shoulders" class="form-control" required>
+					<option value="">-- Choose One --</option>
+					<option value="Roasts" selected>Roasts</option>
+					<option value="Chops">Chops</option>
+					<option value="Diced">Diced</option>
+					<option value="Chops">Rolled Seasoned</option>
+				</select>
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label for="flaps" class="col-sm-2 control-label">Flaps</label>
+			<div class="col-sm-10">
+				<select ng-model="meatOrder.instructions.flaps" name="flaps" class="form-control" required>
+					<option value="">-- Choose One --</option>
+					<option value="Roasts" selected>Roasts</option>
+					<option value="Chops">Chops</option>
+					<option value="Diced">Diced</option>
+					<option value="Chops">Rolled Seasoned</option>
+					<option value="sausages">Sausages</option>
+				</select>
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label for="flavour" class="col-sm-2 control-label">Sausage Flavour</label>
+			<div class="col-sm-10">
+				<input class="form-control" ng-model="meatOrder.instructions.flavour" type="text" name="flavour" value="" placeholder="See the description on the left for information on possible sausage flavours">
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label for="special" class="col-sm-2 control-label">Special Requests</label>
+			<div class="col-sm-10">
+				<textarea class="form-control" rows="4" ng-model="meatOrder.instructions.special" name="special" value="" placeholder="Any other special instructions, allergies, etc?"></textarea>
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<div class="col-sm-10 col-sm-offset-2">
+				<button type="submit" class="btn" ng-class="{'btn-success':meatOrderForm.$valid, 'btn-warning':meatOrderForm.$invalid}">Place Order</button>
+			</div>
+		</div>
+		
+		<br>
+	</form>
+	
+	<div ng-show="success" class="jumbotron">
+		<h2 class="text-center">All ordered!</h2>
+		<p class="text-center">Thank you for your time and your order. We'll be in touch soon with your invoice when your order is finalized.</p>
+		<a href="/store" class="btn btn-primary">Keep Shopping</a>
+	</div>
+</div>
+
+<!-- {{meatOrderForm}} -->

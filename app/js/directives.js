@@ -392,5 +392,109 @@ angular.module('co-op.directives', [])
               });
           }
       };
-  }]);  
+  }])
+	
+.directive('ngEnter', function() {
+	    return function(scope, elm, attrs) {
+	        elm.bind('keypress', function(e) {
+	            if (e.charCode === 13 && !e.ctrlKey) scope.$apply(attrs.ngEnter);
+	        });
+	    };
+	})
+
+.directive('ngEditable', function() {
+	    return {
+	        // can be in-lined or async loaded by xhr
+	        // or inlined as JS string (using template property)
+	        template: '<span class="editable-wrapper">' + '<span data-ng-hide="edit">{{model}}</span>' + ' <a ng-hide="edit" data-ng-click="edit=true;value=model;"><span class="glyphicon glyphicon-pencil"></span></a>' + '<input type="text" data-ng-model="value" data-ng-blur="edit = false; model = value" data-ng-show="edit" data-ng-enter="model=value;edit=false;"/>' + ' <a ng-show="edit" ng-click="model=value;edit=false;"><span class="glyphicon glyphicon-floppy-open"></span></a>' + '</span>',
+	        scope: {
+	            model: '=ngEditableModel',
+	            update: '&ngEditable'
+	        },
+					replace: true,
+					link: function(scope, element, attrs) {
+						scope.focus = function() {
+								element.find("input").focus();
+								};
+							scope.$watch('edit', function(isEditable) {
+								if (isEditable === false) {
+										scope.update();
+										} else {
+										// scope.focus();
+										}
+								});
+						}
+				};
+	})
+	.directive('ngEditableNumber', function() {
+		    return {
+		        // can be in-lined or async loaded by xhr
+		        // or inlined as JS string (using template property)
+		        template: '<span class="editable-wrapper">' + ' <a ng-hide="edit" data-ng-click="edit=true;value=model;"><span class="glyphicon glyphicon-pencil"></span></a>' + '<span data-ng-hide="edit">{{model}}</span>' + '<input class="form-control" style="width: 75%" type="number" data-ng-model="value" data-ng-blur="edit = false; model = value" data-ng-show="edit" data-ng-enter="model=value;edit=false;"/>' + ' <a ng-show="edit" ng-click="model=value;edit=false;" class="float-right"><span class="glyphicon glyphicon-floppy-open"></span></a>' + '</span>',
+		        scope: {
+		            model: '=ngEditableModel',
+		            update: '&ngEditable'
+		        },
+						replace: true,
+						link: function(scope, element, attrs) {
+							scope.focus = function() {
+									element.find("input").focus();
+									};
+								scope.$watch('edit', function(isEditable) {
+									if (isEditable === false) {
+											scope.update();
+											} else {
+											// scope.focus();
+											}
+									});
+							}
+					};
+		})
+
+.directive('ngEditableParagraph', function() {
+	    return {
+	        // can be in-lined or async loaded by xhr
+	        // or inlined as JS string (using template property)
+	        template: '<span class="editable-wrapper">' + '<span data-ng-hide="edit" data-ng-click="edit=true;value=model;" class="respect-newline">{{model}}</span>' + '<textarea data-ng-model="value" data-ng-blur="model=value ; edit=false" data-ng-show="edit" data-ng-enter="model=value;edit=false;" class="form-control"></textarea>' + '</span>',
+	        scope: {
+	            model: '=ngEditableModel',
+	            update: '&ngEditableParagraph'
+	        },
+	        replace: true,
+	        link: function(scope, element, attrs) {
+	            scope.focus = function() {
+	                element.find("textarea").focus();
+	            };
+	            scope.$watch('edit', function(isEditable) {
+	                if (isEditable === false) {
+	                    scope.update();
+	                } else {
+	                    scope.focus();
+	                }
+	            });
+	        }
+	    };
+	})
+
+.directive('ngEditableSelect', function() {
+	    return {
+	        template: '<span class="editable-wrapper">' + '<span data-ng-hide="edit" data-ng-click="edit=true;value=model;"><span>{{model}}</span></span>' + '<select data-ng-model="value" data-ng-show="edit" data-ng-multiple="true" multiple data-ng-options="option for option in options" data-ng-change="model=value;edit=false;">' + '<option value="">Choose Option</option>' + '</select>' + '</span>',
+	        scope: {
+	            text: '&ngEditableSelectText',
+	            model: '=ngEditableSelectModel',
+	            options: '=ngEditableSelectOptions',
+	            update: '&ngEditableSelect'
+	        },
+	        transclude: true,
+	        replace: true,
+	        link: function(scope, element, attrs) {
+	            scope.$watch('edit', function(isEditable) {
+	                if (isEditable === false) {
+	                    scope.update();
+	                }
+	            });
+	        }
+	    };
+	});
+	
 

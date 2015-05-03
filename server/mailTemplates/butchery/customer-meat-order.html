@@ -1,0 +1,24 @@
+Hi {{name}},
+
+<p>Congratulations on ordering {{productName}} from the NNFC. The producer is now processing your order and you will hear again from us soon. We won't know the total you owe us until we figure out the exact hung weight of the animal you're ordering. When we do, we'll send you a proper invoice with payment instructions.</p>
+
+<p>For your records:</p>
+<p>On {{datePlaced}} You ordered {{productName}} from the NNFC at the price of {{unitPrice}} / kg.</p> 
+Instructions: 
+<ul>
+	<% _.forOwn(instructions, function(value, key) { %> 
+		<li>{{key.toUpperCase()}} : {{value}}</li>
+	<% }); %>
+</ul>
+
+<p>Thank you again for using the NNFC to eat more locally.</p>
+
+<p>Yours Truly,</p>
+
+Sean Stanley<br>
+------------<br>
+NNFC Director<br>
+sean@foodcoop.nz<br>
+0210409066
+
+

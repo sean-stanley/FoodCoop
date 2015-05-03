@@ -1,0 +1,28 @@
+<div class="col-xs-12">
+	<h1 class="text-center">Bulk {{order.product.name}} Order</h1>
+	<alert type="info" ng-show="order.invoiced">An invoice for this order has been sent to you at {{order.customer.email}}</alert>
+	<h3>{{order.datePlaced| date:'dd/MM/yyyy h:mm a'}} {{order.customer.name}} ordered {{order.product.name}}</h3>
+	
+	
+	
+	<div class="col-sm-6">
+		<table class="table">
+			<tr class="info"><th colspan="2">General</th></tr>
+			<tr><th>Price</th><td>{{order.unitPriceWithMarkup | currency}} / kg</td></tr>
+			<tr ng-show="order.fixedPrice"><th>Processing Fee</th><td>{{order.fixedPrice | currency}}</td></tr>
+			<tr><th>Weight</th><td>{{order.weight || 'Not Yet Determined'}} <span ng-show="order.weight">kg</span></td></tr>
+			<tr><th>Total</th><td><span ng-show="order.totalWithMarkup">{{order.totalWithMarkup + order.fixedPrice | currency}}</span> <span ng-hide="order.totalWithMarkup">Not Yet Finalised</span></td></tr>
+			<tr class="info"><th colspan="2">Instructions</th></tr>
+			<tr ng-repeat="(key, value) in order.instructions">
+				<td><strong>{{key}}</strong></td>
+				<td>{{value}}</td>
+			</tr>
+		</table>
+	</div>
+	<div class="col-sm-6">
+		<h4><a ng-href="/contact/{{order.supplier}}"><i class="fa fa-envelope"></i> Contact Producer</a></h4>
+		<h4>Pickup Instructions</h4>
+		<article ta-bind ng-model="order.deliveryInstructions"></article>
+		<alert type="info" ng-hide="order.deliveryInstructions">Once the producer has written you some delivery instructions you will be able to find them here.</alert>
+	</div>
+</div>

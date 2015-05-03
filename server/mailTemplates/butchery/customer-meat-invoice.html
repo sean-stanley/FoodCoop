@@ -1,0 +1,66 @@
+<html>
+    <head>
+        <title> Thank you for ordering meat with the NNFC </title>
+    </head>
+    <body>
+				<h2>Thank you!</h2>
+        <p> Hi {{name}},</p>
+				<p>Thank you for shopping with the Northland Natural Food Co-op. Buying local meat strengthens Northland's economy and encourages sustainable practices. Our producers thank you for your support.</p>
+        <p> A summary of your purchase is listed below. We would appreciate payment by <strong> {{dueDate}} </strong>. Once payment has been made, it will be forwarded to the producer.</p>
+				<table border="0" cellspacing="10" cellpadding="10">
+					<thead>
+						<tr>
+							<td><strong>Invoice #{{code}}</strong></td>
+							<td colspan="5">{{name}}'s {{product}}</td>
+						</tr>
+						<tr>
+							<td><strong>Product</strong></td>
+							<td><strong>Weight</strong></td>
+							<td><strong>Cost</strong></td>
+						</tr>
+					</thead>
+					<tbody>
+
+						<% _.each(items, function(item) { %> 
+							<tr>
+								<td>{{item.name}}</td>
+								<td>{{weight}} kg</td>
+								<td>${{item.cost.toFixed(2)}}</td>
+							</tr>
+						<% }); %>
+					</tbody>
+					<tfoot>
+						<tr>
+							<td colspan="3"> Total: ${{total.toFixed(2)}}</td>
+						</tr>
+					</tfoot>
+				</table>
+	   
+		 <h2>Pick Up Instructions from the producer:</h2>
+		 "{{deliveryInstructions}}"
+		 
+		 
+		 <p>Here is a reminder of the butchery instructions you requested:</p>
+		 <ul>
+		 	<% _.forOwn(instructions, function(value, key) { %> 
+		 		<li>{{key.toUpperCase()}} : {{value}}</li>
+		 	<% }); %>
+		 </ul>
+	   
+	   
+	   <p>Payment can be made by internet banking to account # {{account}}. Please use your name as the reference and your invoice number (found above) as the particulars. 
+			 We also accept credit card payments with New Zealand's <a href="https://txtpay.co.nz">TxtPay</a>. To pay by credit card follow this <a href="https://www.txtpay.co.nz/VPos/VPos.aspx?merchant=NNFC&type=Payment">link</a>. If you are unable to pay by internet banking or credit card and would like to make some other arrangement, please contact us so we can work things out as soon as possible.</p>
+       
+	   <hr>
+        <p> A copy of this invoice and its payment status is available <a href="https://foodcoop.nz/my-invoices">online</a>
+        
+        <p>Congratulations on your purchase and good eating!</p>
+        <p>Cheers, <br>
+        The NNFC team </p>
+        
+		<p>
+			<a href="https://foodcoop.nz"><img src="cid:logo@foodcoop" /></a>
+		</p>
+    </body>
+    
+</html>

@@ -212,7 +212,7 @@ angular.module('co-op.services', [])
 	
 	// collects and maps category id's with their names. 
 	.factory('ProductManager', ['$http', 'Restangular', '$rootScope', 'flash', function($http, Restangular, $rootScope, flash) {
-		var module, productCategoryPromise, 
+		var module, productCategoryPromise,
 		categoryIdMapping = {}, 
 		categoryNameMapping = {}, 
 		certificationNameMapping = {},
@@ -245,7 +245,7 @@ angular.module('co-op.services', [])
 		var certificationPromise = Restangular.all("api/certification");
 		
 		certificationPromise.getList().then(function(certifications){
-			var i, certification;
+			var i;
 			certifications = certifications.plain();
 			certificationNameMapping = _.indexBy(certifications, 'name');
 			certificationIdMapping = _.indexBy(certifications, '_id');
@@ -278,6 +278,7 @@ angular.module('co-op.services', [])
 				var cb = callback || angular.noop, message;
 				
 				Restangular.all('api/product').post(productData).then(function(response) {
+					
 					message = 'Congratulations ' + $rootScope.currentUser.name + '! Your ' + productData.variety + " " + productData.productName + ' are now added to the store.';
 					flash.setMessage({type: 'success', 
 					message: message
@@ -303,7 +304,7 @@ angular.module('co-op.services', [])
 			
 			productCategories : productCategoryPromise.getList().$object,
 			
-			certificationTypes: Restangular.all("api/certification").getList().$object,
+			certificationPromise: certificationPromise,
 			
 			getUserProducts: function(callback){
 				$http.get("api/product?producer_ID=:currentUser._id");
@@ -450,14 +451,17 @@ angular.module('co-op.services', [])
 		};
 	}])
 	
-.factory('Cart', ['$rootScope','Restangular', 'LoginManager', 'flash', '$q',
-	function($rootScope, Restangular, LoginManager, flash, $q){
+.factory('Cart', ['$rootScope','Restangular', '$http', 'LoginManager', 'flash', '$q',
+	function($rootScope, Restangular, $http, LoginManager, flash, $q){
 		return {
 			getAllItems : function(callback) {
 				LoginManager.isLoggedIn().then(function() {
 					Restangular.one('api/cart', $rootScope.currentUser._id)
 					.get().then(callback);
 				});
+			},
+			getMeatItems : function(success, error) {
+				$http.get('/api/meat-order/cart').then(success, error);
 			},
 			// optional @callback function will have @list which holds the cart items of
 			// the current month
@@ -522,7 +526,22 @@ angular.module('co-op.services', [])
 		};
 	}
 ])
-
+	.factory('ButcheryForms', [function() {
+		return {
+			beef: {
+				name: 'Beef Form',
+				route: '/butchery/beef',
+			},
+			sheep: {
+				name: 'Lamb, Sheep and Goat Form',
+				route: '/butchery/sheep'
+			},
+			pig: {
+				name: 'Pig Form',
+				route: '/butchery/pig'
+			}
+		};
+	}])
 	
 	.factory('ProductHistory', ['$rootScope', '$http', function($rootScope, $http) {
 		var module = {
@@ -533,8 +552,26 @@ angular.module('co-op.services', [])
 				return $http.get("/api/product-list/past").success(callback);
 			},
 			getAllProducts : function(callback) {
-				this.recentProducts = $http.get("/api/product-list").success(callback);
-			}
+				return $http.get("/api/product-list").success(callback);
+			},
+			getMeatProducts : function(callback) {
+				return $http.get("/api/product-list", {
+					query: {
+						category: '5421e9192ba620071b4cb2a9',
+						permanent: true
+					}
+				})
+				.success(callback);
+			},
+			getMilkProducts : function(callback) {
+				return $http.get("/api/product-list", {
+					query: {
+						category: '5421e9192ba620071b4cb2a9',
+						permanent: true
+					}
+				})
+				.success(callback);
+			},
 			
 		};
 		return module;

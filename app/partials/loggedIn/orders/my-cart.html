@@ -1,0 +1,138 @@
+<div ng-class="{'col-md-10':!meatHistory && !milkHistory, 'col-md-offset-1': !meatHistory && !milkHistory, 'col-xs-12': milkHistory || meatHistory}">
+	<div class="page-header text-center">
+		<h1> <i class="fa fa-shopping-cart"></i> My Cart <small>Live Updates</small></h1>
+	</div>
+	
+	<div ng-class="{'col-sm-8':meatHistory || milkHistory }">
+	
+		<p>Here is where you will see all your shopping orders. You will get an email of this list at the end of the ordering period. Records of your past shopping is here too.</p>
+
+		<h2>{{month}} Cart</h2>
+		<div id="table-div">
+		<table class="table">
+			<thead>
+				<tr>
+					<th><a href="" ng-click="predicate = '_id'; reverse=!reverse">Remove</a></th>
+					<th><a href="" ng-click="predicate = 'product.productName'; reverse=!reverse">Product</a></th>
+					<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse">Quantity</a></th>
+					<th><a href="" ng-click="predicate = 'orderPriceWithMarkup'; reverse=!reverse">Price</a></th>
+					<th><a href="" ng-click="predicate = 'supplier.producerData.companyName' || 'supplier.name'; reverse=!reverse">Producer</a></th>
+				</tr>
+			</thead>
+			<tfoot>
+				<tr>
+					<td colspan="5"><strong>Total: {{cartTotal(cart)|currency}}</strong></td>
+				</tr>
+			</tfoot>
+			<tbody>
+				<tr ng-repeat="c in cart | orderBy:predicate:reverse" >
+			        <td data-title=" 'remove' ">
+			        	<a ng-click="delete($index)"><i class="fa fa-trash"></i></a>
+					</td>
+			        <td data-title="'Product'" >
+			            {{c.product.fullName}}
+			        </td>
+			        <td data-title="'Quantity'">
+						<form class="navbar-form navbar-left" role="search" ng-controller="updateCartCtrl">
+							<div class="form-group">
+								<input type="number" class="form-control" ng-model="c.quantity" 
+								ng-init="lastQuantity = c.quantity"
+								ng-change="showSave = true;">
+							</div>
+							<button type="submit" 
+							class="btn btn-default" 
+							ng-show="showSave" 
+							ng-click="showSave=false; saveNewQuantity(c);"><i class="fa fa-cloud-upload"></i> Save</button>
+						</form>
+			        </td>
+			        <td data-title="'Price'">
+			            {{c.unitPriceWithMarkup * c.quantity | currency}}
+			        </td>
+			        <td data-title="'Customer'">
+			            {{c.supplier.producerData.companyName || c.supplier.name}}
+			        </td>
+			    </tr>
+			</tbody>
+		</table>
+		<h3 ng-show="cart.length > 0">That's it! You will be billed for items in your cart at the end of ordering week. Thanks for shopping local!</h3>
+		</div>
+		<accordion>
+			<accordion-group heading="Cart History" ng-controller="cartHistoryCtrl">
+				<div ng-controller="cartHistoryCtrl">
+					[ <a href="" ng-click="predicate=''">unsorted</a> ]
+					<table class="table">
+						<thead>
+							<tr>
+								<th><a href="" ng-click="predicate = 'datePlaced'; reverse=!reverse">Date</a></th>
+								<th><a href="" ng-click="predicate = 'product.productName'; reverse=!reverse">Product</a></th>
+								<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse">Quantity</a></th>
+								<th><a href="" ng-click="predicate = 'orderPriceWithMarkup'; reverse=!reverse">Price</a></th>
+								<th><a href="" ng-click="predicate = 'supplier.producerData.companyName' || 'supplier.name'; reverse=!reverse">Producer</a></th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td colspan="5"><strong>Total: {{cartTotal(cartHistory)|currency}}</strong></td>
+							</tr>
+						</tfoot>
+						<tbody>
+							<tr ng-repeat="c in cartHistory | orderBy:predicate:reverse" >
+						        <td data-title=" 'Date' ">
+						        	{{c.datePlaced | shortDate}}
+								</td>
+						        <td data-title="'Product'" >
+						            {{c.product.fullName}}
+						        </td>
+						        <td data-title="'Quantity'">
+						           {{c.quantity}}
+						        </td>
+						        <td data-title="'Price'">
+						            {{c.orderPriceWithMarkup | currency}}
+						        </td>
+						        <td data-title="'Customer'">
+						            {{c.supplier.producerData.companyName || c.supplier.name}}
+						        </td>
+						    </tr>
+						</tbody>
+					</table>
+				</div>
+			</accordion-group>
+		</accordion>
+	</div>
+	<div ng-class="{'col-sm-4':meatHistory || milkHistory}" ng-show="meatHistory || milkHistory">
+		<h2>Meat Orders</h2>
+		<p>Orders with a yellow background have not yet been finalised. Click on one to edit it and finalize it. Green orders have been finalised.</p>
+		<table class="table">
+			<thead>
+				<tr>
+					<th><a href="" ng-click="ordering = 'c.datePlaced'; backward=!backward">Date Ordered</a></th>
+					<th><a href="" ng-click="ordering = 'c.product.name'; backward=!backward">Product</a></th>
+					<th><a href="" ng-click="ordering = 'c.unitPriceWithMarkup'; backward=!backward">Price</a></th>
+					<th><a href="" ng-click="ordering = 'c.weight'; backward=!backward">Weight</a></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="c in meatHistory | orderBy:ordering:backward" ng-class="{'warning': !c.invoiced, 'success': c.invoiced}">
+					<td data-title="'Price'">
+						<a ng-href="/meat-order/{{c._id}}">{{c.datePlaced| date:'dd/MM/yyyy h:mm a'}}</a>
+					</td>
+					<td data-title="'Product'" >
+						<a ng-href="/meat-order/{{c._id}}">{{c.product.name}}</a>
+					</td>
+					<td data-title="'Price'">
+						<a ng-href="/meat-order/{{c._id}}">{{c.unitPriceWithMarkup|currency}} / kg</a>
+					</td>
+					<td data-title="'Weight'">
+						<a ng-href="/meat-order/{{c._id}}">{{c.weight || 'TBA'}} <span ng-show="c.weight">kg</span></a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+
+
+
+
+

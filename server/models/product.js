@@ -5,6 +5,7 @@ var mongoose = require('mongoose'), // middleware for connecting to the mongodb 
 	path = require('path'),
 	config = require('./../coopConfig.js'),
 	markup = config.markup,
+	meatMarkup = config.meatMarkup,
 	gm = require('gm');
 
 function toArray (listString) {
@@ -12,6 +13,7 @@ function toArray (listString) {
 		return listString.split(/,\s*/);
 	}
 }
+
 
 // These are the most common properties that a product will have in our co-op.
 // The img property is to be filled with a base64 encoded png or jpeg from the
@@ -30,9 +32,13 @@ var ProductSchema = new Schema({
 			description: {type: String, required: false},
 			certification: {type: Schema.ObjectId, ref: 'Certification'},
 			producer_ID: {type: Schema.ObjectId, required: true, ref: 'User'},
-			cycle: {type: Number, required: true, ref:'Cycle'},
+			cycle: {type: Number, ref:'Cycle', index: -1},
 			amountSold: {type: Number, default: 0},
-			regionID: [{type: Schema.ObjectId, ref: 'Region'}]
+			regionID: [{type: Schema.ObjectId, ref: 'Region'}],
+			// For Meat Products
+			permanent: {type: Boolean, index: 1, default: false},
+			butcheryForm: String,
+			fixedPrice: Number // used for processing fees that don't change with quantity
 }, {
 	toObject: { virtuals : true },
 	toJSON: { virtuals : true }
@@ -44,6 +50,9 @@ function convertToArray (value) {
 }
 
 ProductSchema.virtual('priceWithMarkup').get(function () {
+	if (this.permanent && (this.category._id == '5421e9192ba620071b4cb2a9' || this.category == "5421e9192ba620071b4cb2a9") ) { // meat category
+		return (this.price * (meatMarkup/100 + 1));
+	} 
 	return (this.price * (markup/100 + 1));
 });
 ProductSchema.virtual('fullName').get(function () {

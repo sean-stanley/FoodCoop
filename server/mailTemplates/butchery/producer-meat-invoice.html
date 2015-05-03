@@ -1,0 +1,62 @@
+<html>
+    <head>
+        <title> Bulk Meat Order You've approved </title>
+    </head>
+    <body>
+        <p> Hi {{name}},</p>
+		<p>Thank you for selling with the Northland Natural Food Co-op. Local commerce reduces environmental impact and increases Northland's food security. Thank you for sharing your fantastic products with our customers.</p>
+        <p> Below is a copy of what the NNFC owes you for your recent {{product}} sale.</p>
+		
+				<table border="0" cellspacing="10" cellpadding="10">
+				 <thead>
+					 <tr>
+						 <th><strong>Invoice #{{code}}</strong></th>
+						 <th colspan="5"></td><strong>{{name}}'s Requested {{product}}</strong></th>
+					 </tr>
+					 <tr>
+						<td><strong>Product</strong></td>
+						<td><strong>Weight</strong></td>
+						<td><strong>Cost</strong></td>
+					 </tr>
+				</thead>
+				<tbody>
+					 
+					<% _.each(items, function(item) { %> 
+						 <tr>
+							<td>{{item.name}}</td>
+							<td>{{weight}} kg</td>
+							<td>${{item.cost.toFixed(2)}}</td>
+						 </tr>
+					<% }); %>
+				</tbody>
+					<tfoot>
+						<tr>
+							<td colspan="2"> Total: ${{total.toFixed(2)}}</td>
+						</tr>
+					</tfoot>
+       </table>
+			 
+			 <h2>Delivery / Pickup Instructions</h2>
+			 "{{deliveryInstructions}}"
+		 
+		 
+			 <h2>Here is a reminder of the butchery instructions requested:</h2>
+			 <ul>
+			 	<% _.forOwn(instructions, function(value, key) { %> 
+			 		<li>{{key.toUpperCase()}} : {{value}}</li>
+			 	<% }); %>
+			 </ul>
+	   
+	   <p>Assuming we receive payment promptly, your payment should arrive by <strong>{{dueDate}}</strong> You can expect payment to the account {{account}}. If this is incorrect, please contact us immediately and update your bank account details from the producer profile page on our website.</p>
+
+		 <p> We look forward to fascilitating more orders for you in the future.</p>
+		 <p>Cheers, <br>
+			 The NNFC team 
+		 </p>
+		
+		<p>
+			<a href="https://foodcoop.nz"><img src="cid:logo@foodcoop" /></a>
+		</p>
+    </body>
+    
+</html>

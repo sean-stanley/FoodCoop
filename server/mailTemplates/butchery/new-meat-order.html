@@ -1,0 +1,28 @@
+<p>Hi {{name}},</p>
+
+<p>Congratulations! A new order for you just arrived through the NNFC.</p>
+
+
+
+<p>Here is a summary of the order:</p>
+<p>On {{datePlaced}} <a href="mailto:{{customer.email}}">{{customer.name}}</a> ordered {{productName}} from the NNFC at the price of {{unitPrice}} / kg.</p> 
+
+These are the Butchery Instructions sent by {{customer.name}}: 
+<ul>
+	<% _.forOwn(instructions, function(value, key) { %> 
+		<li>{{key.toUpperCase()}} : {{value}}</li>
+	<% }); %>
+</ul>
+
+<p>If you need any further information from {{customer.name}} you can reach them at <strong>{{customer.email}}</strong>.</p>
+
+<p>Thank you again for using the NNFC to help more Northlanders eat healthy local food.</p>
+
+<p>Yours Truly,</p>
+
+Sean Stanley<br>
+------------<br>
+NNFC Director<br>
+sean@foodcoop.nz<br>
+0210409066
+

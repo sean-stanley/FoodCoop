@@ -21,12 +21,30 @@
 	<li><a href="" ng-click="cancelled = {status : '!CANCELLED'}">Hide Cancelled</a></li>
 </ul>
 
+<div class="well">
+	<h3>Sale Statistics</h3>
+	<p>Total Paid by Customers: {{stats.toCustomers | currency}}<br>
+			Total Paid to Producers: {{stats.toCoop | currency}}<br>
+			Total Revenue Earned from the store to Date: {{stats.revenue | currency}}
+	</p>
+</div>
+
 <section ng-repeat="invoice in invoices | orderBy:sort:reverse | filter:search:searchbar:cancelled">
 	<alert ng-show="invoice.alert" type="{{invoice.alert.type}}">{{invoice.alert.message}}</alert>
 	<alert ng-if="invoice.dueDate &gt; now" type="danger">This invoice is OVERDUE</alert>
 	<alert ng-if="soon(invoice)" type="warning">This invoice is due soon</alert>
 	<alert ng-if="invoice.toCoop" type="info">The Co-op must pay this Invoice</alert>
+	<span>
 	<ul class="list-unstyled">
+		<li><span style="display: inline-block" class="label" 
+				ng-class="{ 
+					'label-default': invoice.status === 'un-paid' || CANCELLED,
+					'label-info' : invoice.status === 'To Refund',
+					'label-success': invoice.status === 'PAID' || 'Refunded',
+					'label-danger' : invoice.status === 'OVERDUE'}">
+					{{invoice.status}}
+				</span>
+		</li>
 		<li ng-hide="invoice.toCoop">
 			To be paid to the NNFC by <span ng-if="invoice.invoicee.name">{{invoice.invoicee.name}}</span><span ng-if="invoice.exInvoicee">{{invoice.exInvoicee}}</span>
 		</li>

@@ -77,8 +77,21 @@ angular.module('co-op.admin')
 			return false;
 		};
 		
+		$scope.stats = {};
+
+		
+		function calculateStats(invoices) {
+			$scope.stats.toCoop = _.sum(_.pluck(_.filter(invoices, {toCoop: true, status: 'PAID'}), 'total'));
+			$scope.stats.toCustomers = _.sum(_.pluck(_.filter(invoices, {toCoop: false, status: 'PAID'}), 'total'));
+			$scope.stats.revenue = $scope.stats.toCustomers - $scope.stats.toCoop;
+		}
+		
+		
 		// the array of invoices for use in the template
-		$scope.invoices = Restangular.all('api/invoice').getList().$object;
+		Restangular.all('api/invoice').getList().then(function(invoices) {
+			$scope.invoices = invoices;
+			calculateStats($scope.invoices);
+		});
 		
 		// update the invoice
 		$scope.invoiceSave = function (invoice) {
@@ -127,7 +140,6 @@ angular.module('co-op.admin')
 			
 				$scope.invoices.splice($scope.invoices.indexOf(invoice), 1);
 			}
-			
 		};
 	}
 ])
@@ -219,7 +231,7 @@ angular.module('co-op.admin')
 
 .controller('orderAdminCtrl', ['$scope', '$rootScope', 'orders', function($scope, $rootScope, orders) {
 	
-	$scope.cycle = $rootScope.cycle || 12;
+	$scope.cycle = $rootScope.cycle || 15;
 	
 	$scope.next = function() {
 		$scope.cycle += 1;

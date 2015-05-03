@@ -92,9 +92,14 @@
 					<div class="btn-group pull-right">
 						<button class="btn btn-primary pull-right" 
 						ng-click="addToCart(product)" ng-if="!product.AlreadyInCart" 
-						ng-hide="product.quantity <= 0">
+						ng-hide="product.quantity <= 0 || product.permanent">
 							Add to Cart
 						</button>
+						<a class="btn btn-primary pull-right" 
+						ng-href="{{product.butcheryForm}}/{{product._id}}"
+						ng-show="product.permanent">
+							Order Now
+						</a>
 						<button class="btn btn-primary pull-right" ng-if="product.AlreadyInCart" disabled>
 							Already in Cart
 						</button>
@@ -147,9 +152,14 @@
 							Added to Cart
 						</button>
 						<button class="btn btn-primary" ng-click="addToCart(product)" 
-						ng-if="!product.AlreadyInCart" ng-hide="product.quantity <= 0">
+						ng-if="!product.AlreadyInCart" ng-hide="product.quantity <= 0 || product.permanent">
 							Add to Cart
 						</button>
+						<a class="btn btn-primary" 
+						ng-href="{{product.butcheryForm}}/{{product._id}}"
+						ng-show="product.permanent && product.butcheryForm">
+							Order Now
+						</a>
 						<a ng-href="/contact/{{product.producer_ID._id}}?subject=Question%20about%20{{product.fullName}}" class="btn btn-info" tooltip="Ask a question about this product" tooltip-append-to-body="true"><i class="fa fa-question-circle"></i></a>
 					</div>
 					<div>

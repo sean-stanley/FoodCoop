@@ -151,4 +151,37 @@ angular.module('co-op.user')
 		};
 	}
 ])
+
+.controller('viewMeatOrderCtrl', function($scope, $rootScope, order, $location) {
+	$scope.order = order.data;
+	
+	if (order.data.customer.id !== $rootScope.currentUser._id) $location.path('/');
+	
+})
+.controller('MeatOrderManagerCtrl', function($scope, $rootScope, order, $location, flash) {
+	$scope.order = order;
+	
+	$scope.flash = function(type, message) {
+		flash.setMessage({type: type, message: message});
+	};
+	
+	if (order.supplier !== $rootScope.currentUser._id) $location.path('/');
+	
+})
+.controller('MeatOrderListCtrl', function($scope, $http, $location) {
+	$http.get('/api/meat-order').success(function(result) {
+		$scope.meatOrders = result;
+		$scope.total = total(result);
+	});
+	
+	function total(orders) {
+		var amount, invoiced = _.filter(orders, 'invoiced');
+		amount = _.reduce(invoiced, function(t, n) {
+			return t + n.total;
+		}, 0);
+		return amount;
+	}
+	
+})
+
 ;

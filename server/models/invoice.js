@@ -15,8 +15,8 @@ var InvoiceSchema = new Schema({
 	title: String,
 	items: [{
 		cost: Number,
-		quantity: {type: String}, 
 		name: {type: String}, 
+		quantity: {type: String}, 
 		customer: {type:Schema.ObjectId, ref: 'User'}, 
 		product: {type:Schema.ObjectId, ref: 'Product'} 
 	}],
@@ -78,6 +78,10 @@ InvoiceSchema.pre('save', function(next) {
 	}
 	else next();
 });
+
+InvoiceSchema.pre('save', function(next) {
+	
+})
 
 
 

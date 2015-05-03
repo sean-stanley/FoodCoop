@@ -13,6 +13,8 @@ angular.module('co-op', [
 	'co-op.controllers',
 	'co-op.admin',
 	'co-op.user',
+	'co-op.product-upload',
+	'co-op.orders',
 	'angular-loading-bar', 
 	'btford.socket-io',
 	'ui.bootstrap',

@@ -1,26 +1,27 @@
 <div class="page-header col-md-12">
 	<h1 class="text-center">
 		<span ng-hide="currentUser.producerData.companyName">My</span>
-		<span ng-show="currentUser.producerData.companyName"> {{currentUser.producerData.companyName}}</span>
-		Products
+		<span ng-show="currentUser.producerData.companyName"> {{currentUser.producerData.companyName}}'s</span>
+		Products &amp; Orders
 	</h1>	
 </div>
 
 <div class="col-md-6">
 
-<h2>Products Now For Sale 
+<h2 class="text-center">Product Manager</h2>
+
+<h3>Products Now For Sale 
 	<a href="/product-upload" class="btn btn-success">
 			<span style="display: inline-block">
 				<span class="glyphicon glyphicon-cloud-upload"></span> Product
 			</span>
 		</a>
-</h2>
-<alert type="danger" ng-hide="canShop">Shopping is Now Closed for the Cycle ending {{deliveryDay | date:'EEEE dd/mm/yy'}}</alert>
+</h3>
+<alert type="danger" ng-hide="canShop">Shopping is Now Closed for the Cycle ending {{deliveryDay | date:'EEEE dd/MM/yy'}}</alert>
 
 <table class="table">
 <thead>
 	<tr>
-		<th ng-if="canShop"><a href="" ng-click="predicate = '_id'; reverse=!reverse" tooltip-placement="right" tooltip="Remove Items">&times;</a></th>
 		<th><a href="" ng-click="predicate = 'productName'; reverse=!reverse ">Product</a></th>
 		<th><a href="" ng-click="predicate = 'price'; reverse=!reverse ">Price</a></th>
 		<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Quantity</a></th>
@@ -29,11 +30,10 @@
 </thead>
 <tbody>
 	<tr ng-repeat="i in currentProducts | orderBy:predicate:reverse " >
-		<td ng-if="canShop">
-			<button type="button" class="close" aria-hidden="true" ng-click="delete($index, i._id)"><i class="fa fa-times"></i></button>
-		</td>
 		<td data-title="'Product'" >
-			<a ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a>
+			<a ng-hide="i.permanent && i.category === '5421e9192ba620071b4cb2a9' " ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a>
+			<a ng-show="i.permanent && i.category === '5421e9192ba620071b4cb2a9' " ng-href="/meat-upload/{{i._id}}">{{i.fullName}}</a>
+			<button type="button" class="close" aria-hidden="true" ng-click="delete($index, i._id)" tooltip-placement="right" tooltip="Delete Item: Warning this will affect orders made of this item."><i class="fa fa-times"></i></button>
 		</td>
 
 		<td data-title="'Price'">
@@ -98,7 +98,8 @@
 			            {{i.cycle.deliveryDay | shortDate}}
 			        </td>
 							<td data-title="'Product'" >
-			            <a ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a>
+			            <a ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a> 
+									<button type="button" class="close" aria-hidden="true" ng-click="delete($index, i._id)"><i class="fa fa-times"></i></button>
 			        </td>
 			        <td data-title="'Price'">
 			            {{i.price | currency}} / {{i.units}}
@@ -142,7 +143,10 @@
 </accordion>
 </div>
 <div class="col-md-6">
-	<h2>Unfulfilled Orders</h2>
+	
+	<h2 class="text-center">Order Manager</h2>
+	
+	<h3>Unfulfilled Orders</h3>
 	<table class="table" ng-repeat="order in sortedOrders">
 		<thead>
 			<tr><th colspan="4"><a ng-href="/contact/{{order._id._id}}">{{order._id.name}} <i class="fa fa-envelope"></i></a></th></tr>
@@ -154,7 +158,8 @@
 		<tbody>
 			<tr ng-repeat="i in order.orders">
 				<td data-title="'Product'" >
-					<a ng-href="/product-upload/{{i.product._id}}">{{i.product.fullName}}</a>
+					<a ng-hide="i.permanent && i.category === '5421e9192ba620071b4cb2a9' " ng-href="/product-upload/{{i.product._id}}">{{i.product.fullName}}</a>
+					<a ng-show="i.permanent && i.category === '5421e9192ba620071b4cb2a9' " ng-href="/meat-upload/{{i.product._id}}">{{i.product.fullName}}</a>
 				</td>
 				<td data-title="'Quantity'">
 					{{i.quantity}}
@@ -206,6 +211,40 @@
 				    </tr>
 				</tbody>
 			</table>
+		</accordion-group>
+		<div ng-controller="MeatOrderListCtrl">
+			<accordion-group heading="Bulk Meat Orders - Total: {{total | currency}}" ng-if="meatOrders">
+				<p>Orders with a yellow background have not yet been finalised. Click on one to edit it and finalize it. Green orders have been finalised.</p>
+				<table class="table">
+					<thead>
+						<tr>
+							<th><a href="" ng-click="ordering = 'c.datePlaced'; backward=!backward">Date Ordered</a></th>
+							<th><a href="" ng-click="ordering = 'c.product.name'; backward=!backward">Product</a></th>
+							<th><a href="" ng-click="ordering = 'c.unitPrice'; backward=!backward">Price</a></th>
+							<th><a href="" ng-click="ordering = 'c.weight'; backward=!backward">Weight</a></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="c in meatOrders | orderBy:ordering:backward" ng-class="{'warning': !c.invoiced, 'success': c.invoiced}">
+							<td data-title="'date'">
+								<a ng-href="/meat-order/edit/{{c._id}}">{{c.datePlaced| date:'dd/MM/yyyy h:mm a'}}</a>
+							</td>
+							<td data-title="'Product'" >
+								<a ng-href="/meat-order/edit/{{c._id}}">{{c.product.name}}</a>
+							</td>
+							<td data-title="'Price'">
+								<a ng-href="/meat-order/edit/{{c._id}}">{{c.unitPrice|currency}} / kg</a>
+							</td>
+							<td data-title="'Weight'">
+								<a ng-href="/meat-order/edit/{{c._id}}">{{c.weight || 'TBA'}} <span ng-show="c.weight">kg</span></a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</accordion-group>
+		</div>
+		<accordion-group heading="Milk Subscriptions - Active: {{activeMilkSubscribers(milkOrders)}}" ng-if="milkOrders">
+			
 		</accordion-group>
 	</accordion>
 </div>

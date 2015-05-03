@@ -96,22 +96,14 @@ exports.checkout = function () {
 				done(e, customers);
 			});
 		},
-		// function(customers, done) {
-// 			models.Product.populate(customers, {path: 'orders.product', select: 'fullName variety productName priceWithMarkup price units refrigeration'}
-// 			, function(e, result){
-// 				done(null, result);
-// 			});
-// 		},
 		function(customers, done) {
 			models.User.populate(customers, {path: '_id', select: 'name email routeTitle balance user_type.name'}
 			, function(e, result){
-				done(null, result);
+				done(e, result);
 			});
 		}
 	],function(e, result){
-		if (e) {
-			console.log(e);
-		}
+		if (e) console.log(e);
 		else {
 			async.each(result, exports.invoiceCustomer, function(error) {
 				if (error) console.log(error);
@@ -141,14 +133,12 @@ exports.invoiceCustomer = function(customer, callback) {
 			
 			invoice.save(function(e, invoice){
 				console.log('Invoice #%s saved for %s and has a total of %s', invoice._id, customer._id.name, invoice.total);
-				if (e) done(e);
-				else done(null, invoice);
+				done(e, invoice);
 			});
 		},
 		function(invoice, done) {
 			invoice.populate('items.product', 'fullName variety productName priceWithMarkup price units refrigeration', function(e, invoice) {
-				if (e) return done(e);
-				done(null, invoice);
+				done(e, invoice);
 			});
 		},
 		function(invoice, done) {
@@ -216,14 +206,13 @@ exports.orderGoods = function() {
 		function(producers, done) {
 			models.User.populate(producers, {path: '_id', select: 'name email producerData.bankAccount balance'}
 			, function(e, result){
-				done(null, result);
+				done(e, result);
 			});
 		}
 	],function(e, result){
 		if (e) {
 			console.log(e);
-		}
-		else {
+		} else {
 			async.each(result, exports.invoiceFromProducer, function(error) {
 				if (error) console.log(error);
 			});
@@ -255,15 +244,13 @@ exports.invoiceFromProducer = function (producer, callback) {
 			}
 			
 			invoice.save(function(e, invoice) {
-				if (e) return done(e);
-				done(null, invoice);
+				done(e, invoice);
 			});
 		},
 		function(invoice, done) {
 			invoice.populate('items.customer', 'name email routeTitle balance').populate('items.product', 'fullName variety productName price units refrigeration',
 			 function(e, invoice) {
-				if (e) return done(e);
-				done(null, invoice);
+				done(e, invoice);
 			});
 		},
 		function(invoice, done) {
@@ -299,8 +286,9 @@ exports.invoiceFromProducer = function (producer, callback) {
 			
 			
 			mail.send(function(err, result) {
-				if (err) done(err);
-				else {
+				if (err) {
+					done(err);
+				} else {
 					console.log('Message sent to producer ' + producer._id.name);
 					done(null);
 				}
@@ -347,42 +335,42 @@ function disableCycle() {
 // }
 
 //
-// function consolidateAmountSold () {
-// 	models.Product.find({amountSold: {$gt: 0 } }, 'quantity amountSold productName variety fullName cycle', function(err, products) {
-// 		if (err) return console.log(err);
-//
-// 		async.each(products, function(product, done) {
-// 			var amount;
-// 			models.Order.find({product: product._id}, 'quantity product', function(err, orders) {
-// 				if (err) return done(err);
-//
-// 				if (orders === null) {
-// 					//console.log(product.fullName + ' has never been ordered for cycle #' + product.cycle);
-// 					product.amountSold = 0;
-// 					product.save(function(err) {
-// 						if (err) return console.log(err);
-// 						done();
-// 					});
-// 				} else {
-// 					var total = _.reduce(orders, function(sum, order) {
-// 						return sum + order.quantity;
-// 					}, 0);
-// 					//console.log(product.fullName + ' has been ordered ' + total + ' times for cycle #' + product.cycle);
-//
-// 					product.amountSold = total;
-// 					product.save(function(err) {
-// 						if (err) return console.log(err);
-// 						done();
-// 					});
-// 				}
-// 			});
-// 		}, function(err) {
-// 			if (err) return console.log(err);
-// 			console.log('consolidation complete');
-// 		})
-//
-// 	})
-// }
+function consolidateAmountSold () {
+	models.Product.find({amountSold: {$gt: 0 } }, 'quantity amountSold productName variety fullName cycle', function(err, products) {
+		if (err) return console.log(err);
+
+		async.each(products, function(product, done) {
+			var amount;
+			models.Order.find({product: product._id}, 'quantity product', function(err, orders) {
+				if (err) return done(err);
+
+				if (orders === null) {
+					//console.log(product.fullName + ' has never been ordered for cycle #' + product.cycle);
+					product.amountSold = 0;
+					product.save(function(err) {
+						if (err) return console.log(err);
+						done();
+					});
+				} else {
+					var total = _.reduce(orders, function(sum, order) {
+						return sum + order.quantity;
+					}, 0);
+					//console.log(product.fullName + ' has been ordered ' + total + ' times for cycle #' + product.cycle);
+
+					product.amountSold = total;
+					product.save(function(err) {
+						if (err) return console.log(err);
+						done();
+					});
+				}
+			});
+		}, function(err) {
+			if (err) return console.log(err);
+			console.log('consolidation complete');
+		})
+
+	})
+}
 
 checkConfig();
 //consolidateAmountSold();

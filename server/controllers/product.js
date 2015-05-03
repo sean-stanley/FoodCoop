@@ -28,11 +28,12 @@ exports.product = function(req, res, next, id) {
 exports.fromBody = function(req, res, next) {
 	Product.findById(req.body._id, function(err, product) {
 		if (err) return next(err);
-		if (!_.isEqual(req.user._id, product.producer_ID) ) {
+		if ( _.isEqual(req.user._id, product.producer_ID) || req.user.user_type.isAdmin ) {
+			req.product = product;
+			next();
+		} else {
 			return res.status(401).send('You can\'t edit someone else\'s product');
 		}
-		req.product = product;
-		next();
 	});
 };
 
@@ -45,6 +46,7 @@ exports.removeID = function(req, res, next) {
 
 exports.create = function(req, res) {
 	var lastProduct, p;
+	req.body.amountSold = 0;
 	if (_.isArray(req.body.cycle) ) {
 		async.each(req.body.cycle, function(cycle, done) {
 			var data = req.body;
@@ -63,10 +65,9 @@ exports.create = function(req, res) {
 		if (req.body.cycle < scheduler.currentCycle._id) req.body.cycle = scheduler.currentCycle._id;
 		
 		p = new Product(req.body);
-		
+				
 		p.save(function(err, product) {
 			if (err) console.log(err);
-			log.info('%s just uploaded', product.variety + ' ' +  product.productName || '');
 			res.json(product);
 		});
 	}
@@ -84,8 +85,10 @@ exports.changePrice = function(req, res, next) {
 
 exports.updateValidator = function(req, res, next) {
 	if (_.isArray(req.body.cycle) ) {
-		return res.status(403).send('sorry you can\'t update your product with more than one delivery day specified.');
-	} next();
+		return res.status(403).send('Sorry you can\'t update your product with more than one delivery day specified.');
+	} else if(req.product.cycle !== req.body.cycle) {
+		return res.status(403).send('Sorry you can\'t change a product\'s sale date once it\'s been created. Instead try uploading the product for a different sale date.');
+	} else next();
 };
 
 exports.update = function(req, res) {
@@ -98,40 +101,40 @@ exports.update = function(req, res) {
 	});
 };
 
-exports.emailChange = function(req, res, next) {
-	req.orders = [];
-
-	Order.find({cycle: scheduler.currentCycle._id, product: new ObjectId(req.product._id) })
-	.populate('customer', 'name email')
-	.exec(function(err, orders){
-		if (err) return next(err);
-		if (!orders) return next();
-		var mailData, mailOptions, update;
-		
-		//make orders available to other middleware
-		req.orders = orders;
-		next();
-		async.each(orders, function(order, done) {
-			mailOptions = {
-				template: 'product-change',
-				subject: 'Update to Product you are Ordering',
-				to: {
-					email: order.customer.email,
-					name: order.customer.name
-				}
-			};
-			mailData = {name: order.customer.name, productName: product.fullName, amount: order.quantity};
-			update = new Emailer(mailOptions, mailData);
-
-			update.send(function(err, result) {
-				if (err) return done(err);
-			});
-			done();
-		}, function(err) {
-			if (err) log.warn(err);
-		});
-	});
-};
+// exports.emailChange = function(req, res, next) {
+// 	req.orders = [];
+//
+// 	Order.find({cycle: scheduler.currentCycle._id, product: new ObjectId(req.product._id) })
+// 	.populate('customer', 'name email')
+// 	.exec(function(err, orders){
+// 		if (err) return next(err);
+// 		if (!orders) return next();
+// 		var mailData, mailOptions, update;
+//
+// 		//make orders available to other middleware
+// 		req.orders = orders;
+// 		next();
+// 		async.each(orders, function(order, done) {
+// 			mailOptions = {
+// 				template: 'product-change',
+// 				subject: 'Update to Product you are Ordering',
+// 				to: {
+// 					email: order.customer.email,
+// 					name: order.customer.name
+// 				}
+// 			};
+// 			mailData = {name: order.customer.name, productName: product.fullName, amount: order.quantity};
+// 			update = new Emailer(mailOptions, mailData);
+//
+// 			update.send(function(err, result) {
+// 				if (err) return done(err);
+// 			});
+// 			done();
+// 		}, function(err) {
+// 			if (err) log.warn(err);
+// 		});
+// 	});
+// };
 
 exports.quantityChange = function(req, res, next) {
 	if (req.product.amountSold > req.body.quantity && req.orders.length > 0) {

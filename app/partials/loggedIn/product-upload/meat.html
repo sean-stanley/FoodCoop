@@ -1,0 +1,212 @@
+<link rel="stylesheet" href="lib/bower_components/angular-cropme/cropme.css">
+<!-- <div class="row bg-primary">
+	<h4 class="text-center"> Upload another type of product</h4>
+	<div class="col-sm-2 col-sm-offset-4 col-xs-6 text-center">
+		<p><a href="/milk-upload" class="text-center jumbo-link">
+			<svg class="icon-milk"><use xlink:href="/img/icons/icons.svg#icon-milk"></use></svg>
+			<br>Raw Milk
+		</a></p>
+	</div>
+	<div class="col-sm-2 col-xs-6 text-center">
+		<p><a href="/meat-upload" class="text-center jumbo-link">
+			<svg class="icon-milk"><use xlink:href="/img/icons/icons.svg#icon-sheep"></use></svg>
+			<br>Bulk Meat</a></p>
+	</div>
+</div> -->
+
+
+<div class="page-header col-xs-12">
+	<h1 class="text-center">Upload Bulk Meat <!--<i class="fa fa-question-circle pull-right" ng-click="showHelp = !showHelp" ng-init="showHelp = false"></i>--></h1>
+	<span class="pull-left">
+		<h4><a href="/product-manager"><span class="glyphicon glyphicon-book"></span> To Product Manager</a></h4>
+	</span>
+	<span class="pull-right">
+		<h4><a href="/meat-upload" class="label label-success" ng-click="reset()"> New Product</a></h4>
+	</span>
+</div>
+
+<div class="col-xs-12">
+	
+	<div id="product-upload-preview-column" class="col-sm-5 col-md-4" >
+		<div ng-controller="calendarCtrl" class="">
+			<a href="/calendar"><i class="fa fa-calendar pull-left fa-4x"></i></a>
+		</div>
+		<section ng-show="productData.category || productData.img || productData.productName">
+			<h2>Preview <small>Live</small></h2>
+			<div class="product-container center-block" ng-controller="productUICtrl" ng-mouseleave="detailsVisible = false" 
+			style="width:100%; max-width: 430px">
+				<figure class="first-layer" ng-mouseover="callDelayed()" ng-mouseleave="callCancelled()" ng-swipe-left="detailsVisible = true;">
+					<img ng-if="productData.certification != certifications[0]._id && productData.img"
+					 ng-src="img/certification/{{certificationImg(productData.certification)}}" class="certification-img">
+					<img ng-src="{{selectedImg || productData.img}}" class="img-responsive" ng-click="preview(productData)" style="min-height: inherit;
+min-width: inherit;">
+					<figcaption>
+						<div class="pull-right">
+							<button class="btn btn-primary pull-right" disabled>Add to Cart</button>
+							<br>
+							<span class="pull-right visible-xs visible-sm"
+							tooltip-placement="left" 
+							tooltip="Swipe left for more info"
+							tooltip-trigger="click"><i class="fa fa-chevron-circle-left"> swipe</i></span>
+						</div>
+						<h5>{{productData.productName}}</h5>
+						<p>{{productData.priceWithMarkup|currency}} / {{productData.units}}</p>
+					</figcaption>
+				</figure>
+				<section class="details-layer" ng-class="{ 'details-layer-visible' : detailsVisible}" ng-mouseleave="detailsVisible = false" ng-swipe-left="preview(productData)">
+					<article class="details">
+						<a href="" class="panel-btn-lg pull-left hidden-lg details-close-button" ng-click="detailsVisible = false">&times; </a>
+						<h4><a ng-href="/producer/{{currentUser.producerData.companyName | forURL}}-{{currentUser.name | forURL}}">
+						<span class="glyphicon glyphicon-user"></span>
+						 {{currentUser.producerData.companyName || currentUser.name}}</a></h4>
+						
+						<h3>{{productData.variety}} {{productData.productName}}</h3>
+						
+						<p>{{productData.priceWithMarkup|currency}} / {{productData.units}}</p>
+						<hr>
+						<p> Category: {{productManager.categoryByID(productData.category).name}} 
+						<span ng-if="product.certification !== 'none' ">
+							Certified by  {{productManager.certificationByID(productData.certification).name}}</span>
+						</p>
+						<p ng-if="product.ingredients && product.ingredients.length > 0">Ingredients: 
+					<span ng-repeat="item in product.ingredients"><a ng-href="/store?search={{item}}">{{item}} </a> </span></p>
+						<div class="btn-group">
+							<button class="btn btn-danger pull-right" disabled ng-if="product.quantity <= 0">
+								SOLD OUT
+							</button>
+							<button class="btn btn-warning" ng-click="preview(productData)">
+								Details
+							</button>
+						</div>
+					</article>
+				</section>
+			</div>
+		</section>
+	
+		
+		<div ng-controller="productHistoryCtrl">
+			<h3 class="text-center">Edit</h3>
+			<ul class="list-unstyled fa-ul">
+				<li ng-repeat="i in products">
+					<i class="fa fa-li fa-times" ng-click="delete($index, i._id)" style="cursor: pointer"></i>
+					<a ng-href="/meat-upload/{{i._id}}">{{i.fullName}}</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+
+	<div id="product-upload-form-container" class="col-sm-7 col-md-8" >
+		<form name="productUpload" autocomplete="off" novalidate>
+			<fieldset>
+				<div class="row">
+					<div class="form-group col-md-12">
+						<br>
+						<label 
+						type="button" class="btn btn-default btn-lg" ng-click="uploadImage = !uploadImage">Upload an image <span class="glyphicon glyphicon-cloud-upload"></span></label>
+						<div collapse="!uploadImage">
+							<cropme width="420" height="300" icon-class="" ratio="0.75" destination-width="400">
+							</cropme>
+
+							<hr>
+							<alert type="info">Please note that your chosen image must be a minimum of <strong>420px by 300px</strong></alert>
+							<p>Please be aware of our image <a href="/policy">policies</a></p>
+							<div class="btn-group">
+								<button class="btn btn-info" ng-click="crop()">Crop Image</button>
+								<button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+							</div>
+						</div>
+					</div>
+				</div>
+					<div class="row">
+						<div class="form-group col-md-6" ng-if="currentUser.user_type.isAdmin">
+							<label for="producer">Product Name</label>
+							<input  name="producer"
+							ng-model="productData.producer_ID" type="text" class="form-control" id="inputName" maxlength="25" required>
+			        <div ng-show="submitted && productUpload.producer.$invalid" class="help-block">
+			          <alert type="danger" ng-show="productUpload.name.$error.required && !nameError" close="nameError = true">Sorry! A producer is required</alert>
+			        </div>
+						</div>
+						
+						<div class="form-group col-md-6">
+							<label for="name">Product Name</label>
+							<input  name="name"
+							ng-model="productData.productName" type="text" class="form-control" id="inputName" maxlength="25" 
+							placeholder="e.g. Lamb" autofocus required>
+			        <div ng-show="submitted && productUpload.name.$invalid" class="help-block">
+			          <alert type="danger" ng-show="productUpload.name.$error.required && !nameError" close="nameError = true">Sorry! A product name is required</alert>
+			        </div>
+						</div>
+					</div>
+				
+					<div class="row form-group">	
+						<div class="form-group col-md-4">
+							<label for="inputVariety">Price per Kilogram</label>
+							<div class="input-group">
+								<div class="input-group-addon">$</div>
+								<input 
+							ng-model="productData.price" name="price" type="number" class="form-control" id="inputPrice" min="0" placeholder="e.g. 2.50" required>
+							</div>
+			        <div ng-show="submitted && productUpload.price.$invalid" class="help-block">
+			          <alert type="danger" ng-show="productUpload.price.$error.required && !priceError" close="priceError = true">Please set a price</alert>
+								<alert type="danger" ng-show="productUpload.price.$error.number && !priceError" close="priceError = true">Just use numbers here please. Dollar signs and decimal padding happens automatically.</alert>
+			        </div>
+						</div>
+						
+						<div class="form-group col-md-4">
+							<label for="inputVariety">Processing Fee (if applicable)</label>
+							<div class="input-group">
+								<div class="input-group-addon">$</div>
+								<input 
+							ng-model="productData.fixedPrice" name="fixedPrice" type="number" class="form-control" min="0" placeholder="e.g. 55">
+							</div>
+			        <div ng-show="submitted && productUpload.fixedPrice.$invalid" class="help-block">
+								<alert type="danger" ng-show="productUpload.fixedPrice.$error.number && !priceError" close="priceError = true">Just use numbers here please. Dollar signs and decimal padding happens automatically.</alert>
+			        </div>
+						</div>
+					    
+						<div class="form-group col-md-4">
+							<label for="quantity">Number Available</label>
+							<input 
+							ng-model="productData.quantity" name="quantity" type="number" max="1000" class="form-control" id="quantity" placeholder="e.g. 27" required>
+							<div ng-show="submitted && productUpload.quantity.$invalid" class="help-block">
+								<alert type="danger" ng-show="productUpload.quantity.$error.required && !quantityError" close="quantityError = true">Please set the quantity you are selling</alert>
+								<alert type="danger" ng-show="productUpload.quantity.$error.number && !quantityError" close="quantityError = true">Just use numbers here please.</alert>
+							</div>
+						</div>
+						</div>
+				
+				<div class="form-group">
+					<label for="certification">Butchery Form</label>
+					<select ng-model="productData.butcheryForm" ng-selected="productData.butcheryForm" ng-options="f.route as f.name for (form, f) in butcheryForms" name="certification" class="form-control">
+					</select>
+				</div>
+				
+				<div class="form-group">
+					<label for="description">Description</label> 
+					<div text-angular
+					ng-model="productData.description"
+					placeholder="Here is a good place to mention the animals feed, age, hanging time and rough approximation of weight."
+					name="description">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="certification">Certification</label>
+					<select ng-model="productData.certification" ng-selected="productData.certification" ng-options="c._id as c.name for c in certifications" name="certification" class="form-control">
+					</select>
+				</div>
+				
+				
+				<div class="form-group">
+					<div class="btn-group">
+						<button type="submit" class="btn" ng-class="{'btn-success':productUpload.$valid, 'btn-warning':productUpload.$invalid}" ng-click="saveOrUpdate(productUpload.$valid);" analytics-on="click" analytics-event="Upload Bulk Meat Product">
+							<span ng-show="!!productData._id">Update</span>
+							<span ng-show="!productData._id">Save</span>
+						</button>
+						<button type="button" ng-click="reset()" class="btn btn-default">Reset Form</button>
+						</div>
+					</div>
+					
+			  </fieldset>
+		  </form>
+	</div>
+</div>

@@ -6,6 +6,14 @@
 		url(fonts/nevis.svg) format('svg'),
 		url(fonts/nevis.otf);
 }
+
+[class^="icon-"], [class*=" icon-"] {
+			height: 64px;
+    width: 64px;
+    display: inline-block; 
+    fill: currentColor; 
+}
+
 html {min-height:100%; position: relative;}
 
 body {
@@ -170,6 +178,10 @@ outline: 0px;
 
 #calendar-container:hover, .sidebar-left .panel-heading:hover, .sidebar-left li:hover {border-color: #ddd; background: #642c4a; color: white;}
 
+.no-underline:hover {
+	text-decoration: none;
+}
+
 /*	------------------
 	-- Sidebar Cart --
 	------------------	*/
@@ -293,16 +305,9 @@ img.certification-img {
 
 .btn-default.selector:active, .btn-default.selector.active {
 	color: #fff;
-	background-color: #2a121f;
-	border-color: #11070c;
-}
-
-.btn-default.selector:hover {
-	color: #fff;
 	background-color: #4d2239;
 	border-color: #3b1a2c;
 }
-
 
 /*	---- Order Manager Page ----	*/
 .input-group-btn {

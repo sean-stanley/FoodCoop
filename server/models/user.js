@@ -1,12 +1,15 @@
-var mongoose = require('mongoose'), // middleware for connecting to the mongodb database
-	Schema = mongoose.Schema, // mongoose schema object for defining collections.
-	passportLocalMongoose = require('passport-local-mongoose'),
-	_ = require('lodash'), // this creates salted and hashed passwords
-	fs = require('fs'),
-	path = require('path'),
-	config = require('./../coopConfig.js'),
-	markup = config.markup,
-	gm = require('gm');
+var Transaction = require('./transaction')
+	, mongoose = require('mongoose') // middleware for connecting to the mongodb database
+	, Schema = mongoose.Schema // mongoose schema object for defining collections.
+	, passportLocalMongoose = require('passport-local-mongoose')
+	, _ = require('lodash') // this creates salted and hashed passwords
+	, fs = require('fs')
+	, path = require('path')
+	, config = require('./../coopConfig.js')
+	, markup = config.markup
+	, gm = require('gm');
+	
+console.log(Transaction);
 
 function toArray (listString) {
 	if (typeof listString === 'string' && listString.length > 0) {
@@ -50,7 +53,9 @@ var UserSchema = new Schema({
 				townsOnRoute: {type: Array, set: toArray},
 				pickupLocation: String
 			},
-			balance: Number,
+			balance: {type: Number, default: 0},
+			businessBalance: {type: Number, default: 0},
+			useBusinessBalance: {type: Boolean, default: true},
 			badges: [{type: Schema.ObjectId, ref: 'Badge'}],
 			
 			routeTitle: String,
@@ -139,5 +144,48 @@ UserSchema.pre('save', function(next) {
 
 // make this schema have passwords and use the email field for usernames.
 UserSchema.plugin(passportLocalMongoose, {usernameField: 'email'});
+
+UserSchema.static('transaction', function(id, amount, options, cb) {
+	// @id(_id) the _id of the user to perform a transaction for
+	// @amount(number) the amount to transact, positive for credit, negative for debit
+	// @options(object), options object with following properties
+	//		-- title(string): a title for the transaction that could be the same as an invoice title
+	//		-- reason(string): a reason for the transaction like 'products not available' or 'last minute extra order
+	//		-- invoice(_id): _id of the invoice this transaction is tied to. The amount of the transaction and total of the invoice should be equal.
+	//		-- businessBalance(boolean): this amount can go on businessBalance if available, usually used for credits for products sold.
+	//		-- sandbox(boolean)
+	
+	if (!cb) {
+		cb = options; // no options argument passed;
+		options = {};
+		var title = amount > 0 ? 'general credit' : 'general debit';
+	}
+	
+	
+	this.findById(id, 'balance businessBalance useBusinessBalance', function(err, user) {
+		if (err) return cb(err);
+		
+		// adjust user's account.
+		if (options.businessBalance && user.useBusinessBalance) {
+			user.businessBalance += amount;
+		} else user.balance += amount;
+
+		user.save(function(err, user) {
+			if (err) return cb(err);
+			// create a transaction for this call
+			Transaction.create({
+				title: options.title || title,
+				amount: amount,
+				account: user._id,
+				invoice: options.invoice,
+				reason: options.reason,
+				sandbox: options.sandbox
+			}, function(err, transaction) {
+				if (err) console.log(err);
+			});
+			cb(null, user);
+		});
+	});
+});
 
 module.exports = mongoose.model('User', UserSchema);

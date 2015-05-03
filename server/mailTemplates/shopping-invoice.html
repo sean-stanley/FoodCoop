@@ -22,15 +22,15 @@
                </tr>
            </thead>
            <tbody>
-               
-			  <% _.each(items, function(item) { %> 
-                 <tr>
-                     <td>{{item.product.refrigeration}}</td>
-					 <td>{{item.product.fullName}}</td>
-					 <td>${{item.product.priceWithMarkup.toFixed(2)}} / {{item.product.units}}</td>
-					 <td>{{item.quantity}}</td>
-                     <td>${{ (item.product.priceWithMarkup * item.quantity).toFixed(2)}}</td>
-                 </tr>
+
+			<% _.each(items, function(item) { %> 
+					<tr>
+						<td>{{item.product.refrigeration}}</td>
+						<td>{{item.product.fullName}}</td>
+						<td>${{item.product.priceWithMarkup.toFixed(2)}} / {{item.product.units}}</td>
+						<td>{{item.quantity}}</td>
+						<td>${{ (item.product.priceWithMarkup * item.quantity).toFixed(2)}}</td>
+					</tr>
 			<% }); %>
            </tbody>
            <tfoot>

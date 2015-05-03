@@ -220,8 +220,12 @@ module.exports = function(grunt) {
 					'app/js/directives.annotated.js',
 					'app/js/user/app.user.annotated.js',
 					'app/js/user/controllers.user.annotated.js',
+					'app/js/user/controllers.orders.annotated.js',
 					'app/js/admin/app.admin.annotated.js',
-					'app/js/admin/controllers.admin.annotated.js',]
+					'app/js/admin/controllers.admin.annotated.js',
+					'app/js/product-upload/app.product-upload.annotated.js',
+					'app/js/product-upload/controllers.product-upload.annotated.js'
+					]
 				}
 			},
 			bowerServer: {
