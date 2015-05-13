@@ -58,35 +58,31 @@
 	<caption>Users List</caption>
 	<thead>
 		<tr>
-			<th>Edit</th>
 			<th><a href="" ng-click="predicate = 'name'; reverse=!reverse ">Name</a></th>
 			<th><a href="" ng-click="predicate = 'address'; reverse=!reverse ">Address</a></th>
-			<th><a href="" ng-click="predicate = 'phone'; reverse=!reverse ">Phone Number</a></th>
 			<th><a href="" ng-click="predicate = 'user_type.name'; reverse=!reverse ">Membership</a></th>
 			<th><a href="" ng-click="predicate = 'dateJoined'; reverse=!reverse ">Date Joined</a></th>
+			<th><a href="" ng-click="predicate = 'balance'; reverse=!reverse ">Balance</a></th>
 			<!--
 			<th>Can Buy</th>
 						<th>Can Sell</th>-->
 		</tr>
 	<tbody>
 		<tr ng-repeat="user in userLibrary | orderBy:predicate:reverse | filter:search">
-			<td data-title=" 'edit' ">
-				<a href="/user/{{user._id}}"><span class="glyphicon glyphicon-pencil"></span></a>
-			</td>
 			<td data-title="'Full Name'" >
-				{{user.name}}
+				<a href="" popover-placement="top" popover="P: {{user.phone}} E: {{user.email}}">{{user.name}}</a> <a href="/user/{{user._id}}"><span class="glyphicon glyphicon-pencil"></span></a>
 			</td>
 			<td data-title="'Address'" >
 				{{user.address}}
-			</td>
-			<td data-title="'Phone'" >
-				{{user.phone}}
 			</td>
 			<td data-title="'membership'">
 				{{user.user_type.name}}
 			</td>
 			<td data-title="'Date Joined'">
 				{{user.dateJoined | shortDate}}
+			</td>
+			<td data-title="'Balance'">
+				{{user.balance || user.businessBalance || 0 | currency}}
 			</td>
 		</tr>
 	</tbody>

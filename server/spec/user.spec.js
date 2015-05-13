@@ -12,8 +12,6 @@ var testUser, invoice, user;
 
 require('datejs');
 
-
-
 describe('registering a producer user', function() {
 	beforeEach(function(done) {
 		testUser = {
@@ -81,8 +79,13 @@ describe('creating an invoice for new user', function() {
 		});
 	});
 	afterEach(function(done) {
+		
 		user.remove(function(err) {
-			done();
+			if (invoice) {
+				invoice.remove(function(err) {
+					done();
+				});
+			} else done();
 		});
 	});
 	it('should have saved user correctly', function(done) {
@@ -109,11 +112,7 @@ describe('creating an invoice for new user', function() {
 			expect(invoice.invoicee).not.toBeUndefined();
 			expect(invoice._id).not.toBeUndefined();
 			expect(invoice.dueDate.toString()).toBe(Date.today().addDays(30).toString());
-			
-			invoice.remove(function(err) {
-				expect(err).toBeNull();
-				done();
-			});
+			done();
 		});
 	});
 });
@@ -152,10 +151,17 @@ describe('perform different transactions on a user object', function() {
 	it('should be able to adjust the balance with a general transaction', function(done) {
 		// assume a $100 purchase was made
 		models.User.transaction(user._id, -100, {sandbox:true}, function(err, user) {
-			console.log(err);
 			expect(err).toBeNull();
 			expect(user).not.toBeUndefined();
 			expect(user.balance).toEqual(-100);
+			done();
+		});
+	});
+	it('should be able to adjust the businessBalance', function(done) {
+		models.User.transaction(user._id, 100, {businessBalance: true, title: 'Test Payment for Products Sold'}, function(err, user) {
+			expect(err).toBeNull();
+			expect(user).not.toBeUndefined();
+			expect(user.businessBalance).toEqual(100);
 			done();
 		});
 	});

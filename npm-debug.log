@@ -1,0 +1,410 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'install' ]
+2 info using npm@2.5.0
+3 info using node@v0.10.32
+4 verbose node symlink /usr/local/bin/node
+5 verbose install where, deps [ '/Users/seanstanley/Sites/FoodCoop',
+5 verbose install   [ 'async',
+5 verbose install     'body-parser',
+5 verbose install     'bunyan',
+5 verbose install     'compression',
+5 verbose install     'connect-redis',
+5 verbose install     'cookie-parser',
+5 verbose install     'crypto',
+5 verbose install     'datejs',
+5 verbose install     'ejs',
+5 verbose install     'express',
+5 verbose install     'express-error-handler',
+5 verbose install     'express-session',
+5 verbose install     'geocoder',
+5 verbose install     'gm',
+5 verbose install     'grunt',
+5 verbose install     'grunt-concurrent',
+5 verbose install     'grunt-contrib-copy',
+5 verbose install     'grunt-contrib-jshint',
+5 verbose install     'grunt-contrib-watch',
+5 verbose install     'grunt-karma',
+5 verbose install     'grunt-node-inspector',
+5 verbose install     'grunt-nodemon',
+5 verbose install     'grunt-rsync',
+5 verbose install     'grunt-shell',
+5 verbose install     'lodash',
+5 verbose install     'mailchimp-api',
+5 verbose install     'method-override',
+5 verbose install     'moment',
+5 verbose install     'mongodb',
+5 verbose install     'mongojs',
+5 verbose install     'mongoose',
+5 verbose install     'node-schedule',
+5 verbose install     'nodemailer',
+5 verbose install     'nodemailer-smtp-transport',
+5 verbose install     'oboe',
+5 verbose install     'passport',
+5 verbose install     'passport-local',
+5 verbose install     'passport-local-mongoose',
+5 verbose install     'password-reset',
+5 verbose install     'prerender-node',
+5 verbose install     'serve-favicon',
+5 verbose install     'socket.io',
+5 verbose install     'socket.io-redis',
+5 verbose install     'grunt-angular-templates',
+5 verbose install     'grunt-bunyan',
+5 verbose install     'grunt-contrib-clean',
+5 verbose install     'grunt-contrib-concat',
+5 verbose install     'grunt-contrib-csslint',
+5 verbose install     'grunt-contrib-uglify',
+5 verbose install     'grunt-ng-annotate',
+5 verbose install     'grunt-ngmin',
+5 verbose install     'grunt-replace',
+5 verbose install     'jasmine',
+5 verbose install     'karma',
+5 verbose install     'karma-chrome-launcher',
+5 verbose install     'karma-coverage',
+5 verbose install     'karma-jasmine',
+5 verbose install     'karma-phantomjs-launcher' ] ]
+6 verbose install where, peers [ '/Users/seanstanley/Sites/FoodCoop', [] ]
+7 info preinstall FoodCoop@0.3.1
+8 warn package.json crypto@0.0.3 crypto is also the name of a node core module.
+9 warn package.json karma-chrome-launcher@0.1.5 No README data
+10 warn package.json node@0.0.0 No description
+11 warn package.json node@0.0.0 No repository field.
+12 verbose already installed skipping grunt-contrib-watch@~0.6.1 /Users/seanstanley/Sites/FoodCoop
+13 verbose already installed skipping grunt-karma@^0.8.3 /Users/seanstanley/Sites/FoodCoop
+14 verbose already installed skipping grunt-node-inspector@~0.1.5 /Users/seanstanley/Sites/FoodCoop
+15 verbose already installed skipping grunt-nodemon@^0.2.1 /Users/seanstanley/Sites/FoodCoop
+16 verbose already installed skipping grunt-rsync@~0.6.2 /Users/seanstanley/Sites/FoodCoop
+17 verbose already installed skipping grunt-shell@~1.1.1 /Users/seanstanley/Sites/FoodCoop
+18 verbose already installed skipping lodash@^2.4.1 /Users/seanstanley/Sites/FoodCoop
+19 verbose already installed skipping mailchimp-api@^2.0.6 /Users/seanstanley/Sites/FoodCoop
+20 verbose already installed skipping method-override@^2.2.0 /Users/seanstanley/Sites/FoodCoop
+21 verbose already installed skipping moment@^2.9.0 /Users/seanstanley/Sites/FoodCoop
+22 verbose already installed skipping mongodb@^1.4.10 /Users/seanstanley/Sites/FoodCoop
+23 verbose already installed skipping mongojs@^0.12.1 /Users/seanstanley/Sites/FoodCoop
+24 verbose already installed skipping mongoose@^3.8.16 /Users/seanstanley/Sites/FoodCoop
+25 verbose already installed skipping node-schedule@^0.1.13 /Users/seanstanley/Sites/FoodCoop
+26 silly cache add args [ 'nodemailer@~1.3.4', null ]
+27 verbose cache add spec nodemailer@~1.3.4
+28 silly cache add parsed spec { raw: 'nodemailer@~1.3.4',
+28 silly cache add   scope: null,
+28 silly cache add   name: 'nodemailer',
+28 silly cache add   rawSpec: '~1.3.4',
+28 silly cache add   spec: '>=1.3.4 <1.4.0',
+28 silly cache add   type: 'range' }
+29 verbose addNamed nodemailer@>=1.3.4 <1.4.0
+30 silly addNamed semver.valid null
+31 silly addNamed semver.validRange >=1.3.4 <1.4.0
+32 silly addNameRange { name: 'nodemailer', range: '>=1.3.4 <1.4.0', hasData: false }
+33 silly mapToRegistry name nodemailer
+34 silly mapToRegistry using default registry
+35 silly mapToRegistry registry https://registry.npmjs.org/
+36 silly mapToRegistry uri https://registry.npmjs.org/nodemailer
+37 verbose addNameRange registry:https://registry.npmjs.org/nodemailer not in flight; fetching
+38 verbose already installed skipping nodemailer-smtp-transport@^0.1.12 /Users/seanstanley/Sites/FoodCoop
+39 verbose already installed skipping oboe@^2.0.2 /Users/seanstanley/Sites/FoodCoop
+40 verbose already installed skipping passport@^0.2.1 /Users/seanstanley/Sites/FoodCoop
+41 verbose already installed skipping passport-local@~1.0.0 /Users/seanstanley/Sites/FoodCoop
+42 verbose already installed skipping passport-local-mongoose@^1.0.0 /Users/seanstanley/Sites/FoodCoop
+43 verbose already installed skipping password-reset@~0.1.4 /Users/seanstanley/Sites/FoodCoop
+44 silly cache add args [ 'prerender-node@latest', null ]
+45 verbose cache add spec prerender-node@latest
+46 verbose already installed skipping serve-favicon@^2.2.0 /Users/seanstanley/Sites/FoodCoop
+47 verbose already installed skipping socket.io@^1.2.1 /Users/seanstanley/Sites/FoodCoop
+48 verbose already installed skipping socket.io-redis@^0.1.4 /Users/seanstanley/Sites/FoodCoop
+49 silly cache add parsed spec { raw: 'prerender-node@latest',
+49 silly cache add   scope: null,
+49 silly cache add   name: 'prerender-node',
+49 silly cache add   rawSpec: 'latest',
+49 silly cache add   spec: 'latest',
+49 silly cache add   type: 'tag' }
+50 verbose addNamed prerender-node@latest
+51 silly addNamed semver.valid null
+52 silly addNamed semver.validRange null
+53 info addNameTag [ 'prerender-node', 'latest' ]
+54 silly mapToRegistry name prerender-node
+55 silly mapToRegistry using default registry
+56 silly mapToRegistry registry https://registry.npmjs.org/
+57 silly mapToRegistry uri https://registry.npmjs.org/prerender-node
+58 verbose addNameTag registry:https://registry.npmjs.org/prerender-node not in flight; fetching
+59 verbose already installed skipping grunt-angular-templates@^0.5.7 /Users/seanstanley/Sites/FoodCoop
+60 verbose already installed skipping grunt-bunyan@^0.5.0 /Users/seanstanley/Sites/FoodCoop
+61 verbose already installed skipping grunt-contrib-clean@^0.6.0 /Users/seanstanley/Sites/FoodCoop
+62 verbose already installed skipping grunt-contrib-concat@^0.5.0 /Users/seanstanley/Sites/FoodCoop
+63 verbose already installed skipping grunt-contrib-csslint@^0.4.0 /Users/seanstanley/Sites/FoodCoop
+64 verbose already installed skipping grunt-contrib-uglify@^0.6.0 /Users/seanstanley/Sites/FoodCoop
+65 verbose request uri https://registry.npmjs.org/nodemailer
+66 verbose request no auth needed
+67 info attempt registry request try #1 at 11:22:21
+68 verbose request id 311e54ca7d968f02
+69 verbose etag "2DZF7UITIR6ETYKZA6QPWMYIF"
+70 http request GET https://registry.npmjs.org/nodemailer
+71 verbose already installed skipping grunt-ng-annotate@^0.4.0 /Users/seanstanley/Sites/FoodCoop
+72 verbose already installed skipping grunt-ngmin@0.0.3 /Users/seanstanley/Sites/FoodCoop
+73 verbose already installed skipping grunt-replace@^0.8.0 /Users/seanstanley/Sites/FoodCoop
+74 silly cache add args [ 'jasmine@1.3.1', null ]
+75 verbose cache add spec jasmine@1.3.1
+76 silly cache add parsed spec { raw: 'jasmine@1.3.1',
+76 silly cache add   scope: null,
+76 silly cache add   name: 'jasmine',
+76 silly cache add   rawSpec: '1.3.1',
+76 silly cache add   spec: '1.3.1',
+76 silly cache add   type: 'version' }
+77 verbose addNamed jasmine@1.3.1
+78 silly addNamed semver.valid 1.3.1
+79 silly addNamed semver.validRange 1.3.1
+80 silly mapToRegistry name jasmine
+81 silly mapToRegistry using default registry
+82 silly mapToRegistry registry https://registry.npmjs.org/
+83 silly mapToRegistry uri https://registry.npmjs.org/jasmine
+84 verbose addNameVersion registry:https://registry.npmjs.org/jasmine not in flight; fetching
+85 verbose already installed skipping karma@~0.12.28 /Users/seanstanley/Sites/FoodCoop
+86 verbose already installed skipping karma-chrome-launcher@^0.1.5 /Users/seanstanley/Sites/FoodCoop
+87 verbose already installed skipping karma-coverage@^0.2.7 /Users/seanstanley/Sites/FoodCoop
+88 verbose already installed skipping karma-jasmine@~0.3.2 /Users/seanstanley/Sites/FoodCoop
+89 verbose already installed skipping karma-phantomjs-launcher@^0.1.4 /Users/seanstanley/Sites/FoodCoop
+90 verbose already installed skipping async@^0.9.0 /Users/seanstanley/Sites/FoodCoop
+91 verbose already installed skipping body-parser@^1.8.1 /Users/seanstanley/Sites/FoodCoop
+92 verbose already installed skipping bunyan@^1.1.3 /Users/seanstanley/Sites/FoodCoop
+93 verbose already installed skipping compression@^1.1.0 /Users/seanstanley/Sites/FoodCoop
+94 verbose already installed skipping connect-redis@^2.1.0 /Users/seanstanley/Sites/FoodCoop
+95 verbose already installed skipping cookie-parser@^1.3.3 /Users/seanstanley/Sites/FoodCoop
+96 verbose already installed skipping crypto@0.0.3 /Users/seanstanley/Sites/FoodCoop
+97 verbose already installed skipping datejs@^1.0.0-rc1 /Users/seanstanley/Sites/FoodCoop
+98 verbose already installed skipping ejs@~1.0.0 /Users/seanstanley/Sites/FoodCoop
+99 verbose already installed skipping express@^4.9.0 /Users/seanstanley/Sites/FoodCoop
+100 verbose already installed skipping express-error-handler@^0.5.4 /Users/seanstanley/Sites/FoodCoop
+101 verbose already installed skipping express-session@^1.8.1 /Users/seanstanley/Sites/FoodCoop
+102 verbose already installed skipping geocoder@^0.2.0 /Users/seanstanley/Sites/FoodCoop
+103 verbose already installed skipping gm@^1.17.0 /Users/seanstanley/Sites/FoodCoop
+104 verbose already installed skipping grunt@~0.4.5 /Users/seanstanley/Sites/FoodCoop
+105 verbose already installed skipping grunt-concurrent@^0.5.0 /Users/seanstanley/Sites/FoodCoop
+106 verbose already installed skipping grunt-contrib-copy@~0.5.0 /Users/seanstanley/Sites/FoodCoop
+107 verbose already installed skipping grunt-contrib-jshint@~0.10.0 /Users/seanstanley/Sites/FoodCoop
+108 verbose request uri https://registry.npmjs.org/prerender-node
+109 verbose request no auth needed
+110 info attempt registry request try #1 at 11:22:21
+111 verbose etag "4F4IYHWMWIJ3G7XVAGMDMKY6U"
+112 http request GET https://registry.npmjs.org/prerender-node
+113 verbose request uri https://registry.npmjs.org/jasmine
+114 verbose request no auth needed
+115 info attempt registry request try #1 at 11:22:21
+116 verbose etag "7FLVOIW7KEXG032IGB4Z1MVJV"
+117 http request GET https://registry.npmjs.org/jasmine
+118 http 200 https://registry.npmjs.org/jasmine
+119 silly get cb [ 200,
+119 silly get   { server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+119 silly get     etag: '"CTJSE2GOUR1SDTZTKBAKCYYFX"',
+119 silly get     'content-type': 'application/json',
+119 silly get     'cache-control': 'max-age=60',
+119 silly get     'content-length': '10422',
+119 silly get     'accept-ranges': 'bytes',
+119 silly get     date: 'Thu, 07 May 2015 23:22:22 GMT',
+119 silly get     via: '1.1 varnish',
+119 silly get     age: '55',
+119 silly get     connection: 'keep-alive',
+119 silly get     'x-served-by': 'cache-syd1625-SYD',
+119 silly get     'x-cache': 'HIT',
+119 silly get     'x-cache-hits': '2',
+119 silly get     'x-timer': 'S1431040942.191961,VS0,VE0',
+119 silly get     vary: 'Accept' } ]
+120 verbose get saving jasmine to /Users/seanstanley/.npm/registry.npmjs.org/jasmine/.cache.json
+121 http 200 https://registry.npmjs.org/prerender-node
+122 silly get cb [ 200,
+122 silly get   { server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+122 silly get     etag: '"C3Y0ILJ592TXTEZ9CH4UXGWYO"',
+122 silly get     'content-type': 'application/json',
+122 silly get     'cache-control': 'max-age=60',
+122 silly get     'content-length': '44325',
+122 silly get     'accept-ranges': 'bytes',
+122 silly get     date: 'Thu, 07 May 2015 23:22:22 GMT',
+122 silly get     via: '1.1 varnish',
+122 silly get     age: '0',
+122 silly get     connection: 'keep-alive',
+122 silly get     'x-served-by': 'cache-syd1623-SYD',
+122 silly get     'x-cache': 'MISS',
+122 silly get     'x-cache-hits': '0',
+122 silly get     'x-timer': 'S1431040942.200048,VS0,VE198',
+122 silly get     vary: 'Accept' } ]
+123 verbose get saving prerender-node to /Users/seanstanley/.npm/registry.npmjs.org/prerender-node/.cache.json
+124 silly addNameTag next cb for prerender-node with tag latest
+125 verbose addNamed prerender-node@1.2.1
+126 silly addNamed semver.valid 1.2.1
+127 silly addNamed semver.validRange 1.2.1
+128 silly cache afterAdd prerender-node@1.2.1
+129 verbose afterAdd /Users/seanstanley/.npm/prerender-node/1.2.1/package/package.json not in flight; writing
+130 verbose afterAdd /Users/seanstanley/.npm/prerender-node/1.2.1/package/package.json written
+131 info already installed prerender-node@1.2.1
+132 http 200 https://registry.npmjs.org/nodemailer
+133 silly get cb [ 200,
+133 silly get   { server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+133 silly get     etag: '"ETA4N0IP6V2FZINT39BEQ3YMN"',
+133 silly get     'content-type': 'application/json',
+133 silly get     'cache-control': 'max-age=60',
+133 silly get     'content-length': '165077',
+133 silly get     'accept-ranges': 'bytes',
+133 silly get     date: 'Thu, 07 May 2015 23:22:22 GMT',
+133 silly get     via: '1.1 varnish',
+133 silly get     age: '0',
+133 silly get     connection: 'keep-alive',
+133 silly get     'x-served-by': 'cache-syd1625-SYD',
+133 silly get     'x-cache': 'HIT',
+133 silly get     'x-cache-hits': '1',
+133 silly get     'x-timer': 'S1431040942.200628,VS0,VE197',
+133 silly get     vary: 'Accept' } ]
+134 verbose get saving nodemailer to /Users/seanstanley/.npm/registry.npmjs.org/nodemailer/.cache.json
+135 silly addNameRange number 2 { name: 'nodemailer', range: '>=1.3.4 <1.4.0', hasData: true }
+136 silly addNameRange versions [ 'nodemailer',
+136 silly addNameRange   [ '0.1.1',
+136 silly addNameRange     '0.1.2',
+136 silly addNameRange     '0.1.3',
+136 silly addNameRange     '0.1.4',
+136 silly addNameRange     '0.1.5',
+136 silly addNameRange     '0.1.6',
+136 silly addNameRange     '0.1.7',
+136 silly addNameRange     '0.1.8',
+136 silly addNameRange     '0.1.9',
+136 silly addNameRange     '0.1.10',
+136 silly addNameRange     '0.1.11',
+136 silly addNameRange     '0.1.12',
+136 silly addNameRange     '0.1.13',
+136 silly addNameRange     '0.1.14',
+136 silly addNameRange     '0.1.15',
+136 silly addNameRange     '0.1.16',
+136 silly addNameRange     '0.1.17',
+136 silly addNameRange     '0.1.18',
+136 silly addNameRange     '0.1.19',
+136 silly addNameRange     '0.1.20',
+136 silly addNameRange     '0.1.21',
+136 silly addNameRange     '0.1.22',
+136 silly addNameRange     '0.1.23',
+136 silly addNameRange     '0.1.24',
+136 silly addNameRange     '0.2.0',
+136 silly addNameRange     '0.2.1',
+136 silly addNameRange     '0.2.2',
+136 silly addNameRange     '0.2.3',
+136 silly addNameRange     '0.2.4',
+136 silly addNameRange     '0.3.0',
+136 silly addNameRange     '0.3.1',
+136 silly addNameRange     '0.3.2',
+136 silly addNameRange     '0.3.3',
+136 silly addNameRange     '0.3.4',
+136 silly addNameRange     '0.3.5',
+136 silly addNameRange     '0.3.6',
+136 silly addNameRange     '0.3.7',
+136 silly addNameRange     '0.3.8',
+136 silly addNameRange     '0.3.9',
+136 silly addNameRange     '0.3.10',
+136 silly addNameRange     '0.3.11',
+136 silly addNameRange     '0.3.12',
+136 silly addNameRange     '0.3.13',
+136 silly addNameRange     '0.3.14',
+136 silly addNameRange     '0.3.15',
+136 silly addNameRange     '0.3.16',
+136 silly addNameRange     '0.3.17',
+136 silly addNameRange     '0.3.18',
+136 silly addNameRange     '0.3.19',
+136 silly addNameRange     '0.3.20',
+136 silly addNameRange     '0.3.21',
+136 silly addNameRange     '0.3.22',
+136 silly addNameRange     '0.3.23',
+136 silly addNameRange     '0.3.24',
+136 silly addNameRange     '0.3.25',
+136 silly addNameRange     '0.3.26',
+136 silly addNameRange     '0.3.27',
+136 silly addNameRange     '0.3.28',
+136 silly addNameRange     '0.3.29',
+136 silly addNameRange     '0.3.30',
+136 silly addNameRange     '0.3.31',
+136 silly addNameRange     '0.3.32',
+136 silly addNameRange     '0.3.33',
+136 silly addNameRange     '0.3.34',
+136 silly addNameRange     '0.3.35',
+136 silly addNameRange     '0.3.37',
+136 silly addNameRange     '0.3.38',
+136 silly addNameRange     '0.3.39',
+136 silly addNameRange     '0.3.40',
+136 silly addNameRange     '0.3.41',
+136 silly addNameRange     '0.3.42',
+136 silly addNameRange     '0.3.43',
+136 silly addNameRange     '0.3.44',
+136 silly addNameRange     '0.4.0',
+136 silly addNameRange     '0.4.1',
+136 silly addNameRange     '0.4.2',
+136 silly addNameRange     '0.4.3',
+136 silly addNameRange     '0.4.4',
+136 silly addNameRange     '0.5.0',
+136 silly addNameRange     '0.5.1',
+136 silly addNameRange     '0.5.2',
+136 silly addNameRange     '0.5.3',
+136 silly addNameRange     '0.5.4',
+136 silly addNameRange     '0.5.5',
+136 silly addNameRange     '0.5.6',
+136 silly addNameRange     '0.5.7',
+136 silly addNameRange     '0.5.8',
+136 silly addNameRange     '0.5.9',
+136 silly addNameRange     '0.5.10',
+136 silly addNameRange     '0.5.11',
+136 silly addNameRange     '0.5.12',
+136 silly addNameRange     '0.5.13',
+136 silly addNameRange     '0.5.14',
+136 silly addNameRange     '0.5.15',
+136 silly addNameRange     '0.6.0',
+136 silly addNameRange     '0.6.1',
+136 silly addNameRange     '0.6.2',
+136 silly addNameRange     '0.6.3',
+136 silly addNameRange     '0.6.4',
+136 silly addNameRange     '0.6.5',
+136 silly addNameRange     '0.7.0',
+136 silly addNameRange     '0.7.1',
+136 silly addNameRange     '1.0.0-rc.1',
+136 silly addNameRange     '1.0.0',
+136 silly addNameRange     '1.0.1',
+136 silly addNameRange     '1.0.2',
+136 silly addNameRange     '1.0.3',
+136 silly addNameRange     '1.0.4',
+136 silly addNameRange     '1.1.0',
+136 silly addNameRange     '1.1.1',
+136 silly addNameRange     '1.1.2',
+136 silly addNameRange     '1.2.0',
+136 silly addNameRange     '1.2.1',
+136 silly addNameRange     '1.2.2',
+136 silly addNameRange     '1.3.0',
+136 silly addNameRange     '1.3.1',
+136 silly addNameRange     '1.3.2',
+136 silly addNameRange     '1.3.3',
+136 silly addNameRange     '1.3.4' ] ]
+137 verbose addNamed nodemailer@1.3.4
+138 silly addNamed semver.valid 1.3.4
+139 silly addNamed semver.validRange 1.3.4
+140 silly mapToRegistry name nodemailer
+141 silly mapToRegistry using default registry
+142 silly mapToRegistry registry https://registry.npmjs.org/
+143 silly mapToRegistry uri https://registry.npmjs.org/nodemailer
+144 verbose addRemoteTarball https://registry.npmjs.org/nodemailer/-/nodemailer-1.3.4.tgz not in flight; adding
+145 verbose addRemoteTarball [ 'https://registry.npmjs.org/nodemailer/-/nodemailer-1.3.4.tgz',
+145 verbose addRemoteTarball   '9e5ca29ddc9fd78584e5ed46ddc486385be43ae3' ]
+146 info retry fetch attempt 1 at 11:22:22
+147 info attempt registry request try #1 at 11:22:22
+148 http fetch GET https://registry.npmjs.org/nodemailer/-/nodemailer-1.3.4.tgz
+149 http fetch 200 https://registry.npmjs.org/nodemailer/-/nodemailer-1.3.4.tgz
+150 silly fetchAndShaCheck shasum 9e5ca29ddc9fd78584e5ed46ddc486385be43ae3
+151 verbose addTmpTarball /var/folders/n0/mn4hy6q51mx6hb0s86tgr8wc0000gn/T/npm-41502-aaa00fc9/registry.npmjs.org/nodemailer/-/nodemailer-1.3.4.tgz not in flight; adding
+152 verbose addTmpTarball already have metadata; skipping unpack for nodemailer@1.3.4
+153 silly cache afterAdd nodemailer@1.3.4
+154 verbose afterAdd /Users/seanstanley/.npm/nodemailer/1.3.4/package/package.json not in flight; writing
+155 verbose afterAdd /Users/seanstanley/.npm/nodemailer/1.3.4/package/package.json written
+156 verbose stack Error: version not found: jasmine@1.3.1
+156 verbose stack     at setData (/usr/local/lib/node_modules/npm/lib/cache/add-named.js:122:12)
+156 verbose stack     at RES (/usr/local/lib/node_modules/npm/node_modules/inflight/inflight.js:23:14)
+156 verbose stack     at f (/usr/local/lib/node_modules/npm/node_modules/once/once.js:17:25)
+156 verbose stack     at saved (/usr/local/lib/node_modules/npm/lib/cache/caching-client.js:173:7)
+156 verbose stack     at Object.oncomplete (fs.js:107:15)
+157 verbose statusCode 404
+158 verbose cwd /Users/seanstanley/Sites/FoodCoop
+159 error Darwin 14.3.0
+160 error argv "node" "/usr/local/bin/npm" "install"
+161 error node v0.10.32
+162 error npm  v2.5.0
+163 error version not found: jasmine@1.3.1
+164 error If you need help, you may report this error at:
+164 error     <http://github.com/npm/npm/issues>
+165 verbose exit [ 1, true ]

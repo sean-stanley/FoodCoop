@@ -1,7 +1,9 @@
-var mongoose = require('mongoose'), // middleware for connecting to the mongodb database
-	Schema = mongoose.Schema, // mongoose schema object for defining collections.
-config = require('./../coopConfig.js'),
-Counter = require('./counter.js');
+var mongoose = require('mongoose') // middleware for connecting to the mongodb database
+	, Schema = mongoose.Schema // mongoose schema object for defining collections.
+	, config = require('./../coopConfig.js')
+	, Transaction = require('./transaction')
+	, User = require('./user')
+	, Counter = require('./counter.js');
 
 // Schema for Invoice Data
 var InvoiceSchema = new Schema({
@@ -81,8 +83,38 @@ InvoiceSchema.pre('save', function(next) {
 
 InvoiceSchema.pre('save', function(next) {
 	
-})
+	var doc = this
+	, amount = doc.toCoop ? doc.total : doc.total * -1 //add or subtract payment
+	, businessBalance = doc.toCoop; // if true, must be a payment
+	
+	if (doc.isNew) {
+		User.transaction(doc.invoicee, amount, {title: doc.title, invoice: doc._id, businessBalance: businessBalance}, function(err) {
+			if (err) return next(err);
+			next();
+		});
+	} else if (doc.isModified('status') && doc.status === 'PAID') {
+		User.transaction(doc.invoicee, amount * -1, {title: doc.title + ' PAID', invoice: doc._id, businessBalance: businessBalance}, function(err) {
+			if (err) return next(err);
+			next();
+		});
+	}  else if (doc.isModified('status') && doc.status === 'CANCELLED') {
+		User.transaction(doc.invoicee, amount * -1, {title: doc.title + ' CANCELLED', invoice: doc._id, businessBalance: businessBalance}, function(err) {
+			if (err) return next(err);
+			next();
+		});
+	} else next();
+});
 
+InvoiceSchema.post('remove', function(invoice) {
+	var amount = invoice.toCoop ? invoice.total : invoice.total * -1
+	, businessBalance = invoice.toCoop;
+	
+	if (invoice.status !== 'PAID') amount = amount * -1;
+	
+	User.transaction(invoice.invoicee, amount, {title: 'DELETED INVOICE ' + invoice._id, businessBalance: businessBalance}, function(err) {
+		if (err) console.log(err);
+	});
+});
 
 
 module.exports = mongoose.model('Invoice', InvoiceSchema);

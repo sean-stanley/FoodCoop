@@ -6,55 +6,53 @@
 				<h2>Thank you!</h2>
         <p> Hi {{name}},</p>
 				<p>Thank you for shopping with the Northland Natural Food Co-op. Buying locally strengthens Northland's economy and encourages sustainable practices. Our producers thank you for your support.</p>
-        <p> A summary of your purchase/s is listed below. We would appreciate payment by <strong> {{dueDate}} </strong>. Once payment has been made, it will be forwarded to the producers you have supported this month. 
-       <table border="0" cellspacing="10" cellpadding="10">
-           <thead>
-               <tr>
-                   <td><strong>Invoice #{{code}}</strong></td>
-				   <td colspan="5">{{name}}'s Shopping Bill</td>
-               </tr>
-               <tr>
-                   <td><strong>Refrigeration</strong></td>
-				   <td><strong>Product</strong></td>
-				   <td><strong>Unit Price</strong></td>
-				   <td><strong>Quantity</strong></td>
-				   <td><strong>Cost</strong></td>
-               </tr>
-           </thead>
-           <tbody>
+        <p> A summary of your purchase/s is listed below. We've adjusted your account balance from this invoice and would appreciate payment by <strong> {{dueDate}} </strong>. Once payment has been received, your account will be credited and payment will be forwarded to the producers you have supported this cycle. 
+					<table border="0" cellspacing="10" cellpadding="10">
+						<thead>
+							<tr>
+								<td><strong>Invoice #{{code}}</strong></td>
+								<td colspan="5">{{name}}'s Shopping Bill</td>
+							</tr>
+							<tr>
+								<td><strong>Refrigeration</strong></td>
+				 			 <td><strong>Product</strong></td>
+							 <td><strong>Unit Price</strong></td>
+							 <td><strong>Quantity</strong></td>
+							 <td><strong>Cost</strong></td>
+						 </tr>
+					 </thead>
+					 <tbody>
 
-			<% _.each(items, function(item) { %> 
-					<tr>
-						<td>{{item.product.refrigeration}}</td>
-						<td>{{item.product.fullName}}</td>
-						<td>${{item.product.priceWithMarkup.toFixed(2)}} / {{item.product.units}}</td>
-						<td>{{item.quantity}}</td>
-						<td>${{ (item.product.priceWithMarkup * item.quantity).toFixed(2)}}</td>
-					</tr>
-			<% }); %>
-           </tbody>
-           <tfoot>
-	             <tr style="display: {{showCredit}}">
-								 <td colspan="6" style="text-align:right"> Subtotal: ${{subtotal.toFixed(2)}}</td>
+						 <% _.each(items, function(item) { %> 
 							 <tr>
-							 <tr style="display: {{showCredit}}">
-								 <td colspan="6"> CR:{{credit()}}</td>
-							 <tr>
-							 <tr>
-                   <td colspan="6"> Total: ${{total.toFixed(2)}}</td>
-               </tr>
-           </tfoot>
-       </table>
+								 <td>{{item.product.refrigeration}}</td>
+								 <td>{{item.product.fullName}}</td>
+								 <td>${{item.product.priceWithMarkup.toFixed(2)}} / {{item.product.units}}</td>
+								 <td>{{item.quantity}}</td>
+								 <td>${{ (item.product.priceWithMarkup * item.quantity).toFixed(2)}}</td>
+							 </tr>
+						<% }); %>
+					</tbody>
+					<tfoot>
+						<tr>
+							<td colspan="6"> Total: ${{total.toFixed(2)}}</td>
+						</tr>
+					</tfoot>
+				</table>
 	   
 	   
 	   
 	   <p>Payment can be made by internet banking to account # {{account}}. Please use your name as the reference and your invoice number (found above) as the particulars. 
 			 We also accept credit card payments with New Zealand's <a href="https://txtpay.co.nz">TxtPay</a>. To pay by credit card follow this <a href="https://www.txtpay.co.nz/VPos/VPos.aspx?merchant=NNFC&type=Payment">link</a>. If you are unable to pay by internet banking or credit card and would like to make some other arrangement, please contact us so we can work things out as soon as possible.</p>
+			 
+		<h2>Collecting your Order</h2>
+		<p>To collect your order you currently have a couple basic options, you can come collect between 2:30pm and 5:30pm on {{deliveryDay}} or you can collect from one of our community locations. Have a look at our list of <a href="https:foodcoop.nz/delivery">delivery</a> routes to see if picking up from one of those will be easier. If yes, join the route and contact the route manager to let them know you'd like to pickup and they'll keep you up to date on the time and location for picking up your order on Delivery Day.</p>
        
 	   <hr>
-        <p> A copy of this invoice and its payment status is available <a href="https://foodcoop.nz/my-invoices">online</a>
+        <p> A copy of this invoice and its payment status is available <a href="https://foodcoop.nz/my-invoices">online</a></p>
+				<p>You can also view your account balance on our website <a href="https://foodcoop.nz/me">here</a></p>
         
-        <p> Congratulations on your purchase/s; they're good for your health, the environment and the local economy.</p>
+        <p> Congratulations on your order; they're good for your health, the environment and the local economy.</p>
         <p>Cheers, <br>
         The NNFC team </p>
         

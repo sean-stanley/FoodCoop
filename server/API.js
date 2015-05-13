@@ -33,6 +33,7 @@ var util = require('util')
 	, cycle = require('./controllers/cycle')
 	, product = require('./controllers/product')
 	, meatOrder = require('./controllers/meatOrder')
+	, invoiceReminder = require('./invoiceEmailReminders.js')
 	
 	, passport = require('passport') // middleware that provides authentication tools for the API.
 	, LocalStrategy = require('passport-local').Strategy; // the passport strategy employed by this API.
@@ -616,12 +617,20 @@ exports.configAPI = function configAPI(app) {
 	
 	// update an invoice's status
 	.put(auth.isAdmin, function(req, res, next) {
-		models.Invoice.findByIdAndUpdate(req.body._id, {status: req.body.status, notes: req.body.notes || ''}, function(e, invoice){
+		models.Invoice.findById(req.body._id)
+		.populate('items.customer', 'name email routeTitle')
+		.populate('items.product', 'fullName variety productName priceWithMarkup price units')
+		.exec(function(e, invoice){
 			if (e) return next(e);
-			// Save the time the invoice was modified
+			// modify the invoice and save it
+			invoice.status = req.body.status;
+			invoice.notes = req.body.notes || '';
 			invoice.dateModified = Date();
 			invoice.save(function(err) {
-				if (err) return next(err);
+				if (err) {
+					log.warn(err);
+					return next(err);
+				}
 				res.status(200).end();
 			});
 		});
@@ -647,10 +656,82 @@ exports.configAPI = function configAPI(app) {
 		});
 	});
 	
+	app.post('/api/invoice/email', auth.isAdmin, function(req, res) {
+		var cb = function(err, result) {
+			if (err) return res.status(400).send(err);
+			res.status(200).send(result);
+		};
+		
+		models.Invoice.findById(req.body._id)
+		.populate('invoicee', 'name address phone email producerData.bankAccount -_id')
+		.populate('cycle')
+		.populate('items.customer', 'name email routeTitle')
+		.populate('items.product', 'fullName variety productName priceWithMarkup price units')
+		.exec(function(e, invoice) {
+			if (e) return next(e);
+			
+			if (invoice.title.match(/^Shopping Order for/)) {
+				//send to customer
+				invoiceReminder.shopping(invoice, cb);
+			} else if (invoice.title.match(/^Products Requested for/) ) {
+				//send to producer
+				invoiceReminder.producer(invoice, cb);
+			} else if (invoice.title.match(/^Membership/) ) {
+				//send to member
+				invoiceReminder.member(invoice, cb);
+			} else {
+				res.status(404).send('Sorry we can\'t generate an email for that invoice yet.');
+			}
+			
+			
+		});
+	});
+	
 	app.get('/api/transactions', auth.isAdmin, function(req, res) {
 		models.Transaction.find(req.query).exec(function(err, results) {
 			if (err) return res.status(500).send(err);
 			res.json(results);
+		});
+	});
+	
+	
+	// enable, visit once then disable this route if your database has invoices before version 1.4
+	// app.get('/api/transactions/initial', auth.isAdmin, function(req, res) {
+// 		models.Invoice.find().populate('items.product', 'fullName variety productName priceWithMarkup price units').exec(function(err, invoices) {
+// 			if (err) return res.status(500).send(err);
+// 			async.each(invoices, function(invoice, done) {
+// 				var amount = invoice.toCoop ? invoice.total : invoice.total * -1
+// 				, transactions = [{
+// 					title: invoice.title,
+// 					amount: amount,
+// 					account: invoice.invoicee,
+// 					invoice: invoice._id
+// 				}];
+//
+// 				if (invoice.status === 'PAID') {
+// 					transactions.push({
+// 						title: invoice.title + ' PAID',
+// 						amount: amount * -1,
+// 						account: invoice.invoicee,
+// 						invoice: invoice._id
+// 					});
+// 				}
+//
+// 				models.Transaction.create(transactions, function(err, result) {
+// 					if (err) return done(err);
+// 					done();
+// 				});
+// 			}, function(err) {
+// 				if (err) return res.status(500).send(err);
+// 				res.status(200).send('All invoices have been tracked with transactions');
+// 			});
+// 		});
+// 	});
+	
+	app.post('/api/transaction', auth.isAdmin, function(req, res) {
+		models.Transaction.create(req.body, function(err, result) {
+			if (err) return res.status(500).send(err);
+			res.json(result);
 		});
 	});
 	
@@ -727,6 +808,7 @@ exports.configAPI = function configAPI(app) {
 			}
 		});
 	});
+	
 	// This registers a new user and if no error occurs the user is logged in 
 	// A new email is sent to them as well.
 	app.post('/api/user', discount.checkForDiscount, function(req, res, next) {
@@ -959,6 +1041,13 @@ exports.configAPI = function configAPI(app) {
 			else {
 				res.status(404).end();
 			}
+		});
+	});
+	
+	app.post('/api/user/:user/transaction', auth.isAdmin, function(req, res) {
+		models.User.transaction(req.params.user, req.body.amount, req.body.options, function(err) {
+			if (err) return res.status(500).json(err);
+			res.status(200).end();
 		});
 	});
 

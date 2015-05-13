@@ -185,7 +185,6 @@ module.exports = function(grunt) {
 					dest: "build"
 				}
 			},
-                
 		},
 		clean: {
 			annotations: {

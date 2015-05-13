@@ -1,8 +1,6 @@
 var config = require('./coopConfig.js'),
 	cycle = config.cycle,
 	async = require('async'),
-	nodemail = require('nodemailer'),
-	smtpTransport = require('nodemailer-smtp-transport'),
 	Emailer = require('./emailer.js'),
 	mongoose = require('mongoose'),
 	ObjectId = require('mongoose').Types.ObjectId, 
@@ -67,9 +65,9 @@ function checkConfig() {
 		} else if (today.equals(cycle.shoppingStop) ) {
 			console.log('Today everyone is invoiced');
 			// checkout everyone's purchases
-			exports.checkout();
+			//exports.checkout();
 			// send order requests to producers
-			exports.orderGoods();
+			//exports.orderGoods();
 		} else if (today.between( shoppingStart, shoppingStop) ) {
 			console.log('today is a shopping day');
 			exports.canShop = true;
@@ -126,19 +124,12 @@ exports.invoiceCustomer = function(customer, callback) {
 				deliveryRoute: customer._id.routeTitle || 'Whangarei'
 			});
 			
-			if (customer._id.user_type.name === 'Customer' && customer._id.balance) {
-				invoice.credit = customer._id.balance;
-				console.log('%s credited on shopping Bill', customer._id.name);
-			}
-			
-			invoice.save(function(e, invoice){
-				console.log('Invoice #%s saved for %s and has a total of %s', invoice._id, customer._id.name, invoice.total);
-				done(e, invoice);
-			});
-		},
-		function(invoice, done) {
 			invoice.populate('items.product', 'fullName variety productName priceWithMarkup price units refrigeration', function(e, invoice) {
-				done(e, invoice);
+				if (e) return done(e);
+				invoice.save(function(e, invoice){
+					done(e, invoice);
+					console.log('Invoice #%s saved for %s and has a total of %s', invoice._id, customer._id.name, invoice.total);
+				});
 			});
 		},
 		function(invoice, done) {
@@ -152,26 +143,17 @@ exports.invoiceCustomer = function(customer, callback) {
 				}
 			};
 			
-			var showCredit = 'none';
-			if (!isNaN(parseFloat(invoice.credit))) showCredit = 'table-row';
-			
 			mailData = {
 				name: customer._id.name,
 				dueDate: Date.parse(exports.currentCycle.shoppingStop).addDays(5).toString('ddd dd MMMM yyyy'),
+				deliveryDay: Date.parse(exports.currentCycle.deliveryDay).toString('ddd dd MMMM yyyy'),
 				code: invoice._id,
 				items: invoice.items,
-				showCredit: showCredit,
-				credit: function() {
-					if (invoice.credit >= 0) return '$' + invoice.credit.toFixed(2);
-					else if(invoice.credit < 0) return '-' + '$' + Math.abs(invoice.credit).toFixed(2);
-				},
-				subtotal: invoice.subtotal,
 				total: invoice.total,
 				account: config.bankAccount
 			};
 			
 			mail = new Emailer(mailOptions, mailData);
-
 			
 			mail.send(function(err, result) {
 				if (err) done(err);
@@ -239,18 +221,12 @@ exports.invoiceFromProducer = function (producer, callback) {
 				bankAccount: producer._id.producerData.bankAccount || 'NO ACCOUNT ON RECORD'
 			});
 			
-			if (producer._id.balance) {
-				invoice.credit = -producer._id.balance;
-			}
-			
-			invoice.save(function(e, invoice) {
-				done(e, invoice);
-			});
-		},
-		function(invoice, done) {
-			invoice.populate('items.customer', 'name email routeTitle balance').populate('items.product', 'fullName variety productName price units refrigeration',
-			 function(e, invoice) {
-				done(e, invoice);
+			invoice.populate('items.customer', 'name email routeTitle balance')
+			.populate('items.product', 'fullName variety productName price units refrigeration', function(e, invoice) {
+				if (e) return done(e);
+				invoice.save(function(e, invoice) {
+					done(e, invoice);
+				});
 			});
 		},
 		function(invoice, done) {
@@ -263,8 +239,6 @@ exports.invoiceFromProducer = function (producer, callback) {
 					name: producer._id.name
 				}
 			};
-			var showCredit = 'none';
-			if (!isNaN(parseFloat(invoice.credit))) showCredit = 'table-row';
 			
 			mailData = {
 				name: producer._id.name,
@@ -272,12 +246,6 @@ exports.invoiceFromProducer = function (producer, callback) {
 				deliveryDay: Date.parse(exports.currentCycle.deliveryDay).toString('ddd dd MMMM yyyy'),
 				code: invoice._id,
 				items: invoice.items,
-				showCredit: showCredit,
-				credit: function() {
-					if (invoice.credit >= 0) return '$' + invoice.credit.toFixed(2);
-					else if(invoice.credit < 0) return '-' + '$' + Math.abs(invoice.credit).toFixed(2);
-				},
-				subtotal: invoice.subtotal,
 				total: invoice.total,
 				account: producer._id.producerData.bankAccount
 			};

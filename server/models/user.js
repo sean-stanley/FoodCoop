@@ -9,8 +9,6 @@ var Transaction = require('./transaction')
 	, markup = config.markup
 	, gm = require('gm');
 	
-console.log(Transaction);
-
 function toArray (listString) {
 	if (typeof listString === 'string' && listString.length > 0) {
 		return listString.split(/,\s*/);
@@ -55,7 +53,7 @@ var UserSchema = new Schema({
 			},
 			balance: {type: Number, default: 0},
 			businessBalance: {type: Number, default: 0},
-			useBusinessBalance: {type: Boolean, default: true},
+			useBusinessBalance: {type: Boolean, default: false},
 			badges: [{type: Schema.ObjectId, ref: 'Badge'}],
 			
 			routeTitle: String,
@@ -154,12 +152,12 @@ UserSchema.static('transaction', function(id, amount, options, cb) {
 	//		-- invoice(_id): _id of the invoice this transaction is tied to. The amount of the transaction and total of the invoice should be equal.
 	//		-- businessBalance(boolean): this amount can go on businessBalance if available, usually used for credits for products sold.
 	//		-- sandbox(boolean)
-	
 	if (!cb) {
 		cb = options; // no options argument passed;
 		options = {};
-		var title = amount > 0 ? 'general credit' : 'general debit';
 	}
+	
+	if ( !options.hasOwnProperty('title') ) options.title = amount > 0 ? 'general credit' : 'general debit';
 	
 	
 	this.findById(id, 'balance businessBalance useBusinessBalance', function(err, user) {
@@ -174,7 +172,7 @@ UserSchema.static('transaction', function(id, amount, options, cb) {
 			if (err) return cb(err);
 			// create a transaction for this call
 			Transaction.create({
-				title: options.title || title,
+				title: options.title,
 				amount: amount,
 				account: user._id,
 				invoice: options.invoice,

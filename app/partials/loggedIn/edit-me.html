@@ -12,19 +12,41 @@
 		<a href="product-upload" class="text-center jumbo-link"><h3 class="text-center"><i class="fa fa-cloud-upload fa-4x"></i><small><br>Upload Product</small></h3></a>
 	</div>
 </div>
-<div class="col-md-12">
-	<div class="page-header">
-		<h1 ng-controller="logoutCtrl">
-			{{currentUser.name}} <small>{{currentUser.user_type.name}}</small>
-			<a href="/" class="btn btn-primary pull-right" ng-click="logOut()"><span class="glyphicon glyphicon-lock"></span> Logout</a>
+<div class="row">
+	
+	<div id="preview-container" class="preview-box col-sm-4 col-md-3">
+		<img ng-if="currentUser.producerData.hasOwnProperty('logo')" ng-src="{{currentUser.producerData.logo}}" alt=" logo placeholder " class="img-responsive">
+		<h1 ng-if="!currentUser.producerData.hasOwnProperty('logo')" class="text-center">
+			<span class="glyphicon glyphicon-user" style="font-size: 6em"></span>
 		</h1>
-		<h3 ng-show="currentUser.balance">Account Balance: {{currentUser.balance | currency}}</h3>
 	</div>
 	
+	<div class="col-sm-8 col-md-9" >
+		<h1>{{currentUser.name}}</h1>
+		<h2 ng-controller="logoutCtrl"><small>{{currentUser.user_type.name}} Member</small><br><a href="/" class="btn btn-primary" ng-click="logOut()"><span class="glyphicon glyphicon-lock"></span> Logout</a></h2>
+		
+		<h3 ng-show="currentUser.balance || currentUser.businessBalance"><span ng-show="currentUser.useBusinessBalance">Personal</span> <span ng-hide="currentUser.useBusinessBalance">Account</span> Balance: {{currentUser.balance | currency}} <br>
+			<span ng-if="currentUser.useBusinessBalance">Business Balance: {{currentUser.businessBalance | currency}}</span>
+		</h3>
+		
+		<form name="businessbalance" ng-submit="save()">
+			<div class="checkbox" ng-show="currentUser.balance && currentUser.user_type.canSell || currentUser.businessBalance && currentUser.user_type.canSell">
+				<label>
+					<input type="checkbox" name="balance" ng-model="currentUser.useBusinessBalance" ng-disabled="currentUser.businessBalance !== 0"> Track My Sales and Purchases seperately
+				</label>
+			</div>
+			<div class="form-control" ng-show="businessBalance.balance.$dirty">
+				<button type="submit" class="btn btn-default"><i class="fa fa-cloud-upload"></i> Save</button>
+			</div>
+		</form>
+		
+	</div>
+</div>
 	
+<hr>
+<div ng-class="{'col-sm-4': currentUser.user_type.name === 'Producer', 'col-sm-offset-4 col-md-offset-3 col-sm-6': currentUser.user_type.name === 'Customer'}">
 	
-
-<form name="editMe" novalidate ng-class="{'col-sm-4': currentUser.user_type.name === 'Producer', 'col-sm-12': currentUser.user_type.name === 'Customer'}">
+	<form name="editMe" novalidate>
 	<legend ng-if="currentUser.user_type.name === 'Producer'">Basic Details</legend>
 	<label ng-if="currentUser.routeTitle"><a href="/delivery">Route: {{currentUser.routeTitle}}</a></label>
 	<div class="form-group">
@@ -94,22 +116,18 @@
 		</div>
 
 		<div class="form-group">
-	        <button ng-click="save()" ng-disabled="editMe.$pristine || editMe.$invalid"
-	                class="btn btn-primary"
-									analytics-on="click">Save User Info</button>
-	        <button ng-click="destroy()"
-	                ng-show="currentUser._id" class="btn btn-danger" analytics-on="click">Leave Co-op</button>
+			<button ng-click="save()" ng-disabled="editMe.$invalid"
+			class="btn btn-primary"
+			analytics-on="click">Save User Info</button>
+			<button ng-click="destroy()"
+			ng-show="currentUser._id" class="btn btn-danger" analytics-on="click">Leave Co-op</button>
 		</div>
 </form>
+</div>
 
 <div ng-if="currentUser.user_type.name === 'Producer'" class="col-sm-8" ng-controller="producerCtrl">
 
-	<div id="producer-preview-column" class="col-md-6">
-		
-		
-	</div>
-
-<div id="producer-form-container" class="col-md-12" >
+	<div id="producer-form-container" >
 	<form name="producerEdit" autocomplete="off" novalidate>
 		<fieldset>
 			<legend>Producer Profile <a class="pull-right" ng-href="/producer/{{currentUser.producerData.companyName || currentUser._id + '/' | forURL}}-{{currentUser.name | forURL}}"><span class="glyphicon glyphicon-user"></span> View Profile</a></legend>
@@ -135,9 +153,7 @@
 					
 					<hr>
 				</div>
-				<div id="preview-container" class="preview-box col-sm-6">
-					<img ng-if="currentUser.producerData.hasOwnProperty('logo')" ng-src="{{currentUser.producerData.logo}}" alt=" logo placeholder " class="img-responsive">	
-				</div>
+				
 			</div>
 			<div class="row">
 				<div class="form-group col-md-6">
@@ -188,10 +204,10 @@
 		</fieldset>
 	</form>
 </div>
+</div>
 
 	
 
-</div>
 	
 <br>
 <br>

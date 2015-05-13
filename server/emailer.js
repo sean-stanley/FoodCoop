@@ -3,7 +3,6 @@
 	var Emailer, emailer, smtpTransport, exports, config, fs, _, path, coopConfig;
 
 	emailer = require('nodemailer');
-	smtpTransport = require('nodemailer-smtp-transport');
 	config = require('./config').Config;
 	fs = require('fs');
 	_ = require('lodash');
@@ -33,7 +32,7 @@
 			html = this.getHtml(this.options.template, this.data);
 			attachments = this.getAttachments(html);
 			messageData = {
-				from: 'Northland Natural Food Co-op',
+				from: 'Northland Natural Food Co-op <info@foodcoop.nz>',
 				to: '',
 				subject: this.options.subject,
 				//replyTo: ''' + this.options.replyTo.name + '' <' + this.options.replyTo.email + '>',
@@ -58,10 +57,10 @@
 
 		Emailer.prototype.getTransport = function() {
 			var opts;
-			return emailer.createTransport(smtpTransport({
-				service: 'gmail',
-				auth: config.gmailCredentials
-			}));
+			return emailer.createTransport({
+				service: 'Mandrill',
+				auth: config.mandrillCredentials
+			});
 		};
 
 		Emailer.prototype.getHtml = function(templateName, data) {

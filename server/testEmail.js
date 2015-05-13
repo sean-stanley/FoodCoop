@@ -1,6 +1,7 @@
 var Emailer = require('./emailer'),
 	adminRecipients = [' "Sean Stanley" <sean@maplekiwi.com>', '"Michael Taylor" <michael@maplekiwi.com>'],
 	companyEmail = {email: 'sean@maplekiwi.com', name: 'Sean Stanley'};
+	
 
 function currentTime() {
 	  var date, hour, min;
@@ -18,7 +19,7 @@ var currentTimeString = currentTime();
 var options = {
 	template: 'server-start',
 	subject: 'Server up and running',
-	to: companyEmail
+	to: companyEmail,
 };
 
 var data = {
@@ -38,7 +39,7 @@ serverStart.send(function(err, result) {
   if (err) {
     console.log(err);
   }
-  console.log('Message sent');
+  console.log(result);
 });
 
 

@@ -5,7 +5,7 @@
     <body>
         <p> Hi {{name}},</p>
 		<p>Thank you for selling with the Northland Natural Food Co-op. Local commerce reduces environmental impact and increases Northland's food security. Our customers thank you for sharing your fantastic products with them.</p>
-        <p> Below is a summary of the products you have sold this cycle, along with the amount you can expect to be paid. Please bring all the products which have been ordered from you to the Woods Centre on delivery day, which is <strong>{{deliveryDay}}</strong>. If you want to make other arrangements to drop off your goods please contact <a href="mailto:sean@foodcoop.nz">me</a></p>
+        <p> Below is a summary of the products you have sold this cycle, along with the amount your account has been credited. Please bring all the products which have been ordered from you to the Woods Centre on delivery day, which is <strong>{{deliveryDay}}</strong>. If you want to make other arrangements to drop off your goods please contact <a href="mailto:sean@foodcoop.nz">me</a></p>
 		
 				<table border="0" cellspacing="10" cellpadding="10">
 				 <thead>
@@ -36,16 +36,11 @@
 			<% }); %>
            </tbody>
            <tfoot>
-             <tr style="display: {{showCredit}}">
-							 <td colspan="6" style="text-align:right"> Subtotal: ${{subtotal.toFixed(2)}}</td>
-						 <tr>
-               <tr style="display: {{showCredit}}">
-								 <td colspan="6"> CR: {{credit()}}</td>
 							 <tr>
-                   <td colspan="6"> Total: ${{total.toFixed(2)}}</td>
-               </tr>
-           </tfoot>
-       </table>
+								 <td colspan="6"> Total: ${{total.toFixed(2)}}</td>
+							 </tr>
+						 </tfoot>
+					 </table>
 	   
 	   <p>Assuming all your customers pay us promptly, your payment should arrive by <strong>{{dueDate}}</strong> You can expect payment to the account {{account}}. If this is incorrect, please contact us immediately and update your bank account details from the producer profile page on our website.</p>
        
@@ -68,9 +63,10 @@
 			</table>
 		<% }); %>
 		
-			
+		<h2>Delivering your Order</h2>
+		<p>Please arrange with us to have your order by {{deliveryDay}}. You can drop it off between 1pm and 3pm at 1 Woods Rd (the warehouse behind Chipmunks) in Whangarei. Or you can arrange pick up with us a couple days beforehand if you won't be in Whangarei on Delivery Day and have no goods to pickup. If there are other NNFC producers near you, consider carpooling your orders together to save time and money. We can also help with courier of your goods if delivery is not efficient for you any other way.</p>
         
-        <p> We look forward to seeing you on delivery day.</p>
+        <p> We look forward to hearing from you and receiving your orders.</p>
         <p>Cheers, <br>
         The NNFC team </p>
         

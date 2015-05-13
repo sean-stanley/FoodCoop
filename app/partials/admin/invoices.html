@@ -29,7 +29,12 @@
 	</p>
 </div>
 
-<section ng-repeat="invoice in invoices | orderBy:sort:reverse | filter:search:searchbar:cancelled">
+<section ng-repeat="invoice in invoices | orderBy:sort:reverse | filter:search:searchbar:cancelled" 
+	ng-class="{
+		'bg-danger':invoice.status === 'OVERDUE',
+		'bg-warning':invoice.status === 'un-paid',
+		'bg-success': invoice.status === 'PAID'
+}">
 	<alert ng-show="invoice.alert" type="{{invoice.alert.type}}">{{invoice.alert.message}}</alert>
 	<alert ng-if="invoice.dueDate &gt; now" type="danger">This invoice is OVERDUE</alert>
 	<alert ng-if="soon(invoice)" type="warning">This invoice is due soon</alert>
@@ -156,6 +161,7 @@
 	<button type='button' class="btn btn-default" ng-model="invoice.status" btn-radio=" 'CANCELLED' " ng-change="invoiceSave(invoice)">CANCELLED</button>
 </div>
 <button type='button' class="btn btn-danger" ng-click="invoiceDelete(invoice)"> Delete Invoice</button>
+<button type='button' class="btn btn-info" ng-click="email(invoice)"> <i class="fa fa-envelope"></i> Send Email Reminder</button>
 <hr>
 </section>
 </div>

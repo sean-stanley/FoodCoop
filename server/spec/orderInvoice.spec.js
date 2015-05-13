@@ -8,8 +8,7 @@ var async = require('async')
 	, config = require('./../coopConfig.js')
 	, discount = require('./../controllers/discount')
 	, _ = require('lodash')
-	, moment = require('moment')
-	, scheduler = require('./../scheduler');
+	, moment = require('moment');
 		
 	require('datejs');
 	
@@ -128,15 +127,16 @@ var async = require('async')
 			
 		});
 		it('should be able to save an invoice and populate the products', function(done) {			
-			invoice.save(function(err, invoice) {
+			invoice.populate('items.product', 'fullName variety productName priceWithMarkup price units refrigeration', function(err, invoice) {
 				expect(err).toBeNull();
-				expect(invoice.cycle).toBe(12);
-				expect(invoice.dueDate.toString()).toEqual(Date.today().addDays(7).toString());
 				expect(invoice.hasOwnProperty('save')).toBeTruthy();
+				expect(isNaN(invoice.total)).not.toBeTruthy();
 				
-				models.Invoice.populate(invoice, {path: 'items.product', select: 'fullName variety productName priceWithMarkup price units refrigeration'}
-				, function(err, invoice) {
-				//	invoice = result;
+				invoice.save(function(err, invoice) {
+					expect(err).toBeNull();
+					expect(isNaN(invoice.total)).not.toBeTruthy();
+					expect(invoice.cycle).toBe(12);
+					expect(invoice.dueDate.toString()).toEqual(Date.today().addDays(7).toString());
 					expect(invoice.items[0].product.fullName).toEqual('Gluten Free Bread');
 					expect(invoice.items[0].product.priceWithMarkup).toBeGreaterThan(invoice.items[0].product.price);
 					expect(invoice.items[0].product.units).toEqual('loaf');
@@ -145,35 +145,18 @@ var async = require('async')
 				});
 			});
 		});
-		it('should not be able to add credit to the invoice if the customer is a producer', function(done) {
-			customer._id.balance = 20;
-			if (customer._id.user_type.name === 'Customer' && customer._id.balance) {
-				invoice.credit = customer._id.balance;
-			}
-			expect(invoice.credit).toBeUndefined();
-			done();
-			
-		});
+		
 		it('should be able to generate the data for the email template from the invoice', function(done) {
 			invoice.populate('items.product', 'fullName variety productName priceWithMarkup price units refrigeration', function(err, invoice) {
 				expect(invoice.hasOwnProperty('save')).toBeTruthy();
 				expect(err).toBeNull();
-				
-				var showCredit = 'none';
-				if (!isNaN(parseFloat(invoice.credit))) showCredit = 'table-row';
-				
-				expect(invoice.credit).toBeUndefined();
+								
 			
 				var mailData = {
 						name: customer._id.name,
 						dueDate: Date.parse(Date.today().toString()).addDays(5).toString('ddd dd MMMM yyyy'),
 						code: invoice._id,
 						items: invoice.items,
-						showCredit: showCredit,
-						credit: function() {
-							if (invoice.credit >= 0) return '$' + invoice.credit.toFixed(2);
-							else if(invoice.credit < 0) return '-' + '$' + Math.abs(invoice.credit).toFixed(2);
-						},
 						subtotal: invoice.subtotal,
 						total: invoice.total,
 						account: config.bankAccount
@@ -181,7 +164,6 @@ var async = require('async')
 				expect(mailData.name).toBe('Sean Stanley');
 				expect(mailData.dueDate).toEqual(Date.today().addDays(5).toString('ddd dd MMMM yyyy'));
 				expect(mailData.code).toBeUndefined() // since the invoice is unsaved;
-				expect(mailData.credit()).toBeUndefined();
 				
 				expect(mailData.items.length).toBe(1);
 				expect(mailData.items[0].product.fullName).toBe('Gluten Free Bread');
@@ -273,46 +255,41 @@ var async = require('async')
 			
 		});
 		it('should be able to save an invoice and populate the products', function(done) {			
-			invoice.save(function(err, invoice) {
+			invoice
+			.populate('items.customer', 'name email routeTitle balance')
+			.populate('items.product', 'fullName variety productName price units refrigeration', function(err, invoice) {
 				expect(err).toBeNull();
+				
+				expect(isNaN(invoice.total)).not.toBeTruthy();
+				
 				expect(invoice.cycle).toBe(12);
 				expect(invoice.dueDate.toString()).toEqual(Date.today().addDays(12).toString());
 				expect(invoice.hasOwnProperty('save')).toBeTruthy();
 				
-				invoice.populate('items.customer', 'name email routeTitle balance').populate('items.product', 'fullName variety productName price units refrigeration',
-					function(err, invoice) {
-						expect(err).toBeNull();
-						
-						expect(invoice.items[0].customer.name).not.toBeUndefined();
-						expect(invoice.items[0].customer.email).not.toBeUndefined();
-						expect(invoice.items[0].customer.balance).not.toBeUndefined();
-						
-						expect(invoice.items[0].product.fullName).toEqual('Organic Gala Apples');
-						expect(invoice.items[0].product.priceWithMarkup).toBeGreaterThan(invoice.items[0].product.price);
-						expect(invoice.items[0].product.units).toEqual('kg');
-						expect(invoice.hasOwnProperty('save')).toBeTruthy();
-						done();
-					});
+				expect(invoice.items[0].customer.name).not.toBeUndefined();
+				expect(invoice.items[0].customer.email).not.toBeUndefined();
+				expect(invoice.items[0].customer.balance).not.toBeUndefined();
+				
+				expect(invoice.items[0].product.fullName).toEqual('Organic Gala Apples');
+				expect(invoice.items[0].product.priceWithMarkup).toBeGreaterThan(invoice.items[0].product.price);
+				
+				invoice.save(function(err, invoice) {
+					expect(err).toBeNull();
+					expect(isNaN(invoice.total)).not.toBeTruthy();
+					expect(invoice.hasOwnProperty('save')).toBeTruthy();
+					expect(invoice.items[0].product.units).toEqual('kg');
+					
+					done();	
+				});
+				
+				
 			});
 		});
-		 		it('should be able to add credit to the invoice of a producer', function(done) {
-		 			producer._id.balance = 20;
-					if (producer._id.balance) {
-						invoice.credit = -producer._id.balance;
-					}
-		 			expect(invoice.credit).toBe(-20);
-		 			done();
-			
-		 		});
+		 		
 		 		it('should be able to generate the data for the email template from the invoice', function(done) {
 		 			invoice.populate('items.product', 'fullName variety productName priceWithMarkup price units refrigeration', function(err, invoice) {
 		 				expect(invoice.hasOwnProperty('save')).toBeTruthy();
 		 				expect(err).toBeNull();
-				
-		 				var showCredit = 'none';
-		 				if (!isNaN(parseFloat(invoice.credit))) showCredit = 'table-row';
-				
-		 				expect(invoice.credit).toBeUndefined();
 						
 						var mailData = {
 							name: producer._id.name,
@@ -320,11 +297,6 @@ var async = require('async')
 							deliveryDay: Date.parse(Date.today().toString()).addDays(10).toString('dddd dd MMMM yyyy'),
 							code: invoice._id,
 							items: invoice.items,
-							showCredit: showCredit,
-							credit: function() {
-								if (invoice.credit >= 0) return '$' + invoice.credit.toFixed(2);
-								else if(invoice.credit < 0) return '-' + '$' + Math.abs(invoice.credit).toFixed(2);
-							},
 							subtotal: invoice.subtotal,
 							total: invoice.total,
 							account: producer._id.producerData.bankAccount
@@ -332,7 +304,6 @@ var async = require('async')
 		 				expect(mailData.name).toBe('Sean Stanley');
 		 				expect(mailData.dueDate).toEqual(Date.today().addDays(12).toString('dddd dd MMMM yyyy'));
 		 				expect(mailData.code).toBeUndefined() // since the invoice is unsaved;
-		 				expect(mailData.credit()).toBeUndefined();
 				
 		 				expect(mailData.items.length).toBe(1);
 		 				expect(mailData.items[0].product.fullName).toBe('Organic Gala Apples');

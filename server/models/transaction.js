@@ -1,6 +1,6 @@
 var mongoose = require('mongoose'), // middleware for connecting to the mongodb database
-Schema = mongoose.Schema,
-User = require('./user'); // mongoose schema object for defining collections.
+Schema = mongoose.Schema;
+
 
 var TransactionSchema = new Schema({
 	dateCreated : {type: Date, required: true, default: new Date() },
@@ -9,7 +9,7 @@ var TransactionSchema = new Schema({
 	account: {type: Schema.ObjectId, ref: 'User', required:true},
 	invoice: {type:Number, ref: 'Invoice'},
 	reason: String,
-	sandbox: {type: Boolean, default: true} // change to false for deployment
+	sandbox: {type: Boolean, default: false} // change to false for deployment
 });
 
 module.exports = mongoose.model('Transaction', TransactionSchema);

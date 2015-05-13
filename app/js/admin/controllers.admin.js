@@ -5,11 +5,33 @@
 
 angular.module('co-op.admin')
 	
-.controller('userAdminCtrl', ['$scope', 'users', '$location',
+.controller('userAdminCtrl', ['$scope', 'users',
 	function($scope, users) {
 		$scope.userLibrary = users.getList().$object;
 	}
 ])
+
+.controller('transactionController', ['$scope', '$http', function($scope, $http) {
+	// inherits user from parent scope adminUserEditCtrl
+	
+	$scope.submitted = false;
+	
+	$scope.transaction = {
+		account: $scope.user._id,
+		amount: 0,
+		options: {}
+	};
+	
+	$scope.createTransaction = function(valid) {
+		if (valid) {
+			$http.post('/api/user/' + $scope.user._id + '/transaction', $scope.transaction).success(function(result) {
+				console.log(result);
+				$scope.transaction.options = {};
+				$scope.transaction.amount = 0;
+			}).error(function(err) {console.log(err);});
+		} else $scope.submitted = true;
+	};
+}])
 
 .controller('adminUserEditCtrl', ['$scope', '$rootScope', 'LoginManager', 'flash', 'Restangular', '$location', 'user',
 	function($scope, $rootScope, LoginManager, flash, Restangular, $location, user) {
@@ -63,8 +85,8 @@ angular.module('co-op.admin')
 	}
 ])
 
-.controller('invoiceCtrl', ['$scope', '$rootScope', 'Restangular', 'flash',
-	function($scope, $rootScope, Restangular, flash) {
+.controller('invoiceCtrl', ['$scope', '$rootScope', 'Restangular', 'flash', '$http',
+	function($scope, $rootScope, Restangular, flash, $http) {
 		$scope.now = Date();
 		
 		$scope.soon = function(invoice) {
@@ -140,6 +162,12 @@ angular.module('co-op.admin')
 			
 				$scope.invoices.splice($scope.invoices.indexOf(invoice), 1);
 			}
+		};
+		
+		$scope.email = function(invoice) {
+			$http.post('/api/invoice/email', invoice).success(function(result) {
+				flash.setMessage({type:'success', message: "email successfully sent: "+ result || 'Great!'});
+			});
 		};
 	}
 ])
@@ -331,8 +359,5 @@ angular.module('co-op.admin')
 		  navigator.msSaveBlob(blob, 'products.csv');
 		}
 	};
-	
-	
-	
 	
 }]);
