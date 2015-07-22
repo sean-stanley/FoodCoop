@@ -7,16 +7,16 @@
 </div>
 -->
 
-	
-<div class="modal-body col-xs-12 clearfix">
+
+<div class="modal-body col-xs-12 clearfix" stop-event="touchend">
 	<a href="" class="panel-btn panel-btn-lg close-top-right" ng-click="cancel()"><i class="fa fa-close"></i></a>
 	<!--
 	<ul class="list-unstyled pull-right col-sm-2">
-			<li><a href="https://twitter.com/share" class="twitter-share-button" 
-				data-url="http://foodcoop.org.nz/store#{{data.fullName}}+{{data.producer_ID.producerData.companyName}}&id={{data._id}}" 
+			<li><a href="https://twitter.com/share" class="twitter-share-button"
+				data-url="http://foodcoop.org.nz/store#{{data.fullName}}+{{data.producer_ID.producerData.companyName}}&id={{data._id}}"
 				data-text="{{data.fullName}} for sale by {{data.producer_ID.name}} in the NNFC Store"
-				data-via="NorthlandNFC" 
-				data-lang="en" 
+				data-via="NorthlandNFC"
+				data-lang="en"
 				data-count="none">Tweet</a></li>
 			<li>
 			</li>
@@ -29,25 +29,26 @@
 				<div class="fb-share-button" data-layout="button" data-href="http://foodcoop.org.nz/store#{{data.fullName}}+{{data.producer_ID.producerData.companyName}}&id={{data._id}}"></div>
 			</li>
 		</ul>-->
-	
+
 	<div class="col-md-6">
 		<div class="">
 			<img ng-if="data.certification.name !== 'none' && data.img && data.certification.img" ng-src="img/certification/{{data.certification.img}}" class="certification-img" alt="organic certification">
 			<img class="product-image-modal img-responsive center-block" ng-src="{{data.img}}" alt="{{data.fullName}}"/>
 		</div>
+		<h4><strong>
+			<a ng-href="/producer/{{data.producer_ID.producerData.companyName | forURL}}-{{data.producer_ID.name | forURL}}">
+				{{data.producer_ID.producerData.companyName || data.producer_ID.name || 'unknown'}}
+			</a>
+		</strong></h4>
 	</div>
-			
-	<div class="col-md-6">	
+
+	<div class="col-md-6">
 		<h1 class='text-center'>{{data.fullName}}</h1>
 		<article ta-bind ng-model="data.description"></article>
 		<p ng-if="data.ingredients"><strong>Ingredients:</strong>
 		<span ng-repeat="item in data.ingredients track by $index"><a ng-href="/store?search={{item}}">{{item}} </a> </span></p>
 		<p ng-if="data.certification.name !== 'none'"><strong>Certification:</strong> {{data.certification.name}}</p>
-		<p><strong>Produced By:</strong> 
-			<a ng-href="/producer/{{data.producer_ID.producerData.companyName | forURL}}-{{data.producer_ID.name | forURL}}">
-				{{data.producer_ID.producerData.companyName || data.producer_ID.name || 'unknown'}}
-			</a><br>
-		</p>
+
 		<h4 ng-hide="data.permanent"><strong>Quantity left:</strong> {{data.quantity - data.amountSold}}</h4>
 		<br>
 		<h3 class="text-center">
@@ -64,7 +65,7 @@
 			<button class="btn btn-primary btn-block" ng-click="addToCart(data)" ng-if="!data.AlreadyInCart" ng-hide="data.quantity <= 0 || data.permanent || !currentUser">
 				<span class="glyphicon glyphicon-shopping-cart"></span> Add to Cart
 			</button>
-			<a class="btn btn-primary btn-block" 
+			<a class="btn btn-primary btn-block"
 			ng-href="{{data.butcheryForm}}/{{data._id}}"
 			ng-show="data.permanent">
 				Order Now
@@ -75,7 +76,7 @@
 			</button>
 			<a class="btn btn-info btn-block" ng-href="/contact/{{data.producer_ID._id}}?subject=Question%20about%20{{data.fullName}}"><i class="fa fa-envelope"></i> Ask the seller about this product</a>
 		</div>
-		
+
 	</div>
 </div>
 <div class="modal-footer" id="modal-bottom">

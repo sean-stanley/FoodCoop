@@ -98,21 +98,31 @@ angular.module('co-op.directives', [])
         }
       };
 	}])
+	.directive('stopEvent', function () {
+    return {
+      restrict: 'A',
+      link: function (scope, element, attr) {
+        element.on(attr.stopEvent, function (e) {
+          e.stopPropagation();
+        });
+      }
+    };
+  })
 	/*
 	.directive("nnfcScroll", function ($window, $document) {
 		    return function(scope, element, attrs) {
 		        var originalHeight = element[0].offsetHeight;
-				
+
 				var pageOffset = function(offset) {
 					var num;
 					console.log(offset);
 						if (offset < 0) num = element[0].offsetHeight - 2* (offset + 51);
-						num = element[0].offsetHeight - offset + 51;				 
+						num = element[0].offsetHeight - offset + 51;
 		   	            return (num < originalHeight) ? num + 'px': originalHeight + 'px';
 						//else return originalHeight + 'px';
-					
+
 		        };
-				
+
 				angular.element($window).bind("scroll", function() {
 					element.css({'height' : pageOffset(this.pageYOffset)});
 					scope.$apply();
@@ -133,8 +143,8 @@ angular.module('co-op.directives', [])
 		    "</div>\n" +
 		    "");
 		}]);*/
-	
-	
+
+
 	.directive("imagePreload", [function() {
 		return {
 			restrict: 'E',
@@ -144,12 +154,12 @@ angular.module('co-op.directives', [])
 			template: '<img style="display:none" ng-src="{{imageUrl}}"/>'
 		};
 	}])
-	
+
 	.directive("fullHero", [ '$window', '$document', '$timeout', function ($window, $document, $timeout) {
 	    return function(scope, element, attrs) {
-        
+
 			var timer;
-			
+
 			var resizeBG = function () {
 				var bgwidth = element[0].offsetWidth;
 				var bgheight = element[0].offsetHeight;
@@ -175,29 +185,29 @@ angular.module('co-op.directives', [])
 					});
 				}
 			};
-						
+
 			function fullSize() {
 				element.css({
 					'min-height' : $window.innerHeight + 'px'
 				});
-				
+
 				// scope.$apply(function() {
 //
 // 				});
 			}
-			
+
 			fullSize();
 			angular.element($window).bind("resize", fullSize);
-			
+
 			// angular.element($document).ready(function() {
 			//
 			// });
 		};
 	}])
-	
+
 	.directive("stickyFooter", ['$window', '$document', '$timeout', function($window, $document, $timeout) {
 		return function(scope, element, attrs) {
-			
+
 			function setHeight() {
 				element.css({
 					'height' : angular.element(element).children()[0].offsetHeight + 'px'
@@ -206,7 +216,7 @@ angular.module('co-op.directives', [])
 					'margin-bottom' : angular.element(element).children()[0].offsetHeight + 'px'
 				});
 			}
-			
+
 			angular.element($document).ready(function() {
 				setHeight();
 				angular.element($window).bind('resize', setHeight);
@@ -216,26 +226,26 @@ angular.module('co-op.directives', [])
 
 	.directive('setNgAnimate', ['$animate', function ($animate) {
 	    return {
-	        link: function ($scope, $element, $attrs) { 
-          
-	            $scope.$watch( function() { 
-	                    return $scope.$eval($attrs.setNgAnimate, $scope); 
+	        link: function ($scope, $element, $attrs) {
+
+	            $scope.$watch( function() {
+	                    return $scope.$eval($attrs.setNgAnimate, $scope);
 	                }, function(valnew, valold){
 	                    $animate.enabled(!!valnew, $element);
-	            });  
-            
-            
+	            });
+
+
 	        }
 	    };
 	}])
-	
+
 	.directive('scrollAnchor', ['$location', '$window', '$timeout', function($location, $window, $timeout) {
 		var callbacks = [];
-		
+
 		function scrollToCallback(id, location, offset, $scope) {
 			var currentLocation = $location.path();
 			event.preventDefault();
-		
+
 			function callback() {
 				var element = document.getElementById(id);
 				if (element) {
@@ -245,7 +255,7 @@ angular.module('co-op.directives', [])
 					$window.scrollBy(0, - offset);
 				}
 			}
-			
+
 			$scope.$apply( function() {
 				if ($location.path() == location) {
 					callback();
@@ -253,10 +263,10 @@ angular.module('co-op.directives', [])
 				else {
 					callbacks.push(callback);
 					$location.path(location);
-				}	
+				}
 			});
 		}
-		
+
 		return {
 			restrict: 'A',
 			scope: {
@@ -275,12 +285,12 @@ angular.module('co-op.directives', [])
 				});
 			}
 		};
-		
-		
-	}])
-	
 
-  
+
+	}])
+
+
+
 .directive("fileread", [function () {
     return {
         restrict: 'A',
@@ -307,7 +317,7 @@ angular.module('co-op.directives', [])
 								scope.fileread = loadEvent.target.result;
 						});
 					}
-					
+
 				};
 				//file = event.originalEvent.dataTransfer.files[0];
 				file = changeEvent.target.files[0];
@@ -332,7 +342,7 @@ angular.module('co-op.directives', [])
                   }
                   event.dataTransfer.effectAllowed = 'copy';
 									return false;
-									
+
               };
 							startDrag = function(event) {
                 if (event !== null) {
@@ -393,7 +403,7 @@ angular.module('co-op.directives', [])
           }
       };
   }])
-	
+
 .directive('ngEnter', function() {
 	    return function(scope, elm, attrs) {
 	        elm.bind('keypress', function(e) {
@@ -496,10 +506,10 @@ angular.module('co-op.directives', [])
 					}
 				};
 	})
-	
+
 .directive('ngInputGrow', function() {
 	var className = 'input-lg';
-	
+
 	return {
 		restrict: 'A',
 		link: function(scope, el, attrs) {
@@ -512,5 +522,3 @@ angular.module('co-op.directives', [])
 		}
 	};
 });
-	
-

@@ -85,7 +85,7 @@
 					<ul class="list-unstyled">
 						<li><a href="/me" style="color:#fff"><i class="fa fa-user"></i> My Profile</a></li>
 						<li><a href="/edit-me" style="color:#fff"><i class="fa fa-pencil"></i> Edit Details</a></li>
-						<li><a ng-click="logOut()" style="color:#fff"><span class="glyphicon glyphicon-lock"></span> Log Out</a></li>
+						<li ng-controller="logoutCtrl"><a ng-click="logOut()" style="color:#fff"><span class="glyphicon glyphicon-lock"></span> Log Out</a></li>
 					</ul>
 				</div>
 			</div>
@@ -160,7 +160,7 @@
 					<li ng-class="{active:isActive('/my-cart')}" ng-show="currentUser"><a href="my-cart">Cart Page</a></li>
 					<li ng-class="{active:isActive('/order-manager')}"
 					ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
-					><a href="product-manager">My Products</a></li>
+					><a href="product-manager">Sales Dashboard</a></li>
 					<li ng-class="{active:isActive('/product-upload')}"
 					ng-show="currentUser && currentUser.user_type.name === 'Producer'"
 					><a href="product-upload">Upload a Product</a></li>
@@ -312,29 +312,28 @@
 
 
 	<!-- Other plugins here -->
-<!-- <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?&libraries=places&sensor=true"></script> -->
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?&libraries=places&sensor=true"></script>
 
 	<script type="text/javascript">
-	// var $buoop = {};
-// 	$buoop.ol = window.onload;
-// 	window.onload=function(){
-// 	 try {if ($buoop.ol) $buoop.ol();}catch (e) {}
-// 	 var e = document.createElement("script");
-// 	 e.setAttribute("type", "text/javascript");
-// 	 e.setAttribute("src", "//browser-update.org/update.js");
-// 	 document.body.appendChild(e);
-// 	}
+	var $buoop = {};
+	$buoop.ol = window.onload;
+	window.onload=function(){
+	 try {if ($buoop.ol) $buoop.ol();}catch (e) {}
+	 var e = document.createElement("script");
+	 e.setAttribute("type", "text/javascript");
+	 e.setAttribute("src", "//browser-update.org/update.js");
+	 document.body.appendChild(e);
+	}
 	</script>
 
 	<script>
-	// (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-// 		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-// 		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-// 	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-//
-// 	ga('create', 'UA-45071933-1', 'foodcoop.org.nz');
-	//ga('send', 'pageview');
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
+	ga('create', 'UA-45071933-1', 'foodcoop.org.nz');
+	ga('send', 'pageview');
 	</script>
 
 <image-preload src="/img/originals/cropped-Agricultural_grass.jpg"></image-preload>

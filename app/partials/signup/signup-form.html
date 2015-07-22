@@ -2,13 +2,13 @@
 <div class="modal-header">
             <h3 class="modal-title">Sign Up as a {{data}}</h3>
         </div>
-<div class="modal-body">
+<div class="modal-body" stop-event="touchend">
 
 	<alert type="{{message.type}}" role="alert" ng-show="message">
 		{{message.message}}
 	</alert>
 
-	<form name="signUp" autocomplete="on" novalidate role="form" id="signup-form">		
+	<form name="signUp" autocomplete="on" novalidate role="form" id="signup-form">
 		<div class="form-group" ng-class="{'has-error': submitted && signUp.email.$invalid}">
 			<label for="email">Email address</label>
 			<input autofocus ng-model="userData.email" name="email" type="email" class="form-control" placeholder="Enter email" required>
@@ -17,22 +17,22 @@
 				<span ng-show="signUp.email.$error.email">Please, write a valid email address.</span>
 			</alert>
 		</div>
-	
+
 		<div class="form-group" ng-class="{'has-error': submitted && signUp.pw.$invalid}">
 			<label for="pw">Create a Password</label>
-			<input type="password" 
-			class="form-control" 
+			<input type="password"
+			class="form-control"
 			ng-model="userData.password"
-			ng-minlength="7" 
-			name="pw" 
-			placeholder="Enter a Password" 
+			ng-minlength="7"
+			name="pw"
+			placeholder="Enter a Password"
 			required>
 			<alert type="danger" ng-show="submitted && signUp.pw.$invalid">Sorry:
 				<span ng-show="signUp.pw.$error.required">a password is definately required.</span>
 				<span ng-show="signUp.pw.$error.minlength">Passwords must be greater than 7 characters long.</span>
 			</alert>
 		</div>
-	
+
 		<div class="form-group" ng-class="{'has-warning': submitted && signUp.userFullName.$invalid}">
 			<label for="userFullName">Full Name</label>
 			<input ng-model="userData.name" name="userFullName" type="text" class="form-control" placeholder="Full Name" required>
@@ -40,31 +40,31 @@
 				<span ng-show="signUp.userFullName.$error.required">Full name is required.</span>
 			</alert>
 		</div>
-	
-	
+
+
 		<div class="form-group" ng-controller="geoCtrl" ng-class="{'has-warning': submitted && signUp.address.$invalid}">
 			<label for="address">Address</label>
 			<input type="text" id="Autocomplete" class="form-control" ng-autocomplete="userData.address" details="addressDetails" options="addressOptions" ng-model="userData.address"/>
-		
+
 			<alert type="danger" ng-show="submitted && signUp.address.$invalid">	Sorry:
 				<span ng-show="signUp.userFullName.$error.required">Your NZ address is required.</span>
 			</alert>
 		</div>
-	
+
 		<div class="form-group" ng-class="{'has-warning': submitted && signUp.phone.$invalid}">
 			<label for="phone">Phone</label>
 			<input type="tel" class="form-control" ng-model="userData.phone" name="phone" placeholder="Enter your preferred phone number" required>
-			<alert type="warning" ng-show="submitted && signUp.phone.$invalid">		
+			<alert type="warning" ng-show="submitted && signUp.phone.$invalid">
 
 				<span ng-show="signUp.phone.$error.required">Sorry: Please give us your preferred contact phone number.</span>
 			</alert>
 		</div>
-		
+
 		<div class="form-group">
 			<label for="discount">Discount Code</label>
 			<input type="text" class="form-control" ng-model="userData.discountCode" name="discount" placeholder="If you have a discount code, enter it here.">
 		</div>
-	
+
 		<div class="form-group">
 			<small>By clicking 'Signup' you agree to pay your membership fee and also agree to the <a href="terms-cons" >Terms and Conditions</a> as well as our <a href="priv-pol" >Privacy Policy</a></small>
 		</div>
@@ -75,9 +75,9 @@
 
 
 <div class="modal-footer">
-	<button type="submit" 
-	class="btn btn-primary" 
-	form="signup-form" 
+	<button type="submit"
+	class="btn btn-primary"
+	form="signup-form"
 	analytics-on="click" analytics-event="Signup" ng-click="submitForm(signUp.$valid)">Signup</button>
 	<button class="btn btn-warning" ng-click="cancel()" type="reset">Cancel</button>
 </div>
