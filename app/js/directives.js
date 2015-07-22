@@ -303,19 +303,19 @@ angular.module('co-op.directives', [])
 				var reader = new FileReader();
                 reader.onload = function (loadEvent) {
 					if (checkSize(size)) {
-					    scope.$apply(function () {
-	                        scope.fileread = loadEvent.target.result;
-	                    });
+						scope.$apply(function () {
+								scope.fileread = loadEvent.target.result;
+						});
 					}
-				    
-                };
+					
+				};
 				//file = event.originalEvent.dataTransfer.files[0];
 				file = changeEvent.target.files[0];
 				size = file.size;
-                reader.readAsDataURL(changeEvent.target.files[0]);
-            });
-        }
-    };
+				reader.readAsDataURL(changeEvent.target.files[0]);
+			});
+		}
+	};
 }])
   .directive('fileDropzone', [function() {
       return {
@@ -488,13 +488,29 @@ angular.module('co-op.directives', [])
 	        transclude: true,
 	        replace: true,
 	        link: function(scope, element, attrs) {
-	            scope.$watch('edit', function(isEditable) {
-	                if (isEditable === false) {
-	                    scope.update();
-	                }
-	            });
-	        }
-	    };
-	});
+						scope.$watch('edit', function(isEditable) {
+							if (isEditable === false) {
+								scope.update();
+							}
+						});
+					}
+				};
+	})
+	
+.directive('ngInputGrow', function() {
+	var className = 'input-lg';
+	
+	return {
+		restrict: 'A',
+		link: function(scope, el, attrs) {
+			angular.element(el).bind('focus', function() {
+				angular.element(this).addClass(className);
+			});
+			angular.element(el).bind('blur', function() {
+				angular.element(this).removeClass(className);
+			});
+		}
+	};
+});
 	
 

@@ -1,5 +1,0 @@
-#slide1 { background: url(/img/originals/cheese-wine-meat.jpg) no-repeat -9999px -9999px; }
-#slide2 { background: url(/img/originals/cow-nosey.jpg) no-repeat -9999px -9999px; }
-#slide3 { background: url(/img/originals/farm_wallpaper.jpg) no-repeat -9999px -9999px; }
-#slide4 { background: url(/img/originals/crowd2.jpg) no-repeat -9999px -9999px; }
-#slide5 { background: url(/img/originals/directory-books.jpg) no-repeat -9999px -9999px; }

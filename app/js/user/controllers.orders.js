@@ -1,11 +1,11 @@
 'use strict';
-/*global angular, _, Date, oboe*/
+/*global angular, _, Date, moment*/
 
 /* Controllers */
 
 angular.module('co-op.orders', [])
-.controller('butcheryFormCtrl', ['$scope', '$rootScope', '$http', 'beast', 'flash',
-	function($scope, $rootScope, $http, beast, flash) {
+.controller('butcheryFormCtrl', ['$scope', '$rootScope', '$http', 'beast', 'flash', '$modalInstance',
+	function($scope, $rootScope, $http, beast, flash, $modalInstance) {
 		$scope.beast = beast.data;
 		
 		$scope.meatOrder = {
@@ -32,6 +32,31 @@ angular.module('co-op.orders', [])
 				}, function(error) {
 					flash.setMessage({type: 'danger', message: 'error: ' + error.data});
 				});
+			} else $scope.submitted = true;
+		};
+	}
+]).controller('MilkFormCtrl', ['$scope', '$rootScope', '$http', 'milk', 'flash', '$modalInstance',
+	function($scope, $rootScope, $http, milk, flash, $modalInstance) {
+		$scope.milk = milk;
+		
+		$scope.weeks = [];
+		
+		var n = moment($rootScope.nextDeliveryDay).diff($rootScope.deliveryDay, 'weeks');
+		
+		for (var i = 0; i < n; i++) {
+			var deliveryDay = moment($rootScope.deliveryDay).add(i, 'w').format();
+			$scope.weeks.push({
+				product: $scope.milk._id,
+				customer: $rootScope.currentUser._id,
+				supplier: $scope.milk.producer_ID._id,
+				deliveryDay: deliveryDay,
+				milk: true
+			});
+		}
+		
+		$scope.order = function(valid) {
+			if (valid) {
+				$modalInstance.close($scope.weeks);
 			} else $scope.submitted = true;
 		};
 	}

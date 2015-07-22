@@ -7,25 +7,46 @@ var path = require('path');
 var config = require('./server/config').Config;
 
 var bower_components = [
+	'app/lib/bower_components/lodash/lodash.js',
 	'app/lib/bower_components/angular/angular.js',
+	'app/lib/bower_components/angular-animate/angular-animate.js',
+	'app/lib/bower_components/angular-touch/angular-touch.js',
 	'app/lib/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
 	'app/lib/bower_components/angular-cropme/cropme.js',
 	'app/lib/bower_components/angular-loading-bar/build/loading-bar.js',
 	'app/lib/bower_components/angular-route/angular-route.js',
-	'app/lib/bower_components/angular-sanitize/angular-sanitize.js',
+	// 'app/lib/bower_components/angular-sanitize/angular-sanitize.js',
 	'app/lib/bower_components/angular-socket-io/socket.js',
 	'app/lib/bower_components/angulartics/src/angulartics.js',
 	'app/lib/bower_components/angulartics/src/angulartics-ga.js',
 	'app/lib/bower_components/datejs/build/date-en-NZ.js',
+	'app/lib/bower_components/jcrop/js/jquery.Jcrop.js',
 	'app/lib/bower_components/momentjs/moment.js',
+	'app/lib/bower_components/ng-jcrop/ng-jcrop.js',
+	'app/lib/bower_components/ngImgCrop/compile/ng-img-crop.js',
+	'app/lib/bower_components/restangular/dist/restangular.js',
 	'app/lib/bower_components/textAngular/dist/textAngular-rangy.min.js',
 	'app/lib/bower_components/textAngular/dist/textAngular-sanitize.min.js',
-	'app/lib/bower_components/textAngular/dist/textAngular.min.js',
+	'app/lib/bower_components/textAngular/dist/textAngular.js',
+	'app/lib/bower_components/textAngular/dist/textAngularSetup.js',
 	'app/lib/oboe-browser.min.js'
+];
+
+var css_components = [
+	'app/lib/bower_components/bootstrap/dist/css/bootstrap.css',
+	'app/css/animations.css',
+	'app/css/banner.css',
+	'app/css/site.css',
+	'app/lib/bower_components/textAngular/dist/textAngular.css',
+	'app/lib/bower_components/jcrop/css/jquery.Jcrop.css',
+	'app/lib/bower_components/ng-jcrop/css/jquery.Jcrop.css',
+	'app/lib/bower_components/font-awesome/css/font-awesome.min.css',
+	'app/lib/bower_components/angular-loading-bar/build/loading-bar.css'
 ];
 
 module.exports = function(grunt) {
         
+	require('load-grunt-tasks')(grunt);
 	// Project configuration.
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
@@ -90,6 +111,17 @@ module.exports = function(grunt) {
 					stdout: true
 				}
 			}
+		},
+		cssmin: {
+		  options: {
+		    shorthandCompacting: false,
+		    roundingPrecision: -1
+		  },
+		  target: {
+		    files: {
+		      'app/css/compiled.min.css': css_components
+		    }
+		  }
 		},
 		watch: {
 			scripts: {
@@ -271,26 +303,26 @@ module.exports = function(grunt) {
 		}
 	});
 
-	grunt.loadNpmTasks('grunt-contrib-jshint');
-	grunt.loadNpmTasks('grunt-contrib-csslint');
-	grunt.loadNpmTasks('grunt-contrib-copy');
-	grunt.loadNpmTasks('grunt-contrib-watch');
-	grunt.loadNpmTasks('grunt-karma');
-	grunt.loadNpmTasks('grunt-concurrent');
-	grunt.loadNpmTasks('grunt-nodemon');
-	grunt.loadNpmTasks('grunt-shell');
-	grunt.loadNpmTasks('grunt-node-inspector');
-	grunt.loadNpmTasks('grunt-rsync');
-	grunt.loadNpmTasks('grunt-contrib-uglify');
-	grunt.loadNpmTasks('grunt-replace');
-	grunt.loadNpmTasks('grunt-ng-annotate');
-	grunt.loadNpmTasks('grunt-contrib-clean');
+	// grunt.loadNpmTasks('grunt-contrib-jshint');
+	// grunt.loadNpmTasks('grunt-contrib-csslint');
+	// grunt.loadNpmTasks('grunt-contrib-copy');
+	// grunt.loadNpmTasks('grunt-contrib-watch');
+	// grunt.loadNpmTasks('grunt-karma');
+	// grunt.loadNpmTasks('grunt-concurrent');
+	// grunt.loadNpmTasks('grunt-nodemon');
+	// grunt.loadNpmTasks('grunt-shell');
+	// grunt.loadNpmTasks('grunt-node-inspector');
+	// grunt.loadNpmTasks('grunt-rsync');
+	// grunt.loadNpmTasks('grunt-contrib-uglify');
+	// grunt.loadNpmTasks('grunt-replace');
+	// grunt.loadNpmTasks('grunt-ng-annotate');
+	// grunt.loadNpmTasks('grunt-contrib-clean');
     
 	// Default task(s).
-	grunt.registerTask('dev', ['uglify:bowerDev', 'concurrent:dev']);
-	grunt.registerTask('build', ['concurrent:build', 'replace', 'clean:annotations', 'ngAnnotate', 'uglify:app', 'uglify:bowerServer']);
+	grunt.registerTask('dev', ['cssmin','uglify:bowerDev', 'concurrent:dev']);
+	grunt.registerTask('build', ['cssmin', 'concurrent:build', 'replace', 'clean:annotations', 'ngAnnotate', 'uglify:app', 'uglify:bowerServer']);
 	grunt.registerTask('serve-opt', ['build', 'nodemon:opt']);
-	grunt.registerTask('debug', ['concurrent:debug']);
+	grunt.registerTask('debug', ['cssmin','concurrent:debug']);
 	grunt.registerTask('deploy-debug', ['rsync:linode', 'shell:updateServer']);
 	grunt.registerTask('deploy', ['build', 'rsync:linodeOpt', 'shell:updateServer']);
 	grunt.registerTask('decrypt-config', ['shell:decryptConfig']);

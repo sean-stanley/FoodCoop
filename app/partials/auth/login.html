@@ -7,28 +7,20 @@
 	<div ng-show="showLogin" class="login animate-show">
 		<button type="button" class="close" aria-hidden="true" ng-click="showLogin = false">&times;</button>
 		<form name="signIn" autocomplete="on" novalidate>
-			<div class="form-group">
-				<!-- <label for="inputEmail" class="col-lg-2 control-label">Email</label> -->
-				<input ng-model="loginData.email" type="email" name="email" class="form-control" id="inputEmail" placeholder="Email">
-				<div class="alert alert-warning" ng-show="signIn.email.$dirty && signIn.email.$invalid">Sorry:
-					<span ng-show="signIn.email.$error.required">email is required.</span>
-					<span ng-show="signIn.email.$error.email">Please, write a valid email address.</span>
-				</div>				      
+			<div class="form-group" ng-class="{'has-error': signIn.email.$invalid && signIn.email.$dirty, 'has-success':signIn.email.$valid && signIn.email.$dirty}">
+				<label for="inputEmail" class="sr-only">Email</label>
+				<input ng-model="loginData.email" ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }"
+				type="email" name="email" class="form-control" id="inputEmail" placeholder="Email">
 			</div>
 			<div class="form-group">
-				<!-- <label for="inputPassword" class="col-lg-2 control-label">Password</label> -->
+				<label for="inputPassword" class="sr-only">Password</label>
 				<input ng-model="loginData.password" type="password" name="password" class="form-control" id="inputPassword" placeholder="Password">
-				<!--
-					<div class="checkbox" style="margin-bottom: 35px;">
-					<br>
-					<input type="checkbox" ng-model="loginData.rememberMe" value="true"> <p>Remember me</p>
-					</div>-->
 			</div>
 			<div class="form-group">
-				<button type="submit" class="btn btn-default btn-block" ng-click="showLogin = false; submitForm()">Sign in</button>
+				<button type="submit" class="btn btn-primary btn-block" ng-click="showLogin = false; submitForm()">Login</button>
 			</div>
 		</form>
-		<a href="/forgot" ng-click="showLogin = false" class="text-center">Forgot my password?</a>
+		<span ng-click="showLogin = false"><a href="/forgot" class="text-center">Forgot my password?</a></span>
 	</div>
 
 </div>

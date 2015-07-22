@@ -1,0 +1,108 @@
+<div class="row bg-primary">
+	<div ng-class="{'col-xs-3': currentUser.user_type.canSell, 'col-xs-6': !currentUser.user_type.canSell}">
+		<a href="my-cart" class="text-center jumbo-link"><h3 class="text-center">
+			<i class="fa fa-shopping-cart fa-4x hidden-xs"></i>
+			<i class="fa fa-shopping-cart fa-2x visible-xs-inline"></i>
+			<span class="badge">{{cartTally}}</span><small><br>Cart</small></h3></a>
+	</div>
+	<div ng-class="{'col-sm-3 col-xs-3': currentUser.user_type.canSell, 'col-xs-6': !currentUser.user_type.canSell}">
+		<a href="message-board" class="text-center jumbo-link"><h3 class="text-center">
+			<i class="fa fa-envelope-o fa-4x hidden-xs"></i>
+			<i class="fa fa-envelope-o fa-2x visible-xs-inline"></i>
+			<small><br>Message Board</small></h3></a>
+	</div>
+	<div class="col-xs-3" ng-show="currentUser.user_type.canSell">
+		<a href="product-manager" class="text-center jumbo-link"><h3 class="text-center">
+			<i class="fa fa-tachometer fa-4x hidden-xs"></i>
+			<i class="fa fa-tachometer fa-2x visible-xs-inline"></i>
+			<small><br>Sales Dashboard</small></h3></a>
+	</div>
+	<div class="col-xs-3" ng-show="currentUser.user_type.canSell">
+		<a href="product-upload" class="text-center jumbo-link"><h3 class="text-center">
+			<i class="fa fa-cloud-upload fa-4x hidden-xs"></i>
+			<i class="fa fa-cloud-upload fa-2x visible-xs-inline"></i>
+			<small><br>Upload to Store</small></h3></a>
+	</div>
+</div>
+<div class="row">
+	
+	<div id="preview-container" class="preview-box col-sm-4 col-md-3">
+		<img ng-if="currentUser.producerData.hasOwnProperty('logo')" ng-src="{{currentUser.producerData.logo}}" alt=" logo placeholder " class="img-responsive">
+		<h1 ng-if="!currentUser.producerData.hasOwnProperty('logo')" class="text-center">
+			<span class="glyphicon glyphicon-user" style="font-size: 6em"></span>
+		</h1>
+	</div>
+	
+	<div class="col-sm-8 col-md-9" >
+		<h1>{{currentUser.name}}</h1>
+		<h2 ng-controller="logoutCtrl"><small>{{currentUser.user_type.name}} Member</small><br><a href="/" class="btn btn-primary" ng-click="logOut()"><span class="glyphicon glyphicon-lock"></span> Logout</a></h2>
+		
+		<h3 ng-show="currentUser.balance || currentUser.businessBalance">
+			<span ng-show="currentUser.useBusinessBalance">Personal</span> 
+			<span ng-hide="currentUser.useBusinessBalance">Account</span> Balance: 
+				<span ng-class="{'text-success': currentUser.balance > 0, 'text-danger':currentUser.balance < 0}">
+					{{currentUser.balance | currency}}
+				</span> 
+			<br>
+			<span ng-if="currentUser.useBusinessBalance">
+				Business Balance: 
+				<span ng-class="{'text-success': currentUser.businessBalance > 0, 'text-danger':currentUser.businessBalance < 0}">
+					{{currentUser.businessBalance | currency}}
+				</span>
+			</span>
+		</h3>
+	</div>
+</div>
+	
+<hr>
+
+<div ng-controller="calendarCtrl" class="col-sm-4 col-md-3">
+	<a href="/calendar"><i class="fa fa-calendar pull-left fa-4x"></i></a>
+	<p>
+		<i class="fa fa-shopping-cart fa-fw"></i> Shopping <strong>{{shoppingTime()}}</strong><br>
+		<i class="fa fa-gift fa-fw"></i> Delivery Day is <strong>{{deliveryDayFromNow}}</strong><br>
+	</p>
+	<h2>Events for {{month}}</h2>
+	<table class="table col-lg-11" border="0" cellspacing="5" cellpadding="5">
+		<tr ng-repeat-start="cycle in calendar[month]">
+			<th><a href="/faq#shopping-start">Shopping</a></th>
+			<td>{{cycle.shoppingStart | longDate}} - {{cycle.shoppingStop | longDate}}</td>
+		</tr>
+		<tr ng-repeat-end>
+			<th><a href="/faq#delivery-day">Delivery Day</a></th>
+			<td>{{cycle.deliveryDay | longDate}}</td>
+		</tr>
+	</table>
+</div>
+
+<div class="col-sm-4 col-md-3" ng-if="currentUser.user_type.canSell" >
+	<h2>{{currentUser.producerData.companyName || currentUser.name}}</h2>
+	<article ta-bind ng-model="currentUser.producerData.description"></article>
+	
+	<a ng-show="currentUser.user_type.canSell" href="/edit-me" class="btn btn-block btn-default"><span class="glyphicon glyphicon-pencil"></span> Edit My Profile</a>
+	<br>
+</div>
+
+<div class="col-sm-4 col-md-3 well" ng-if="currentUser.user_type.canSell" >
+	<h2>Personal Bio</h2>
+	<article ta-bind ng-model="currentUser.producerData.personalBio"></article>
+	<a ng-show="currentUser.user_type.canSell" href="/edit-me" class="btn btn-block btn-default"><span class="glyphicon glyphicon-pencil"></span> Edit My Profile</a>
+	<br>
+</div>
+
+
+<div class="col-sm-4 col-md-3">
+	<ul class="list-unstyled">
+		<li><span class="glyphicon glyphicon-earphone"></span> {{currentUser.phone}}</li>
+		<li><span class="glyphicon glyphicon-envelope"></span> {{currentUser.email}}</li>
+		<li><span class="glyphicon glyphicon-map-marker"></span> {{currentUser.address}}</li>
+		<li ng-show="producer.producerData.website"><img src="../img/glyphicons/Globe.png" width="18" alt="Globe"> <a href="http://{{producer.producerData.website}}" >{{currentUser.producerData.website}}</a></li>
+	</ul>
+	<a href="/edit-me" class="btn btn-block btn-default"><span class="glyphicon glyphicon-user"></span> Edit My Info</a>
+
+</div>
+	
+
+	
+<br>
+<br>

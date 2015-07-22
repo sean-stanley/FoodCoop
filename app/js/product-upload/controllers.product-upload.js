@@ -5,13 +5,29 @@
 
 angular.module('co-op.product-upload')
 // main controller for product upload page
-.controller('productUploadCtrl', ['$scope', '$rootScope', '$sce', '$location', '$modal', 'ProductManager', 'Restangular', 'product', 'flash',
-	function($scope, $rootScope, $sce, $location, $modal, ProductManager, Restangular, product, flash) {
+.controller('imgCropController', function($scope){
+    $scope.obj = {};
+
+    // The url or the data64 for the image
+    //$scope.obj.src = 'beautifulImage.jpg';
+
+    // Must be [x, y, x2, y2, w, h]
+    $scope.obj.selection = [100, 100, 200, 200, 100, 100];
+
+    // You can add a thumbnail if you want
+    $scope.obj.thumbnail = false;
+
+		$scope.cancel = function() {
+			$scope.obj.src = undefined;
+		};
+})
+.controller('productUploadCtrl', ['$scope', '$rootScope', '$sce', '$location', '$modal', 'ProductManager', 'Restangular', '$http', 'product', 'flash',
+	function($scope, $rootScope, $sce, $location, $modal, ProductManager, Restangular, $http, product, flash) {
 		// init
 		$rootScope.$broadcast("cropme:cancel");
 		$scope.productManager = ProductManager;
 		console.log($rootScope.cycle);
-			
+
 		$scope.newProduct = {
 			refrigeration: 'none',
 			img: null,
@@ -20,7 +36,7 @@ angular.module('co-op.product-upload')
 			producer_ID: $rootScope.currentUser._id
 		};
 		$scope.newProduct.cycle = $rootScope.canSell ? $rootScope.cycle : !!$rootScope.cycle ? $rootScope.cycle + 1 : undefined;
-		
+
 		$scope.reset = function() {
 			$rootScope.$broadcast("cropme:cancel");
 			var path = $location.path();
@@ -29,17 +45,17 @@ angular.module('co-op.product-upload')
 				$location.path('product-upload');
 			}
 		};
-		
+
 		$scope.productData = product || angular.copy($scope.newProduct);
 		$scope.selectedImg = $scope.productData.img || null;
-		
+
 		/* -----------------------
 		|  Set the product Cycle  |
 		// ----------------------*/
-		
+
 		var originalCycle = (!!product && product.hasOwnProperty('cycle') ) ? product.cycle : undefined;
-		
-		if ($rootScope.cycle) { 
+
+		if ($rootScope.cycle) {
 			//true if calendar-loaded already fired
 			if ($scope.productData.cycle < $rootScope.cycle || $scope.productData.cycle === undefined) {
 				// old product from a past cycle or new product
@@ -47,7 +63,7 @@ angular.module('co-op.product-upload')
 			}
 			// old product from distant future -- do nothing
 		}
-		
+
 		$scope.$on('CALENDAR-LOADED', function() {
 			if ($scope.productData.cycle < $rootScope.cycle || $scope.productData.cycle === undefined) {
 				// old product from a past cycle or new product
@@ -55,17 +71,17 @@ angular.module('co-op.product-upload')
 				// old product from distant future -- do nothing
 			}
 		});
-		
-		
+
+
 		$scope.ingredients = false;
-		
+
 		$scope.selectAllCycles = function() {
 			$scope.productData.cycle = [];
 			for (var i = 0; i < ProductManager.cycles.length; i++) {
 				$scope.productData.cycle.push(ProductManager.cycles[i]._id);
 			}
 		};
-		
+
 		$scope.$watch('multiCycle', function(newValue) {
 			if (!newValue) {
 				if ($rootScope.canShop) {
@@ -73,13 +89,13 @@ angular.module('co-op.product-upload')
 				} else $scope.productData.cycle = $scope.productData.hasOwnProperty('_id') ? originalCycle : $rootScope.cycle + 1;
 			} else $scope.productData.cycle = [];
 		});
-		
+
 		$scope.$watch('productData.price', function(newValue) {
 			$scope.productData.priceWithMarkup = newValue * 1.1;
 		});
-		
+
 		$scope.categoryError = true;
-		
+
 		$scope.$watch('productData.category', function(newValue) {
 			if (newValue) {
 				$scope.categoryError = false;
@@ -87,7 +103,7 @@ angular.module('co-op.product-upload')
 		});
 
 		var certifications = Restangular.all('api/certification');
-		
+
 		certifications.getList().then(function(certification) {
 			for (var i = 0; i < certification.length; i++) {
 				certification[i].plain();
@@ -104,39 +120,39 @@ angular.module('co-op.product-upload')
 			if (isValid && !categoryError) {
 				$scope.submitted = false;
 				flash.setMessage({type: 'warning', message: 'Beginning upload of '+ $scope.productData.productName});
-				
+
 				if (_.isArray($scope.productData.cycle) ) {
 					$scope.productData.cycle = _.compact($scope.productData.cycle); // removes false, null, 0 and other falsey values
 					if ($scope.productData.cycle.length === 1) $scope.productData.cycle = $scope.productData.cycle[0];
 				} else if ($scope.productData.cycle <= $rootScope.cycle || !$scope.productData.cycle) {
 					$scope.productData.cycle = $rootScope.canShop ? $rootScope.cycle : $rootScope.cycle + 1; //next cycle;
 				}
-			
+
 				ProductManager.registerProduct($scope.productData, function(product) {
 					$scope.$broadcast('REFRESHCURRENT');
 					$scope.productData = product;
 				});
-				
+
 			} else $scope.submitted = true;
 			if (categoryError) {
 				flash.setMessage({type:'warning', message: 'Please select a category for your product'});
 			}
 		};
-		
+
 		$scope.update = function(isValid, categoryError) {
 			if( _.isArray($scope.productData.cycle) ) {
 				$scope.productData.cycle = _.compact($scope.productData.cycle);
 				if ($scope.productData.cycle.length === 1) $scope.productData.cycle = $scope.productData.cycle[0];
-				else flash.setMessage({type: 'danger', message: 'Sorry! Please select just one delivery date when trying to update a product. Use the "Save" button to upload a product for more than one date at a time.'});
+				else flash.setMessage({type: 'danger', message: 'Sorry! Please select just one delivery date when trying to update a product. Use the "List across selected dates" button to upload a product for more than one date at a time.'});
 			}
-			
+
 			if (isValid && !categoryError && !_.isArray($scope.productData.cycle) ) {
-				
+
 				$scope.submitted = false;
 				flash.setMessage({type: 'warning', message: 'Beginning update of '+ $scope.productData.productName});
-				
+
 				$scope.productData.save().then(function(response) {
-					flash.setMessage({type: 'success', 
+					flash.setMessage({type: 'success',
 					message: $scope.productData.variety + " " + $scope.productData.productName + ' successfully updated'
 					});
 					$scope.$broadcast('REFRESHCURRENT');
@@ -149,14 +165,20 @@ angular.module('co-op.product-upload')
 				flash.setMessage({type:'warning', message: 'Please select a category for this product'});
 			}
 		};
-				
-		$scope.crop = function() {
-			$rootScope.$broadcast("cropme:ok");
+
+		$scope.crop = function(obj) {
+			obj.dimensions = {x:420, y:300};
+			$http.post('/api/crop', obj).then(function(img) {
+				console.log(img);
+				$scope.productData.img = $scope.selectedImg = img.data;
+			}, function(err) {
+				flash.setMessage({type:'danger', message: err.data});
+			});
 		};
 
-		$scope.cancel = function() {
-			$rootScope.$broadcast("cropme:cancel");
-		};
+		// $scope.cancel = function() {
+		// 	$rootScope.$broadcast("cropme:cancel");
+		// };
 
 		$scope.$on("cropme:done", function(e, result, canvasEl) {
 			console.log(result.croppedImage);
@@ -169,7 +191,7 @@ angular.module('co-op.product-upload')
 				$scope.productData.img = reader.result;
 			};
 		});
-		
+
 		$scope.preview = function(product) {
 			var modalInstance = $modal.open({
 				templateUrl: 'partials/store/store-modal.html',
@@ -184,7 +206,7 @@ angular.module('co-op.product-upload')
 
 			modalInstance.result.then(function(product) {
 				$location.hash('');
-				
+
 			}, function() {
 				$location.hash('');
 				console.log('Modal dismissed at: ' + new Date());
@@ -193,16 +215,16 @@ angular.module('co-op.product-upload')
 	}
 ])
 
-.controller('PermanentProductUploadController', ['$scope', '$rootScope', '$sce', '$location', '$modal', 'ProductManager', 'ButcheryForms', 'Restangular', 'product', 'category', 'flash',
-	function($scope, $rootScope, $sce, $location, $modal, ProductManager, ButcheryForms, Restangular, product, category, flash) {
+.controller('PermanentProductUploadController', ['$scope', '$rootScope', '$sce', '$location', '$modal', 'ProductManager', 'ButcheryForms', '$http', 'product', 'category', 'flash',
+	function($scope, $rootScope, $sce, $location, $modal, ProductManager, ButcheryForms, $http, product, category, flash) {
 		$rootScope.$broadcast("cropme:cancel");
 		$scope.productManager = ProductManager;
-		
+
 		var markup = 1.1;
 		if (category.data[0].name === 'Meat') {
 			markup = 1.05;
 		}
-		
+
 		$scope.productData = {
 			permanent: true,
 			price: 0,
@@ -213,13 +235,13 @@ angular.module('co-op.product-upload')
 			butcheryForm: '/butchery/sheep',
 			markup: markup
 		};
-		
+
 		if (product) $scope.productData = product;
-		
+
 		$scope.$watch('productData.price', function(newValue) {
 			$scope.productData.priceWithMarkup = newValue * markup;
 		});
-		
+
 		$scope.$watch('productData.fixedPrice', function(newValue) {
 			if (newValue > 0) {
 				var match = $scope.productData.description.match(/<p id="fixedPrice">.*?<\/p>/),
@@ -230,11 +252,11 @@ angular.module('co-op.product-upload')
 			} else {
 				$scope.productData.description = $scope.productData.description.replace(/<p id="fixedPrice">.*?<\/p>/, '');
 			}
-			
+
 		});
-		
+
 		$scope.butcheryForms = ButcheryForms;
-		
+
 		ProductManager.certificationPromise.getList().then(function(certifications) {
 			$scope.certifications = certifications;
 			$scope.productData.certification = (product.hasOwnProperty('certification')) ? product.certification : $scope.certifications[0]._id;
@@ -243,7 +265,7 @@ angular.module('co-op.product-upload')
 				return el.img;
 			};
 		});
-		
+
 		$scope.saveOrUpdate = function(isValid) {
 			if (isValid) {
 				if ($scope.productData.hasOwnProperty('_id') ) {
@@ -251,23 +273,23 @@ angular.module('co-op.product-upload')
 				} else save();
 			} else $scope.submitted = true;
 		};
-				
+
 		function save(isValid) {
 			$scope.submitted = false;
 			flash.setMessage({type: 'warning', message: 'Beginning upload of '+ $scope.productData.productName});
-			
+
 			ProductManager.registerProduct($scope.productData, function(product) {
 				$scope.$broadcast('REFRESHCURRENT');
 				$scope.productData = product;
 			});
 		}
-		
+
 		function update(isValid) {
 			$scope.submitted = false;
 			flash.setMessage({type: 'warning', message: 'Beginning upload of '+ $scope.productData.productName});
-			
+
 			$scope.productData.save().then(function(response) {
-				flash.setMessage({type: 'success', 
+				flash.setMessage({type: 'success',
 				message: $scope.productData.productName + ' successfully updated'
 				});
 				$scope.$broadcast('REFRESHCURRENT');
@@ -276,9 +298,15 @@ angular.module('co-op.product-upload')
 				flash.setMessage({type:'danger', message: 'Oops! Something went wrong: ' + err});
 			});
 		}
-		
-		$scope.crop = function() {
-			$rootScope.$broadcast("cropme:ok");
+
+		$scope.crop = function(obj) {
+			//$rootScope.$broadcast("cropme:ok");
+			$http.post('/api/crop', obj).then(function(img) {
+				console.log(img);
+				$scope.productData.img = $scope.selectedImg = img.data;
+			}, function(err) {
+				flash.setMessage({type:'danger', message: err.data});
+			});
 		};
 
 		$scope.cancel = function() {
@@ -296,7 +324,7 @@ angular.module('co-op.product-upload')
 				$scope.productData.img = reader.result;
 			};
 		});
-		
+
 		$scope.preview = function(product) {
 			var modalInstance = $modal.open({
 				templateUrl: 'partials/store/store-modal.html',
@@ -311,7 +339,7 @@ angular.module('co-op.product-upload')
 
 			modalInstance.result.then(function(product) {
 				$location.hash('');
-				
+
 			}, function() {
 				$location.hash('');
 				console.log('Modal dismissed at: ' + new Date());
@@ -321,25 +349,25 @@ angular.module('co-op.product-upload')
 ])
 
 
-.controller('previewCtrl', ['$scope', '$modalInstance', 'data', 'ProductManager', 
+.controller('previewCtrl', ['$scope', '$modalInstance', 'data', 'ProductManager',
 function($scope, $modalInstance, data, ProductManager) {
-	
+
 	$scope.data = angular.copy(data);
 	$scope.data.fullName = data.variety + ' ' + data.productName;
-	
+
 	if ($scope.data.hasOwnProperty('certification')) {
 		$scope.data.certification = ProductManager.certificationByID($scope.data.certification);
 	}
-	
+
 	if (typeof $scope.data.ingredients === 'string' && $scope.data.ingredients.length > 0) {
 		console.log('converting string to array');
 		$scope.data.ingredients = $scope.data.ingredients.split(/,\s*/);
 	}
-	
+
 	$scope.cancel = function() {
 		$modalInstance.dismiss('cancel');
 	};
-	
+
 }])
 
 // left-column of product-upload page
@@ -351,11 +379,11 @@ function($scope, $modalInstance, data, ProductManager) {
 				$scope.currentProducts = result;
 			});
 		});
-		
+
 		ProductHistory.getCurrentProducts(function(result) {
 			$scope.currentProducts = result;
 		});
-		
+
 		ProductHistory.getPastProducts(function(result) {
 			$scope.pastProducts = result;
 		});
@@ -377,11 +405,11 @@ function($scope, $modalInstance, data, ProductManager) {
 				$scope.currentMeat = result;
 			});
 		});
-		
+
 		ProductHistory.getMeatProducts(function(result) {
 			$scope.currentMeat = result;
 		});
-		
+
 		$scope.delete = function(idx, id) {
 			var itemToDelete = $scope.currentMeat[idx];
 			ProductManager.deleteProduct(id);

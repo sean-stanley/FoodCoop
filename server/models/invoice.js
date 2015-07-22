@@ -20,14 +20,18 @@ var InvoiceSchema = new Schema({
 		name: {type: String}, 
 		quantity: {type: String}, 
 		customer: {type:Schema.ObjectId, ref: 'User'}, 
-		product: {type:Schema.ObjectId, ref: 'Product'} 
+		product: {type:Schema.ObjectId, ref: 'Product'}
 	}],
 	credit: Number,
 	bankAccount: {type:String, required: true, default: config.bankAccount},
 	//valid types are 'un-paid', 'PAID', 'overdue', 'To Refund', 'refunded' and
 	//'CANCELLED'.
 	status: {type: String, required: true, default: 'un-paid', validator:validStatus},
+	
+	paymentMethod: {type: String, validator:validPaymentMethod},
+	
 	cycle: {type: Number, ref: 'Cycle'},
+	meatOrder: {type:Schema.ObjectId, ref: 'MeatOrder'},
 	// only for invoices to customers
 	deliveryRoute: String,
 	notes: String,
@@ -68,6 +72,10 @@ function validStatus (val) {
 	return /un-paid|PAID|OVERDUE|To Refund|Refunded|CANCELLED/i.test(val);
 }
 
+function validPaymentMethod (val) {
+	return /credit card|bank transfer|balance|direct deposit|cash/i.test(val);
+}
+
 // occurs just before an invoice is saved. should work with Model.create() shortcut
 InvoiceSchema.pre('save', function(next) {
 	var doc = this;
@@ -92,12 +100,17 @@ InvoiceSchema.pre('save', function(next) {
 			if (err) return next(err);
 			next();
 		});
-	} else if (doc.isModified('status') && doc.status === 'PAID') {
+	} else if (doc.isModified('status') && doc.status === 'PAID' && doc.paymentMethod !== "balance") {
 		User.transaction(doc.invoicee, amount * -1, {title: doc.title + ' PAID', invoice: doc._id, businessBalance: businessBalance}, function(err) {
 			if (err) return next(err);
 			next();
 		});
-	}  else if (doc.isModified('status') && doc.status === 'CANCELLED') {
+	} else if (doc.isModified('status') && doc.status === 'un-paid') {
+		User.transaction(doc.invoicee, amount, {title: doc.title + doc.status, invoice: doc._id, businessBalance: businessBalance}, function(err) {
+			if (err) return next(err);
+			next();
+		});
+	} else if (doc.isModified('status') && doc.status === 'CANCELLED') {
 		User.transaction(doc.invoicee, amount * -1, {title: doc.title + ' CANCELLED', invoice: doc._id, businessBalance: businessBalance}, function(err) {
 			if (err) return next(err);
 			next();
@@ -112,7 +125,7 @@ InvoiceSchema.post('remove', function(invoice) {
 	if (invoice.status !== 'PAID') amount = amount * -1;
 	
 	User.transaction(invoice.invoicee, amount, {title: 'DELETED INVOICE ' + invoice._id, businessBalance: businessBalance}, function(err) {
-		if (err) console.log(err);
+		if (err) console.error(err);
 	});
 });
 

@@ -4,50 +4,50 @@
 /* Controllers */
 
 angular.module('co-op.controllers', [])
-	
+
 .controller('navCtrl', ['$scope', '$location', 'flash',
 	function($scope, $location, flash) {
-			// init			
+			// init
 			$scope.predictiveSearch = [];
 			$scope.flash = flash;
-			
+
 			$scope.cartPanel = {open: false};
-			
+
 			// Date info for use in the app
 			$scope.today = Date.today().toString("ddd d MMM yyyy");
 			$scope.month = Date.today().toString("MMMM");
 			$scope.monthPlusOne = Date.today().addMonths(1).toString("MMMM");
 			$scope.monthPlusTwo = Date.today().addMonths(2).toString("MMMM");
-			
+
 			// methods
-			
+
 			$scope.isActive = function(route) {
 				return route === $location.path();
 			};
-			
+
 			$scope.storePage = function() {
 				if ($location.path() === '/store') {
 					return true;
 				}
 				else return false;
 			};
-			
+
 			$scope.href = function(path) {$location.path(path);};
-			
+
 			// location logic
-			
+
 			$scope.searchObject = $location.search();
-			
+
 			if ($scope.searchObject.menu) {
 				$scope.panelLeftDisplay = true;
 			}
-			
+
 			if ($scope.searchObject.search) {
 				$scope.search = $scope.searchObject.search;
 			}
-			
+
 			// watches
-			
+
 			$scope.$watch('panelLeftDisplay', function(newValue) {
 				if (newValue === true) {
 					$location.search('menu', true);
@@ -56,7 +56,7 @@ angular.module('co-op.controllers', [])
 					$location.search('menu', null);
 				}
 			});
-			
+
 			$scope.$watch('search', function(newValue) {
 				// if newValue is falsey
 				if (!newValue) {
@@ -66,18 +66,18 @@ angular.module('co-op.controllers', [])
 					$location.search('search' , newValue);
 				}
 			});
-			
+
 			$scope.$on("$routeUpdate", function() {
 				$scope.search = $location.search().search;
 			});
-			
+
 			// events
-			
+
 			$scope.$on('PREDICTIVE_SEARCH', function(event, list) {
 				$scope.predictiveSearch = list;
 				console.log($scope.predictiveSearch);
 			});
-		
+
 	}
 ])
 .controller('faqCtrl', ['$scope', '$location', '$sce', function($scope, $location, $sce){
@@ -85,7 +85,7 @@ angular.module('co-op.controllers', [])
 	$scope.hashFunction = function(hash) {
 		$scope.hash = $scope.hash === hash ? $scope.hash = false : $scope.hash = hash;
 	};
-	
+
 	var mapURL = 'https://maps.google.com/?q=2+Woods+Rd+Whangarei+New+Zealand&output=embed';
 	$scope.map = $sce.trustAsResourceUrl(mapURL);
 }])
@@ -100,7 +100,7 @@ angular.module('co-op.controllers', [])
 ])
 
 .controller('loginCtrl', ['$scope', '$rootScope', '$location', 'LoginManager',
-	function($scope, $rootScope, $location, LoginManager) {		
+	function($scope, $rootScope, $location, LoginManager) {
 		$scope.showLogin = false;
 
 		$scope.loginData = {
@@ -114,7 +114,7 @@ angular.module('co-op.controllers', [])
 					$location.path($rootScope.savedLocation);
 					$rootScope.savedLocation = "";
 				}
-				else $location.path('me');
+				// else $location.path('me');
 			});
 		};
 	}
@@ -133,7 +133,7 @@ angular.module('co-op.controllers', [])
 	}
 ])
 
-.controller('resetCtrl', ['$scope', 'Restangular', '$location', 'user', 'LoginManager', 
+.controller('resetCtrl', ['$scope', 'Restangular', '$location', 'user', 'LoginManager',
 	function($scope, Restangular, $location, user, LoginManager){
 		$scope.user = Restangular.copy(user);
 		$scope.save = function() {
@@ -150,44 +150,44 @@ angular.module('co-op.controllers', [])
 .controller('MessageBoardCtrl', ['$scope', 'socket', '$rootScope', 'messageHistory',
 	function($scope, socket, $rootScope, messageHistory){
 		$scope.messages = messageHistory;
-		
+
 		$scope.openRight = function() {
 			$scope.panelRightDisplay = true;
 		};
-		
+
 		function update(event, msg) {
 			var idx = _.findIndex($scope.messages, {_id: msg._id});
 			$scope.messages[idx] = msg;
 		}
-		
+
 		socket.forward('edit message');
-		
+
 		socket.on('connection', function(s) {
 			console.log('successfully connected to server');
 		});
-		
+
 		// socket.on('message history', function(messages) {
 // 			$scope.messages = messages;
 // 		});
-		
+
 		socket.on('message', function(msg){
 			$scope.messages.unshift(msg);
 		});
-		
+
 		socket.on('edit message', update);
-		
+
 		$scope.$on('MESSAGE_EDIT_DONE', update);
-		
+
 		$scope.$on('socket:edit message', update);
-		
+
 		socket.on('remove message', function(m) {
 			_.remove($scope.messages, m);
 		});
-		
+
 		$scope.update = function(m) {
 			$scope.$broadcast('EDIT_MESSAGE', m);
 		};
-		
+
 		$scope.remove = function(m) {
 			if (_.contains($scope.messages, m)) {
 				_.remove($scope.messages, m);
@@ -199,11 +199,11 @@ angular.module('co-op.controllers', [])
 .controller('CreateOrEditMessageCtrl', ['$scope', 'socket', '$rootScope',
 	function($scope, socket, $rootScope){
 		$scope.message = {};
-		
+
 		$scope.$on('EDIT_MESSAGE', function(event, message) {
 			$scope.message = message;
 		});
-		
+
 		$scope.send = function(isValid, message) {
 			if (message.hasOwnProperty('_id')) $scope.update(isValid, message);
 			else if (isValid && $rootScope.currentUser) {
@@ -215,16 +215,16 @@ angular.module('co-op.controllers', [])
 				socket.emit('message', message);
 				message.author.name = 'Me';
 				$scope.messages.unshift(message);
-				
+
 				// reset message fields
 				// $scope.message.img = undefined;
 // 				$scope.message.title = undefined;
 // 				$scope.message.body = undefined;
 				delete $scope.message;
-				
+
 			} else $scope.submitted = true;
 		};
-		
+
 		$scope.update = function(isValid, message) {
 			if (isValid && $rootScope.currentUser) {
 				message.update = new Date();
@@ -233,7 +233,7 @@ angular.module('co-op.controllers', [])
 				delete $scope.message;
 			} else $scope.submitted = true;
 		};
-		
+
 	}])
 
 
@@ -259,7 +259,7 @@ angular.module('co-op.controllers', [])
 .controller('deliveryCtrl', ['$scope', '$rootScope', 'UserManager', 'routeManagerList',
 	function($scope, $rootScope, UserManager, routeManagerList) {
 		$scope.routeManagerList = routeManagerList;
-		
+
 		$scope.join = function(title) {
 			$rootScope.currentUser.routeTitle = title;
 			UserManager.save();
@@ -270,7 +270,7 @@ angular.module('co-op.controllers', [])
 // This is used on the store page
 .controller('modalInstanceCtrl', ['$scope', '$location', '$modalInstance', 'data',
 	function($scope, $location, $modalInstance, data) {
-		
+
 		/*
 		// facebook sdk setup
 				(function(d, s, id) {
@@ -281,14 +281,14 @@ angular.module('co-op.controllers', [])
 					js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.0";
 					fjs.parentNode.insertBefore(js, fjs);
 				}(document, 'script', 'facebook-jssdk'));
-		
+
 				// google+ setup
 				(function() {
 					var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
 					po.src = 'https://apis.google.com/js/platform.js';
 					var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
 				})();
-				
+
 				// twitter setup
 				(function(d,s,id){
 					var js, fjs = d.getElementsByTagName('script')[0];
@@ -299,34 +299,34 @@ angular.module('co-op.controllers', [])
 						fjs.parentNode.insertBefore(js,fjs);
 					}
 				})(document,"script","twitter-wjs");*/
-		
-		
-		
+
+
+
 		/*
 		var twitterRenderedAttribute = function(bool){
 					document.body.dataset.twttrRendered = bool;
 					};
-						
+
 				twitterRenderedAttribute(true);*/
-		
-		
+
+
 		$scope.data = data;
-		
+
 		function producer() {
 			return data.producer_ID.hasOwnProperty('producerData') ? data.producer_ID.producerData.companyName : data.producer_ID.name;
 		}
-		
+
 		if (typeof $scope.data.ingredients === 'string') {
 			console.log('converting string to array');
 			$scope.data.ingredients = $scope.data.ingredients.split(/,\s*/);
 		}
-		
+
 		if (data.hasOwnProperty('fullName') ) $location.hash(data.fullName + "+" + producer()+ "&id=" + data._id);
-		
+
 		$scope.addToCart = function(product) {
 			//twitterRenderedAttribute(false);
 			$modalInstance.close($scope.data);
-			
+
 		};
 
 		$scope.cancel = function() {
@@ -337,16 +337,26 @@ angular.module('co-op.controllers', [])
 ])
 
 
-.controller('producerCtrl', ['$scope', '$rootScope', 'ProducerManager', '$location',
-	function($scope, $rootScope, ProducerManager, $location) {
+.controller('producerCtrl',
+	function($scope, $rootScope, ProducerManager, $location, $http, flash) {
 		$scope.submitForm = function() {
 			ProducerManager.saveProducer();
 		};
+		
+		$scope.crop = function(obj) {
+			obj.dimensions = {x:450, y:450};
+			$http.post('/api/crop', obj).then(function(img) {
+				$rootScope.currentUser.producerData.logo = img.data;
+			}, function(err) {
+				flash.setMessage({type:'danger', message: err.data});
+			});
+		};
+
 	}
-])
+)
 .controller('calendarPopupCtrl', ['$scope', function ($scope) {
 	$scope.format = 'dd/MM/yyyy';
-	
+
 	$scope.open = function($event) {
 		$event.preventDefault();
 		$event.stopPropagation();
@@ -357,14 +367,14 @@ angular.module('co-op.controllers', [])
 	function($scope, $rootScope, myOrders, products, unfullfilledOrders, Calendar, ProductHistory, ProductManager) {
 		$scope.dateParams = {start: null, end: null};
 		$scope.stats = {};
-		
+
 		myOrders.getList().then(function(orders) {
 			$scope.orders = orders.plain();
 			$scope.currentOrders = _.filter($scope.orders, {cycle: $rootScope.cycle});
 			$scope.sortedOrders = unfullfilledOrders.getList().$object;
 			getStats();
 		});
-		
+
 		$scope.orderTotal = function(list) {
 			if (angular.isArray(list) ) {
 				return _.reduce(list, function(sum, order) {
@@ -372,7 +382,7 @@ angular.module('co-op.controllers', [])
 				}, 0);
 			} return 0;
 		};
-		
+
 		$scope.sortedOrderTotal = function(list) {
 			if (angular.isArray(list)) {
 				return _.reduce(list, function(sum, customer) {
@@ -383,53 +393,53 @@ angular.module('co-op.controllers', [])
 				}, 0);
 			} return 0;
 		};
-		
+
 		$scope.getCurrentProducts = function() {
 			ProductHistory.getCurrentProducts(function(products) {
 				$scope.currentProducts = products;
 			});
 		};
-		
+
 		$scope.getCurrentProducts();
-		
+
 		products.getList().then(function(result) {
 			 $scope.products = result;
 			 $scope.futureProducts = _.filter($scope.products, function(product) {
 				 return moment($rootScope.deliveryDay).isBefore( moment(product.cycle.deliveryDay) );
 			 });
-			 
+
 			 $scope.stats.futureAmount = $scope.futureProducts.length;
-			 
+
 			 $scope.pastProducts = _.filter($scope.products, function(product) {
-			 	return product.cycle === null || moment($rootScope.deliveryDay).isAfter( moment(product.cycle.deliveryDay) ); 
+			 	return product.cycle === null || moment($rootScope.deliveryDay).isAfter( moment(product.cycle.deliveryDay) );
 			 });
-			 
+
 			 $scope.stats.pastAmount = $scope.pastProducts.length;
 			 getStats();
-			 
+
 		});
-		
+
 		$scope.delete = function(idx, id) {
 			var itemToDelete = $scope.currentProducts[idx];
 			$scope.currentProducts.splice(idx, 1);
 			ProductManager.deleteProduct(id);
 		};
-		
+
 		$scope.lastMonth = Date.today().add(-1).months().toString('MMMM');
 		$scope.predicate = 'product';
-		
+
 		function getProductStat(array) {
 			if (_.isArray(array) ) {
 				$scope.stats.currentAmount = _.sum( _.map(array, 'amountSold') );
 
 				console.log(_.map(array, 'amountSold'));
-				
+
 				$scope.stats.bestSeller =  _.max(array, 'amountSold' );
-			
+
 				$scope.stats.topEarner = _.max(array, function(product) {
 					return product.amountSold * product.price;
 				});
-			
+
 				var cycleChain = _.chain(array)
 				.groupBy(function(p) {
 					var cycle = moment(p.dateUploaded).format('MMMM D YYYY');
@@ -442,20 +452,20 @@ angular.module('co-op.controllers', [])
 						return sum + total;
 					}, 0);
 				});
-			
+
 				var topCycle = cycleChain.max().value();
 				$scope.stats.bestSellingCycle = cycleChain.invert().result(topCycle).value();
 			}
 		}
-		
+
 		function getOrderStat(array) {
 			if (angular.isArray(array)) {
 				$scope.stats.saleAmount = array.length;
-			
+
 				$scope.stats.orderTotal = _.reduce(array, function(sum, order) {
 					return sum + order.product.price * order.quantity;
 				}, 0);
-				
+
 				var customerFrequencyChain = _.chain(array)
 				.countBy(function(order) {
 					return order.customer.name;
@@ -478,7 +488,7 @@ angular.module('co-op.controllers', [])
 				$scope.stats.valueCustomer = customerValueChain.invert().result($scope.stats.maxAmount).value();
 			}
 		}
-	
+
 		function getStats(start, end) {
 			if (!start && ! end) {
 				getProductStat($scope.products);
@@ -502,7 +512,7 @@ angular.module('co-op.controllers', [])
 						if (product.cycle) date = moment(product.cycle.deliveryDay);
 						return moment(end).isAfter( date );
 					});
-					
+
 					filteredOrders = _.filter(filteredOrders, function(order) {
 						return moment(end).isAfter( moment(order.datePlaced) );
 					});
@@ -511,7 +521,7 @@ angular.module('co-op.controllers', [])
 				getProductStat(filteredProducts);
 			}
 		}
-	
+
 		$scope.$watch('dateParams.start', function(n) {
 			getStats(n, $scope.dateParams.end);
 		});
@@ -525,28 +535,28 @@ angular.module('co-op.controllers', [])
 	function($scope, $rootScope, $location, Cart, flash) {
 		$scope.cart = [];
 		$scope.cartProduct_ids = [];
-		
+
 		if ($rootScope.cycle) {
 			Cart.getCurrentCart(function(cart) {
 				$scope.cart = cart;
 				getIds();
 			});
 		}
-		
+
 		Cart.getMeatItems(function(items) {
 			$scope.meatHistory = items.data;
 		});
-		
+
 		$scope.cartTotal = function(cart) {
 			$scope.total = 0;
 			if (Object.prototype.toString.call( cart ) === '[object Array]') {
 				for(var i=0; i < cart.length; i++) {
-					$scope.total += (cart[i].unitPriceWithMarkup * cart[i].quantity); 
+					$scope.total += (cart[i].unitPriceWithMarkup * cart[i].quantity);
 				}
 			}
 			return $scope.total;
 		};
-	
+
 		$scope.delete = function(idx, error) {
 			var err = error || angular.noop;
 			var itemToDelete = $scope.cart[idx];
@@ -560,7 +570,7 @@ angular.module('co-op.controllers', [])
 				$scope.cartTotal($scope.cart);
 			}, err);
 		};
-		
+
 		// only for the store.html page use of this controller
 		function getIds() {
 			$scope.cart.forEach(function(item) {
@@ -569,26 +579,36 @@ angular.module('co-op.controllers', [])
 			$scope.cartProduct_ids = _.uniq($scope.cartProduct_ids, true);
 			$rootScope.$broadcast('CART_IDS', $scope.cartProduct_ids);
 		}
-		
+
 		$scope.$on('GET_CART', function() {
 			Cart.getCurrentCart(function(cart) {
 				$scope.cart = cart;
 				getIds();
 			});
 		});
-		
+
 		$scope.$on('UPDATE_CART', function(event, item){
 			console.log(item);
+
 			$scope.cart.push(item);
-			$scope.cartProduct_ids.push(item.product._id);
+
+			if (_.isArray(item)) {
+				$scope.cart = _.flatten($scope.cart);
+				angular.forEach(item, function(i) {
+					$scope.cartProduct_ids.push(i.product._id);
+				});
+			} else {
+				$scope.cartProduct_ids.push(item.product._id);
+			}
+
 			$rootScope.$broadcast('CART_IDS', $scope.cartProduct_ids);
 		});
-		
+
 		$scope.$on('FAILED_CART_UPDATE', function(event, quantity, id) {
 			var idx = _.findIndex($scope.cart, {_id : id});
 			$scope.cart[idx].quantity = quantity;
 		});
-		
+
 		$scope.open = function(item) {
 			var path = $location.path();
 			if (path === "/store") {
@@ -602,7 +622,7 @@ angular.module('co-op.controllers', [])
 ])
 .controller('updateCartCtrl', ['$scope', '$rootScope', '$location', 'Cart', 'flash', function($scope, $rootScope, $location, Cart, flash) {
 	//$scope.lastQuantity = undefined;
-	
+
 	$scope.saveNewQuantity = function(item) {
 		if (item.quantity === 0) {
 			$scope.delete($scope.cart.indexOf(item), function() {
@@ -613,7 +633,7 @@ angular.module('co-op.controllers', [])
 			flash.setMessage({type: 'warning', message: 'Please enter a valid quantity and try again.'});
 			$scope.$emit('FAILED_CART_UPDATE', $scope.lastQuantity, item._id);
 		}
-	
+
 		else {
 			Cart.updateItem(item, function(error) {
 				if (error) {
@@ -641,23 +661,24 @@ angular.module('co-op.controllers', [])
 }])
 
 .controller('contactCtrl', ['$scope', 'MailManager', '$location',
-	function($scope, MailManager, $location) {		
+	function($scope, MailManager, $location) {
 		$scope.mail = {
 			name: '',
 			email: '',
 			message: ''
 		};
 		var search = $location.search();
-		
+
 		$scope.mail.subject = search.hasOwnProperty('subject') ? search.subject : '';
-		
-		$scope.submitForm = function(mail) {
-			MailManager.mail(mail);
+
+		$scope.submitForm = function(valid, mail) {
+			if (valid) MailManager.mail(mail);
+			else $scope.submitted = true;
 		};
 	}
 ])
 .controller('producerContactCtrl', ['$scope', 'MailManager', '$location', 'member',
-	function($scope, MailManager, $location, member) {				
+	function($scope, MailManager, $location, member) {
 		$scope.mail = {
 			to: '',
 			toName: '',
@@ -666,19 +687,21 @@ angular.module('co-op.controllers', [])
 			subject: '',
 			message: ''
 		};
-		
+
 		$scope.member = member.plain();
 		$scope.mail.to = $scope.member.email;
 		$scope.mail.toName = $scope.member.name;
-		
+
 		var search = $location.search();
-		
+
 		$scope.mail.subject = search.hasOwnProperty('subject') ? search.subject : '';
-		
-				
-		$scope.submitForm = function(message) {
-			MailManager.mail($scope.mail);
-			$location.path("/store");
+
+
+		$scope.submitForm = function(valid, message) {
+			if (valid) {
+				MailManager.mail($scope.mail);
+				$location.path("/store");
+			} else $scope.submitted = true;
 		};
 	}
 ])
@@ -686,20 +709,20 @@ angular.module('co-op.controllers', [])
 .controller('storeCtrl', ['$scope', '$rootScope', '$location', '$routeParams', '$modal', 'LoginManager', 'flash', '$http', 'Cart',
 	function($scope, $rootScope, $location, $routeParams, $modal, LoginManager, flash, $http, Cart) {
 		var category, sort, reverse, productURL;
-		
+
 		console.log(Cart);
-		
+
 		$rootScope.$broadcast('GET_CART');
 		$scope.isProducts = true;
-		
+
 		$scope.searchObject = $location.search();
-		
+
 		$scope.predictiveSearch = [];
 		$scope.category = $scope.searchObject.hasOwnProperty('category') ? $scope.searchObject.category : undefined;
 		$scope.sort = $scope.searchObject.hasOwnProperty('sort') ? $scope.searchObject.sort : undefined;
 		$scope.reverse = $scope.searchObject.hasOwnProperty('reverse') ? $scope.searchObject.reverse : undefined;
-		
-		
+
+
 		var findCartItems = function() {
 			if ($scope.cartProduct_ids && $scope.products) {
 				$scope.products.forEach(function(product) {
@@ -710,14 +733,14 @@ angular.module('co-op.controllers', [])
 				});
 			}
 		};
-		
+
 		// initiate the real-time message container
 		//$scope.message = {type: 'danger', closeMessage: function() {if (this.message) this.message = null;} };
 		$scope.products = [];
-		
-		
+
+
 		var productsStarted;
-		
+
 		function loadProducts(productURL) {
 			oboe(productURL)
 				.path('!.*', function(product) {
@@ -742,26 +765,26 @@ angular.module('co-op.controllers', [])
 							$scope.open(product);
 						}
 					}());
-			
+
 					// this will do nothing if the products are loaded before the cart is ready
 					// or no user is logged in
 					findCartItems();
-			
+
 					$scope.predictiveSearch = _.map($scope.products, 'fullName');
 					$rootScope.$broadcast('PREDICTIVE_SEARCH', $scope.predictiveSearch);
-				
+
 					return oboe.drop;
 				});
 		}
-		
+
 		if ($rootScope.cycle) {
 			if (!$rootScope.canShop) {
 				productURL = 'api/product?cycle='+ ($rootScope.cycle + 1);
-			} else productURL = 'api/product?cycle='+$rootScope.cycle;			
+			} else productURL = 'api/product?cycle='+$rootScope.cycle;
 			loadProducts(productURL);
 			productsStarted = true;
 		}
-		
+
 		$rootScope.$watch('cycle', function(newValue){
 			if ($rootScope.cycle && !productsStarted) {
 				if (!$rootScope.canShop) {
@@ -770,13 +793,19 @@ angular.module('co-op.controllers', [])
 				loadProducts(productURL);
 			}
 		});
-		
+
 		$scope.searchFor = function(term) {
 			$location.search('search', term);
 		};
-				
+
 		// open the modal
 		$scope.open = function(product) {
+			var template = 'partials/store/store-modal.html',
+			controller = 'modalInstanceCtrl';
+			if (product.fullName.match(/milk/i)) {
+				template = 'partials/store/milk.html';
+				controller = 'MilkFormCtrl';
+			}
 			var modalInstance = $modal.open({
 				templateUrl: 'partials/store/store-modal.html',
 				controller: 'modalInstanceCtrl',
@@ -787,20 +816,19 @@ angular.module('co-op.controllers', [])
 					}
 				}
 			});
-			
+
 			// modalInstance.opened.then(function() {
 	//
 	// 		});
 			modalInstance.result.then(function(product) {
 				$location.hash('');
 				$scope.addToCart(product);
-				
 			}, function() {
 				$location.hash('');
 				console.log('Modal dismissed at: ' + new Date());
 			});
 		};
-		
+
 		$scope.$on('OPEN_PRODUCT', function(event, item) {
 			if ($scope.products) {
 				var product = _.find($scope.products, {_id: item.product._id});
@@ -808,13 +836,13 @@ angular.module('co-op.controllers', [])
 			}
 			else console.log("can't open product because it's undefined currently");
 		});
-		
+
 		$scope.$on('NOT_IN_CART', function(event, id) {
 			if ($scope.products) {
 				findCartItems();
 			}
 		});
-		
+
 		// if the user has items in their cart that are also in the store
 		// flag those items with the bool AlreadyInCart = true;
 		$scope.$on('CART_IDS', function(event, cartProduct_ids) {
@@ -822,36 +850,72 @@ angular.module('co-op.controllers', [])
 			// this will do nothing if the cart is loaded before the products are ready
 			findCartItems();
 		});
-		
+
 		// A very important function :-)
 		$scope.addToCart = function(product) {
+			var order, modalInstance;
 			if ($rootScope.currentUser) {
-				var order = {
-				product: product._id,
-				customer: $rootScope.currentUser._id,
-				supplier: product.producer_ID._id,
-				quantity: 1
-				};
+				//TODO:need a better matcher in future
+				if (product.fullName.match(/milk/i)) {
+					modalInstance = $modal.open({
+						templateUrl: 'partials/store/milk.html',
+						controller: 'MilkFormCtrl',
+						size: 'sm',
+						resolve: {
+							milk: function() {
+								return product;
+							}
+						}
+					});
+
+					// modalInstance.opened.then(function() {
+			//
+			// 		});
+					modalInstance.result.then(function(orders) {
+						$location.hash('');
+						Cart.addToCart(orders, function(err, cartOrder) {
+							if (err) {
+								console.log(err);
+							} else {
+								$rootScope.$broadcast('UPDATE_CART', cartOrder);
+								LoginManager.getTally();
+							}
+						});
+					}, function() {
+						$location.hash('');
+						console.log('Modal dismissed at: ' + new Date());
+					});
+				} else {
+					order = {
+						product: product._id,
+						customer: $rootScope.currentUser._id,
+						supplier: product.producer_ID._id,
+						quantity: 1
+					};
+
+					Cart.addToCart(order, function(err, cartOrder){
+						if (err) {
+							console.log(err);
+						} else {
+							$rootScope.$broadcast('UPDATE_CART', cartOrder);
+							LoginManager.getTally();
+						}
+					});
+				}
 				// This is where the magic really happens
 				// an error returns an empty callback
-				Cart.addToCart(order, function(cartOrder){
-					if (cartOrder) {
-						$rootScope.$broadcast('UPDATE_CART', cartOrder);
-						LoginManager.getTally();
-					}
-				});
 			}
 			else {
-				var modalInstance = $modal.open({
-				templateUrl: 'partials/store/not-a-member.html',
-				size : 'sm'
+				modalInstance = $modal.open({
+					templateUrl: 'partials/store/not-a-member.html',
+					size : 'sm'
 				});
 			}
-			
+
 		};
-		
+
 		// route params
-				
+
 		$scope.$watch('category', function(newValue) {
 			// if newValue is falsey
 			if (!newValue) {
@@ -861,7 +925,7 @@ angular.module('co-op.controllers', [])
 				$location.search('category' , newValue);
 			}
 		});
-		
+
 		$scope.$watch('sort', function(newValue) {
 			// if newValue is falsey
 			if (!newValue) {
@@ -874,7 +938,7 @@ angular.module('co-op.controllers', [])
 				$location.search('sort' , newValue);
 			}
 		});
-		
+
 		$scope.$watch('reverse', function(newValue) {
 			// if newValue is falsey
 			if (!newValue) {
@@ -884,7 +948,7 @@ angular.module('co-op.controllers', [])
 				$location.search('reverse' , true);
 			}
 		});
-		
+
 		// $rootScope.$watch('canShop', function() {
 // 			if ($rootScope.canShop === false) {
 // 				flash.setMessage({type: 'warning', message: 'Shopping is not allowed yet sorry. Please check the calendar for when shopping is open next.'});
@@ -906,9 +970,9 @@ angular.module('co-op.controllers', [])
                 timer = undefined;
 			}, 1200);
 		};
-		
+
 		$scope.showHideDetails = function(bool) {$scope.detailsVisible = bool;};
-		
+
 		$scope.callCancelled = function() { $timeout.cancel(timer); };
 
 		$scope.$on("$destroy", function(event) { $timeout.cancel(timer); });
@@ -921,15 +985,15 @@ angular.module('co-op.controllers', [])
 			console.log('Calendar loaded!');
 			// $scope.countDown = Calendar.countDown;
 			$scope.calendar = Calendar.calendar;
-			
+
 			$scope.significantDays = Calendar.cycle;
 			$scope.nextCycle = Calendar.nextCycle;
 			// $scope.twoMonth = Calendar.twoMonth;
 			$scope.daysBeforeOrderingStops = Calendar.daysBeforeOrderingStops;
 			$scope.daysBeforeDeliveryDay = Calendar.daysBeforeDeliveryDay;
-			
+
 			$scope.deliveryDayFromNow = moment(Calendar.cycle.deliveryDay).fromNow();
-			
+
 			$scope.shoppingTime = function() {
 				// if now is before start then print days until start happens
 				// if now is after start then print days until end happens
@@ -938,9 +1002,9 @@ angular.module('co-op.controllers', [])
 				if ( moment().isBefore(Calendar.cycle.shoppingStop) ) return 'ends ' + moment(Calendar.cycle.shoppingStop).fromNow();
 				if ( moment().isAfter(Calendar.cycle.shoppingStop) ) return 'is ' + moment(Calendar.nextCycle.shoppingStart).fromNow();
 			};
-			
+
 		});
-		
+
 		if (Calendar.cycle) {
 			$scope.deliveryDayFromNow = moment(Calendar.cycle.deliveryDay).fromNow();
 			$scope.shoppingTime = function() {
@@ -952,12 +1016,12 @@ angular.module('co-op.controllers', [])
 				if ( moment().isAfter(Calendar.cycle.shoppingStop) ) return 'is ' + moment(Calendar.nextCycle.shoppingStart).fromNow();
 			};
 		}
-		
+
 		$scope.calendar = Calendar.calendar;
 		$scope.significantDays = Calendar.cycle;
 		$scope.nextCycle = Calendar.nextCycle;
 		$scope.daysBeforeOrderingStops = Calendar.daysBeforeOrderingStops;
 		$scope.daysBeforeDeliveryDay = Calendar.daysBeforeDeliveryDay;
-		
-	}	
+
+	}
 ]);

@@ -4,7 +4,7 @@
 		Bulk {{order.product.name}} Order for <a ng-href="/contact/{{order.customer.id}}">{{order.customer.name}}</a> 
 		<div class="btn-group pull-right">
 			<button class="btn btn-default" ng-click="order.save(); flash('success', 'Your order is saved');" ng-disabled="order.invoiced">Save</button>
-			<button class="btn btn-primary" ng-click="order.invoiced = true; order.save({invoice: 1}); flash('success', 'Thanks! This Order is now finalised')" ng-disabled="order.invoiced">Save and Invoice</button>
+			<button class="btn btn-primary" ng-click="order.invoiced = true; order.save({invoice: 1}); flash('success', 'Thanks! This Order is now finalised')" ng-disabled="order.invoiced && order.weight > 0">Save and Invoice</button>
 		</div>
 	</h1>
 	

@@ -5,25 +5,15 @@
 	<!-- <title>NNFC - Northland Natural Food Co-op</title> -->
 	<title ng-bind="$root.page_title + ' - Northland Natural Food Co-op' ">Buy and Sell Local Food - Northland Natural Food Co-op</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.00"/>
-	<script type="text/javascript">
-	    window.onload=function(){
-	        var ua = navigator.userAgent;
-	        if(ua.indexOf("Android")>=0){
-	            var androidversion=parseFloat(ua.slice(ua.indexOf("Android")+8)); 
-	            if(androidversion<=2.3){
-	                document.getElementsByName("viewport")[0].setAttribute("content","width=device-width, initial-scale=1.02");
-	            }
-	        }
-	    };
-	</script>
 	<meta name="fragment" content="!">
-	
+
 	<meta name="google-site-verification" content="PWN_NnwZNR-kE040IR0OxaKzqakhtPZeVFDGhrWZ8Yw" />
-	
+
 	<meta name="description" content="{{page_description}}">
-	
+	<meta name="keywords" content="Raw Milk, Local Food, Organic Food, Northland, Support local farmers">
+
 	<base href="/index.html">
-	
+
 	<style>
 		/* Loading Page Styles are inline to increase speed */
 		[ng-cloak].splash {display: block;}
@@ -39,65 +29,69 @@
 100%{-webkit-transform:rotate(359deg);transform:rotate(359deg)}
 }
 	</style>
-	
-	
+
+
 	<!-- Google Font -->
-	<link href='https://fonts.googleapis.com/css?family=Raleway:700,500' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" href="lib/bower_components/font-awesome/css/font-awesome.min.css" type="text/css" media="screen" title="no title" charset="utf-8">
-	
-	<link rel="stylesheet" href="lib/bower_components/angular-loading-bar/build/loading-bar.css" type="text/css">
-	
-	<link href="lib/bower_components/textAngular/src/textAngular.css" rel="stylesheet" type="text/css">
-	<link href="lib/bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css">
-	
-	<link href="css/banner.css" rel="stylesheet" media="screen">
-	<link href="css/site.css" rel="stylesheet" type="text/css" media="screen">
-	<link href="css/animations.css" rel="stylesheet">
-	
+	<link href='http://fonts.googleapis.com/css?family=Raleway:700,500' rel='stylesheet' type='text/css'>
+
+	<link rel="stylesheet" href="css/compiled.min.css" type="text/css">
+
 	<!--[if lt IE 9]>
-	<script src="https://html5shim.googlecode.com/svn/trunk/html5.js">
+	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js">
 	</script>
 	<![endif]-->
-	
+
 </head>
 
-<body ng-controller="navCtrl"  ng-swipe-right="panelLeftDisplay = true">
+<body ng-controller="navCtrl">
 	<div id="fb-root"></div>
-<script>
-  window.fbAsyncInit = function() {
-    FB.init({
-      appId      : '450010881815724',
-      xfbml      : true,
-      version    : 'v2.2'
-    });
-  };
-
-  (function(d, s, id){
-     var js, fjs = d.getElementsByTagName(s)[0];
-     if (d.getElementById(id)) {return;}
-     js = d.createElement(s); js.id = id;
-     js.src = "//connect.facebook.net/en_US/sdk.js";
-     fjs.parentNode.insertBefore(js, fjs);
-   }(document, 'script', 'facebook-jssdk'));
-</script>
+	<!-- <script>
+  // window.fbAsyncInit = function() {
+//     FB.init({
+//       appId      : '450010881815724',
+//       xfbml      : true,
+//       version    : 'v2.2'
+//     });
+//   };
+//
+//   (function(d, s, id){
+//      var js, fjs = d.getElementsByTagName(s)[0];
+//      if (d.getElementById(id)) {return;}
+//      js = d.createElement(s); js.id = id;
+//      js.src = "//connect.facebook.net/en_US/sdk.js";
+//      fjs.parentNode.insertBefore(js, fjs);
+//    }(document, 'script', 'facebook-jssdk'));
+</script> -->
 	<div ng-cloak="" class='splash text-center'>
-		<h1 style="font-size: 6em">Loading your Co-op</h1>
+		<h1 class="text-center" style="font-size: 2em">Loading your Co-op</h1>
 		<i class="fa fa-cog fa-spin" style='font-size: 10em'></i>
-	</div>	
+	</div>
 	<div class="sidebar sidebar-left" ng-swipe-left="panelLeftDisplay = false" ng-show="panelLeftDisplay" ng-class="{'wide-sidebar':cartPanel.open, 'narrow-sidebar':!cartPanel.open}" ng-cloak>
 		<div class="sidebar-main">
 			<a href="" class="panel-btn panel-btn-lg close-sidebar-button close-sidebar-button-left" ng-click="panelLeftDisplay = false">&times;</a>
-			<div ng-show="storePage()">
-				<div class="input-group">
-					<label class="sr-only" for="storeSearch">Search the store</label>
-					<div class="input-group-addon"><span class="glyphicon glyphicon-search"></span></div>
-					<input ng-model="search" class="form-control" 
-					typeahead="keyword for keyword in predictiveSearch | filter:$viewValue | limitTo:8"
-					name="storeSearch" type="search" placeholder="Search"/>
+			<div class="sidebar-me clearfix" ng-if="!!currentUser">
+				<div class="col-xs-4 icon">
+					<h1><span class="glyphicon glyphicon-user"></span></h1>
 				</div>
-			</div>	
+				<br>
+				<div class="col-xs-8">
+					<p><strong>{{currentUser.name}}</strong><br>
+						<small>{{currentUser.email}} &nbsp;</small>
+						<a style="color:white"><span class="glyphicon" ng-click="userLinks = !userLinks"
+							ng-class="{'glyphicon-menu-down': !userLinks, 'glyphicon-menu-up': userLinks}"></span></a>
+					</p>
+				</div>
+				<div collapse="!userLinks" class="col-xs-8 col-xs-offset-4">
+					<ul class="list-unstyled">
+						<li><a href="/me" style="color:#fff"><i class="fa fa-user"></i> My Profile</a></li>
+						<li><a href="/edit-me" style="color:#fff"><i class="fa fa-pencil"></i> Edit Details</a></li>
+						<li><a ng-click="logOut()" style="color:#fff"><span class="glyphicon glyphicon-lock"></span> Log Out</a></li>
+					</ul>
+				</div>
+			</div>
+
 			<a href="/calendar" style="color:#dddddd"><ng-include src=" 'partials/calendar-blurb.html' "></ng-include></a>
-	
+
 			<accordion close-others="false" ng-if="currentUser" >
 				<accordion-group is-open="cartPanel.open" ng-class="{'panel-open-sidebar':cartPanel.open}">
 					<accordion-heading>
@@ -107,7 +101,6 @@
 							<table class="table">
 								<thead>
 									<tr>
-										<th class="hidden-xs"><a href="" ng-click="predicate = '_id'; reverse=!reverse" tooltip-placement="right" tooltip="Remove Items">&times;</a></th>
 										<th><a href="" ng-click="predicate = 'product.productName'; reverse=!reverse">Product</a></th>
 										<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse">Quantity</a></th>
 										<th><a href="" ng-click="predicate = 'orderPriceWithMarkup'; reverse=!reverse">Price</a></th>
@@ -116,46 +109,45 @@
 								</thead>
 								<tfoot>
 									<tr>
-										<td colspan="5"><strong>Total: {{cartTotal(cart)|currency}}</strong></td>
+										<td colspan="4"><strong>Total: {{cartTotal(cart)|currency}}</strong></td>
 									</tr>
 								</tfoot>
 								<tbody>
 									<tr ng-repeat="c in cart | orderBy:predicate:reverse" >
-								        <td data-title=" 'remove' " class="hidden-xs">
-								        	<a ng-click="delete($index)"><i class="fa fa-trash"></i></a>
+										<td data-title="'Product'"
+											ng-init="showDelete = false"
+											ng-swipe-right="showDelete = !showDelete"
+											ng-hide="showDelete">
+											<a ng-click="delete($index)"><i class="fa fa-trash"></i></a>
+											<a href="" ng-click="open(c)" ng-hide="c.milk">{{c.product.fullName}}</a>
+											<a href="" ng-click="open(c)" ng-show="c.milk">{{c.product.productName}} for {{c.deliveryDay | date:'d/M/yy'}}</a>
 										</td>
-								        <td data-title="'Product'" 
-										ng-init="showDelete = false" 
-										ng-swipe-right="showDelete = !showDelete" 
-										ng-hide="showDelete">
-								            <a href="" ng-click="open(c)">{{c.product.fullName}}</a>
-								        </td>
 										<td ng-show="showDelete" ng-swipe-left="showDelete=false" colspan=2>
 											<button class="btn-danger btn" ng-click="delete($index); showDelete = false;">
 												<i class="fa fa-trash"></i> Delete
 											</button>
 										</td>
-								        <td data-title="'Quantity'" ng-hide="showDelete">
+										<td data-title="'Quantity'" ng-hide="showDelete">
 											<form role="search" ng-controller="updateCartCtrl">
 												<div class="form-group">
-													<input type="number" class="form-control" ng-model="c.quantity" 
+													<input type="number" class="form-control" ng-model="c.quantity"
 													ng-init="lastQuantity = c.quantity"
 													ng-change="showSave = true;">
 												</div>
-												<button type="submit" 
-												class="btn btn-default" 
-												ng-show="showSave" 
+												<button type="submit"
+												class="btn btn-default"
+												ng-show="showSave"
 												ng-click="showSave=false; saveNewQuantity(c)">Save</button>
 											</form>
-								        </td>
-								        <td data-title="'Price'">
-								            {{c.unitPriceWithMarkup * c.quantity | currency}}
-								        </td>
-								        <td data-title="'Producer'" class="hidden-xs">
-								            <a 
+										</td>
+										<td data-title="'Price'">
+											{{c.unitPriceWithMarkup * c.quantity | currency}}
+										</td>
+										<td data-title="'Producer'" class="hidden-xs">
+											<a
 				ng-href="/producer/{{c.supplier.producerData.companyName | forURL}}-{{c.supplier.name | forURL}}">{{c.supplier.producerData.companyName || c.supplier.name}}</a>
-								        </td>
-								    </tr>
+										</td>
+									</tr>
 									</tbody>
 								</tbody>
 							</table>
@@ -163,29 +155,24 @@
 				</accordion-group>
 			</accordion>
 			<ul class="nav nav-pills nav-stacked">
-					<li ng-class="{active:isActive('/producer-list')}"><a href="producer-list">Producer List</a></li>
+
 					<li ng-class="{active:isActive('/message-board')}"><a href="message-board">Message Board</a></li>
-					<li ng-class="{active:isActive('/delivery')}"><a href="delivery">Delivery</a></li>
 					<li ng-class="{active:isActive('/my-cart')}" ng-show="currentUser"><a href="my-cart">Cart Page</a></li>
-					<li ng-class="{active:isActive('/order-manager')}" 
+					<li ng-class="{active:isActive('/order-manager')}"
 					ng-show="currentUser && currentUser.user_type.name === 'Producer' && currentUser.user_type.canSell"
 					><a href="product-manager">My Products</a></li>
-					<li ng-class="{active:isActive('/product-upload')}" 
+					<li ng-class="{active:isActive('/product-upload')}"
 					ng-show="currentUser && currentUser.user_type.name === 'Producer'"
-					
 					><a href="product-upload">Upload a Product</a></li>
 					<li ng-class="{active:isActive('/my-invoices')}" ng-show="currentUser"><a ng-href="my-invoices">Invoices</a></li>
 			</ul>
 		</div>
-		<ul class="nav nav-pills nav-stacked sidebar-bottom" ng-controller="logoutCtrl">
-			<li ng-show="currentUser != null"><a ng-click="logOut()" class="text-center"><h1><span class="glyphicon glyphicon-lock"></span></h1><p>Log Out</p></a></li>
-		</ul>
 	</div>
-	
+
 	<nav class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container-fluid">
-			<div class="navbar-header" ng-init="mobileMenu = true">
-				<button type="button" class="navbar-toggle collapsed" ng-click="mobileMenu = !mobileMenu">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" ng-click="$root.mobileMenu = !$root.mobileMenu">
 					<span class="sr-only">Toggle navigation</span>
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
@@ -193,10 +180,10 @@
 				</button>
 				<a class="navbar-brand" href="/">NNFC</a>
 				<a class="navbar-brand" ng-click="panelLeftDisplay = !panelLeftDisplay">
-					<small class="hidden-sm hidden-xs"><span class="glyphicon glyphicon-cog"></span> Member Tools</small>
+					<small><span class="glyphicon glyphicon-cog"></span> Member Tools</small>
 				</a>
 			</div>
-			<div class="collapse navbar-collapse" collapse="mobileMenu" >
+			<div class="collapse navbar-collapse" collapse="$root.mobileMenu" >
 				<ul class="nav navbar-nav navbar-right">
 					<li class="hidden-md hidden-lg" ng-if="currentUser == null">
 						<a href="/login-page" ><span class="glyphicon glyphicon-lock"></span>Login</a>
@@ -204,8 +191,19 @@
 					<li ng-class="{active:isActive('/store')}"><a href="/store"><span class="glyphicon glyphicon-shopping-cart"></span> Store</a></li>
 					<li ng-class="{active:isActive('/')}"><a href="/">Home</a></li>
 					<li ng-class="{active:isActive('/signup')}" ng-show="!currentUser"><a href="/signup">Sign Up</a></li>
-					<li ng-class="{active:isActive('/about')}"><a href="/about">About</a></li>
-					<li ng-class="{active:isActive('/faq')}"><a href="/faq">FAQ</a></li>
+
+					<li dropdown>
+						<a href="" class='dropdown-toggle' dropdown-toggle>About <span class="caret"></span></a>
+						<ul class="dropdown-menu" role="menu">
+							<!-- <li ng-class="{active:isActive('/features')}"><a href="/features">How it Works</a></li> -->
+							<li ng-class="{active:isActive('/about')}"><a href="/about">About Us</a></li>
+							<li ng-class="{active:isActive('/faq')}"><a href="/faq">FAQ</a></li>
+							<li ng-class="{active:isActive('/producer-list')}"><a href="producer-list">Producer List</a></li>
+							<li ng-class="{active:isActive('/delivery')}"><a href="delivery">Delivery</a></li>
+						</ul>
+					</li>
+
+
 					<li ng-class="{active:isActive('/contact')}"><a href="/contact">Contact</a></li>
 
 					<li class="hidden-sm hidden-xs" ng-if="currentUser == null"><ng-include src=" 'partials/auth/login.html' "></ng-include></li>
@@ -214,25 +212,21 @@
 			</div>
 		</div>
 	</nav>
-		
+
 	<div class="page-wrap">
-	
-	<div class="visible-sm visible-xs mobile-arrow" ng-class="{'mobile-arrow-menu-open': panelLeftDisplay}" ng-show="!panelLeftDisplay">
-		<i class="fa fa-chevron-circle-right fa-3x" ng-click="panelLeftDisplay = true"></i>
-	</div>
 
 		<div class="container-fluid alert-box" ng-cloak>
 			<alert type="{{alert.type}}" dismiss-on-timeout='6000' ng-repeat="alert in queue" close="flash.closeMessage($index)" role="alert">
 				{{alert.message}}
 			</alert>
-		</div> 
-			
-		<!--  This is where the partials go for the forms and information pages.  ng-swipe-right="panelLeftDisplay = true"/-->    
+		</div>
+
+		<!--  This is where the partials go for the forms and information pages.  ng-swipe-right="panelLeftDisplay = true"/-->
 		<div id="view"
 		ng-cloak
 		ng-view
-		autoscroll="true" 
-		class="template-container app-body clearfix" 
+		autoscroll="true"
+		class="template-container app-body clearfix"
 		ng-class="{'menu-open-narrow' : panelLeftDisplay && !cartPanel.open,
 							'menu-open-wide': panelLeftDisplay && cartPanel.open,
 							'menu-open-right' : panelRightDisplay
@@ -268,35 +262,35 @@
 					</section>
 					<section class="col-sm-2 text-center">
 						<ul class="list-unstyled social-footer">
-							<li><a  href="https://www.facebook.com/nzfoodcoop"><i class="fa fa-facebook-square fa-fw fa-2x"></i></a></li>
-							<li><a  href="https://twitter.com/NorthlandNFC"><i class="fa fa-twitter-square fa-fw fa-2x"></i></a></li>
-							<li><a  href="https://plus.google.com/105941223701197922003" rel="publisher"><i class="fa fa-google-plus-square fa-fw fa-2x"></i></a></li>
+							<li><a  href="http://www.facebook.com/nzfoodcoop"><i class="fa fa-facebook-square fa-fw fa-2x"></i></a></li>
+							<li><a  href="http://twitter.com/NorthlandNFC"><i class="fa fa-twitter-square fa-fw fa-2x"></i></a></li>
+							<li><a  href="http://plus.google.com/105941223701197922003" rel="publisher"><i class="fa fa-google-plus-square fa-fw fa-2x"></i></a></li>
 						</ul>
-						<a ng-hide="1" href="https://plus.google.com/105941223701197922003" rel="publisher">Google+</a>
+						<a ng-hide="1" href="http://plus.google.com/105941223701197922003" rel="publisher">Google+</a>
 					</section>
 				</div>
 			</div>
-			
+
 				<small class="pull-left">&copy; 2014. All Rights Reserved. Proudly donated by <a href="http://redhead.xyz">Red Head Web</a></small><br>
-			
+
 		</div>
 	</div>
-	
-	
-	
-	
-	<!-- SocketIO-Client -->
-	<script src="https://cdn.socket.io/socket.io-1.2.1.js"></script>
 
-		
+
+
+
+	<!-- SocketIO-Client -->
+<!-- <script src="http://cdn.socket.io/socket.io-1.2.1.js"></script> -->
+<script src="lib/bower_components/jquery/dist/jquery.js"></script>
+
 	<!-- Include all compiled plugins (below) -->
 	<script src="lib/aggregated.min.js"></script>
-	
-	
+
+
 	<!-- project-specific angular data here -->
-	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular-animate.min.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular-touch.js"></script>
-    
+<!-- <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular-animate.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular-touch.js"></script> -->
+
 	<!-- food coop files -->
 	<script src="js/app.js"></script>
 <!--<script src="js/production.js"></script>-->
@@ -311,40 +305,34 @@
 	<script src="js/admin/controllers.admin.js"></script>
 	<script src="js/product-upload/app.product-upload.js"></script>
 	<script src="js/product-upload/controllers.product-upload.js"></script>
-	
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.4.0/lodash.min.js"></script>
+
+<!-- <script src="http://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.4.0/lodash.min.js"></script> -->
 	<!--lodash: Restangular Dependency-->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/restangular/1.4.0/restangular.min.js"></script>
-	
-	
-	
-	
+<!--<script src="http://cdnjs.cloudflare.com/ajax/libs/restangular/1.4.0/restangular.min.js"></script>-->
 
-	
 
-	
-	<!-- Other plugins here -->	
-	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?&libraries=places&sensor=true"></script>
-	
-	<script type="text/javascript"> 
-	var $buoop = {}; 
-	$buoop.ol = window.onload; 
-	window.onload=function(){ 
-	 try {if ($buoop.ol) $buoop.ol();}catch (e) {} 
-	 var e = document.createElement("script"); 
-	 e.setAttribute("type", "text/javascript"); 
-	 e.setAttribute("src", "//browser-update.org/update.js"); 
-	 document.body.appendChild(e); 
-	} 
+	<!-- Other plugins here -->
+<!-- <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?&libraries=places&sensor=true"></script> -->
+
+	<script type="text/javascript">
+	// var $buoop = {};
+// 	$buoop.ol = window.onload;
+// 	window.onload=function(){
+// 	 try {if ($buoop.ol) $buoop.ol();}catch (e) {}
+// 	 var e = document.createElement("script");
+// 	 e.setAttribute("type", "text/javascript");
+// 	 e.setAttribute("src", "//browser-update.org/update.js");
+// 	 document.body.appendChild(e);
+// 	}
 	</script>
 
 	<script>
-	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-	ga('create', 'UA-45071933-1', 'foodcoop.org.nz');
+	// (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+// 		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+// 		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+// 	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+//
+// 	ga('create', 'UA-45071933-1', 'foodcoop.org.nz');
 	//ga('send', 'pageview');
 
 	</script>

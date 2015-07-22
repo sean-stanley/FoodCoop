@@ -1,5 +1,5 @@
 <div class="col-md-3"></div>
-<div class="col-md-6">	
+<div class="col-md-6">
 	<div class="page-header">
 		<h1>Producer List</h1>
 	</div>
@@ -10,15 +10,13 @@
 	</div>
 
 	 <div class="btn-group" dropdown>
-	      <button type="button" class="btn btn-primary dropdown-toggle" ng-disabled="disabled">
+	      <button type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle ng-disabled="disabled">
 	        Sort By <span class="caret"></span>
 	      </button>
 	      <ul class="dropdown-menu" role="menu">
-			<li><a ng-click="predicate= 'dateJoined'">Date Joined</a></li>
-			<li><a ng-click="predicate= 'producerData.companyName'">Company Name</a></li>
-			<li><a ng-click="predicate= 'name'">Producer Name</a></li>
-			<li class="divider"></li>
-			<li><a ng-click="reverse=!reverse">Reverse Order</a></li>
+			<li><a ng-click="predicate= 'dateJoined'; reverse=!reverse">Date Joined</a></li>
+			<li><a ng-click="predicate= 'producerData.companyName'; reverse=!reverse">Company Name</a></li>
+			<li><a ng-click="predicate= 'name'; reverse=!reverse">Producer Name</a></li>
 	      </ul>
 	    </div>
 
@@ -30,7 +28,7 @@
 			<h3>{{i.producerData.companyName || i.name}} <small ng-show="i.producerData.companyName">{{i.name}}</small></h3>
 			<ul class="list-unstyled">
 				<li><span class="glyphicon glyphicon-envelope"></span> <a ng-href="/contact/{{i._id}}">Email this Producer</a></li>
-				<li ng-if="i.addressPermission"><span class="glyphicon glyphicon-map-marker"></span> 
+				<li ng-if="i.addressPermission"><span class="glyphicon glyphicon-map-marker"></span>
 					<a ng-href="//mapof.it/{{currentUser.address | forURL}}/{{i.address | forURL}}">{{i.address}}</a>
 				</li>
 			</ul>

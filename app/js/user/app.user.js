@@ -78,7 +78,6 @@ angular.module('co-op.user', ['ngRoute']).config(['$routeProvider', function($ro
 			unfullfilledOrders: function(Restangular) {
 				return Restangular.all('api/order/cycle');
 			}
-			
 		}
 	})
 	.when('/my-invoices', {
@@ -88,11 +87,16 @@ angular.module('co-op.user', ['ngRoute']).config(['$routeProvider', function($ro
 		title : 'My Invoices',
 		description: 'Use the contact form to contact another northland natural food co-op member.',
 	})
-	.when('/me', {
+	.when('/edit-me', {
 		controller: 'userEditCtrl',
 		templateUrl:'partials/loggedIn/edit-me.html',
 		loggedInOnly: true, reloadOnSearch: false,
 		title : 'My Settings',
+	})
+	.when('/me', {
+		templateUrl:'partials/loggedIn/profile.html',
+		loggedInOnly: true, reloadOnSearch: false,
+		title : 'My Profile',
 	})
 	
 	

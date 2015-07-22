@@ -6,7 +6,7 @@ moment = require('moment'),
 async = require('async'),
 bunyan = require('bunyan'),
 log = bunyan.createLogger({
-	name: 'product', 
+	name: 'meat orders', 
 	serializers: {
 		req: bunyan.stdSerializers.req,
 		err: bunyan.stdSerializers.err,
@@ -17,6 +17,15 @@ log = bunyan.createLogger({
 }),
 ObjectId = require('mongoose').Types.ObjectId,
 _ = require('lodash');
+
+//missing invoice
+
+// MeatOrder.findById("555d568b424e806d3ae2922d", function(err, order) {
+// 	if (err) log.warn(err);
+// 	invoiceCustomer(order);
+// 	invoiceProducer(order);
+// });
+
 
 exports.meatOrder = function(req, res, next, id) {
 	MeatOrder.findById(id, function(err, order) {
@@ -65,13 +74,14 @@ exports.update = function(req, res, next) {
 		//save product
 		order.save(function(err, order) {
 			if (err) return next(err);
-			if (req.query.invoice) {
-				if (order.weight > 0 && order.deliveryInstructions) {
+			if (req.query.invoice && order.weight > 0 && order.deliveryInstructions) {
 					invoiceCustomer(order);
 					invoiceProducer(order);
 					res.json(order);
-					
-				} else res.status(403).send("Could not send invoice, weight or delivery instructions are missing");
+			} else if (req.query.invoice) {
+				order.invoice = false;
+				order.save();
+				res.status(403).send("Could not send invoice, weight or delivery instructions are missing");
 			} else res.json(order);
 		});
 	});
@@ -112,15 +122,19 @@ function alertProducer(order) {
 		};
 		update = new Emailer(mailOptions, mailData);
 
-		update.send(function(err, result) {
-			if (err) log.warn(err);
-			log.info('message sent about new item to be %s', order.customer.email);
-		});
+		if (process.env.NODE_ENV==='production') {
+			update.send(function(err, result) {
+				if (err) log.warn(err);
+				log.info('message sent about new item to be %s', order.customer.email);
+			});
+		} else log(update);
+		
+		
 	});
 }
 
 function emailCustomer(order) {
-	var mailOptions, mailData, email;
+	var mailOptions, mailData, mail;
 	mailOptions = {
 		template: 'butchery/customer-meat-order',
 		subject: 'Bulk ' + order.product.name + ' order',
@@ -136,12 +150,14 @@ function emailCustomer(order) {
 		unitPrice: '$' + order.unitPriceWithMarkup.toFixed(2),
 		instructions: order.instructions
 	};
-	email = new Emailer(mailOptions, mailData);
-
-	email.send(function(err, result) {
-		if (err) log.warn(err);
-		log.info('message sent about bulk meat order to %s', order.customer.email);
-	});
+	mail = new Emailer(mailOptions, mailData);
+	
+	if (process.env.NODE_ENV==='production') {
+		mail.send(function(err, result) {
+			if (err) log.warn(err);
+			log.info('message sent about bulk meat order to %s', order.customer.email);
+		});
+	} else log(mail);
 }
 
 function invoiceCustomer(order) {
@@ -149,11 +165,12 @@ function invoiceCustomer(order) {
 		function (done) {
 			var invoice = new Invoice({
 				dueDate: moment().add(7, 'd').format(),
+				meatOrder: order._id,
 				invoicee: order.customer.id,
 				title: order.product.name + ' order from the NNFC',
 				items: [{
 					cost: order.totalWithMarkup,
-					name: order.product.name + ' @ $' + order.unitPriceWithMarkup.toFixed(2) + '/ kg'
+					name: order.product.name + ' @ $' + order.unitPriceWithMarkup.toFixed(2) + '/ kg (' + order.weight + ' kg)'
 				}],
 			});
 			
@@ -220,12 +237,13 @@ function invoiceProducer(order) {
 		function (done) {
 			var invoice = new Invoice({
 				dueDate: moment().add(14, 'd').format(),
+				meatOrder: order._id,
 				toCoop: true,
 				invoicee: order.supplier,
-				title: order.product.name + ' order for' + order.customer.name + 'at the NNFC',
+				title: order.product.name + ' order for ' + order.customer.name + ' at the NNFC',
 				items: [{
 					cost: order.total,
-					name: order.product.name + ' @ $' + order.unitPrice.toFixed(2) + '/ kg'
+					name: order.product.name + ' @ $' + order.unitPrice.toFixed(2) + '/ kg (' + order.weight + ' kg)'
 				}],
 				bankAccount: order.supplier.producerData.bankAccount 
 			});
@@ -266,8 +284,8 @@ function invoiceProducer(order) {
 			};
 			
 			mail = new Emailer(mailOptions, mailData);
-
 			
+				
 			mail.send(function(err, result) {
 				if (err) done(err);
 				// a response is sent so the client request doesn't timeout and get an error.
@@ -275,8 +293,7 @@ function invoiceProducer(order) {
 					done(null);
 				}
 			});
-		}
-		
+		}		
 	], function(error) {
 		if (error) log.warn(error);
 	});

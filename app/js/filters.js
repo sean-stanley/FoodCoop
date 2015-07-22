@@ -9,7 +9,7 @@ angular.module('co-op.filters', []).
       return String(text).replace(/\%VERSION\%/mg, version);
     };
   }])
-  
+
 	.filter('currency', function() {
 		return function(num) {
 			if (Number(num) >= 0) return '$' + Number(num).toFixed(2);
@@ -17,7 +17,7 @@ angular.module('co-op.filters', []).
 			else return;
 		};
 	})
-	
+
   .filter('blurb', function() {
 	  return function(blurb) {
 		  if (blurb) {
@@ -33,21 +33,22 @@ angular.module('co-op.filters', []).
   })
   .filter('forURL', function() {
 	  return function(forURL) {
-		  var URLready;
-		  if (forURL) {
-			  forURL.toString();
-			  URLready = forURL.replace(/\s/g, "+");
-			  return URLready;
-		  }
+		  // var URLready;
+		  // if (forURL) {
+			//   forURL.toString();
+			//   URLready = forURL.replace(/\s/g, "+");
+			//   return URLready;
+		  // }
+      return encodeURIComponent(forURL);
 	  };
   })
   .filter('shortDate', function() {
 	return function(shortDate) {
 		if (shortDate) {
 			if ( Date.parse(shortDate).clearTime().equals(Date.today()) ) {
-				return Date.parse(shortDate).toString('h:mm tt'); 
+				return Date.parse(shortDate).toString('h:mm tt');
 			}
-			return Date.parse(shortDate).toString('d/M/yyyy');  
+			return Date.parse(shortDate).toString('d/M/yyyy');
 		}
 	};
   })

@@ -12,7 +12,7 @@ exports.cycle = function(req, res, next, id) {
 		if (!cycle) return next(new Error('Failed to load cycle: ' + id));
 		req.cycle = cycle;
 		next();
-	});	
+	});
 };
 
 exports.create = function(req, res) {
@@ -46,6 +46,10 @@ exports.destroy = function(req, res) {
 
 exports.show = function(req, res) {
   res.json(req.cycle);
+};
+
+exports.current = function(req, res) {
+	res.json(scheduler.currentCycle);
 };
 
 exports.all = function(req, res) {

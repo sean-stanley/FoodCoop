@@ -31,6 +31,7 @@
 			<button type='button' class="btn btn-default" ng-model="category" btn-radio="'Baked Goods'" >Baked Goods</button>
 			<button type='button' class="btn btn-default" ng-model="category" btn-radio="'Dairy & Eggs'" >Dairy &amp; Eggs</button>
 			<button type='button' class="btn btn-default" ng-model="category" btn-radio="'Tea & Beverages'" >Tea &amp; Beverages</button>
+			<button type='button' class="btn btn-default" ng-model="category" btn-radio="'Ready Made Meals'">Ready Made Meals</button>
 			<button type='button' class="btn btn-default" ng-model="category" btn-radio="null">All</button>
 		</div>
 	</div>
@@ -38,17 +39,17 @@
 	<div class="btn-group visible-sm visible-xs" dropdown>
 		<button class='btn btn-default dropdown-toggle' dropdown-toggle>Categories <span class="caret"></span></button>
 		<ul class="dropdown-menu" role="menu">
-	        <li><a ng-click="category = 'Produce'">Produce</a></li>
-	        <li><a ng-click="category = 'Meat'">Meat</a></li>
-	        <li><a ng-click="category = 'Processed-Goods'">Processed Goods</a></li>
-	        <li><a ng-click="category = 'Baked Goods'">Baked Goods</a></li>
-	        <li><a ng-click="category = 'Dairy & Eggs'">Dairy &amp; Eggs</a></li>
-					<li><a ng-click="category = 'Tea & Beverages'">Tea &amp; Beverages</a></li>
-	        <li class="divider"></li>
-	        <li><a ng-click="category = null">Show All</a></li>
-	    </ul>
+			<li><a ng-click="category = 'Produce'">Produce</a></li>
+			<li><a ng-click="category = 'Meat'">Meat</a></li>
+			<li><a ng-click="category = 'Processed-Goods'">Processed Goods</a></li>
+			<li><a ng-click="category = 'Baked Goods'">Baked Goods</a></li>
+			<li><a ng-click="category = 'Dairy & Eggs'">Dairy &amp; Eggs</a></li>
+			<li><a ng-click="category = 'Tea & Beverages'">Tea &amp; Beverages</a></li>
+			<li><a ng-click="category = 'Ready Made Meals'">Ready Made Meals</a></li>
+			<li class="divider"></li>
+			<li><a ng-click="category = null">Show All</a></li>
+		</ul>
 	</div>
-	   
 						
 	<div ng-class="{ 'pull-right' : !panelDisplay, 'sort-buttons-menu-open' : panelDisplay }" ng-show="products.length > 1">
 		<label> Sort: </label>
@@ -65,14 +66,27 @@
 			ng-click="sort = 'price'; reverse=!reverse">  <span class="glyphicon glyphicon-sort"></span>  Price</button>
 		</div>
 	</div>
-           
+	
 </section>
 
 <div id="products-section" class="col-xs-12">
-	<div ng-show="!isProducts" class="col-md-8 col-md-offset-2">
+	<div class="row">
+		<div class="col-xs-8 col-xs-offset-2">
+			<div class="input-group">
+				<label class="sr-only" for="storeSearch">Search the store</label>
+				<div class="input-group-addon"><span class="glyphicon glyphicon-search"></span></div>
+				<input ng-model="search" class="form-control animate-me" 
+				typeahead="keyword for keyword in predictiveSearch | filter:$viewValue | limitTo:8"
+				name="storeSearch" type="search" placeholder="Search" ng-input-grow/>
+			</div>
+		</div>
+	</div>
+	
+	
+	<div ng-hide="isProducts" class="col-md-8 col-md-offset-2">
 		<div class="jumbotron">
 			<h1 class="text-center">What? No Products?</h1>
-			<p>This happens when no members have uploaded products for this month yet.</p>
+			<p>This happens when no members have uploaded products for the current shopping cycle yet.</p>
 			<p>Please be patient and check back when <a href="/calendar">shopping</a> starts again.</p>
 		</div>
 	</div>
@@ -113,10 +127,8 @@
 						tooltip-trigger="click"><i class="fa fa-chevron-circle-left"> swipe</i></span>
 					</div>
 					<h4>{{product.fullName}}</h4>
-					<div ng-show="product.productName === 'Raw Milk' ">
-						<p>{{product.priceWithMarkup|currency}} for 4L over two weeks ({{0.5*product.priceWithMarkup|currency}} / 2L)</p>
-					</div>
-					<p ng-hide="product.productName === 'Raw Milk' ">{{product.priceWithMarkup|currency}} / {{product.units}}</p>
+					
+					<p>{{product.priceWithMarkup|currency}} / {{product.units}}</p>
 				</figcaption>
 			</figure>
 			<section class="details-layer"  ng-class="{ 'details-layer-visible' : detailsVisible}" ng-mouseleave="detailsVisible = false" ng-swipe-right="showHideDetails(false)" ng-swipe-left="open(product)">
@@ -127,10 +139,7 @@
 					<span class="glyphicon glyphicon-user"></span> 
 					 {{product.producer_ID.producerData.companyName || product.producer_ID.name}}</a></h4>
 					<h3>{{product.fullName}}</h3>
-					<div ng-show="product.productName === 'Raw Milk' ">
-						<p>{{product.priceWithMarkup|currency}} for 4L over two weeks ({{0.5*product.priceWithMarkup|currency}} / 2L)</p>
-					</div>
-					<p ng-hide="product.productName === 'Raw Milk' ">{{product.priceWithMarkup|currency}} / {{product.units}}</p>
+					<p>{{product.priceWithMarkup|currency}} / {{product.units}}</p>
 					
 					<!--<div ta-bind ng-model='product.description'></div>-->
 					<hr>
@@ -139,6 +148,7 @@
 					</p>
 					<p ng-if="product.ingredients && product.ingredients.length > 0">Ingredients: 
 					<span ng-repeat="item in product.ingredients track by $index">
+						<!-- TODO: find a way to limit number  of ingredients-->
 						<a class="yellow-link" ng-click="searchFor(item)">{{item}} </a> 
 					</span></p>
 					<div class="btn-group">

@@ -7,17 +7,21 @@ markup = config.markup;
 // this represents an entry in a cart or producer order. It is made when a user
 // add's a product to his or her cart.
 var OrderSchema = new Schema({
-		datePlaced: {type: Date, default: Date.now()},
-		product: {type: Schema.ObjectId, required: true, ref: 'Product'},
-		customer: {type: Schema.ObjectId, required: true, ref: 'User'},
-		supplier: {type: Schema.ObjectId, required: true, ref: 'User'},
-		quantity: {type: Number, required: true},
-		markup: {type: Number, required: true, default: markup}, // 20%
-		cycle: {type: Number, required: true},
+	datePlaced: {type: Date, default: Date.now()},
+	product: {type: Schema.ObjectId, required: true, ref: 'Product'},
+	customer: {type: Schema.ObjectId, required: true, ref: 'User'},
+	supplier: {type: Schema.ObjectId, required: true, ref: 'User'},
+	quantity: {type: Number, required: true},
+	markup: {type: Number, required: true, default: markup}, // 20%
+	cycle: {type: Number, required: true},
+	deliveryDay: {type: Date},
+	milk: {type: Boolean, default: false}
 }, {
 	toObject: { virtuals : true },
 	toJSON: { virtuals : true } 
 });
+
+// Milk story: click product > determine how many weeks are in the upcoming cycle > select how many litres you want per week > confirm > see order in your cart so it appears on invoice afterwards > 
 
 // these functions create virtual properties for common calculations
 OrderSchema.virtual('unitPriceWithMarkup').get(function () {

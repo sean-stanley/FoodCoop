@@ -9,7 +9,7 @@
  */
 
 (function() {
-  angular.module("cropme", ["ngSanitize", "ngTouch"]);
+  angular.module("cropme", ["ngSanitize", "ngTouch", "superswipe"]);
 
 }).call(this);
 ;

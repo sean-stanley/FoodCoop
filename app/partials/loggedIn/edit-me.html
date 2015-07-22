@@ -1,34 +1,21 @@
-<div class="row bg-primary">
-	<div ng-class="{'col-sm-3': currentUser.user_type.canSell, 'col-sm-6': !currentUser.user_type.canSell}">
-		<a href="my-cart" class="text-center jumbo-link"><h3 class="text-center"><i class="fa fa-shopping-cart fa-4x"></i><span class="badge">{{cartTally}}</span><small><br>Cart</small></h3></a>
-	</div>
-	<div ng-class="{'col-sm-3': currentUser.user_type.canSell, 'col-sm-6': !currentUser.user_type.canSell}">
-		<a href="message-board" class="text-center jumbo-link"><h3 class="text-center"><i class="fa fa-envelope-o fa-4x"></i><small><br>Message Board</small></h3></a>
-	</div>
-	<div class="col-sm-3" ng-show="currentUser.user_type.canSell">
-		<a href="product-manager" class="text-center jumbo-link"><h3 class="text-center"><i class="fa fa-home fa-4x"></i><small><br>My Products</small></h3></a>
-	</div>
-	<div class="col-sm-3" ng-show="currentUser.user_type.canSell">
-		<a href="product-upload" class="text-center jumbo-link"><h3 class="text-center"><i class="fa fa-cloud-upload fa-4x"></i><small><br>Upload Product</small></h3></a>
-	</div>
-</div>
+
 <div class="row">
-	
+
 	<div id="preview-container" class="preview-box col-sm-4 col-md-3">
 		<img ng-if="currentUser.producerData.hasOwnProperty('logo')" ng-src="{{currentUser.producerData.logo}}" alt=" logo placeholder " class="img-responsive">
 		<h1 ng-if="!currentUser.producerData.hasOwnProperty('logo')" class="text-center">
 			<span class="glyphicon glyphicon-user" style="font-size: 6em"></span>
 		</h1>
 	</div>
-	
+
 	<div class="col-sm-8 col-md-9" >
 		<h1>{{currentUser.name}}</h1>
 		<h2 ng-controller="logoutCtrl"><small>{{currentUser.user_type.name}} Member</small><br><a href="/" class="btn btn-primary" ng-click="logOut()"><span class="glyphicon glyphicon-lock"></span> Logout</a></h2>
-		
+
 		<h3 ng-show="currentUser.balance || currentUser.businessBalance"><span ng-show="currentUser.useBusinessBalance">Personal</span> <span ng-hide="currentUser.useBusinessBalance">Account</span> Balance: {{currentUser.balance | currency}} <br>
 			<span ng-if="currentUser.useBusinessBalance">Business Balance: {{currentUser.businessBalance | currency}}</span>
 		</h3>
-		
+
 		<form name="businessbalance" ng-submit="save()">
 			<div class="checkbox" ng-show="currentUser.balance && currentUser.user_type.canSell || currentUser.businessBalance && currentUser.user_type.canSell">
 				<label>
@@ -39,89 +26,96 @@
 				<button type="submit" class="btn btn-default"><i class="fa fa-cloud-upload"></i> Save</button>
 			</div>
 		</form>
-		
+
 	</div>
 </div>
-	
+
 <hr>
 <div ng-class="{'col-sm-4': currentUser.user_type.name === 'Producer', 'col-sm-offset-4 col-md-offset-3 col-sm-6': currentUser.user_type.name === 'Customer'}">
-	
-	<form name="editMe" novalidate>
+
+<form name="editMe" novalidate>
 	<legend ng-if="currentUser.user_type.name === 'Producer'">Basic Details</legend>
-	<label ng-if="currentUser.routeTitle"><a href="/delivery">Route: {{currentUser.routeTitle}}</a></label>
-	<div class="form-group">
+	<label ng-if="currentUser.routeTitle">Route:<a href="/delivery"> {{currentUser.routeTitle}}</a></label>
+	<div class="form-group" ng-class="{'has-error': editMe.email.$invalid && editMe.email.$dirty}">
 		<label for="email">Email address</label>
-		<input ng-model="currentUser.email" name="email" type="email" class="form-control" placeholder="Enter email" autofocus required>
-		<div class="custom-error" ng-show="editMe.email.$dirty && editMe.email.$invalid">Sorry:
-			<span ng-show="editMe.email.$error.required">email is required.</span>
+		<input ng-model="currentUser.email"
+		ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }"
+		name="email" type="email" class="form-control" placeholder="Enter email" required>
+		<alert type="danger" ng-show="editMe.email.$dirty && editMe.email.$invalid">Sorry:
+			<span ng-show="editMe.email.$error.required">your email is required.</span>
 			<span ng-show="editMe.email.$error.email">Please, write a valid email address.</span>
-		</div>
+		</alert>
 	</div>
-		
+
 	<accordion>
-	    <accordion-group heading="Change Password">
+	  <accordion-group heading="Change Password">
 			<div class="form-group">
 				<label for="pwOld">Supply your old Password</label>
 				<input type="password" class="form-control" ng-model="currentUser.oldPassword" name="pw" placeholder="old password here">
 			</div>
-			<div class="form-group">
+			<div class="form-group" ng-class="{'has-error': editMe.pw.$invalid && editMe.pw.$dirty}">
 				<label for="pw">Choose a New Password</label>
-				<input type="password" class="form-control" ng-model="currentUser.password" name="pw" placeholder="new password here" ng-minlength="7">
-				<div class="custom-error" ng-show="editMe.pw.$dirty && editMe.pw.$invalid">Sorry:
+				<input type="password" class="form-control" ng-model="currentUser.password"
+				ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }"
+				name="pw" placeholder="new password here" ng-minlength="7">
+				<alert type="danger" class="custom-error" ng-show="editMe.pw.$dirty && editMe.pw.$invalid">Sorry:
 					<span ng-show="editMe.pw.$error.required">a password is definately required.</span>
 					<span ng-show="editMe.pw.$error.minlength">Passwords must be greater than 7 characters long.</span>
-				</div>
+				</alert>
 			</div>
-	    </accordion-group>
+	  </accordion-group>
 	</accordion>
-	
+
 	<div class="form-group">
 		<label for="userFullName">Full Name</label>
 		<input ng-model="currentUser.name" name="userFullName" type="text" class="form-control" placeholder="Full Name" required>
-		<div class="custom-error" ng-show="editMe.userFullName.$dirty && editMe.userFullName.$invalid">		Sorry:
+		<alert type="danger" ng-show="editMe.userFullName.$dirty && editMe.userFullName.$invalid">		Sorry:
 			<span ng-show="editMe.userFullName.$error.required">Full name is required.</span>
+		</alert>
+	</div>
+
+
+	<div class="form-group" ng-controller="geoCtrl">
+		<label for="address">Address</label>
+		<input type="text" class="form-control" ng-model="currentUser.address" name="address"/>
+
+		<alert type="danger" ng-show="editMe.address.$dirty && editMe.address.$invalid">		Sorry:
+			<span ng-show="editMe.address.$error.required">Your NZ address is required.</span>
+		</alert>
+	</div>
+
+	<div class="form-group">
+		<label for="phone">Phone</label>
+		<input type="tel" class="form-control" ng-model="currentUser.phone" name="phone" placeholder="Enter your preferred phone number" required>
+		<alert type="danger" ng-show="editMe.phone.$dirty && editMe.phone.$invalid">		Sorry:
+			<span ng-show="editMe.phone.$error.required">Please give us a valid phone number to use to quickly sort out issues.</span>
+		</alert>
+	</div>
+
+	<div class="form-group" ng-if="currentUser.routeManager.title">
+		<h3>Route Manager Options</h3>
+		<label><a href="/delivery">Route: {{currentUser.routeManager.title}}</a></label>
+		<label for="pickup">Pick Up Location</label>
+		<input type="text" class="form-control" ng-model="currentUser.routeManager.pickupLocation" name="pickup" placeholder="Enter the current pickup location for this route here.">
+	</div>
+
+	<div class="form-group">
+		<div class="btn-group">
+			<button type='button' class="btn btn-primary" ng-model="currentUser.user_type.name" btn-radio="'Customer'">Customer</button>
+			<button type='button' class="btn btn-primary" ng-model="currentUser.user_type.name" btn-radio="'Producer'">Producer</button>
 		</div>
 	</div>
-		
-		
-		<div class="form-group" ng-controller="geoCtrl">
-			<label for="address">Address</label>
-			<input type="text" class="form-control" ng-model="currentUser.address"/>
-			
-			<div class="custom-error" ng-show="editMe.address.$dirty && editMe.address.$invalid">		Sorry:
-				<span ng-show="editMe.userFullName.$error.required">Your NZ address is required.</span>
-			</div>
-		</div>
-		
-		<div class="form-group">
-			<label for="phone">Phone</label>
-			<input type="tel" class="form-control" ng-model="currentUser.phone" name="phone" placeholder="Enter your preferred phone number" required>
-			<div class="custom-error" ng-show="editMe.phone.$dirty && editMe.phone.$invalid">		Sorry:
-				<span ng-show="editMe.userFullName.$error.required">Please give us a valid phone number to use to quickly sort out issues.</span>
-			</div>
-		</div>
-		
-		<div class="form-group" ng-if="currentUser.routeManager.title">
-			<h3>Route Manager Options</h3>
-			<label><a href="/delivery">Route: {{currentUser.routeManager.title}}</a></label>
-			<label for="pickup">Pick Up Location</label>
-			<input type="text" class="form-control" ng-model="currentUser.routeManager.pickupLocation" name="pickup" placeholder="Enter the current pickup location for this route here.">
-		</div>
-				
-		<div class="form-group">
-			<div class="btn-group">
-				<button type='button' class="btn btn-primary" ng-model="currentUser.user_type.name" btn-radio="'Customer'">Customer</button>
-				<button type='button' class="btn btn-primary" ng-model="currentUser.user_type.name" btn-radio="'Producer'">Producer</button>
-			</div>
-		</div>
 
-		<div class="form-group">
-			<button ng-click="save()" ng-disabled="editMe.$invalid"
-			class="btn btn-primary"
-			analytics-on="click">Save User Info</button>
-			<button ng-click="destroy()"
-			ng-show="currentUser._id" class="btn btn-danger" analytics-on="click">Leave Co-op</button>
-		</div>
+	<div class="form-group">
+		<alert type="danger" ng-show="editMe.$invalid">
+			Before saving changes please correct any errors.
+		</alert>
+		<button ng-click="save()" ng-disabled="editMe.$invalid"
+		class="btn btn-primary"
+		analytics-on="click">Save User Info</button>
+		<!-- <button ng-click="destroy()"
+		ng-show="currentUser._id" class="btn btn-danger" analytics-on="click">Leave Co-op</button> -->
+	</div>
 </form>
 </div>
 
@@ -132,42 +126,45 @@
 		<fieldset>
 			<legend>Producer Profile <a class="pull-right" ng-href="/producer/{{currentUser.producerData.companyName || currentUser._id + '/' | forURL}}-{{currentUser.name | forURL}}"><span class="glyphicon glyphicon-user"></span> View Profile</a></legend>
 			<div class="row">
-				
-				<div class="form-group col-sm-6">	
-					<div file-dropzone="[image/png, image/jpeg, image/gif]" file="currentUser.producerData.logo" data-max-file-size="3" id="file-dropzone" class="image-drop form-group">
+
+				<div class="form-group col-sm-6" ng-controller="imgCropController">
+					<div ng-if="!!obj.src" ng-jcrop="obj.src" selection="obj.selection" thumbnail="obj.thumbnail"></div>
+					<div file-dropzone="[image/png, image/jpeg, image/gif]" file="obj.src" data-max-file-size="5" id="file-dropzone" class="image-drop form-group">
 						<div>
 							<p class="text-muted" ng-if="currentUser.producerData.logo">Drop a new photo here</p>
 							<p class="text-muted" ng-if="!currentUser.producerData.logo">Drop a photo here</p>
 								<h1 class="text-muted"><i class="fa fa-cloud-upload"></i></h1>
 							<span class="btn btn-default btn-sm upload">
-								<input type="file" class="opacity" 
-								fileread="currentUser.producerData.logo" 
-								accept="image/*" 
+								<input type="file" class="opacity"
+								fileread="obj.src"
+								accept="image/*"
 								capture="camera"
-								data-max-file-size="3">
+								data-max-file-size="5">
 								<span class="text-muted">Or click to upload</span>
 							</span>
 						</div>
-						
 					</div>
-					
+					<div class="btn-group" ng-if="!!obj.src">
+						<button class="btn btn-info" ng-click="crop(obj)">Crop Image</button>
+						<button class="btn btn-info" ng-click="cancel()">cancel</button>
+					</div>
 					<hr>
 				</div>
-				
+
 			</div>
 			<div class="row">
 				<div class="form-group col-md-6">
 					<label for="inputCompany">Company Name</label>
-					<input ng-model="currentUser.producerData.companyName" name="inputCompany" type="text" class="form-control" id="inputName" placeholder="e.g. {{currentUser.name}} Farms" autofocus required>
+					<input ng-model="currentUser.producerData.companyName" name="inputCompany" type="text" class="form-control" id="inputName" placeholder="e.g. {{currentUser.name}} Farms" required>
 				</div>
 				<div class="form-group col-md-6">
 					<label for="companyWebsite">Company Website <small>If you have one</small></label>
-					<input ng-model="currentUser.producerData.website" name="companyWebsite" type="text" class="form-control" id="inputName" placeholder="e.g. www.{{currentUser.name | forURL}}.com" autofocus>
+					<input ng-model="currentUser.producerData.website" name="companyWebsite" type="text" class="form-control" id="inputName" placeholder="e.g. www.{{currentUser.name | forURL}}.com">
 				</div>
-				<div class="form-group col-md-12">
+				<div class="form-group col-md-12" ng-class="{'has-warning': producerEdit.bankAccount.$dirty && producerEdit.bankAccount.$invalid}">
 					<label for="bankAccount">Bank Account <small>To receive payment to</small></label>
-					<input ng-model="currentUser.producerData.bankAccount" name="bankAccount" type="text" class="form-control" id="inputName" placeholder="e.g. 01-2345-6789-012-00" autofocus>
-					<alert type="danger" 
+					<input ng-model="currentUser.producerData.bankAccount" name="bankAccount" type="text" class="form-control" id="inputName" placeholder="e.g. 01-2345-6789-012-00">
+					<alert type="warning"
 					ng-show="producerEdit.bankAccount.$dirty && producerEdit.bankAccount.$invalid">
 						<span>We need to know how to send you money online.</span>
 					</alert>
@@ -181,17 +178,17 @@
 					</div>
 				</div>
 				<div class="form-group col-md-12">
-					<label for="description">Company Description</label> 
-					<text-angular 
-					ng-model="currentUser.producerData.description" 
+					<label for="description">Company Description</label>
+					<text-angular
+					ng-model="currentUser.producerData.description"
 					placeholder="Write a few paragraphs for customers to see about your business and methadologies"
 					name="description">
 					</text-angular>
-					
+
 				</div>
 				<div class="form-group col-md-12">
 					<label for="bio">Personal Bio <small>(Optional)</small></label>
- 					<text-angular 
+ 					<text-angular
  					ng-model="currentUser.producerData.personalBio"
  					placeholder="Write a few paragraphs about yourself for people to see."
  					name="bio">
@@ -206,8 +203,8 @@
 </div>
 </div>
 
-	
 
-	
+
+
 <br>
 <br>

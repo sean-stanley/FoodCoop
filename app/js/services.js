@@ -374,6 +374,7 @@ angular.module('co-op.services', [])
 			module.cycle = result.currentCycle;
 			module.nextCycle = result.nextCycle;
 			//module.twoMonth = results.cycles[2];
+			$rootScope.cycleObject = result.currentCycle;
 			$rootScope.cycle = result.currentCycle._id;
 			$rootScope.deliveryDay = result.currentCycle.deliveryDay;
 			$rootScope.nextDeliveryDay = result.nextCycle.deliveryDay;
@@ -477,11 +478,11 @@ angular.module('co-op.services', [])
 				Restangular.all("api/order").post(order).then(function(result){
 					flash.setMessage({type: 'success', message: 'Poof! Successfully added to order'});
 					LoginManager.getTally();
-					callback(result);
+					callback(null, result);
 				}, function(error){
 					console.log(error);
 					flash.setMessage({type: 'danger', message: 'Drat! Failed to add that to your cart. ' + error.data});
-					callback();
+					callback(error);
 				});
 			},
 			

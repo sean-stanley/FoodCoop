@@ -16,7 +16,9 @@ describe('invoice model', function(){
 			toCoop: false,
 		});
 		
-		done();
+		models.User.findByIdAndUpdate("5546bbf9641453ae40d1840d", {balance: 0}, function(err, user) {
+			done();
+		});
 	});
 	it('should have defaults already populated', function(done){
     expect(invoice.bankAccount).toEqual('02-1248-0425752-001');
@@ -26,6 +28,7 @@ describe('invoice model', function(){
 	it('should be able to save', function(done) {
 		invoice.save(function(err, invoice) {
 			expect(err).toBeNull();
+			expect(invoice.status).toBe('un-paid');
 			
 			invoice.remove(function(err) {
 				expect(err).toBeNull();
@@ -49,6 +52,60 @@ describe('invoice model', function(){
 			});
 		});
 	});
+	it('when marked as paid should re-adjust user\'s balance', function(done) {
+		expect(invoice.status).toBe('un-paid');
+		
+		invoice.save(function(err, invoice) {
+			expect(err).toBeNull();
+			expect(invoice.total).toBe(100);
+			expect(invoice.status).toBe('un-paid');
+			
+			invoice.set({
+				status: 'PAID',
+			});
+			
+			expect(invoice.status).toBe('PAID');
+			
+			invoice.save(function(err, invoice) {
+				models.User.findById("5546bbf9641453ae40d1840d", function(err, user) {
+					expect(err).toBeNull();
+					expect(user.balance).toBe(0);
+				
+					invoice.remove(function(err) {
+						expect(err).toBeNull();
+						done();
+					});
+				});
+			});
+		});
+	});
+	it('when marked as paid with paymentMethod balance should not adjust user\'s balance', function(done) {
+		invoice.save(function(err, invoice) {
+			expect(err).toBeNull();
+			expect(invoice.total).toBe(100);
+			expect(invoice.status).toBe('un-paid');
+			
+			invoice.set({
+				status: 'PAID',
+				paymentMethod: 'balance'
+			});
+			
+			expect(invoice.status).toBe('PAID');
+			expect(invoice.paymentMethod).toBe('balance');
+			
+			invoice.save(function(err, invoice) {
+				models.User.findById("5546bbf9641453ae40d1840d", function(err, user) {
+					expect(err).toBeNull();
+					expect(user.balance).toBe(-100);
+				
+					invoice.remove(function(err) {
+						expect(err).toBeNull();
+						done();
+					});
+				});
+			});
+		});
+	});
 });
 
 describe('invoice model toCoop', function() {
@@ -62,12 +119,15 @@ describe('invoice model toCoop', function() {
 			toCoop: true,
 		});
 		
-		done();
+		models.User.findByIdAndUpdate("5546bbf9641453ae40d1840d", {balance: 0}, function(err, user) {
+			done();
+		});
 	});
 	it('when saved should alter user\'s balance', function(done) {
 		invoice.save(function(err, invoice) {
 			expect(err).toBeNull();
 			expect(invoice.total).toBe(100);
+			expect(invoice.status).toBe('un-paid');
 		
 			models.User.findById("5546bbf9641453ae40d1840d", function(err, user) {
 				expect(err).toBeNull();
@@ -76,6 +136,58 @@ describe('invoice model toCoop', function() {
 				invoice.remove(function(err) {
 					expect(err).toBeNull();
 					done();
+				});
+			});
+		});
+	});
+	it('when marked as paid should re-adjust user\'s balance', function(done) {
+		invoice.save(function(err, invoice) {
+			expect(err).toBeNull();
+			expect(invoice.total).toBe(100);
+			expect(invoice.status).toBe('un-paid');
+			
+			invoice.set({
+				status: 'PAID',
+			});
+			
+			expect(invoice.status).toBe('PAID');
+			
+			invoice.save(function(err, invoice) {
+				models.User.findById("5546bbf9641453ae40d1840d", function(err, user) {
+					expect(err).toBeNull();
+					expect(user.balance).toBe(0);
+				
+					invoice.remove(function(err) {
+						expect(err).toBeNull();
+						done();
+					});
+				});
+			});
+		});
+	});
+	it('when marked as paid with paymentMethod balance should not adjust user\'s balance', function(done) {
+		invoice.save(function(err, invoice) {
+			expect(err).toBeNull();
+			expect(invoice.total).toBe(100);
+			expect(invoice.status).toBe('un-paid');
+			
+			invoice.set({
+				status: 'PAID',
+				paymentMethod: 'balance'
+			});
+			
+			expect(invoice.status).toBe('PAID');
+			expect(invoice.paymentMethod).toBe('balance');
+			
+			invoice.save(function(err, invoice) {
+				models.User.findById("5546bbf9641453ae40d1840d", function(err, user) {
+					expect(err).toBeNull();
+					expect(user.balance).toBe(100);
+				
+					invoice.remove(function(err) {
+						expect(err).toBeNull();
+						done();
+					});
 				});
 			});
 		});

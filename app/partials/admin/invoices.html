@@ -1,4 +1,30 @@
 <div class="col-md-10 col-md-offset-1">
+<nav class="navbar navbar-default" role="navigation">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">NNFC Admin</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="/admin">Users</a></li>
+        <li><a href="/admin/invoices">Invoices</a></li>
+				<li><a href="/admin/orders">Orders</a></li>
+				<li><a href="/admin/cycles">Cycles</a></li>
+				<li><a href="/admin/routes">Routes</a></li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
 <div class="page-header">
 	<h1>Invoices <small>Current Date: {{now | shortDate}}</h1>
 </div>
@@ -54,7 +80,7 @@
 			To be paid to the NNFC by <span ng-if="invoice.invoicee.name">{{invoice.invoicee.name}}</span><span ng-if="invoice.exInvoicee">{{invoice.exInvoicee}}</span>
 		</li>
 		<li ng-show="invoice.toCoop">
-			The NNFC must pay this invoice to {{invoice.invoicee.name}} <span ng-show="invoice.invoicee.producerData.companyName">of {{invoice.invoicee.producerData.companyName}}</span>
+			The NNFC must pay this invoice to <a href="" popover-placement="top" popover="P: {{invoice.invoicee.phone}} E: {{invoice.invoicee.email}} A: {{invoice.invoicee.address}}">{{invoice.invoicee.name}} <span ng-show="invoice.invoicee.producerData.companyName">of {{invoice.invoicee.producerData.companyName}}</span></a>
 		</li>
 		<li>Date Placed: {{invoice.datePlaced | shortDate}}</li>
 		<li>Due Date: {{invoice.dueDate | shortDate}}</li>
@@ -138,7 +164,7 @@
 	<tbody>
 		<tr ng-repeat="item in invoice.items">
 			<td>{{item.product.fullName}} </td>
-			<td>{{item.customer.name}}</td>
+			<td><a href="" popover-placement="top" popover="P: {{item.customer.phone}} E: {{item.customer.email}} A: {{item.customer.address}}">{{item.customer.name}}</a></td>
 			<td>{{item.product.price | currency}} / {{item.product.units}}</td>
 			<td>{{item.quantity}}</td>
 			<td>{{item.product.price * item.quantity | currency}}</td>
@@ -160,6 +186,22 @@
 	<button type='button' class="btn btn-default" ng-model="invoice.status" btn-radio=" 'Refunded' " ng-change="invoiceSave(invoice)">Refunded</button>
 	<button type='button' class="btn btn-default" ng-model="invoice.status" btn-radio=" 'CANCELLED' " ng-change="invoiceSave(invoice)">CANCELLED</button>
 </div>
+	<div class="btn-group" dropdown>
+		<button class='btn btn-success dropdown-toggle' dropdown-toggle ng-disabled="invoice.status == 'PAID'">
+			<span ng-hide="invoice.status == 'PAID' ">Payment Method</span>
+			<span ng-show="invoice.status == 'PAID' ">{{invoice.paymentMethod}}</span>
+			 <span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu" role="menu">
+			<li ng-class="{selected: invoice.paymentMethod == 'bank transfer'}"><a ng-click="invoice.paymentMethod = 'bank transfer'">Bank Transfer</a></li>
+			<li ng-class="{selected: invoice.paymentMethod == 'balance'}"><a ng-click="invoice.paymentMethod = 'balance'">Balance Account</a></li>
+			<li ng-class="{selected: invoice.paymentMethod == 'credit card'}"><a ng-click="invoice.paymentMethod = 'credit card'">Credit Card</a></li>
+			<li ng-class="{selected: invoice.paymentMethod == 'Direct Deposit'}"><a ng-click="invoice.paymentMethod = 'Direct Deposit'">Direct Deposit</a></li>
+			<li ng-class="{selected: invoice.paymentMethod == 'Cash'}"><a ng-click="invoice.paymentMethod = 'Cash'">Cash</a></li>
+			<li class="divider"></li>
+			<li ng-class="{selected: !invoice.paymentMethod}"><a ng-click="invoice.paymentMethod = undefined">None</a></li>
+		</ul>
+	</div>
 <button type='button' class="btn btn-danger" ng-click="invoiceDelete(invoice)"> Delete Invoice</button>
 <button type='button' class="btn btn-info" ng-click="email(invoice)"> <i class="fa fa-envelope"></i> Send Email Reminder</button>
 <hr>

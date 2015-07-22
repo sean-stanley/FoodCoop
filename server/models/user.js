@@ -86,7 +86,7 @@ UserSchema.pre('save', function(next) {
 				PHONE : user.phone
 			}
 		};
-		if (!user.isNew) {
+		if (!user.isNew && user.isModified('name') ) {
 			mc.lists.updateMember(params, function(result) {}, function(err) {
 				console.log(err);
 			});

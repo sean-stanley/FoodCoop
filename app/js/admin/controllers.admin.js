@@ -257,23 +257,38 @@ angular.module('co-op.admin')
 	$scope.ruralUsers = UserManager.users.all('route').getList().$object;
 }])
 
-.controller('orderAdminCtrl', ['$scope', '$rootScope', 'orders', function($scope, $rootScope, orders) {
+.controller('orderAdminCtrl', ['$scope', '$rootScope', '$http', 'orders', 'Calendar', function($scope, $rootScope, $http, orders, Calendar) {
 	
-	$scope.cycle = $rootScope.cycle || 15;
+	$scope.orders = [];
+	
+	$http.get('/api/admin/cycle/current').success(function(cycle) {
+		$scope.cycle = cycle;
+		$scope.orders = orders.getList({cycle: $scope.cycle._id}).$object;
+	});
+	
+	$http.get('/api/admin/cycle').success(function(cycles) {
+		$scope.cycles = cycles;
+	});
+			
+	$scope.$on('CALENDAR-LOADED', function() {
+		$scope.cycle = Calendar.cycle;
+	});
 	
 	$scope.next = function() {
-		$scope.cycle += 1;
-		$scope.orders = orders.getList({cycle: $scope.cycle}).$object;
+		var idx = $scope.cycle._id+1;
+		$scope.cycle = _.findLast($scope.cycles, {_id: idx});
+		$scope.orders = orders.getList({cycle: $scope.cycle._id}).$object;
 	};
 	
 	$scope.previous = function() {
-		$scope.cycle -= 1;
-		$scope.orders = orders.getList({cycle: $scope.cycle}).$object;
+		var idx = $scope.cycle._id-1;
+		$scope.cycle = _.findLast($scope.cycles, {_id: idx});
+		$scope.orders = orders.getList({cycle: $scope.cycle._id}).$object;
 	};
 	
 	$scope.predicate = 'customer.name';
-	$scope.orders = orders.getList({cycle: $scope.cycle}).$object;
-	$scope.total = function(orders, property, filter) {
+	
+	$scope.total = function(orders, property) {
 		var total = 0;
 		
 		if (_.isArray(orders)) {

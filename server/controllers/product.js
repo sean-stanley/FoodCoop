@@ -65,7 +65,7 @@ exports.create = function(req, res) {
 		if (req.body.cycle < scheduler.currentCycle._id) req.body.cycle = scheduler.currentCycle._id;
 		
 		p = new Product(req.body);
-				
+		
 		p.save(function(err, product) {
 			if (err) console.log(err);
 			res.json(product);

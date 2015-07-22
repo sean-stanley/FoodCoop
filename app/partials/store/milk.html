@@ -1,0 +1,45 @@
+<div class="page-header">
+	<h1 class="text-center">Milk Order Form <small>Beta</small></h1>
+</div>
+
+<!-- <div class="col-sm-4">
+	<img class="img-responsive" ng-src="{{milk.img}}">
+	<h4 class="text-center">{{milk.priceWithMarkup | currency}} / {{milk.units}}</h4>
+	<article ta-bind ng-model="milk.description"></article>
+</div> -->
+<div class="col-sm-12">
+	<!-- <p class="lead">Thank you for deciding to order your {{milk.productName}} through the Northland Natural Food Co-op.</p>
+
+	<h3>How it works</h3>
+	<p>Once you click the 'Place Order' button at the bottom of the page, milk will be added to your cart for each week of milk starting {{cycleObject.deliveryDay | date:long}} and ending {{nextDeliveryDay | date:long}}. Select how many litres you'd like each </p> -->
+	<h3>How many litres of milk would you like each week?</h3>
+	
+	<form class="form-horizontal" name="milkOrderForm" ng-submit="order(milkOrderForm.$valid)" ng-hide="success">
+		
+		<div class="form-group" ng-repeat="week in weeks" ng-class="{'has-success': milkOrderForm.week{{$index}}.$valid && milkOrderForm.week{{$index}}.$dirty, 'has-error': milkOrderForm.week{{$index}}.$invalid}">
+			<label for="date" class="col-sm-6 control-label">{{week.deliveryDay | date:long}}</label>
+			<div class="col-sm-6">
+				<div class="input-group">
+					<input class="form-control" name="week{{$index}}" ng-model="week.quantity" type="number" step="1" min="2">
+					<div class="input-group-addon">Litres</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<div class="col-sm-6 col-sm-offset-6">
+				<button type="submit" class="btn" ng-class="{'btn-success':milkOrderForm.$valid && milkOrderForm.$dirty, 'btn-warning':milkOrderForm.$invalid}">Add To Cart</button>
+			</div>
+		</div>
+		
+		<br>
+	</form>
+	
+	<!-- <div ng-show="success" class="jumbotron">
+		<h2 class="text-center">All added to your </h2>
+		<p class="text-center">Thank you for your time and your order. We'll be in touch soon with your invoice when your order is finalized.</p>
+		<a href="/store" class="btn btn-primary">Keep Shopping</a>
+	</div> -->
+</div>
+
+<!-- {{milkOrderForm}} -->

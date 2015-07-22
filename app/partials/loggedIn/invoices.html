@@ -41,27 +41,29 @@
 			<h3>
 			You owe the NNFC
 			<span style="display: inline-block" class="label" 
-						ng-class="{ 
-							'label-default': invoice.status === 'un-paid' || CANCELLED,
-							'label-info' : invoice.status === 'To Refund',
-							'label-success': invoice.status === 'PAID' || 'Refunded',
-							'label-danger' : invoice.status === 'OVERDUE'}">
-							{{invoice.status}}
-						</span>
-			</h3></li>
+				ng-class="{ 
+				'label-default': invoice.status === 'un-paid' || CANCELLED,
+				'label-info' : invoice.status === 'To Refund',
+				'label-success': invoice.status === 'PAID' || 'Refunded',
+				'label-danger' : invoice.status === 'OVERDUE'}">
+				{{invoice.status}}
+			</span>						
+			</h3>
+		</li>
 		<li ng-show="invoice.toCoop">
 			<h3>
 			The NNFC owes you
 			<span style="display: inline-block" class="label" 
-						ng-class="{ 
-							'label-default': invoice.status === 'un-paid' || CANCELLED,
-							'label-info' : invoice.status === 'To Refund',
-							'label-success': invoice.status === 'PAID' || 'Refunded',
-							'label-danger' : invoice.status === 'OVERDUE'}">
-							{{invoice.status}}
-						</span>
+			ng-class="{ 
+				'label-default': invoice.status === 'un-paid' || CANCELLED,
+				'label-info' : invoice.status === 'To Refund',
+				'label-success': invoice.status === 'PAID' || 'Refunded',
+				'label-danger' : invoice.status === 'OVERDUE'}">
+				{{invoice.status}}
+			</span>
 			</h3>
 		</li>
+		<li ng-if="invoice.paymentMethod">Payment Method: {{invoice.paymentMethod}}</li>
 		<li>Date Placed: {{invoice.datePlaced | shortDate}}</li>
 		<li>Due Date: {{invoice.dueDate | shortDate}}</li>
 	</ul>
@@ -113,7 +115,7 @@
 	</tfoot>
 	<tbody>
 		<tr ng-repeat="item in invoice.items">
-			<td>{{item.product.fullName}}</td>
+			<td>{{item.product.fullName}} <span ng-show="item.product.deliveryDay">for {{item.product.deliveryDay | date:'long'}}</span></td>
 			<td>{{item.product.priceWithMarkup | currency}} / {{item.product.units}}</td>
 			<td>{{item.quantity}}</td>
 			<td>{{item.product.priceWithMarkup * item.quantity | currency}}</td>
@@ -146,7 +148,7 @@
 	</tfoot>
 	<tbody>
 		<tr ng-repeat="item in invoice.items">
-			<td>{{item.product.fullName}} </td>
+			<td>{{item.product.fullName}} <span ng-show="item.product.deliveryDay">for {{item.product.deliveryDay | date:'long'}}</span></td>
 			<td>{{item.customer.name}}</td>
 			<td>{{item.product.price | currency}} / {{item.product.units}}</td>
 			<td>{{item.quantity}}</td>

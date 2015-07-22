@@ -1,5 +1,6 @@
 var mongoose = require('mongoose'), // middleware for connecting to the mongodb database
 Schema = mongoose.Schema, // mongoose schema object for defining collections.
+moment = require('moment'),
 Counter = require('./counter');
 
 // for keeping records of all possible cycle codes. Codes are used by products, carts
@@ -12,6 +13,13 @@ var cycleSchema = new Schema({
 	shoppingStart: {type: Date, required: true},
 	shoppingStop: {type: Date, required: true},
 	deliveryDay: {type: Date, required: true, unique: true},
+}, {
+	toObject: { virtuals : true },
+	toJSON: { virtuals : true } 
+});
+
+cycleSchema.virtual('weeks').get(function() {
+	return moment(this.start).diff(moment(this.deliveryDay), 'weeks');
 });
 
 cycleSchema.pre('save', function(next) {

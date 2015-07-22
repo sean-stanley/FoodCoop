@@ -1,3 +1,29 @@
+<nav class="navbar navbar-default" role="navigation">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">NNFC Admin</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="/admin">Users</a></li>
+        <li><a href="/admin/invoices">Invoices</a></li>
+				<li><a href="/admin/orders">Orders</a></li>
+				<li><a href="/admin/cycles">Cycles</a></li>
+				<li><a href="/admin/routes">Routes</a></li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
 <div class="page-header col-xs-12">
 	<h1>{{user.name}} <small>{{user.user_type.name}}</small></h1>
 </div>
@@ -15,7 +41,7 @@
 		<div class="col-sm-9">
 			<div class="input-group">
 				<div class="input-group-addon">$</div>
-				<input type="number" class="form-control" placeholder="Amount" ng-model="transaction.amount" required>
+				<input type="number" step="any" class="form-control" placeholder="Amount" ng-model="transaction.amount" required>
 			</div>
 		</div>
 	</div>

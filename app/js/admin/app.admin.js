@@ -26,7 +26,7 @@ angular.module('co-op.admin', ['ngRoute']).config(['$routeProvider', function($r
 			}
 		})
 		.when('/admin/invoices', { controller: 'invoiceCtrl', templateUrl: 'partials/admin/invoices.html', adminOnly: true, reloadOnSearch: false, title: 'Admin' })
-		.when('/admin/cycle', { 
+		.when('/admin/cycles', { 
 			controller: 'cycleCtrl', 
 			templateUrl: 'partials/admin/cycle.html', 
 			adminOnly: true, 

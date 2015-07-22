@@ -74,7 +74,7 @@ ProductSchema.pre('save', function(next) {
 	if (b64reg.test(product.img) ) {
 		product.variety = !!product.variety ? product.variety : '';
 		
-		var productName = product.productName.replace(/\.+|\/+|\?+|=+/, '') + '+' + product.variety.replace(/\.+|\/+|\?+|=+/, '');
+		var productName = product.productName.replace(/\.+|\/+|\?+|=+/g, '') + '+' + product.variety.replace(/\.+|\/+|\?+|=+/g, '');
 		var destination = path.normalize(path.join(__dirname, '../../app', 'upload', 'products', productName+'+id-'+product._id+'.jpg'));
 		var base64Data = product.img.replace(/^data:image\/png;base64,/, '');
 		

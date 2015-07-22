@@ -124,15 +124,15 @@
 			</thead>
 			<tbody>
 				<tr ng-repeat="i in products | orderBy:predicate:reverse " >
-			        <td data-title="'cycle'" >
-			            {{i.cycle.deliveryDay | shortDate}}
-			        </td>
-							<td data-title="'Product'" >
-			            <a ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a>
-			        </td>
-			        <td data-title="'Price'">
-			            {{i.price | currency}} / {{i.units}}
-			        </td>
+					<td data-title="'cycle'" >
+						{{i.cycle.deliveryDay | shortDate}}
+					</td>
+					<td data-title="'Product'" >
+						<a ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a>
+					</td>
+					<td data-title="'Price'">
+						{{i.price | currency}} / {{i.units}}
+					</td>
 					<td data-title="'times Ordered'">
 						{{i.amountSold || 0}}
 					</td>
@@ -158,8 +158,8 @@
 		<tbody>
 			<tr ng-repeat="i in order.orders">
 				<td data-title="'Product'" >
-					<a ng-hide="i.permanent && i.category === '5421e9192ba620071b4cb2a9' " ng-href="/product-upload/{{i.product._id}}">{{i.product.fullName}}</a>
-					<a ng-show="i.permanent && i.category === '5421e9192ba620071b4cb2a9' " ng-href="/meat-upload/{{i.product._id}}">{{i.product.fullName}}</a>
+					<a ng-hide="i.milk" ng-href="/product-upload/{{i.product._id}}">{{i.product.fullName}}</a>
+					<a ng-show="i.milk" ng-href="/product-upload/{{i.product._id}}">{{i.product.productName}} for {{i.deliveryDay | date:'d/M/yy'}}</a>
 				</td>
 				<td data-title="'Quantity'">
 					{{i.quantity}}

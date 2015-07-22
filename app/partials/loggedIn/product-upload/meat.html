@@ -103,30 +103,37 @@ min-width: inherit;">
 						<br>
 						<label 
 						type="button" class="btn btn-default btn-lg" ng-click="uploadImage = !uploadImage">Upload an image <span class="glyphicon glyphicon-cloud-upload"></span></label>
-						<div collapse="!uploadImage">
-							<cropme width="420" height="300" icon-class="" ratio="0.75" destination-width="400">
-							</cropme>
-
-							<hr>
-							<alert type="info">Please note that your chosen image must be a minimum of <strong>420px by 300px</strong></alert>
-							<p>Please be aware of our image <a href="/policy">policies</a></p>
-							<div class="btn-group">
-								<button class="btn btn-info" ng-click="crop()">Crop Image</button>
-								<button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+						<div collapse="!uploadImage" ng-controller="imgCropController">
+							<div ng-if="!!obj.src" ng-jcrop="obj.src" selection="obj.selection" thumbnail="obj.thumbnail"></div>
+								
+							<div file-dropzone="[image/png, image/jpeg, image/gif]" file="obj.src" data-max-file-size="10" id="file-dropzone" class="image-drop form-group" ng-if="!obj.src">
+								<div>
+									<p class="text-muted" ng-if="!!productData.img">Drop a new photo here</p>
+									<p class="text-muted" ng-if="!productData.img">Drop a photo here</p>
+									<h1 class="text-muted"><i class="fa fa-cloud-upload"></i></h1>
+									<span class="btn btn-default btn-sm upload">
+										<input type="file" class="opacity" 
+										fileread="obj.src" 
+										accept="image/*" 
+										capture="camera"
+										data-max-file-size="10">
+										<span class="text-muted">Or click to upload</span>
+									</span>
+								</div>
 							</div>
+							<hr>
+							<section>
+								<alert type="info">Please note that your chosen image must be a minimum of <strong>420px by 300px</strong></alert>
+								<p>Please be aware of our image <a href="/policy">policies</a></p>
+								<div class="btn-group" ng-if="!!obj.src">
+									<button class="btn btn-info" ng-click="crop(obj)">Crop Image</button>
+									<button class="btn btn-info" ng-click="cancel()">cancel</button>
+								</div>
+							</section>
 						</div>
 					</div>
 				</div>
 					<div class="row">
-						<div class="form-group col-md-6" ng-if="currentUser.user_type.isAdmin">
-							<label for="producer">Product Name</label>
-							<input  name="producer"
-							ng-model="productData.producer_ID" type="text" class="form-control" id="inputName" maxlength="25" required>
-			        <div ng-show="submitted && productUpload.producer.$invalid" class="help-block">
-			          <alert type="danger" ng-show="productUpload.name.$error.required && !nameError" close="nameError = true">Sorry! A producer is required</alert>
-			        </div>
-						</div>
-						
 						<div class="form-group col-md-6">
 							<label for="name">Product Name</label>
 							<input  name="name"

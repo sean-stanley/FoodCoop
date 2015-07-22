@@ -171,6 +171,7 @@ h2.slogan {
 	z-index: 999;
 	position: absolute;
 	right:0;
+	top: 54px;
 	width: 250px;
 }
 
