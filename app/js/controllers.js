@@ -109,10 +109,16 @@ angular.module('co-op.controllers', [])
 		};
 
 		$scope.submitForm = function(message) {
+			var loginPaths = ['/login-page', '/must-login', '/login-failed']
 			LoginManager.login('local', $scope.loginData, function() {
+				var path;
 				if ($rootScope.savedLocation) {
 					$location.path($rootScope.savedLocation);
 					$rootScope.savedLocation = "";
+				}
+				path = $location.path();
+				if (_.contains(loginPaths, path) ) {
+					$location.path('me')
 				}
 				// else $location.path('me');
 			});
@@ -342,7 +348,7 @@ angular.module('co-op.controllers', [])
 		$scope.submitForm = function() {
 			ProducerManager.saveProducer();
 		};
-		
+
 		$scope.crop = function(obj) {
 			obj.dimensions = {x:450, y:450};
 			$http.post('/api/crop', obj).then(function(img) {
