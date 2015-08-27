@@ -109,7 +109,7 @@ angular.module('co-op.controllers', [])
 		};
 
 		$scope.submitForm = function(message) {
-			var loginPaths = ['/login-page', '/must-login', '/login-failed']
+			var loginPaths = ['/login-page', '/must-login', '/login-failed'];
 			LoginManager.login('local', $scope.loginData, function() {
 				var path;
 				if ($rootScope.savedLocation) {
@@ -118,7 +118,7 @@ angular.module('co-op.controllers', [])
 				}
 				path = $location.path();
 				if (_.contains(loginPaths, path) ) {
-					$location.path('me')
+					$location.path('me');
 				}
 				// else $location.path('me');
 			});
@@ -729,7 +729,7 @@ angular.module('co-op.controllers', [])
 		$scope.reverse = $scope.searchObject.hasOwnProperty('reverse') ? $scope.searchObject.reverse : undefined;
 
 
-		var findCartItems = function() {
+		function findCartItems() {
 			if ($scope.cartProduct_ids && $scope.products) {
 				$scope.products.forEach(function(product) {
 					if ( _.contains($scope.cartProduct_ids, product._id) ) {
@@ -738,7 +738,7 @@ angular.module('co-op.controllers', [])
 					else product.AlreadyInCart = 0;
 				});
 			}
-		};
+		}
 
 		// initiate the real-time message container
 		//$scope.message = {type: 'danger', closeMessage: function() {if (this.message) this.message = null;} };
@@ -805,7 +805,9 @@ angular.module('co-op.controllers', [])
 		};
 
 		// open the modal
-		$scope.open = function(product) {
+		$scope.open = openProduct;
+
+		function openProduct(product) {
 			var template = 'partials/store/store-modal.html',
 			controller = 'modalInstanceCtrl';
 			if (product.fullName.match(/milk/i)) {
@@ -823,9 +825,7 @@ angular.module('co-op.controllers', [])
 				}
 			});
 
-			// modalInstance.opened.then(function() {
-	//
-	// 		});
+
 			modalInstance.result.then(function(product) {
 				$location.hash('');
 				$scope.addToCart(product);
@@ -833,7 +833,7 @@ angular.module('co-op.controllers', [])
 				$location.hash('');
 				console.log('Modal dismissed at: ' + new Date());
 			});
-		};
+		}
 
 		$scope.$on('OPEN_PRODUCT', function(event, item) {
 			if ($scope.products) {
@@ -858,7 +858,9 @@ angular.module('co-op.controllers', [])
 		});
 
 		// A very important function :-)
-		$scope.addToCart = function(product) {
+		$scope.addToCart = addToCart;
+
+		function addToCart(product) {
 			var order, modalInstance;
 			if ($rootScope.currentUser) {
 				//TODO:need a better matcher in future
@@ -874,9 +876,6 @@ angular.module('co-op.controllers', [])
 						}
 					});
 
-					// modalInstance.opened.then(function() {
-			//
-			// 		});
 					modalInstance.result.then(function(orders) {
 						$location.hash('');
 						Cart.addToCart(orders, function(err, cartOrder) {
@@ -896,15 +895,15 @@ angular.module('co-op.controllers', [])
 						product: product._id,
 						customer: $rootScope.currentUser._id,
 						supplier: product.producer_ID._id,
-						quantity: 1
+						quantity: product.minOrder || 1
 					};
 
 					Cart.addToCart(order, function(err, cartOrder){
 						if (err) {
 							console.log(err);
 						} else {
-							$rootScope.$broadcast('UPDATE_CART', cartOrder);
 							LoginManager.getTally();
+							$rootScope.$broadcast('UPDATE_CART', cartOrder);
 						}
 					});
 				}
@@ -917,8 +916,7 @@ angular.module('co-op.controllers', [])
 					size : 'sm'
 				});
 			}
-
-		};
+		}
 
 		// route params
 

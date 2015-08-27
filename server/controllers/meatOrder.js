@@ -6,7 +6,7 @@ moment = require('moment'),
 async = require('async'),
 bunyan = require('bunyan'),
 log = bunyan.createLogger({
-	name: 'meat orders', 
+	name: 'meat orders',
 	serializers: {
 		req: bunyan.stdSerializers.req,
 		err: bunyan.stdSerializers.err,
@@ -116,7 +116,7 @@ function alertProducer(order) {
 			datePlaced: moment(order.datePlaced).format('MMMM Do YYYY, h:mm:ss a'),
 			name: order.supplier.name,
 			customer: order.customer,
-			productName: order.product.name, 
+			productName: order.product.name,
 			unitPrice: '$' + order.unitPrice.toFixed(2),
 			instructions: order.instructions
 		};
@@ -127,9 +127,9 @@ function alertProducer(order) {
 				if (err) log.warn(err);
 				log.info('message sent about new item to be %s', order.customer.email);
 			});
-		} else log(update);
-		
-		
+		} else log.info({update: update});
+
+
 	});
 }
 
@@ -145,19 +145,19 @@ function emailCustomer(order) {
 	};
 	mailData = {
 		datePlaced: moment(order.datePlaced).format('MMMM Do YYYY, h:mm:ss a'),
-		name: order.customer.name, 
-		productName: order.product.name, 
+		name: order.customer.name,
+		productName: order.product.name,
 		unitPrice: '$' + order.unitPriceWithMarkup.toFixed(2),
 		instructions: order.instructions
 	};
 	mail = new Emailer(mailOptions, mailData);
-	
+
 	if (process.env.NODE_ENV==='production') {
 		mail.send(function(err, result) {
 			if (err) log.warn(err);
 			log.info('message sent about bulk meat order to %s', order.customer.email);
 		});
-	} else log(mail);
+	} else log.info({mail: mail});
 }
 
 function invoiceCustomer(order) {
@@ -173,14 +173,14 @@ function invoiceCustomer(order) {
 					name: order.product.name + ' @ $' + order.unitPriceWithMarkup.toFixed(2) + '/ kg (' + order.weight + ' kg)'
 				}],
 			});
-			
+
 			if (order.fixedPrice) {
 				invoice.items.push({
 					cost: order.fixedPrice,
 					name: 'Processing Fee',
 				});
 			}
-						
+
 			invoice.save(function(err, invoice){
 				done(err, invoice);
 			});
@@ -195,7 +195,7 @@ function invoiceCustomer(order) {
 					name: order.customer.name
 				},
 			};
-			
+
 			mailData = {
 				name: order.customer.name,
 				dueDate: moment(invoice.dueDate).format('dddd DD MMMM YYYY'),
@@ -208,7 +208,7 @@ function invoiceCustomer(order) {
 				instructions: order.instructions,
 				deliveryInstructions: order.deliveryInstructions
 			};
-			
+
 			mail = new Emailer(mailOptions, mailData);
 
 			mail.send(function(err, result) {
@@ -219,7 +219,7 @@ function invoiceCustomer(order) {
 				}
 			});
 		}
-		
+
 	], function(error) {
 		log.warn(error);
 	});
@@ -245,16 +245,16 @@ function invoiceProducer(order) {
 					cost: order.total,
 					name: order.product.name + ' @ $' + order.unitPrice.toFixed(2) + '/ kg (' + order.weight + ' kg)'
 				}],
-				bankAccount: order.supplier.producerData.bankAccount 
+				bankAccount: order.supplier.producerData.bankAccount
 			});
-			
+
 			if (order.fixedPrice) {
 				invoice.items.push({
 					cost: order.fixedPrice,
 					name: 'Processing Fee',
 				});
 			}
-						
+
 			invoice.save(function(err, invoice){
 				done(err, invoice);
 			});
@@ -269,7 +269,7 @@ function invoiceProducer(order) {
 					name: order.supplier.name
 				},
 			};
-			
+
 			mailData = {
 				name: order.supplier.name,
 				dueDate: moment(invoice.dueDate).format('dddd DD MMMM YYYY'),
@@ -282,10 +282,10 @@ function invoiceProducer(order) {
 				account: invoice.bankAccount,
 				deliveryInstructions: order.deliveryInstructions
 			};
-			
+
 			mail = new Emailer(mailOptions, mailData);
-			
-				
+
+
 			mail.send(function(err, result) {
 				if (err) done(err);
 				// a response is sent so the client request doesn't timeout and get an error.
@@ -293,7 +293,7 @@ function invoiceProducer(order) {
 					done(null);
 				}
 			});
-		}		
+		}
 	], function(error) {
 		if (error) log.warn(error);
 	});

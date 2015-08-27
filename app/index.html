@@ -17,7 +17,7 @@
 	<style>
 		/* Loading Page Styles are inline to increase speed */
 		[ng-cloak].splash {display: block;}
-		@font-face{font-family:'FontAwesome';src:url('fonts/fontawesome-webfont.eot?v=4.2.0');src:url('fonts/fontawesome-webfont.eot?#iefix&v=4.2.0') format('embedded-opentype'),url('fonts/fontawesome-webfont.woff?v=4.2.0') format('woff'),url('fonts/fontawesome-webfont.ttf?v=4.2.0') format('truetype'),url('fonts/fontawesome-webfont.svg?v=4.2.0#fontawesomeregular') format('svg');font-weight:normal;font-style:normal}
+		@font-face{font-family:'FontAwesome';src:url('fonts/fontawesome-webfont.eot?v=4.3.0');src:url('fonts/fontawesome-webfont.eot?#iefix&v=4.3.0') format('embedded-opentype'),url('fonts/fontawesome-webfont.woff?v=4.3.0') format('woff'),url('fonts/fontawesome-webfont.ttf?v=4.3.0') format('truetype'),url('fonts/fontawesome-webfont.svg?v=4.3.0#fontawesomeregular') format('svg');font-weight:normal;font-style:normal}
 .splash{position:fixed;display:block;width:100%;height:100%;padding:25%;background:#642c4a;color:white;z-index:9999999;display:none;}
 .splash .fa{display:inline-block;font:normal normal normal 14px/1 FontAwesome;font-size:inherit;text-rendering:auto;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 .splash .fa-cog:before{content:"\f013"}
@@ -92,7 +92,7 @@
 
 			<a href="/calendar" style="color:#dddddd"><ng-include src=" 'partials/calendar-blurb.html' "></ng-include></a>
 
-			<accordion close-others="false" ng-if="currentUser" >
+			<accordion close-others="false" ng-if="!!currentUser" >
 				<accordion-group is-open="cartPanel.open" ng-class="{'panel-open-sidebar':cartPanel.open}">
 					<accordion-heading>
 					<h1 class="text-center"><i class="fa fa-shopping-cart" style='font-size:1.5em'></i> <span class="badge">{{cartTally}}</span></h1>
@@ -195,7 +195,7 @@
 					<li dropdown>
 						<a href="" class='dropdown-toggle' dropdown-toggle>About <span class="caret"></span></a>
 						<ul class="dropdown-menu" role="menu">
-							<!-- <li ng-class="{active:isActive('/features')}"><a href="/features">How it Works</a></li> -->
+							<li ng-class="{active:isActive('/features')}"><a href="/features">Co-op Features</a></li>
 							<li ng-class="{active:isActive('/about')}"><a href="/about">About Us</a></li>
 							<li ng-class="{active:isActive('/faq')}"><a href="/faq">FAQ</a></li>
 							<li ng-class="{active:isActive('/producer-list')}"><a href="producer-list">Producer List</a></li>
@@ -207,7 +207,7 @@
 					<li ng-class="{active:isActive('/contact')}"><a href="/contact">Contact</a></li>
 
 					<li class="hidden-sm hidden-xs" ng-if="currentUser == null"><ng-include src=" 'partials/auth/login.html' "></ng-include></li>
-					<li ng-if="currentUser" ng-class="{active:isActive('/me')}"><a href="/me"><span class="glyphicon glyphicon-user"></span></a></li>
+					<li ng-if="!!currentUser" ng-class="{active:isActive('/me')}"><a href="/me"><span class="glyphicon glyphicon-user"></span></a></li>
 				</ul>
 			</div>
 		</div>
@@ -271,7 +271,7 @@
 				</div>
 			</div>
 
-				<small class="pull-left">&copy; 2014. All Rights Reserved. Proudly donated by <a href="http://redhead.xyz">Red Head Web</a></small><br>
+				<small class="pull-left">&copy; 2014. All Rights Reserved. Proudly donated by <a href="mailto:sean@redheadweb.nz">Redhead Web</a></small><br>
 
 		</div>
 	</div>
@@ -286,7 +286,7 @@
 	<!-- Include all compiled plugins (below) -->
 	<script src="lib/aggregated.min.js"></script>
 
-
+<script src="/socket.io/socket.io.js"></script>
 	<!-- project-specific angular data here -->
 <!-- <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular-animate.min.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular-touch.js"></script> -->
@@ -308,7 +308,6 @@
 
 <!-- <script src="http://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.4.0/lodash.min.js"></script> -->
 	<!--lodash: Restangular Dependency-->
-<!--<script src="http://cdnjs.cloudflare.com/ajax/libs/restangular/1.4.0/restangular.min.js"></script>-->
 
 
 	<!-- Other plugins here -->

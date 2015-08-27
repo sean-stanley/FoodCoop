@@ -272,27 +272,44 @@ min-width: inherit;">
 					</div>
 
 					<div class="form-group col-md-4">
-							<label for="units">Quantity Units</label>
-							<input  type="text" ng-model="productData.units" name="units" id="units" class="form-control"
-							typeahead="unit for unit in productManager.categoryByID(productData.category).availableUnits | filter:$viewValue"
-							placeholder ="e.g. kg or L or whole beast" required>
-							<div ng-show="submitted && productUpload.units.$invalid" class="help-block">
-								<alert type="danger" ng-show="productUpload.units.$error.required && !unitError" close="unitError = true">Please specify the unit of sale</alert>
-							</div>
-						</div>
-
-						<div class="form-group col-md-4">
-							<label for="quantity">Number Available <i class="fa fa-info-circle" tooltip="only have a small number to sell? Put an estimate here and you won't receive more orders than this amount"></i></label>
-							<input
-							ng-model="productData.quantity" name="quantity" type="number" max="1000" class="form-control" id="quantity" placeholder="e.g. 27" required>
-							<div ng-show="submitted && productUpload.quantity.$invalid" class="help-block">
-								<alert type="danger" ng-show="productUpload.quantity.$error.required && !quantityError" close="quantityError = true">Please set the quantity you are selling</alert>
-								<alert type="danger" ng-show="productUpload.quantity.$error.number && !quantityError" close="quantityError = true">Just use numbers here please.</alert>
-							</div>
+						<label for="units">Quantity Units</label>
+						<input  type="text" ng-model="productData.units" name="units" id="units" class="form-control"
+						typeahead="unit for unit in productManager.categoryByID(productData.category).availableUnits | filter:$viewValue"
+						placeholder ="e.g. kg or L or whole beast" required>
+						<div ng-show="submitted && productUpload.units.$invalid" class="help-block">
+							<alert type="danger" ng-show="productUpload.units.$error.required && !unitError" close="unitError = true">Please specify the unit of sale</alert>
 						</div>
 					</div>
 
+					<div class="form-group col-md-4">
+						<label for="quantity">Number Available <i class="fa fa-info-circle" tooltip="only have a small number to sell? Put an estimate here and you won't receive more orders than this amount"></i></label>
+						<input
+						ng-model="productData.quantity" name="quantity" type="number" max="1000" class="form-control" id="quantity" placeholder="e.g. 27" required>
+						<div ng-show="submitted && productUpload.quantity.$invalid" class="help-block">
+							<alert type="danger" ng-show="productUpload.quantity.$error.required && !quantityError" close="quantityError = true">Please set the quantity you are selling</alert>
+							<alert type="danger" ng-show="productUpload.quantity.$error.number && !quantityError" close="quantityError = true">Just use numbers here please.</alert>
+						</div>
+					</div>
+				</div>
 
+				<div class="row form-group clearfix" ng-init="advancedOptions = true;">
+					<h2><i class="fa fa-gears"></i> More Options <a href=""><span class="glyphicon" ng-click="advancedOptions = !advancedOptions"
+					ng-class="{'glyphicon-menu-down': advancedOptions, 'glyphicon-menu-up': !advancedOptions}"></span></a></h2>
+					<div collapse="advancedOptions">
+						<div class="form-group col-md-4">
+							<label for="units">Minimum Order Quantity</label>
+							<input type="text" ng-model="productData.minOrder" name="minOrder" id="minOrder" class="form-control"
+							placeholder ="number only">
+							<div ng-show="submitted && productUpload.minOrder.$invalid" class="help-block">
+								<alert type="danger" ng-show="productUpload.minOrder.$error && !unitError" close="unitError = true">Please specify the unit of sale</alert>
+							</div>
+						</div>
+						<div class="form-group col-md-4">
+							<p>Preview: <br> Minimum order is: {{productData.minOrder}} x {{productData.units}}</p>
+						</div>
+					</div>
+
+				</div>
 
 
 				<div class="form-group col-md-12 well">

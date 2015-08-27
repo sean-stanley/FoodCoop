@@ -45,7 +45,7 @@ var css_components = [
 ];
 
 module.exports = function(grunt) {
-        
+
 	require('load-grunt-tasks')(grunt);
 	// Project configuration.
 	grunt.initConfig({
@@ -244,10 +244,10 @@ module.exports = function(grunt) {
 					sourceMap: 'build/app/js/foodcoop-map.js'
 				},
 				files: {
-					'build/app/js/foodcoop.min.js': ['app/js/app.annotated.js', 
-					'app/js/services.annotated.js', 
-					'app/js/controllers.annotated.js', 
-					'app/js/filters.annotated.js', 
+					'build/app/js/foodcoop.min.js': ['app/js/app.annotated.js',
+					'app/js/services.annotated.js',
+					'app/js/controllers.annotated.js',
+					'app/js/filters.annotated.js',
 					'app/js/directives.annotated.js',
 					'app/js/user/app.user.annotated.js',
 					'app/js/user/controllers.user.annotated.js',
@@ -262,6 +262,7 @@ module.exports = function(grunt) {
 			bowerServer: {
 				options: {
 					mangle: true,
+					compress: true
 				},
 				files: {
 					'build/app/lib/aggregated.min.js': bower_components
@@ -270,12 +271,13 @@ module.exports = function(grunt) {
 			bowerDev: {
 				options: {
 					beautify: true,
+					compress: false
 				},
 				files: {
 					'app/lib/aggregated.min.js': bower_components
 				}
 			},
-			
+
 		},
 		replace: {
 			dist: {
@@ -293,9 +295,9 @@ module.exports = function(grunt) {
 				},
 				files: [
 					{
-						expand: true, 
-						flatten: true, 
-						src: ['app/index.html'], 
+						expand: true,
+						flatten: true,
+						src: ['app/index.html'],
 						dest: 'build/app'
 					}
 				]
@@ -317,7 +319,7 @@ module.exports = function(grunt) {
 	// grunt.loadNpmTasks('grunt-replace');
 	// grunt.loadNpmTasks('grunt-ng-annotate');
 	// grunt.loadNpmTasks('grunt-contrib-clean');
-    
+
 	// Default task(s).
 	grunt.registerTask('dev', ['cssmin','uglify:bowerDev', 'concurrent:dev']);
 	grunt.registerTask('build', ['cssmin', 'concurrent:build', 'replace', 'clean:annotations', 'ngAnnotate', 'uglify:app', 'uglify:bowerServer']);
@@ -327,7 +329,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('deploy', ['build', 'rsync:linodeOpt', 'shell:updateServer']);
 	grunt.registerTask('decrypt-config', ['shell:decryptConfig']);
 	grunt.registerTask('encrypt-config', ['shell:encryptConfig']);
-	  
+
 	//Test task.
 	grunt.registerTask('test', ['jshint:browser', 'karma:unit']);
 	//	grunt.registerTask('test', ['concurrent:test']);

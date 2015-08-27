@@ -27,6 +27,7 @@ var ProductSchema = new Schema({
 			price: {type: Number, required: true},
 			quantity: {type: Number, required: true},
 			units: {type: String, required: true},
+			minOrder: {type:Number},
 			refrigeration: {type: String, required: false, default: 'none'},
 			ingredients: {type: Array, required: false, set: toArray},
 			description: {type: String, required: false},
@@ -52,7 +53,7 @@ function convertToArray (value) {
 ProductSchema.virtual('priceWithMarkup').get(function () {
 	if (this.permanent && (this.category._id == '5421e9192ba620071b4cb2a9' || this.category == "5421e9192ba620071b4cb2a9") ) { // meat category
 		return (this.price * (meatMarkup/100 + 1));
-	} 
+	}
 	return (this.price * (markup/100 + 1));
 });
 ProductSchema.virtual('fullName').get(function () {
@@ -64,24 +65,24 @@ ProductSchema.virtual('fullName').get(function () {
 ProductSchema.pre('save', function(next) {
 	var product=this;
 	var b64reg = /^data:image\/png;base64,/;
-	
+
 	if (product.isNew) {
 		product.amountSold = 0;
 		dateUploaded = new Date();
 	}
-	
+
 
 	if (b64reg.test(product.img) ) {
 		product.variety = !!product.variety ? product.variety : '';
-		
+
 		var productName = product.productName.replace(/\.+|\/+|\?+|=+/g, '') + '+' + product.variety.replace(/\.+|\/+|\?+|=+/g, '');
 		var destination = path.normalize(path.join(__dirname, '../../app', 'upload', 'products', productName+'+id-'+product._id+'.jpg'));
 		var base64Data = product.img.replace(/^data:image\/png;base64,/, '');
-		
+
 		gm(new Buffer(base64Data, 'base64')).write(destination, function(err) {
 			if (err) return console.log(err);
 		});
-		
+
 		product.img = path.normalize(path.join('upload', 'products', productName+'+id-'+product._id+'.jpg'));
 	}
 	next();

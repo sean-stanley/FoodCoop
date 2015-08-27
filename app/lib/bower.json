@@ -24,11 +24,11 @@
     "datejs": "~1.0.0-rc1",
     "angular-route": "1.3.x",
     "angulartics": "~0.17.1",
-    "angular-socket-io": "~0.6.1",
-    "textAngular": "~1.4.1",
+    "angular-socket-io": "~0.7.x",
+    "textAngular": "~1.4.x",
     "angular-sanitize": "1.3.x",
     "lodash": "~3.9.3",
-    "restangular": "~1.4.0",
+    "restangular": "~1.5.x",
     "ng-jcrop": "~2.0.3"
   },
   "moduleType": [
@@ -45,6 +45,6 @@
     "tests"
   ],
   "resolutions": {
-    "angular": "1.3.13"
+    "angular": ">=1.3.0"
   }
 }

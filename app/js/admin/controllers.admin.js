@@ -4,7 +4,7 @@
 /* Controllers */
 
 angular.module('co-op.admin')
-	
+
 .controller('userAdminCtrl', ['$scope', 'users',
 	function($scope, users) {
 		$scope.userLibrary = users.getList().$object;
@@ -13,15 +13,15 @@ angular.module('co-op.admin')
 
 .controller('transactionController', ['$scope', '$http', function($scope, $http) {
 	// inherits user from parent scope adminUserEditCtrl
-	
+
 	$scope.submitted = false;
-	
+
 	$scope.transaction = {
 		account: $scope.user._id,
 		amount: 0,
 		options: {}
 	};
-	
+
 	$scope.createTransaction = function(valid) {
 		if (valid) {
 			$http.post('/api/user/' + $scope.user._id + '/transaction', $scope.transaction).success(function(result) {
@@ -35,11 +35,11 @@ angular.module('co-op.admin')
 
 .controller('adminUserEditCtrl', ['$scope', '$rootScope', 'LoginManager', 'flash', 'Restangular', '$location', 'user',
 	function($scope, $rootScope, LoginManager, flash, Restangular, $location, user) {
-		
+
 		var original = user;
-		
+
 		$scope.user = Restangular.copy(original);
-  
+
   		$scope.$watch('user.user_type.canSell', function(newValue) {
   			if ($scope.user.user_type.canSell) {
   				$scope.user.user_type.name = "Producer";
@@ -47,7 +47,7 @@ angular.module('co-op.admin')
   				$scope.user.user_type.name = "Customer";
   			}
   		});
-		  
+
 		$scope.isClean = function() {
 			return angular.equals(original, $scope.user);
 		};
@@ -64,12 +64,12 @@ angular.module('co-op.admin')
 				});
 			}
 		};
-		
+
 		// sends a request for a password reset email to be sent to this user's email.
 		$scope.passwordReset = function() {
 			Restangular.all('api/forgot').post({email: original.email});
 		};
-		
+
 		$scope.save = function() {
 			if (!$scope.isClean()) {
 				$scope.user.customPUT($scope.user, $scope.user._id).then(function(response) {
@@ -80,7 +80,7 @@ angular.module('co-op.admin')
 			else {
 				flash.setMessage({type: 'warning', message: 'No changes detected so no changes saved'});
 			}
-			
+
 		};
 	}
 ])
@@ -88,33 +88,33 @@ angular.module('co-op.admin')
 .controller('invoiceCtrl', ['$scope', '$rootScope', 'Restangular', 'flash', '$http',
 	function($scope, $rootScope, Restangular, flash, $http) {
 		$scope.now = Date();
-		
+
 		$scope.soon = function(invoice) {
 			if (invoice.status === 'un-paid') {
 				if ( Date.parse(invoice.dueDate).between( Date.today(), Date.today().addWeeks(1) ) ) {
 					return true;
 					}
 			}
-			
+
 			return false;
 		};
-		
+
 		$scope.stats = {};
 
-		
+
 		function calculateStats(invoices) {
 			$scope.stats.toCoop = _.sum(_.pluck(_.filter(invoices, {toCoop: true, status: 'PAID'}), 'total'));
 			$scope.stats.toCustomers = _.sum(_.pluck(_.filter(invoices, {toCoop: false, status: 'PAID'}), 'total'));
 			$scope.stats.revenue = $scope.stats.toCustomers - $scope.stats.toCoop;
 		}
-		
-		
+
+
 		// the array of invoices for use in the template
 		Restangular.all('api/invoice').getList().then(function(invoices) {
 			$scope.invoices = invoices;
 			calculateStats($scope.invoices);
 		});
-		
+
 		// update the invoice
 		$scope.invoiceSave = function (invoice) {
 			invoice.put().then(
@@ -125,7 +125,7 @@ angular.module('co-op.admin')
 				});
 				$scope.unPaid();
 				$scope.overdue();
-				}, 
+				},
 			function(error) {
 				flash.setMessage({
 					message: "Sorry! Failed to update the invoice for some reason",
@@ -133,22 +133,22 @@ angular.module('co-op.admin')
 				});
 			});
 		};
-		
+
 		$scope.unPaid = function() {
 			var match;
 			match = _.where($scope.invoices, {status: 'un-paid'});
 			return match.length;
 		};
-		
+
 		$scope.overdue = function() {
 			var match;
 			match = _.where($scope.invoices, {status: 'OVERDUE'});
 			return match.length;
 		};
-		
+
 		$scope.invoiceDelete = function(invoice) {
 			var certain = confirm('Are you sure you want to delete invoice #' + invoice._id + "?");
-			
+
 			if (certain) {
 				invoice.remove({id:invoice._id}).then(function(result){
 					flash.setMessage({type:'success', message: "invoice successfully removed: "+ result || 'Great!'});
@@ -159,11 +159,11 @@ angular.module('co-op.admin')
 						type: "danger"
 					});
 				});
-			
+
 				$scope.invoices.splice($scope.invoices.indexOf(invoice), 1);
 			}
 		};
-		
+
 		$scope.email = function(invoice) {
 			$http.post('/api/invoice/email', invoice).success(function(result) {
 				flash.setMessage({type:'success', message: "email successfully sent: "+ result || 'Great!'});
@@ -171,7 +171,7 @@ angular.module('co-op.admin')
 		};
 	}
 ])
-.controller('userCtrl', ['$scope', '$modal', '$location', 
+.controller('userCtrl', ['$scope', '$modal', '$location',
 	function($scope, $modal, $location) {
 		$scope.open = function(application_type) {
 			var modalInstance = $modal.open({
@@ -184,11 +184,11 @@ angular.module('co-op.admin')
 					}
 				}
 			});
-			
+
 			modalInstance.result.then(function (nextRoute) {
 				console.log(nextRoute);
-				$location.path(nextRoute);	
-				
+				$location.path(nextRoute);
+
 			}, function () {
 				console.log('Modal dismissed at: ' + new Date());
 			});
@@ -197,7 +197,7 @@ angular.module('co-op.admin')
 ])
 .controller('adminCalendarCtrl', ['$scope', function ($scope) {
 	$scope.format = 'EEEE MMMM dd yyyy Z';
-	
+
 	$scope.open = function($event) {
 		$event.preventDefault();
 		$event.stopPropagation();
@@ -207,21 +207,21 @@ angular.module('co-op.admin')
 // admin cycle control
 .controller('cycleCtrl', ['$scope', 'Restangular', '$http', 'flash', 'Calendar',
 	function($scope, Restangular, $http, flash, Calendar){
-		
+
 		$http.get('/api/admin/cycle').success(function(cycles) {
 			$scope.cycles = cycles;
 		});
-				
+
 		$scope.$on('CALENDAR-LOADED', function() {
 			$scope.currentCycle = Calendar.cycle;
 		});
-		
+
 		$scope.cycleToEdit = {};
-		
+
 		$scope.edit = function(index) {
 			$scope.cycleToEdit = $scope.cycles[index];
 		};
-		
+
 		$scope.save = function(cycle) {
 			$http.post('/api/admin/cycle/', cycle).success(function(cycle) {
 				console.log(cycle);
@@ -231,7 +231,7 @@ angular.module('co-op.admin')
 				flash.setMessage({type: 'danger', message: 'Drat! Something went wrong: '+ err.data || err});
 			});
 		};
-		
+
 		$scope.update = function(cycle) {
 			$http.put('/api/admin/cycle/' + cycle._id, cycle).success(function(cycle) {
 				flash.setMessage({type: 'success', message: 'Yay! Cycle '+ cycle._id + ' was updated'});
@@ -241,7 +241,7 @@ angular.module('co-op.admin')
 				flash.setMessage({type: 'danger', message: 'Drat! Something went wrong: '+ err.data || err});
 			});
 		};
-		
+
 		$scope.invoice = function() {
 			$http.post('api/admin/send-invoices', {}).success(function() {
 				flash.setMessage({type: 'success', message:'sending invoices manually'});
@@ -250,7 +250,7 @@ angular.module('co-op.admin')
 				console.log(error);
 			});
 		};
-		
+
 	}])
 
 .controller('routeAdminCtrl', ['$scope', 'UserManager', function($scope, UserManager) {
@@ -258,39 +258,39 @@ angular.module('co-op.admin')
 }])
 
 .controller('orderAdminCtrl', ['$scope', '$rootScope', '$http', 'orders', 'Calendar', function($scope, $rootScope, $http, orders, Calendar) {
-	
+
 	$scope.orders = [];
-	
+
 	$http.get('/api/admin/cycle/current').success(function(cycle) {
 		$scope.cycle = cycle;
-		$scope.orders = orders.getList({cycle: $scope.cycle._id}).$object;
+		orders.getList({cycle: $scope.cycle._id}).then(success);
 	});
-	
+
 	$http.get('/api/admin/cycle').success(function(cycles) {
 		$scope.cycles = cycles;
 	});
-			
+
 	$scope.$on('CALENDAR-LOADED', function() {
 		$scope.cycle = Calendar.cycle;
 	});
-	
+
 	$scope.next = function() {
 		var idx = $scope.cycle._id+1;
 		$scope.cycle = _.findLast($scope.cycles, {_id: idx});
-		$scope.orders = orders.getList({cycle: $scope.cycle._id}).$object;
+		orders.getList({cycle: $scope.cycle._id}).then(success);
 	};
-	
+
 	$scope.previous = function() {
 		var idx = $scope.cycle._id-1;
 		$scope.cycle = _.findLast($scope.cycles, {_id: idx});
-		$scope.orders = orders.getList({cycle: $scope.cycle._id}).$object;
+		orders.getList({cycle: $scope.cycle._id}).then(success);
 	};
-	
+
 	$scope.predicate = 'customer.name';
-	
+
 	$scope.total = function(orders, property) {
 		var total = 0;
-		
+
 		if (_.isArray(orders)) {
 			for (var i=0; i < orders.length; i++) {
 				total += Number(orders[i][property]);
@@ -298,7 +298,24 @@ angular.module('co-op.admin')
 			return total;
 		}
 	};
-	
+
+	function count(property) {
+		if ($scope.orders.length > 0) {
+			return _.chain($scope.orders).countBy(function(order) {
+				return order[property]._id;
+			}).keys().value();
+		}
+	}
+
+	function success(result) {
+		var customer, producer;
+		$scope.orders = result;
+		customer = count('customer') || [];
+		producer = count('supplier') || [];
+		$scope.customerCount = customer.length;
+		$scope.producerCount = producer.length;
+	}
+
 	$scope.$watch('search', function() {
 		$scope.total($scope.orders);
 	});
@@ -314,15 +331,15 @@ angular.module('co-op.admin')
 	//    variety
 	//    price (number or gt, lt value)
 	$scope.params = {};
-	
+
 	$scope.get = function() {
 		$http.get('/api/product', {
 			params: $scope.params
-		}).then(function(result) { 
+		}).then(function(result) {
 			$scope.products = result.data;
 		}, function(error) {console.log(error);});
 	};
-	
+
 	$scope.open = function(product) {
 		var modalInstance = $modal.open({
 			templateUrl: 'partials/store/catalogue-modal.html',
@@ -340,11 +357,11 @@ angular.module('co-op.admin')
 			console.log('Modal dismissed at: ' + new Date());
 		});
 	};
-	
+
 	$scope.$watch('products', function(n) {
 		makeCsv(n);
 	});
-	
+
 	function makeCsv(array) {
 		var A = [];
 		A.push(['Product Name', 'Producer', 'Amount Available', 'Price']); // add permanent link to product as well?
@@ -360,13 +377,13 @@ angular.module('co-op.admin')
 			csvRows.push(A[i].join(','));
 		}
 		var csvString = csvRows.join("\r\n");
-		
+
 		$scope.csv = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csvString);
 		//return 'data:application/csv;charset=utf-8,' + encodeURIComponent(csvString);
 	}
-	
+
 	$scope.download = function(csvString) {
-		
+
 		if ($window.navigator.msSaveOrOpenBlob) {
 		  var blob = new Blob([decodeURIComponent(encodeURI(csvString))], {
 		    type: "text/csv;charset=utf-8;"
@@ -374,5 +391,5 @@ angular.module('co-op.admin')
 		  navigator.msSaveBlob(blob, 'products.csv');
 		}
 	};
-	
+
 }]);

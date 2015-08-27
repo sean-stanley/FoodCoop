@@ -35,7 +35,7 @@
 			<img ng-if="data.certification.name !== 'none' && data.img && data.certification.img" ng-src="img/certification/{{data.certification.img}}" class="certification-img" alt="organic certification">
 			<img class="product-image-modal img-responsive center-block" ng-src="{{data.img}}" alt="{{data.fullName}}"/>
 		</div>
-		<h4><strong>
+		<h4 class="text-center"><strong>
 			<a ng-href="/producer/{{data.producer_ID.producerData.companyName | forURL}}-{{data.producer_ID.name | forURL}}">
 				{{data.producer_ID.producerData.companyName || data.producer_ID.name || 'unknown'}}
 			</a>
@@ -50,13 +50,10 @@
 		<p ng-if="data.certification.name !== 'none'"><strong>Certification:</strong> {{data.certification.name}}</p>
 
 		<h4 ng-hide="data.permanent"><strong>Quantity left:</strong> {{data.quantity - data.amountSold}}</h4>
+		<h4 ng-show="data.minOrder"><strong>Minimum Order:</strong> {{data.minOrder}} x {{data.units}}</h4>
 		<br>
 		<h3 class="text-center">
-			<span ng-show="data.productName === 'Raw Milk' ">
-				<strong>{{data.priceWithMarkup|currency}} for 4L over two weeks</strong> ({{0.5*data.priceWithMarkup|currency}} / 2L)
-			</span>
-			<span ng-hide="data.productName === 'Raw Milk' ">
-			{{data.priceWithMarkup|currency}} / {{data.units}}</span>
+			{{data.priceWithMarkup|currency}} / {{data.units}}
 		</h3>
 		<div class="well">
 			<button class="btn btn-danger btn-block" disabled ng-if="data.quantity === 0">

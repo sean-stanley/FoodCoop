@@ -31,6 +31,9 @@
 	<button class="btn btn-primary" ng-click="previous()">&lt; Previous</button><button class="btn btn-primary" ng-click="next()">Next &gt;</button>
 </div>
 
+<p>Number of Customers: <span class="badge">{{customerCount}}</span><br>
+  Number of Producers: <span class="badge">{{producerCount}}</span></p>
+
 <h2> Master List By Producer</h2>
 <input type="search" ng-model='search' placeholder="filter results" class='form-control'>
 
@@ -53,13 +56,13 @@
 							<a ng-href="/user/{{i.supplier._id}}">{{i.supplier.producerData.companyName || i.supplier.name}}</a>
 						</td>
 						<td data-title="'Product'" >
-							x{{i.quantity}} <a ng-href="/product-upload/{{i.product._id}}">{{i.product.fullName}}</a> 
-							<span ng-show="i.milk"> for {{i.deliveryDay | date:'d/M/yy'}}</span> 
+							x{{i.quantity}} <a ng-href="/product-upload/{{i.product._id}}">{{i.product.fullName}}</a>
+							<span ng-show="i.milk"> for {{i.deliveryDay | date:'d/M/yy'}}</span>
 						</td>
 						<td data-title="'Price'">
 							{{i.unitPrice | currency}} / {{i.product.units}}
 						</td>
-						
+
 						<td data-title="'times Ordered'">
 							{{i.orderPrice | currency}}
 						</td>
@@ -93,8 +96,8 @@
 							<a ng-href="/user/{{i.customer._id}}">{{i.customer.name}}</a>
 						</td>
 						<td data-title="'Product'" >
-							x{{i.quantity}} <a ng-href="/product-upload/{{i.product._id}}">{{i.product.fullName}}</a> 
-							<span ng-show="i.milk"> for {{i.deliveryDay | date:'d/M/yy'}}</span> 
+							x{{i.quantity}} <a ng-href="/product-upload/{{i.product._id}}">{{i.product.fullName}}</a>
+							<span ng-show="i.milk"> for {{i.deliveryDay | date:'d/M/yy'}}</span>
 						</td>
 						<td data-title="'Price'">
 							{{i.unitPriceWithMarkup | currency}} / {{i.product.units}}

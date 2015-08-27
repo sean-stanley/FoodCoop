@@ -4,7 +4,7 @@ var gm = require('gm');
 // @coords is an array of the following form [x, y, x2, y2, w, h]
 // @resize must be an object like {x: #Number, y:#Number}
 function cropImage (data, coords, resize, cb) {
-	var base64Data = data.replace(/^data:image\/jpeg;base64,/, '');
+	var base64Data = data.replace(/^data:image\/(jpeg|png);base64,/, '');
 	gm(new Buffer(base64Data, 'base64') )
 	.crop(coords[4], coords[5], coords[0], coords[1])
 	.resize(resize.x, resize.y)
