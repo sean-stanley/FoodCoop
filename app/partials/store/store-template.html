@@ -1,7 +1,7 @@
 <alert type="{{message.type}}" ng-show="message.message" close="message.closeMessage()" role="alert">
 	{{message.message}}
 </alert>
-					
+
 <section id="main-nav-and-sorting" class="col-xs-12 clearfix">
 		<br>
 		<div ng-controller="calendarCtrl" class="clearfix">
@@ -22,51 +22,39 @@
 			<p>Tell us what you'd like to see and we'll start scouting for a local producer of what you're after.</p>
 			<a href="/contact?subject=More%20Products%20%Needed%20In%20The%20Store" class="btn btn-primary">Contact Us</a>
 		</div>
-				
+
     <div ng-class="{ 'pull-left' : !panelDisplay}" class="hidden-sm hidden-xs">
 		<div class="btn-group">
-			<button type='button' class="btn btn-default" ng-model="category" btn-radio="'Produce'" >Produce</button>
-			<button type='button' class="btn btn-default" ng-model="category" btn-radio="'Meat'" >Meat</button>
-			<button type='button' class="btn btn-default" ng-model="category" btn-radio="'Processed-Goods'" >Processed Goods</button>
-			<button type='button' class="btn btn-default" ng-model="category" btn-radio="'Baked Goods'" >Baked Goods</button>
-			<button type='button' class="btn btn-default" ng-model="category" btn-radio="'Dairy & Eggs'" >Dairy &amp; Eggs</button>
-			<button type='button' class="btn btn-default" ng-model="category" btn-radio="'Tea & Beverages'" >Tea &amp; Beverages</button>
-			<button type='button' class="btn btn-default" ng-model="category" btn-radio="'Ready Made Meals'">Ready Made Meals</button>
-			<button type='button' class="btn btn-default" ng-model="category" btn-radio="null">All</button>
+			<button ng-repeat="c in categories" type='button' class="btn btn-default" ng-model="$parent.filterCategory" btn-radio="c._id" uncheckable>{{c.name}}</button>
+			<button type='button' class="btn btn-default" ng-model="filterCategory" btn-radio="null">All</button>
 		</div>
 	</div>
-	
+
 	<div class="btn-group visible-sm visible-xs" dropdown>
 		<button class='btn btn-default dropdown-toggle' dropdown-toggle>Categories <span class="caret"></span></button>
 		<ul class="dropdown-menu" role="menu">
-			<li><a ng-click="category = 'Produce'">Produce</a></li>
-			<li><a ng-click="category = 'Meat'">Meat</a></li>
-			<li><a ng-click="category = 'Processed-Goods'">Processed Goods</a></li>
-			<li><a ng-click="category = 'Baked Goods'">Baked Goods</a></li>
-			<li><a ng-click="category = 'Dairy & Eggs'">Dairy &amp; Eggs</a></li>
-			<li><a ng-click="category = 'Tea & Beverages'">Tea &amp; Beverages</a></li>
-			<li><a ng-click="category = 'Ready Made Meals'">Ready Made Meals</a></li>
+			<li ng-repeat="c in categories"><a ng-click="$parent.filterCategory = c._id">{{c.name}}</a></li>
 			<li class="divider"></li>
 			<li><a ng-click="category = null">Show All</a></li>
 		</ul>
 	</div>
-						
+
 	<div ng-class="{ 'pull-right' : !panelDisplay, 'sort-buttons-menu-open' : panelDisplay }" ng-show="products.length > 1">
 		<label> Sort: </label>
 		<div class="btn-group">
-			<button type='button' class="btn btn-primary" 
+			<button type='button' class="btn btn-primary"
 			ng-click="sort = 'producer_ID.producerData.companyName' || 'producer_ID.name'; reverse=!reverse">
 				 <span class="glyphicon glyphicon-sort"></span>  Producer
 			</button>
-			<button type='button' class="btn btn-primary" 
+			<button type='button' class="btn btn-primary"
 			ng-click="sort = 'fullName' || 'productName'; reverse=!reverse">
 				  <span class="glyphicon glyphicon-sort"></span>  Alphabetical
 			</button>
-			<button type='button' class="btn btn-primary" 
+			<button type='button' class="btn btn-primary"
 			ng-click="sort = 'price'; reverse=!reverse">  <span class="glyphicon glyphicon-sort"></span>  Price</button>
 		</div>
 	</div>
-	
+
 </section>
 
 <div id="products-section" class="col-xs-12">
@@ -75,14 +63,14 @@
 			<div class="input-group">
 				<label class="sr-only" for="storeSearch">Search the store</label>
 				<div class="input-group-addon"><span class="glyphicon glyphicon-search"></span></div>
-				<input ng-model="search" class="form-control animate-me" 
+				<input ng-model="search" class="form-control animate-me"
 				typeahead="keyword for keyword in predictiveSearch | filter:$viewValue | limitTo:8"
 				name="storeSearch" type="search" placeholder="Search" ng-input-grow/>
 			</div>
 		</div>
 	</div>
-	
-	
+
+
 	<div ng-hide="isProducts" class="col-md-8 col-md-offset-2">
 		<div class="jumbotron">
 			<h1 class="text-center">What? No Products?</h1>
@@ -90,10 +78,10 @@
 			<p>Please be patient and check back when <a href="/calendar">shopping</a> starts again.</p>
 		</div>
 	</div>
-	
+
 	<ul id="store-products" class="list-unstyled">
-		<li ng-repeat="product in products | orderBy:sort:reverse | filter:search | filter:category " class="product-container" 
-		ng-controller="productUICtrl" 
+		<li ng-repeat="product in products | orderBy:sort:reverse | filter:search | filter:filterCategory " class="product-container"
+		ng-controller="productUICtrl"
 		ng-mouseleave="detailsVisible = false"
 		ng-swipe-left="detailsVisible = true;"
 		>
@@ -104,12 +92,12 @@
 				<img ng-src="{{product.img}}" class="img-responsive" alt="product image" ng-click="open(product)">
 				<figcaption>
 					<div class="btn-group pull-right">
-						<button class="btn btn-primary pull-right" 
-						ng-click="addToCart(product)" ng-if="!product.AlreadyInCart" 
+						<button class="btn btn-primary pull-right"
+						ng-click="addToCart(product)" ng-if="!product.AlreadyInCart"
 						ng-hide="product.quantity <= 0 || product.permanent">
 							Add to Cart
 						</button>
-						<a class="btn btn-primary pull-right" 
+						<a class="btn btn-primary pull-right"
 						ng-href="{{product.butcheryForm}}/{{product._id}}"
 						ng-show="product.permanent">
 							Order Now
@@ -122,34 +110,34 @@
 						</button>
 						<br>
 						<span class="pull-right visible-xs visible-sm"
-						tooltip-placement="left" 
+						tooltip-placement="left"
 						tooltip="Swipe left for more info"
 						tooltip-trigger="click"><i class="fa fa-chevron-circle-left"> swipe</i></span>
 					</div>
 					<h4>{{product.fullName}}</h4>
-					
+
 					<p>{{product.priceWithMarkup|currency}} / {{product.units}}</p>
 				</figcaption>
 			</figure>
 			<section class="details-layer"  ng-class="{ 'details-layer-visible' : detailsVisible}" ng-mouseleave="detailsVisible = false" ng-swipe-right="showHideDetails(false)" ng-swipe-left="open(product)">
-				
+
 				<article class="details">
 					<a href="" class="panel-btn-lg pull-left hidden-lg details-close-button" ng-click="detailsVisible = false">&times; </a>
 					<h4> <a ng-href="/producer/{{product.producer_ID.producerData.companyName | forURL}}-{{product.producer_ID.name | forURL}}">
-					<span class="glyphicon glyphicon-user"></span> 
+					<span class="glyphicon glyphicon-user"></span>
 					 {{product.producer_ID.producerData.companyName || product.producer_ID.name}}</a></h4>
 					<h3>{{product.fullName}}</h3>
 					<p>{{product.priceWithMarkup|currency}} / {{product.units}}</p>
-					
+
 					<!--<div ta-bind ng-model='product.description'></div>-->
 					<hr>
 					<p> Category: {{product.category.name}}<br>
 					<span ng-if="product.certification !== 'none' ">Certified by {{product.certification.name}}</span>
 					</p>
-					<p ng-if="product.ingredients && product.ingredients.length > 0">Ingredients: 
+					<p ng-if="product.ingredients && product.ingredients.length > 0">Ingredients:
 					<span ng-repeat="item in product.ingredients track by $index">
 						<!-- TODO: find a way to limit number  of ingredients-->
-						<a class="yellow-link" ng-click="searchFor(item)">{{item}} </a> 
+						<a class="yellow-link" ng-click="searchFor(item)">{{item}} </a>
 					</span></p>
 					<div class="btn-group">
 						<button class="btn btn-danger pull-right" disabled ng-if="product.quantity === 0">
@@ -161,11 +149,11 @@
 						<button class="btn btn-primary" disabled ng-if="product.AlreadyInCart" ng-hide="product.AlreadyInCart">
 							Added to Cart
 						</button>
-						<button class="btn btn-primary" ng-click="addToCart(product)" 
+						<button class="btn btn-primary" ng-click="addToCart(product)"
 						ng-if="!product.AlreadyInCart" ng-hide="product.quantity <= 0 || product.permanent">
 							Add to Cart
 						</button>
-						<a class="btn btn-primary" 
+						<a class="btn btn-primary"
 						ng-href="{{product.butcheryForm}}/{{product._id}}"
 						ng-show="product.permanent && product.butcheryForm">
 							Order Now
@@ -181,4 +169,3 @@
 		</li>
 	</ul>
 </div>
-

@@ -712,8 +712,8 @@ angular.module('co-op.controllers', [])
 	}
 ])
 
-.controller('storeCtrl', ['$scope', '$rootScope', '$location', '$routeParams', '$modal', 'LoginManager', 'flash', '$http', 'Cart',
-	function($scope, $rootScope, $location, $routeParams, $modal, LoginManager, flash, $http, Cart) {
+.controller('storeCtrl', ['$scope', '$rootScope', '$location', '$routeParams', '$modal', 'LoginManager', 'categories', 'flash', '$http', 'Cart',
+	function($scope, $rootScope, $location, $routeParams, $modal, LoginManager, categories, flash, $http, Cart) {
 		var category, sort, reverse, productURL;
 
 		console.log(Cart);
@@ -721,13 +721,14 @@ angular.module('co-op.controllers', [])
 		$rootScope.$broadcast('GET_CART');
 		$scope.isProducts = true;
 
+		$scope.categories = categories.data;
+
 		$scope.searchObject = $location.search();
 
 		$scope.predictiveSearch = [];
-		$scope.category = $scope.searchObject.hasOwnProperty('category') ? $scope.searchObject.category : undefined;
+		$scope.category = $scope.searchObject.hasOwnProperty('category') ? $scope.searchObject.category : null;
 		$scope.sort = $scope.searchObject.hasOwnProperty('sort') ? $scope.searchObject.sort : undefined;
 		$scope.reverse = $scope.searchObject.hasOwnProperty('reverse') ? $scope.searchObject.reverse : undefined;
-
 
 		function findCartItems() {
 			if ($scope.cartProduct_ids && $scope.products) {
@@ -921,13 +922,8 @@ angular.module('co-op.controllers', [])
 		// route params
 
 		$scope.$watch('category', function(newValue) {
-			// if newValue is falsey
-			if (!newValue) {
-				$location.search('category', null);
-			}
-			else {
-				$location.search('category' , newValue);
-			}
+			$scope.filterCategory = _.result(_.find($scope.categories, {name: newValue}), '_id');
+			$location.search('category', newValue);
 		});
 
 		$scope.$watch('sort', function(newValue) {
@@ -951,6 +947,10 @@ angular.module('co-op.controllers', [])
 			else {
 				$location.search('reverse' , true);
 			}
+		});
+
+		$scope.$watch('filterCategory', function(newValue) {
+			$scope.category = _.result(_.find($scope.categories, {_id: newValue}), 'name');
 		});
 
 		// $rootScope.$watch('canShop', function() {

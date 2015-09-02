@@ -197,7 +197,6 @@ exports.configAPI = function configAPI(app) {
 		models.Product.find()
 		.or([{permanent: true}, req.query])
 		.sort({_id: 1})
-		.populate('category', 'name')
 		.populate('certification', 'name -_id img')
 		.populate('producer_ID', 'name producerData.companyName email')
 		//.stream({transform: JSON.stringify})

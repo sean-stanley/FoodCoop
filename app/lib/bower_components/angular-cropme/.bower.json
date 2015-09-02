@@ -11,7 +11,7 @@
     "./cropme.js",
     "./cropme.css"
   ],
-  "version": "0.3.2",
+  "version": "0.3.3",
   "dependencies": {
     "angular": "^1.2.10",
     "angular-sanitize": "^1.2.10",
@@ -22,11 +22,11 @@
     "angular-mocks": "^1.2.10",
     "angular-scenario": "^1.2.10"
   },
-  "_release": "0.3.2",
+  "_release": "0.3.3",
   "_resolution": {
     "type": "version",
-    "tag": "0.3.2",
-    "commit": "405477f5ea560e927ae61ccea2ab486de28d88d9"
+    "tag": "0.3.3",
+    "commit": "995e88eb1ae3623a7222072b881b4663961697d8"
   },
   "_source": "git://github.com/standup75/cropme.git",
   "_target": "*",

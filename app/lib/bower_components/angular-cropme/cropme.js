@@ -72,12 +72,6 @@
           return scope.yCropZone = Math.round((scope.height - scope.heightCropZone) / 2);
         };
         scope.checkScopeVariables = function() {
-          if (!scope.width) {
-            scope.width = element[0].offsetWidth;
-            if (!(scope.ratio || scope.height)) {
-              scope.height = element[0].offsetHeight;
-            }
-          }
           if (scope.destinationHeight && !scope.ratio) {
             scope.ratio = scope.destinationHeight / scope.destinationWidth;
           } else if (scope.ratio) {
@@ -120,13 +114,16 @@
           reader = new FileReader;
           reader.onload = function(e) {
             return scope.$apply(function() {
-              return loadImage(e.target.result);
+              return loadImage(e.target.result, true);
             });
           };
           return reader.readAsDataURL(file);
         };
-        loadImage = function(src) {
+        loadImage = function(src, base64Src) {
           var img;
+          if (base64Src == null) {
+            base64Src = false;
+          }
           if (!src) {
             return;
           }
@@ -164,7 +161,9 @@
                 }
               });
             };
-            img.crossOrigin = "anonymous";
+            if (!base64Src) {
+              img.crossOrigin = "anonymous";
+            }
             return img.src = src;
           }
         };

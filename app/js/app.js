@@ -143,7 +143,17 @@ angular.module('co-op', [
     .when('/login-failed/attempts=:tries', {templateUrl: 'partials/auth/login-failed.html', reloadOnSearch: false})
 
     // store routes
-	.when('/store', {templateUrl: 'partials/store/store-template.html', controller: 'storeCtrl', reloadOnSearch: false, title: 'Store'})
+	.when('/store', {
+		templateUrl: 'partials/store/store-template.html',
+		controller: 'storeCtrl',
+		reloadOnSearch: false,
+		title: 'Store',
+		resolve: {
+			categories: function($http) {
+				return $http.get('/api/category');
+			}
+		}
+	})
 
     .otherwise({redirectTo: '/'});
 

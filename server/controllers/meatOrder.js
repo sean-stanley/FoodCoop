@@ -104,6 +104,11 @@ exports.show = function(req, res) {
 function alertProducer(order) {
 	var mailOptions, mailData, update;
 	order.populate('supplier', 'name email producerData.companyName', function(err, order) {
+		if (err) {
+			order.remove();
+			log.err('Meat Order Supplier not found. Error.')
+			return
+		}
 		mailOptions = {
 			template:'butchery/new-meat-order',
 			subject: 'New order of ' + order.product.name + ' from the NNFC',
@@ -125,11 +130,9 @@ function alertProducer(order) {
 		if (process.env.NODE_ENV==='production') {
 			update.send(function(err, result) {
 				if (err) log.warn(err);
-				log.info('message sent about new item to be %s', order.customer.email);
+				log.info('message sent about new item to be %s', order.supplier.email);
 			});
 		} else log.info({update: update});
-
-
 	});
 }
 

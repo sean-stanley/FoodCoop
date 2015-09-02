@@ -14,7 +14,7 @@ Copy the cropme.js and cropme.css files into your project and add the following 
 
 Alternatively, if you're using bower, you can add this to your component.json (or bower.json):
 
-		"angular-cropme": "~0.2.8"
+		"angular-cropme": "~0.3.2"
 
 Or simply run
 
@@ -54,9 +54,9 @@ Usage
 			type="png"
 			destination-width="300"
 			id="cropme1"
-			okLabel="Ok"
+			ok-label="Ok"
 			src="images/myImage.jpg"
-			cancelLabel="Cancel">
+			cancel-label="Cancel">
 		</cropme>
 
 Attributes
@@ -91,16 +91,18 @@ WARNING: When setting a ratio attribute you must not also set a destination-heig
 To control the size of the cropped image you can use a combination of destination-width and ratio or destination-width and destination-height.
 
 #### src (optional)
-url of the image to preload (skips file selection)
+url of the image to preload (skips file selection). Note that if the url is not local, you might get the following error:
+`Error: [$sce:insecurl] Blocked loading resource from url not allowed by $sceDelegate policy`
+In this case make sure that wrap the source string with `$sce.trustAsResourceUrl` in your controller. You can see the controller of the demo for an example
 #### send-original (default: false)
 If you want to send the original file
 #### send-cropped (default: true)
 If you want to send the cropped image
 #### id (optional)
 Add id to cropme to tell which cropme element sent the done/ loaded event
-#### okLabel
+#### ok-label
 Label for the ok button (default: "Ok")
-#### cancelLabel
+#### cancel-label
 Label for the cancel button (default: "Cancel")
 
 Events Sent
@@ -118,6 +120,8 @@ Where result is an object with the following keys:
 		width: width of the crop image
 		croppedImage: crop image as a blob
 		originalImage: original image as a blob
+		destinationHeight: height of the cropped image
+		destinationWidth: width of the cropped image
 		filename: name of the original file
 
 Also cropme will send an event when a picture has been chosen by the user, so you can do something like

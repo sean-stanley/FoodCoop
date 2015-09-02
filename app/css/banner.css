@@ -1,4 +1,4 @@
-#slideCow {background: url('/img/slides/raw-milk-sm.jpg') no-repeat center center fixed; 
+#slideCow {background: url('http://res.cloudinary.com/foodcoop/image/upload/c_thumb,g_center,h_1080,w_768/v1441054190/raw-milk-comp_vjvww6.jpg') no-repeat center center fixed;
 -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -6,7 +6,11 @@
 	background-position: center;
 }
 
-#slideLamb {background: url('/img/slides/lambs-sm.jpg') no-repeat center center fixed; 
+#slideLamb {background:
+  linear-gradient(
+      rgba(0, 0, 0, 0.3),
+      rgba(0, 0, 0, 0.3)
+    ), url('http://res.cloudinary.com/foodcoop/image/upload/c_fill,g_west,h_1080,w_768/v1441055297/oxville-sausages-slide_hrf5oa.jpg') no-repeat center center fixed;
 -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -14,31 +18,31 @@
 	background-position: center;
 }
 
-#slide1 {background: url('/img/cheese-wine-meat-sm.jpg') no-repeat center center fixed; 
+#slide1 {background: url('http://res.cloudinary.com/foodcoop/image/upload/c_fill,g_center,h_1080,w_768/v1441053340/foodbag-slide_sx1xej.jpg') no-repeat center center fixed;
 -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
 }
-#slide2 {background: url('/img/cow-nosey-sm.jpg') no-repeat center center fixed; 
+#slide2 {background: url('http://res.cloudinary.com/foodcoop/image/upload/c_fill,g_center,h_1080,w_768/v1441054183/cow-nosey-original_cqtv6e.jpg') no-repeat center center fixed;
 -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
 }
-#slide3 {background: url('/img/farm_wallpaper-sm.jpg') no-repeat center center fixed; 
+#slide3 {background: url('http://res.cloudinary.com/foodcoop/image/upload/c_fill,g_center,h_1080,w_768/v1441053443/democratic-food-slide_mfhulx.jpg') no-repeat center center fixed;
 -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
 }
-#slide4 {background: url('/img/crowd2-sm.jpg') no-repeat center center fixed; 
+#slide4 {background: url('http://res.cloudinary.com/foodcoop/image/upload/c_fill,g_center,h_1080,w_768/v1441055419/crowd2-slide_vwejsa.jpg') no-repeat center center fixed;
 -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
 }
-#slide5 {background: url('/img/directory-books-sm.jpg') no-repeat center center fixed; 
+#slide5 {background: url('http://res.cloudinary.com/foodcoop/image/upload/c_fill,h_1080,w_768/v1441056071/old-books-slide_uhzxla.jpg') no-repeat center center fixed;
 -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -46,45 +50,48 @@
 }
 
 @media (min-width: 769px) {
-	#slideCow {background: url('/img/slides/raw-milk-comp.jpg') no-repeat top center fixed;
+	#slideCow {background: url('http://res.cloudinary.com/foodcoop/image/upload/c_thumb,h_1080,w_1920/v1441054190/raw-milk-comp_vjvww6.jpg') no-repeat top center fixed;
 	-webkit-background-size: cover;
 	  -moz-background-size: cover;
 	  -o-background-size: cover;
 	  background-size: cover;
 }
 
-#slideLamb {background: url('/img/slides/lambs-comp.jpg') no-repeat top center fixed;
+  #slideLamb {background: linear-gradient(
+      rgba(0, 0, 0, 0.7),
+      rgba(0, 0, 0, 0.7)
+    ), url('http://res.cloudinary.com/foodcoop/image/upload/c_fill,h_1080,w_1920/v1441055297/oxville-sausages-slide_hrf5oa.jpg') no-repeat top center fixed;
+	  -webkit-background-size: cover;
+	  -moz-background-size: cover;
+	  -o-background-size: cover;
+	  background-size: cover;
+}
+
+	#slide1 {background: url('http://res.cloudinary.com/foodcoop/image/upload/c_fill,g_center,h_1080,w_1920/v1441053340/foodbag-slide_sx1xej.jpg') no-repeat top center fixed;
 	-webkit-background-size: cover;
 	  -moz-background-size: cover;
 	  -o-background-size: cover;
 	  background-size: cover;
 }
-	
-	#slide1 {background: url('/img/originals/cheese-wine-meat.jpg') no-repeat top center fixed;
+	#slide2 {background: url('http://res.cloudinary.com/foodcoop/image/upload/v1441054183/cow-nosey-original_cqtv6e.jpg') no-repeat top center fixed;
 	-webkit-background-size: cover;
 	  -moz-background-size: cover;
 	  -o-background-size: cover;
 	  background-size: cover;
 }
-	#slide2 {background: url('/img/originals/cow-nosey.jpg') no-repeat top center fixed;
+	#slide3 {background: url('http://res.cloudinary.com/foodcoop/image/upload/c_fill,g_center,h_1080,w_1920/v1441053443/democratic-food-slide_mfhulx.jpg') no-repeat center center fixed;
 	-webkit-background-size: cover;
 	  -moz-background-size: cover;
 	  -o-background-size: cover;
 	  background-size: cover;
 }
-	#slide3 {background: url('/img/originals/farm_wallpaper.jpg') no-repeat center center fixed;
+	#slide4 {background: url('http://res.cloudinary.com/foodcoop/image/upload/c_fill,g_center,h_1080,w_1920/v1441055419/crowd2-slide_vwejsa.jpg') no-repeat bottom center fixed;
 	-webkit-background-size: cover;
 	  -moz-background-size: cover;
 	  -o-background-size: cover;
 	  background-size: cover;
 }
-	#slide4 {background: url('/img/originals/crowd2.jpg') no-repeat bottom center fixed;
-	-webkit-background-size: cover;
-	  -moz-background-size: cover;
-	  -o-background-size: cover;
-	  background-size: cover;
-}
-	#slide5 {background: url('/img/originals/directory-books.jpg') no-repeat top center fixed;
+	#slide5 {background: url('http://res.cloudinary.com/foodcoop/image/upload/c_fill,h_1080,w_1920/v1441056071/old-books-slide_uhzxla.jpg') no-repeat top center fixed;
 	-webkit-background-size: cover;
 	  -moz-background-size: cover;
 	  -o-background-size: cover;
@@ -107,13 +114,13 @@
      display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
      display: -ms-flexbox;      /* TWEENER - IE 10 */
      display: -webkit-flex;     /* NEW - Chrome */
-     display: flex; 
-	 	-webkit-flex-direction: column; 
-	 	-webkit-justify-content: center; 
-	 	-webkit-align-items: center; 
-	 	flex-direction: column; 
-	 	justify-content: center; 
-	 	align-items: center; 
+     display: flex;
+	 	-webkit-flex-direction: column;
+	 	-webkit-justify-content: center;
+	 	-webkit-align-items: center;
+	 	flex-direction: column;
+	 	justify-content: center;
+	 	align-items: center;
 	 }
 
 .carousel-caption {position: relative; left: inherit; right: inherit; width: 80%;}
@@ -183,5 +190,5 @@ h2.slogan {
 	margin-bottom: 0px;
 	border-bottom: 5px solid #652c4a;
 	overflow: hidden;
-	
+
 }

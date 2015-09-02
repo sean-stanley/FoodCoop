@@ -130,11 +130,15 @@ module.exports = function(grunt) {
 				options: {
 					spawn: false,
 				},
+			},
+			css: {
+				files: ['app/css/*.css', 'app/lib/*/*.css', '!app/css/compiled.min.css'],
+				tasks: ['cssmin']
 			}
 		},
 		concurrent: {
 			dev: {
-				tasks: ['nodemon', 'watch:scripts'],
+				tasks: ['nodemon', 'watch'],
 				options: {
 					logConcurrentOutput: true
 				}
