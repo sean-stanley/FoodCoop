@@ -1,5 +1,3 @@
-require('datejs');
-
 // Here static variables for the co-op app can be maintained and edited.
 // More variables and options to come soon.
 
@@ -35,10 +33,10 @@ exports.mileage = 0.8;
 
 // CONTACT DETAILS
 exports.standardsEmail = [
-{name: 'Sean Stanley', email: 'sean@maplekiwi.com'},
+{name: 'Sean Stanley', email: 'sean@foodcoop.nz'},
 {name: 'Klaus Lotz', email: 'klotz@northtec.ac.nz'}
 ];
-exports.adminEmail = {name: 'Sean Stanley', email: 'sean@foodcoop.org.nz'};
+exports.adminEmail = {name: 'Sean Stanley', email: 'sean@foodcoop.nz'};
 
 // redis session store details
 exports.redis = {

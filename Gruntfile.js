@@ -50,6 +50,17 @@ module.exports = function(grunt) {
 	// Project configuration.
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
+		coffee: {
+			compile: {
+				expand: true,
+    		flatten: true,
+				bare: true,
+		    cwd: 'server',
+		    src: ['*.coffee', '/*/.coffee'],
+		    dest: 'server/',
+		    ext: '.js'
+			}
+		},
 		jshint: {
 			browser: {
 				files: {
@@ -58,7 +69,17 @@ module.exports = function(grunt) {
 			},
 			nodejs: {
 				files: {
-					src: ['*.js', 'server/*.js', 'server/*/*.js'],
+					src: ['*.js', 'server/*.js', 'server/*/*.js', '!server/*/*.spec.js'],
+				},
+				options: {
+					node: true,
+					globalstrict: false,
+					browser: false
+				}
+			},
+			jasmine: {
+				files: {
+					src: ['server/spec/*/*.js'],
 				},
 				options: {
 					node: true,
@@ -125,8 +146,8 @@ module.exports = function(grunt) {
 		},
 		watch: {
 			scripts: {
-				files: ['*.js', 'app/js/*.js', 'app/js/*/*.js', 'test/unit/*.js', '!server/spec/*'],
-				tasks: ['concurrent:continuous'],
+				files: ['*.js', 'app/js/*.js', 'app/js/*/*.js', 'test/unit/*.js', 'server/*.coffee', '!server/spec/*'],
+				tasks: ['coffee:compile', 'concurrent:continuous'],
 				options: {
 					spawn: false,
 				},
@@ -325,10 +346,10 @@ module.exports = function(grunt) {
 	// grunt.loadNpmTasks('grunt-contrib-clean');
 
 	// Default task(s).
-	grunt.registerTask('dev', ['cssmin','uglify:bowerDev', 'concurrent:dev']);
-	grunt.registerTask('build', ['cssmin', 'concurrent:build', 'replace', 'clean:annotations', 'ngAnnotate', 'uglify:app', 'uglify:bowerServer']);
+	grunt.registerTask('dev', ['cssmin', 'coffee:compile', 'uglify:bowerDev', 'concurrent:dev']);
+	grunt.registerTask('build', ['cssmin', 'coffee:compile', 'concurrent:build', 'replace', 'clean:annotations', 'ngAnnotate', 'uglify:app', 'uglify:bowerServer']);
 	grunt.registerTask('serve-opt', ['build', 'nodemon:opt']);
-	grunt.registerTask('debug', ['cssmin','concurrent:debug']);
+	grunt.registerTask('debug', ['cssmin', 'coffee:compile', 'concurrent:debug']);
 	grunt.registerTask('deploy-debug', ['rsync:linode', 'shell:updateServer']);
 	grunt.registerTask('deploy', ['build', 'rsync:linodeOpt', 'shell:updateServer']);
 	grunt.registerTask('decrypt-config', ['shell:decryptConfig']);

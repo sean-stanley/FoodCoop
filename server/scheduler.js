@@ -8,7 +8,7 @@ var config = require('./coopConfig.js'),
 	fs = require('fs'),
 	_ = require('lodash'),
 	schedule = require('node-schedule'),
-	mailChimp = require('./mailChimp.js');
+	mandrill = require('./mandrill.js');
 
 	require('datejs');
 
@@ -47,6 +47,16 @@ var orderCycleChecker = schedule.scheduleJob({hour:1, minute: 0}, checkConfig);
 function checkConfig() {
 	var today = new Date();
 	today.setHours(0, 0, 0, 0);
+
+	// mandrill.sendMessage('<h1>Hi!</h1><p>Just testing if I can send you an automated email from the NNFC.</p>',
+	// [
+	// 	{name: 'Sean Stanley', email: 'sean@maplekiwi.com'},
+	// 	{name:'Oxville Farms', email: 'leah@oxvillefarms.com'}
+	// ], 'TEST MESSAGE FROM NNFC', function(err, result) {
+	// 	if (err) console.log(err);
+	// 	else console.log(result);
+	// });
+
 
 	checkCycle(today, function(err, cycle) {
 		if (err) {
