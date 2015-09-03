@@ -175,6 +175,41 @@
 	</table>
 	<h4>Total so far: <strong>{{sortedOrderTotal(sortedOrders) | currency}}</strong></h4>
 
+	<div ng-controller="MeatOrderListCtrl">
+		<h3 ng-if="meatOrders.length > 0">Bulk Meat Orders</h3>
+		<accordion ng-if="meatOrders.length > 0">
+		<accordion-group heading="Bulk Meat Orders - Total: {{total | currency}}" is-open="true">
+			<p>Orders with a yellow background have not yet been finalised. Click on one to edit it and finalize it. Green orders have been finalised.</p>
+			<table class="table">
+				<thead>
+					<tr>
+						<th><a href="" ng-click="ordering = 'datePlaced'; backward=!backward">Date Ordered</a></th>
+						<th><a href="" ng-click="ordering = 'product.name'; backward=!backward">Product</a></th>
+						<th><a href="" ng-click="ordering = 'unitPrice'; backward=!backward">Price</a></th>
+						<th><a href="" ng-click="ordering = 'weight'; backward=!backward">Weight</a></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="c in meatOrders | orderBy:ordering:backward" ng-class="{'warning': !c.invoiced, 'success': c.invoiced}">
+						<td data-title="'date'">
+							<a ng-href="/meat-order/edit/{{c._id}}">{{c.datePlaced| date:'dd/MM/yyyy h:mm a'}}</a>
+						</td>
+						<td data-title="'Product'" >
+							<a ng-href="/meat-order/edit/{{c._id}}">{{c.product.name}}</a>
+						</td>
+						<td data-title="'Price'">
+							<a ng-href="/meat-order/edit/{{c._id}}">{{c.unitPrice|currency}} / kg</a>
+						</td>
+						<td data-title="'Weight'">
+							<a ng-href="/meat-order/edit/{{c._id}}">{{c.weight || 'TBA'}} <span ng-show="c.weight">kg</span></a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</accordion-group>
+		</accordion>
+	</div>
+
 	<accordion>
 		<accordion-group heading="Order History - Total: {{orderTotal(orders) | currency}}">
 			<table class="table">
@@ -212,37 +247,7 @@
 				</tbody>
 			</table>
 		</accordion-group>
-		<div ng-controller="MeatOrderListCtrl">
-			<accordion-group heading="Bulk Meat Orders - Total: {{total | currency}}" ng-if="meatOrders">
-				<p>Orders with a yellow background have not yet been finalised. Click on one to edit it and finalize it. Green orders have been finalised.</p>
-				<table class="table">
-					<thead>
-						<tr>
-							<th><a href="" ng-click="ordering = 'datePlaced'; backward=!backward">Date Ordered</a></th>
-							<th><a href="" ng-click="ordering = 'product.name'; backward=!backward">Product</a></th>
-							<th><a href="" ng-click="ordering = 'unitPrice'; backward=!backward">Price</a></th>
-							<th><a href="" ng-click="ordering = 'weight'; backward=!backward">Weight</a></th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr ng-repeat="c in meatOrders | orderBy:ordering:backward" ng-class="{'warning': !c.invoiced, 'success': c.invoiced}">
-							<td data-title="'date'">
-								<a ng-href="/meat-order/edit/{{c._id}}">{{c.datePlaced| date:'dd/MM/yyyy h:mm a'}}</a>
-							</td>
-							<td data-title="'Product'" >
-								<a ng-href="/meat-order/edit/{{c._id}}">{{c.product.name}}</a>
-							</td>
-							<td data-title="'Price'">
-								<a ng-href="/meat-order/edit/{{c._id}}">{{c.unitPrice|currency}} / kg</a>
-							</td>
-							<td data-title="'Weight'">
-								<a ng-href="/meat-order/edit/{{c._id}}">{{c.weight || 'TBA'}} <span ng-show="c.weight">kg</span></a>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</accordion-group>
-		</div>
+
 		<accordion-group heading="Milk Subscriptions - Active: {{activeMilkSubscribers(milkOrders)}}" ng-if="milkOrders">
 
 		</accordion-group>
