@@ -196,11 +196,11 @@ angular.module('co-op.admin')
 	}
 ])
 .controller('adminCalendarCtrl', ['$scope', function ($scope) {
-	$scope.format = 'EEEE MMMM dd yyyy Z';
+	$scope.format = 'EEEE MMMM dd yyyy';
 
 	$scope.open = function($event) {
-		$event.preventDefault();
-		$event.stopPropagation();
+		// $event.preventDefault();
+		// $event.stopPropagation();
 		$scope.opened = true;
 	};
 }])

@@ -127,12 +127,10 @@ function alertProducer(order) {
 		};
 		update = new Emailer(mailOptions, mailData);
 
-		if (process.env.NODE_ENV==='production') {
-			update.send(function(err, result) {
-				if (err) log.warn(err);
-				log.info('message sent about new item to be %s', order.supplier.email);
-			});
-		} else log.info({update: update});
+		update.send(function(err, result) {
+			if (err) log.warn(err);
+			log.info('message sent about new item to be %s', order.supplier.email);
+		});
 	});
 }
 
@@ -155,12 +153,10 @@ function emailCustomer(order) {
 	};
 	mail = new Emailer(mailOptions, mailData);
 
-	if (process.env.NODE_ENV==='production') {
-		mail.send(function(err, result) {
-			if (err) log.warn(err);
-			log.info('message sent about bulk meat order to %s', order.customer.email);
-		});
-	} else log.info({mail: mail});
+	mail.send(function(err, result) {
+		if (err) log.warn(err);
+		log.info('message sent about bulk meat order to %s', order.customer.email);
+	});
 }
 
 function invoiceCustomer(order) {

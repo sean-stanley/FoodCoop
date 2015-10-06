@@ -13,6 +13,8 @@
 
   mandrill_client = new mandrill.Mandrill(config.mandrillCredentials.pass);
 
+  console.log(process.env.NODE_ENVIRONMENT);
+
   template_name = 'delivery-day-template';
 
   template_content = [];

@@ -12,10 +12,6 @@ var config = require('./coopConfig.js'),
 
 	require('datejs');
 
-var dailyRule = new schedule.RecurrenceRule();
-dailyRule.minute = 0;
-dailyRule.hour = 0;
-
 function checkCycle(date, done) {
 	if (!date) date = Date.today().toISOString();
 	//console.log(date);
@@ -24,7 +20,6 @@ function checkCycle(date, done) {
 		start: {$lte: new Date(date).toISOString()},
 		deliveryDay: {$gte: new Date(date).toISOString()}
 	})
-	//.min({start: date}).max({start: Date.today().addMonths(1).toString()})
 	.lean().exec(function(err, cycle) {
 
 		if (err) {
@@ -85,6 +80,29 @@ function checkConfig() {
 
 		else if (today.equals(deliveryDay) ) {
 			console.log('Today is Delivery Day!');
+			models.Order.find({cycle: exports.currentCycle}, 'supplier customer')
+			.populate('supplier', 'name email')
+			.populate('customer', 'name email')
+			.exec(function(err, orders) {
+
+				var customers, suppliers, recipients;
+				if (err) {
+					console.error(err);
+					return
+				}
+				customers = _.pluck(orders, 'customer');
+	      suppliers = _.pluck(orders, 'supplier');
+	      recipients = _.merge(customers, suppliers);
+
+				console.log('sending delivery day message to: ', recipients.length)
+				if (process.env.NODE_ENVIRONMENT !== "Production") {
+					recipients = {name: 'Sean Stanley', email: 'sean@maplekiwi.com'}
+				}
+				mandrill.send('delivery-day-template', recipients, {tags:["delivery day"]}, function(err, result) {
+					console.log(results)
+				});
+			});
+
 		}
 
 	});
