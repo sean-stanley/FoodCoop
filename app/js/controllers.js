@@ -413,7 +413,7 @@ angular.module('co-op.controllers', [])
 			 $scope.futureProducts = _.filter($scope.products, function(product) {
 				 if (product.cycle) {
 					 return moment($rootScope.deliveryDay).isBefore( moment(product.cycle.deliveryDay) );
-				 } else if (product.permanent) return true
+				 } else if (product.permanent) return true;
 
 			 });
 
@@ -422,7 +422,7 @@ angular.module('co-op.controllers', [])
 			 $scope.pastProducts = _.filter($scope.products, function(product) {
 				if (product.cycle) {
 					return moment($rootScope.deliveryDay).isAfter( moment(product.cycle.deliveryDay) );
-				} else if (product.permanent) return true
+				} else if (product.permanent) return true;
 			 });
 
 			 $scope.stats.pastAmount = $scope.pastProducts.length;
