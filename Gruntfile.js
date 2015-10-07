@@ -37,6 +37,8 @@ var css_components = [
 	'app/css/animations.css',
 	'app/css/banner.css',
 	'app/css/site.css',
+	'app/css/*.css',
+	'!app/css/compiled.min.css',
 	'app/lib/bower_components/textAngular/dist/textAngular.css',
 	'app/lib/bower_components/jcrop/css/jquery.Jcrop.css',
 	'app/lib/bower_components/ng-jcrop/css/jquery.Jcrop.css',

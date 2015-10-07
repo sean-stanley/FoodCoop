@@ -213,7 +213,7 @@ outline: 0px;
 /*	-------------
 	-- Alert Box --
 	-------------	*/
-.alert-box {position: fixed; top: 66px; z-index: 999999999; width: 100%;}
+.alert-box {position: fixed; top: 66px; right:15px; z-index: 999999999;}
 .alert {-webkit-box-shadow: 0 0 20px 20px rgba(255,255,255,0.5);
 box-shadow: 0 0 20px 20px rgba(255,255,255,0.5);}
 

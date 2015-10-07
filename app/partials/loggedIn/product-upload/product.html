@@ -296,23 +296,32 @@ min-width: inherit;">
 					<h2><i class="fa fa-gears"></i> More Options <a href=""><span class="glyphicon" ng-click="advancedOptions = !advancedOptions"
 					ng-class="{'glyphicon-menu-down': advancedOptions, 'glyphicon-menu-up': !advancedOptions}"></span></a></h2>
 					<div collapse="advancedOptions">
-						<div class="form-group col-md-4">
-							<label for="units">Minimum Order Quantity</label>
-							<input type="text" ng-model="productData.minOrder" name="minOrder" id="minOrder" class="form-control"
-							placeholder ="number only">
-							<div ng-show="submitted && productUpload.minOrder.$invalid" class="help-block">
-								<alert type="danger" ng-show="productUpload.minOrder.$error && !unitError" close="unitError = true">Please specify the unit of sale</alert>
+						<div class="row">
+							<div class="form-group col-md-4">
+								<label for="units">Minimum Order Quantity</label>
+								<input type="text" ng-model="productData.minOrder" name="minOrder" id="minOrder" class="form-control"
+								placeholder ="number only">
+								<div ng-show="submitted && productUpload.minOrder.$invalid" class="help-block">
+									<alert type="danger" ng-show="productUpload.minOrder.$error && !unitError" close="unitError = true">Please specify the unit of sale</alert>
+								</div>
+							</div>
+							<div class="form-group col-md-4">
+								<p>Preview: <br> Minimum order is: {{productData.minOrder}} x {{productData.units}}</p>
 							</div>
 						</div>
-						<div class="form-group col-md-4">
-							<p>Preview: <br> Minimum order is: {{productData.minOrder}} x {{productData.units}}</p>
+						<div class="form-group col-md-12">
+							<div class="checkbox">
+    						<label>
+      						<input type="checkbox" ng-model="productData.permanent"> keep my {{productData.variety}} {{productData.productName}} in the store until further notice
+    						</label>
+  						</div>
 						</div>
 					</div>
 
 				</div>
 
 
-				<div class="form-group col-md-12 well">
+				<div class="form-group col-md-12 well" ng-hide="productData.permanent">
 
 					<h3>Select Sale Dates for Each Product <i class="fa fa-info-circle" tooltip="A copy of your product and sale options will be created for each delivery cycle selected. That way if you need to make changes later you can without affecting information in the past."></i></h3>
 
@@ -344,13 +353,13 @@ min-width: inherit;">
 							<span ng-show="!!productData._id && productData.cycle < cycle && !canShop">Re-list For Next Cycle</span>
 							<span ng-show="!!productData._id && productData.cycle === cycle && canShop">List in the Store</span>
 							<span ng-show="!!productData._id && productData.cycle === cycle && !canShop">Re-list for Next Cycle</span>
-							<span ng-show="!!productData._id && productData.cycle > cycle">List for Future Cycle</span>
+							<span ng-show="!!productData._id && !!productData.cycle && productData.cycle > cycle">List for Future Cycle</span>
 							<span ng-show="!!productData._id && productData.cycle.length > 0">List Across Selected Date(s)</span>
 							<span ng-show="!productData._id && productData.cycle.length > 0">List Across Selected Date(s)</span>
+							<span ng-show="!!productData._id && productData.permanent === true && !productData.cycle">List in the Store</span>
 							<span ng-show="!productData._id">Save</span>
 						</button>
-						<button ng-if="productData._id" type="submit" class="btn" ng-class="{'btn-success': productUpload.$valid, 'btn-warning':productUpload.$invalid}" ng-click="update(productUpload.$valid, categoryError);" analytics-on="click" analytics-event="Upload Product" ng-hide="!!productData._id && productData.cycle < cycle">Update Current Listing</button>
-						<button type="button" ng-click="reset()" class="btn btn-default">Reset Form</button>
+						<button ng-if="productData._id" type="submit" class="btn" ng-class="{'btn-success': productUpload.$valid, 'btn-warning':productUpload.$invalid}" ng-click="update(productUpload.$valid, categoryError);" analytics-on="click" analytics-event="Update Product" ng-hide="!!productData._id && productData.cycle < cycle">Update Current Listing</button>
 						</div>
 					</div>
 

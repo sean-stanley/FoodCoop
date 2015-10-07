@@ -5,7 +5,7 @@ Emailer = require('./../emailer.js'),
 async = require('async'),
 bunyan = require('bunyan'),
 log = bunyan.createLogger({
-	name: 'product', 
+	name: 'product',
 	serializers: {
 		req: bunyan.stdSerializers.req,
 		err: bunyan.stdSerializers.err,
@@ -63,9 +63,9 @@ exports.create = function(req, res) {
 		});
 	} else {
 		if (req.body.cycle < scheduler.currentCycle._id) req.body.cycle = scheduler.currentCycle._id;
-		
+
 		p = new Product(req.body);
-		
+
 		p.save(function(err, product) {
 			if (err) console.log(err);
 			res.json(product);
@@ -86,14 +86,14 @@ exports.changePrice = function(req, res, next) {
 exports.updateValidator = function(req, res, next) {
 	if (_.isArray(req.body.cycle) ) {
 		return res.status(403).send('Sorry you can\'t update your product with more than one delivery day specified.');
-	} else if(req.product.cycle !== req.body.cycle) {
+	} else if(req.product.cycle !== req.body.cycle && !req.body.permanent) {
 		return res.status(403).send('Sorry you can\'t change a product\'s sale date once it\'s been created. Instead try uploading the product for a different sale date.');
 	} else next();
 };
 
 exports.update = function(req, res) {
 	product = _.merge(req.product, req.body);
-	
+
 	//save product
 	product.save(function(err) {
 		if (err) return next(err);
@@ -140,13 +140,13 @@ exports.quantityChange = function(req, res, next) {
 	if (req.product.amountSold > req.body.quantity && req.orders.length > 0) {
 		var amountToRemove = req.product.amountSold - req.body.quantity;
 		req.product.amountSold -= amountToRemove;
-		
+
 		// when fewer products are available than the amount ordered, preference is
 		// given to customers by time not an even averaging of quantities per order.
 		async.eachSeries(req.orders, function(order, done) {
 			// if the amount to remove is greater than the quantity of an order, delete that order
 			if (amountToRemove === 0) done('complete');
-		
+
 			else if (amountToRemove > order.quantity) {
 				amountToRemove -= order.quantity;
 				sendProductNotAvailableEmail(order);
@@ -155,12 +155,12 @@ exports.quantityChange = function(req, res, next) {
 					log.info('deleted order of %s because of quantity change', product.fullName);
 					if (amountToRemove > 0) done();
 					else done('complete');
-				
+
 				});
 			} else if (amountToRemove < order.quantity) {
 				order.quantity -= amountToRemove;
 				log.info('changed quantity of %s\'s order to be %s', order.customer.name, order.quantity);
-			
+
 				order.save(function(err, order) {
 					if (err) return done(err);
 					sendProductChangeAmountEmail(order);
@@ -172,7 +172,7 @@ exports.quantityChange = function(req, res, next) {
 			if (result !== 'complete') return next(result);
 			log.info('all orders have been adjusted for product quantity change');
 		});
-		
+
 	} next();
 };
 
@@ -186,8 +186,8 @@ function sendProductNotAvailableEmail(order) {
 			name: order.customer.name
 		}
 	};
-	mailData = {name: order.customer.name, 
-		productName: order.product.fullName, 
+	mailData = {name: order.customer.name,
+		productName: order.product.fullName,
 		producerID: order.product.producer_ID
 	};
 	update = new Emailer(mailOptions, mailData);
@@ -209,8 +209,8 @@ function sendProductChangeAmountEmail(order) {
 		}
 	};
 	mailData = {
-		name: order.customer.name, 
-		productName: order.product.fullName, 
+		name: order.customer.name,
+		productName: order.product.fullName,
 		amount: order.quantity,
 		producerID: order.product.producer_ID
 	};
