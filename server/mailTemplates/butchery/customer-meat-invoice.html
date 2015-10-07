@@ -15,52 +15,52 @@
 						</tr>
 						<tr>
 							<td><strong>Product</strong></td>
-							<td><strong>Weight</strong></td>
 							<td><strong>Cost</strong></td>
 						</tr>
 					</thead>
 					<tbody>
 
-						<% _.each(items, function(item) { %> 
+						<% _.each(items, function(item) { %>
 							<tr>
 								<td>{{item.name}}</td>
-								<td>{{weight}} kg</td>
 								<td>${{item.cost.toFixed(2)}}</td>
 							</tr>
 						<% }); %>
 					</tbody>
 					<tfoot>
 						<tr>
-							<td colspan="3"> Total: ${{total.toFixed(2)}}</td>
+							<td colspan="2"> Total: ${{total.toFixed(2)}}</td>
 						</tr>
 					</tfoot>
 				</table>
-	   
-		 <h2>Pick Up Instructions from the producer:</h2>
-		 "{{deliveryInstructions}}"
-		 
-		 
+
+		 <h2>Pick Up Instructions</h2>
+		 <p>When your order is ready, you can collect your order from <strong>1 Woods Road, Whangarei.</strong> On the next Delivery Day after your order is processed. Processing can take a number of weeks depending on abattoir scheduling, meat hanging time, and butchery scheduling. We appreciate your patience.</p>
+     <p>We will let you know when your order is ready and you can pick up your meat along with any other orders for that delivery day.</p>
+
+
 		 <p>Here is a reminder of the butchery instructions you requested:</p>
 		 <ul>
-		 	<% _.forOwn(instructions, function(value, key) { %> 
+		 	<% _.forOwn(instructions, function(value, key) { %>
 		 		<li>{{key.toUpperCase()}} : {{value}}</li>
 		 	<% }); %>
 		 </ul>
-	   
-	   
-	   <p>Payment can be made by internet banking to account # {{account}}. Please use your name as the reference and your invoice number (found above) as the particulars. 
-			 We also accept credit card payments with New Zealand's <a href="https://txtpay.co.nz">TxtPay</a>. To pay by credit card follow this <a href="https://www.txtpay.co.nz/VPos/VPos.aspx?merchant=NNFC&type=Payment">link</a>. If you are unable to pay by internet banking or credit card and would like to make some other arrangement, please contact us so we can work things out as soon as possible.</p>
-       
+
+     <h3>Payment</h3>
+     <p>Please make payment before you receive your order, the farmers and butchers greatly appreciate this courtesy.</p>
+	   <p>Payment can be made by internet banking to account # {{account}}. Please use either your name or the invoice number as a reference.</p>
+		 <p>We also accept credit card payments with New Zealand's <a href="https://txtpay.co.nz">TxtPay</a>. To pay by credit card follow this <a href="https://www.txtpay.co.nz/VPos/VPos.aspx?merchant=NNFC&type=Payment">link</a>. If you are unable to pay by internet banking or credit card and would like to make some other arrangement, please contact us so we can work things out as soon as possible.</p>
+
 	   <hr>
         <p> A copy of this invoice and its payment status is available <a href="https://foodcoop.nz/my-invoices">online</a>
-        
+
         <p>Congratulations on your purchase and good eating!</p>
         <p>Cheers, <br>
         The NNFC team </p>
-        
+
 		<p>
 			<a href="https://foodcoop.nz"><img src="cid:logo@foodcoop" /></a>
 		</p>
     </body>
-    
+
 </html>

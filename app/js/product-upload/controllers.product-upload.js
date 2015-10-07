@@ -188,7 +188,6 @@ angular.module('co-op.product-upload')
     function crop(obj) {
 			obj.dimensions = {x:420, y:300};
 			$http.post('/api/crop', obj).then(function(img) {
-				console.log(img);
 				$scope.productData.img = $scope.selectedImg = img.data;
 			}, function(err) {
 				flash.setMessage({type:'danger', message: err.data});
@@ -220,18 +219,14 @@ angular.module('co-op.product-upload')
 
 .controller('PermanentProductUploadController', ['$scope', '$rootScope', '$sce', '$location', '$modal', 'ProductManager', 'ButcheryForms', '$http', 'product', 'category', 'flash',
 	function($scope, $rootScope, $sce, $location, $modal, ProductManager, ButcheryForms, $http, product, category, flash) {
-		$rootScope.$broadcast("cropme:cancel");
 		$scope.productManager = ProductManager;
 
 		var markup = 1.1;
-		if (category.data[0].name === 'Meat') {
-			markup = 1.05;
-		}
 
 		$scope.productData = {
 			permanent: true,
 			price: 0,
-			units: 'kg',
+			units: 'Whole Beast',
 			refrigeration: 'frozen',
 			producer_ID: $rootScope.currentUser._id,
 			category: '5421e9192ba620071b4cb2a9', // Meat,
@@ -245,29 +240,11 @@ angular.module('co-op.product-upload')
 			$scope.productData.priceWithMarkup = newValue * markup;
 		});
 
-		$scope.$watch('productData.fixedPrice', function(newValue) {
-			if (newValue > 0) {
-				var match = $scope.productData.description.match(/<p id="fixedPrice">.*?<\/p>/),
-				newStr = '<p id="fixedPrice">Please note there is a $' + newValue + ' processing fee on all orders.</p>';
-				if (match) {
-					$scope.productData.description = $scope.productData.description.replace(/<p id="fixedPrice">.*?<\/p>/, newStr);
-				} else $scope.productData.description += newStr;
-			} else {
-				$scope.productData.description = $scope.productData.description.replace(/<p id="fixedPrice">.*?<\/p>/, '');
-			}
-
-		});
+		$scope.$watch('productData.fixedPrice', modifyDescriptionWithFixedPrice);
 
 		$scope.butcheryForms = ButcheryForms;
 
-		ProductManager.certificationPromise.getList().then(function(certifications) {
-			$scope.certifications = certifications;
-			$scope.productData.certification = (product.hasOwnProperty('certification')) ? product.certification : $scope.certifications[0]._id;
-			$scope.certificationImg = function(id) {
-				var el = _.findWhere($scope.certifications, {_id: $scope.productData.certification});
-				return el.img;
-			};
-		});
+		ProductManager.certificationPromise.getList().then(getCertifications);
 
 		$scope.saveOrUpdate = function(isValid) {
 			if (isValid) {
@@ -302,31 +279,7 @@ angular.module('co-op.product-upload')
 			});
 		}
 
-		$scope.crop = function(obj) {
-			//$rootScope.$broadcast("cropme:ok");
-			$http.post('/api/crop', obj).then(function(img) {
-				console.log(img);
-				$scope.productData.img = $scope.selectedImg = img.data;
-			}, function(err) {
-				flash.setMessage({type:'danger', message: err.data});
-			});
-		};
-
-		$scope.cancel = function() {
-			$rootScope.$broadcast("cropme:cancel");
-		};
-
-		$scope.$on("cropme:done", function(e, result, canvasEl) {
-			console.log(result.croppedImage);
-			var fileURL = URL.createObjectURL(result.croppedImage);
-			$scope.selectedImg = $sce.trustAsResourceUrl(fileURL);
-			var reader = new window.FileReader();
-			reader.readAsDataURL(result.croppedImage);
-			reader.onloadend = function() {
-				console.log(reader.result);
-				$scope.productData.img = reader.result;
-			};
-		});
+		$scope.crop = crop;
 
 		$scope.preview = function(product) {
 			var modalInstance = $modal.open({
@@ -345,9 +298,41 @@ angular.module('co-op.product-upload')
 
 			}, function() {
 				$location.hash('');
-				console.log('Modal dismissed at: ' + new Date());
 			});
 		};
+
+    function getCertifications(certifications) {
+			$scope.certifications = certifications;
+			$scope.productData.certification = (product.hasOwnProperty('certification')) ? product.certification : $scope.certifications[0]._id;
+			$scope.certificationImg = function(id) {
+				var el = _.findWhere($scope.certifications, {_id: $scope.productData.certification});
+				return el.img;
+			};
+		}
+
+    function modifyDescriptionWithFixedPrice(newValue) {
+      if (newValue > 0) {
+        var match = $scope.productData.description.match(/<p id="fixedPrice">.*?<\/p>/),
+        newStr = '<p id="fixedPrice">Please note there is a $' + newValue + ' processing fee on all orders.</p>';
+        if (match) {
+          $scope.productData.description = $scope.productData.description.replace(/<p id="fixedPrice">.*?<\/p>/, newStr);
+        } else $scope.productData.description += newStr;
+      } else {
+        $scope.productData.description = $scope.productData.description.replace(/<p id="fixedPrice">.*?<\/p>/, '');
+      }
+    }
+
+    function crop(obj) {
+      obj.dimensions = {x:420, y:300};
+			$http.post('/api/crop', obj).then(function(img) {
+				$scope.productData.img = $scope.selectedImg = img.data;
+			}, function(err) {
+				flash.setMessage({type:'danger', message: err.data});
+			});
+		}
+
+
+
 	}
 ])
 

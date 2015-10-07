@@ -1,24 +1,23 @@
 <div class="col-xs-12">
-	
-	<h1 class="text-center">
-		Bulk {{order.product.name}} Order for <a ng-href="/contact/{{order.customer.id}}">{{order.customer.name}}</a> 
-		<div class="btn-group pull-right">
-			<button class="btn btn-default" ng-click="order.save(); flash('success', 'Your order is saved');" ng-disabled="order.invoiced">Save</button>
-			<button class="btn btn-primary" ng-click="order.invoiced = true; order.save({invoice: 1}); flash('success', 'Thanks! This Order is now finalised')" ng-disabled="order.invoiced && order.weight > 0">Save and Invoice</button>
-		</div>
-	</h1>
-	
-	<p><strong>Instructions:</strong> Fill out the weight of the {{order.product.name}}. The total price for the order will be automatically calculated from the weight. Then, write out pickup instruction. Be sure to include a location, date and time for pickup.</p>
-	<p>Click save, if you need to make changes later or 'Save and Invoice' to send an invoice to <a ng-href="/contact/{{order.customer.id}}">{{order.customer.name}}</a>. Once you send an invoice you will not be able to save any new changes to your order.</p>
+	<div class="page-header">
+		<h1 class="text-center">
+			{{order.product.name}} Order for <a ng-href="/contact/{{order.customer.id}}">{{order.customer.name}}</a>
+			<!-- <div class="btn-group pull-right">
+				<button class="btn btn-default" ng-click="order.save(); flash('success', 'Your order is saved');" ng-disabled="order.invoiced">Save</button>
+				<button class="btn btn-primary" ng-click="order.invoiced = true; order.save({invoice: 1}); flash('success', 'Thanks! This Order is now finalised')" ng-disabled="order.invoiced && order.weight > 0">Save and Invoice</button>
+			</div> -->
+		</h1>
+	</div>
 
-	<h2>{{order.datePlaced| date:'dd/MM/yyyy h:mm a'}} {{order.customer.name}} ordered {{order.product.name}}</h2>
+	<!-- <p><strong>Instructions:</strong> Fill out the weight of the {{order.product.name}}. The total price for the order will be automatically calculated from the weight. Then, write out pickup instruction. Be sure to include a location, date and time for pickup.</p>
+	<p>Click save, if you need to make changes later or 'Save and Invoice' to send an invoice to <a ng-href="/contact/{{order.customer.id}}">{{order.customer.name}}</a>. Once you send an invoice you will not be able to save any new changes to your order.</p> -->
+
 	<div class="col-sm-6">
 		<table class="table">
 			<tr class="info"><th colspan="2">General</th></tr>
-			<tr><th>Price</th><td>{{order.unitPrice | currency}} / kg</td></tr>
-			<tr ng-show="order.fixedPrice"><th>Processing Fee</th><td>{{order.fixedPrice | currency}}</td></tr>
-			<tr><th>Weight</th><td><span class="editable-span" data-ng-editable-number data-ng-editable-model="order.weight"></span> <span ng-show="order.weight">kg</span></td></tr>
-			<tr><th>Total</th><td>{{order.unitPrice * order.weight + order.fixedPrice | currency}}</td></tr>
+			<tr><th>Product</th><td>{{order.product.name}}</td></tr>
+			<tr><th>Price</th><td>{{order.price | currency}}</td></tr>
+			<tr><th>Date Placed</th><td>{{order.datePlaced| date:'dd/MM/yyyy h:mm a'}}</td></tr>
 			<tr class="info"><th colspan="2">Instructions</th></tr>
 			<tr ng-repeat="(key, value) in order.instructions">
 				<td><strong>{{key}}</strong></td>
@@ -27,8 +26,7 @@
 		</table>
 	</div>
 	<div class="col-sm-6">
-		<h4><a ng-href="/contact/{{order.supplier}}"><i class="fa fa-envelope"></i> Contact {{order.customer.name}} with a question</a></h4>
-		<h4>Pickup Instructions</h4>
-		<div text-angular ng-model="order.deliveryInstructions" placeholder="Put here where and when you want the customer to collect their order once you've finished preparing it." name="description"></div>
+		<h4>Ordered By: <a ng-href="/contact/{{order.customer.id}}">{{order.customer.name}}</a></h4>
+		<p><a ng-href="/contact/{{order.customer.id}}"><i class="fa fa-envelope-o"></i> Email {{order.customer.name}}</a></p>
 	</div>
 </div>

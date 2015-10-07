@@ -159,6 +159,8 @@
 							Order Now
 						</a>
 						<a ng-href="/contact/{{product.producer_ID._id}}?subject=Question%20about%20{{product.fullName}}" class="btn btn-info" tooltip="Ask a question about this product" tooltip-append-to-body="true"><i class="fa fa-question-circle"></i></a>
+						<a ng-href="/product-upload/{{product._id}}" ng-if="currentUser.user_type.isAdmin || product.producer_ID === currentUser._id"
+						class="btn btn-info"><i class="fa fa-pencil-square-o"></i></a>
 					</div>
 					<div>
 						<br>

@@ -411,13 +411,18 @@ angular.module('co-op.controllers', [])
 		products.getList().then(function(result) {
 			 $scope.products = result;
 			 $scope.futureProducts = _.filter($scope.products, function(product) {
-				 return moment($rootScope.deliveryDay).isBefore( moment(product.cycle.deliveryDay) );
+				 if (product.cycle) {
+					 return moment($rootScope.deliveryDay).isBefore( moment(product.cycle.deliveryDay) );
+				 } else if (product.permanent) return true
+
 			 });
 
 			 $scope.stats.futureAmount = $scope.futureProducts.length;
 
 			 $scope.pastProducts = _.filter($scope.products, function(product) {
-			 	return product.cycle === null || moment($rootScope.deliveryDay).isAfter( moment(product.cycle.deliveryDay) );
+				if (product.cycle) {
+					return moment($rootScope.deliveryDay).isAfter( moment(product.cycle.deliveryDay) );
+				} else if (product.permanent) return true
 			 });
 
 			 $scope.stats.pastAmount = $scope.pastProducts.length;
@@ -449,7 +454,7 @@ angular.module('co-op.controllers', [])
 				var cycleChain = _.chain(array)
 				.groupBy(function(p) {
 					var cycle = moment(p.dateUploaded).format('MMMM D YYYY');
-					if (p.cycle.deliveryDay) cycle = moment(p.cycle.deliveryDay).format('MMMM D YYYY');
+					if (p.cycle && p.cycle.deliveryDay) cycle = moment(p.cycle.deliveryDay).format('MMMM D YYYY');
 					return cycle;
 				})
 				.mapValues(function(product) {
@@ -541,6 +546,8 @@ angular.module('co-op.controllers', [])
 	function($scope, $rootScope, $location, Cart, flash) {
 		$scope.cart = [];
 		$scope.cartProduct_ids = [];
+		$scope.backward = true;
+		$scope.ordering = 'datePlaced';
 
 		if ($rootScope.cycle) {
 			Cart.getCurrentCart(function(cart) {

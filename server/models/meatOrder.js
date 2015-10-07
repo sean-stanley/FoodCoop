@@ -8,7 +8,8 @@ var mongoose = require('mongoose'), // middleware for connecting to the mongodb 
 // add's a product to his or her cart.
 var MeatOrderSchema = new Schema({
 		datePlaced: {type: Date, default: Date.now()},
-		unitPrice: {type: Number, required: true}, // e.g. 7 for $7/kg
+	// deprecated	unitPrice: {type: Number, required: true}, // e.g. 7 for $7/kg
+		price: {type: Number, required: true},
 		fixedPrice: {type:Number},
 		product: {
 			id: {type: Schema.ObjectId, required: true, ref: 'Product'},
@@ -27,7 +28,7 @@ var MeatOrderSchema = new Schema({
 		invoiced: Boolean,
 }, {
 	toObject: { virtuals : true },
-	toJSON: { virtuals : true } 
+	toJSON: { virtuals : true }
 });
 
 // MeatOrderSchema.pre('save', function(next) {
@@ -36,17 +37,17 @@ var MeatOrderSchema = new Schema({
 // });
 
 // these functions create virtual properties for common calculations
-MeatOrderSchema.virtual('unitPriceWithMarkup').get(function () {
-	return (this.unitPrice * (this.markup/100 + 1));
+MeatOrderSchema.virtual('priceWithMarkup').get(function () {
+	return (this.price * (this.markup/100 + 1));
 });
-MeatOrderSchema.virtual('unitMarkup').get(function () {
-	return (this.unitPriceWithMarkup - this.unitPrice);
-});
-MeatOrderSchema.virtual('total').get(function () {
-	if (this.weight) return (this.unitPrice * this.weight);
-});
-MeatOrderSchema.virtual('totalWithMarkup').get(function () {
-	if (this.weight) return (this.unitPriceWithMarkup * this.weight);
-});
+// MeatOrderSchema.virtual('unitMarkup').get(function () {
+// 	return (this.unitPriceWithMarkup - this.unitPrice);
+// });
+// MeatOrderSchema.virtual('total').get(function () {
+// 	if (this.weight) return (this.unitPrice * this.weight);
+// });
+// MeatOrderSchema.virtual('totalWithMarkup').get(function () {
+// 	if (this.weight) return (this.price * this.weight);
+// });
 
 module.exports = mongoose.model('MeatOrder', MeatOrderSchema);

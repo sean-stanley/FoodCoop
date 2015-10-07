@@ -9,7 +9,7 @@ angular.module('co-op.orders', [])
 		$scope.beast = beast.data;
 
 		$scope.meatOrder = {
-			unitPrice: $scope.beast.price,
+			price: $scope.beast.price,
 			product: {
 				id: $scope.beast._id,
 				name: $scope.beast.productName,

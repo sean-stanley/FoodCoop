@@ -2,9 +2,9 @@
 	<div class="page-header text-center">
 		<h1> <i class="fa fa-shopping-cart"></i> My Cart <small>Live Updates</small></h1>
 	</div>
-	
+
 	<div ng-class="{'col-sm-8':meatHistory || milkHistory }">
-	
+
 		<p>Here is where you will see all your shopping orders. You will get an email of this list at the end of the ordering period. Records of your past shopping is here too.</p>
 
 		<h2>{{month}} Cart</h2>
@@ -28,18 +28,18 @@
 					<td data-title="'Product'" >
 						<a ng-click="delete($index)"><i class="fa fa-trash"></i></a>
 						<span ng-hide="c.milk">{{c.product.fullName}}</span>
-						<span ng-show="c.milk">{{c.product.productName}} for {{c.deliveryDay | date:'d/M/yy'}}</span> 
+						<span ng-show="c.milk">{{c.product.productName}} for {{c.deliveryDay | date:'d/M/yy'}}</span>
 					</td>
 					<td data-title="'Quantity'">
 						<form class="navbar-form navbar-left" role="search" ng-controller="updateCartCtrl">
 							<div class="form-group">
-								<input type="number" class="form-control" ng-model="c.quantity" 
+								<input type="number" class="form-control" ng-model="c.quantity"
 								ng-init="lastQuantity = c.quantity"
 								ng-change="showSave = true;">
 							</div>
-							<button type="submit" 
-							class="btn btn-default" 
-							ng-show="showSave" 
+							<button type="submit"
+							class="btn btn-default"
+							ng-show="showSave"
 							ng-click="showSave=false; saveNewQuantity(c);"><i class="fa fa-cloud-upload"></i> Save</button>
 						</form>
 			        </td>
@@ -100,18 +100,16 @@
 	</div>
 	<div ng-class="{'col-sm-4':meatHistory}" ng-show="meatHistory" class="table-responsive">
 		<h2>Meat Orders</h2>
-		<p>Orders with a yellow background have not yet been finalised. Click on one to edit it and finalize it. Green orders have been finalised.</p>
 		<table class="table">
 			<thead>
 				<tr>
-					<th><a href="" ng-click="ordering = 'c.datePlaced'; backward=!backward">Date Ordered</a></th>
-					<th><a href="" ng-click="ordering = 'c.product.name'; backward=!backward">Product</a></th>
-					<th><a href="" ng-click="ordering = 'c.unitPriceWithMarkup'; backward=!backward">Price</a></th>
-					<th><a href="" ng-click="ordering = 'c.weight'; backward=!backward">Weight</a></th>
+					<th><a href="" ng-click="ordering = 'datePlaced'; backward=!backward">Date Ordered</a></th>
+					<th><a href="" ng-click="ordering = 'product.name'; backward=!backward">Product</a></th>
+					<th><a href="" ng-click="ordering = 'priceWithMarkup'; backward=!backward">Price</a></th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="c in meatHistory | orderBy:ordering:backward" ng-class="{'warning': !c.invoiced, 'success': c.invoiced}">
+				<tr ng-repeat="c in meatHistory | orderBy:ordering:backward">
 					<td data-title="'Price'">
 						<a ng-href="/meat-order/{{c._id}}">{{c.datePlaced| date:'dd/MM/yyyy h:mm a'}}</a>
 					</td>
@@ -119,19 +117,10 @@
 						<a ng-href="/meat-order/{{c._id}}">{{c.product.name}}</a>
 					</td>
 					<td data-title="'Price'">
-						<a ng-href="/meat-order/{{c._id}}">{{c.unitPriceWithMarkup|currency}} / kg</a>
-					</td>
-					<td data-title="'Weight'">
-						<a ng-href="/meat-order/{{c._id}}">{{c.weight || 'TBA'}} <span ng-show="c.weight">kg</span></a>
+						<a ng-href="/meat-order/{{c._id}}">{{c.priceWithMarkup|currency}}</a>
 					</td>
 				</tr>
 			</tbody>
 		</table>
 	</div>
 </div>
-
-
-
-
-
-

@@ -1,0 +1,134 @@
+<div class="page-header">
+	<h1 class="text-center">Beef Order Form <small>Beta</small></h1>
+</div>
+
+<div class="col-sm-4">
+	<img class="img-responsive" ng-src="{{beast.img}}">
+	<h4 class="text-center">{{beast.priceWithMarkup | currency}} / {{beast.units}}</h4>
+	<article ta-bind ng-model="beast.description"></article>
+</div>
+<div class="col-sm-8">
+	<p class="lead">Thank you for deciding to order your {{beast.productName}} through the Northland Natural Food Co-op. Whenever you order a whole <span ng-show="beast.half">or half </span>{{beast.productName}} you'll need to fill out this form. It contains the instructions the butchers need to know how to prepare your meat.</p>
+
+	<h3>How it works</h3>
+	<p>Once you click the 'Place Order' button at the bottom of the page, your instructions and order will be sent directly to the producer. If they need any other details from you the producer will contact you by email. You will receive an email as well to be a record of your order.</p>
+
+	<p>Then the producer will begin work on your order. Once the producer has completed your order they will notify you and you can pick it up on the next delivery day. Because slaughter schedules may not always line up with our delivery day schedule, you may not be able to get your meat order at the same time as your other shopping items.</p>
+
+	<img class="img-responsive" src="http://res.cloudinary.com/foodcoop/image/upload/v1444199775/meat-diagrams/shutterstock_125055797-cropped.jpg" alt="meat-diagrams">
+	<blockquote>
+	  <p>If you are unfamiliar as to where your cuts and steaks come from on a cow, here is a simple diagram to help you</p>
+	</blockquote>
+
+
+
+	<p>All whole and half beef orders come with the following cuts:</p>
+	<ul>
+		<li>Scotch Fillet</li>
+		<li>Rump Steak or Roast</li>
+		<li>Mince</li>
+		<li>Sausages (gluten and preservative free)</li>
+		<li>Bolar Roasts</li>
+		<li>Rolled Roasts</li>
+		<li>Topside - Schnitzel</li>
+		<li>Silverside - Corned</li>
+	</ul>
+
+	<form class="form-horizontal" name="meatOrderForm" ng-submit="order(meatOrderForm.$valid)" ng-hide="success">
+
+		<div class="form-group">
+			<label for="rump" class="col-sm-2 control-label">Rump</label>
+			<div class="col-sm-10">
+				<select ng-model="meatOrder.instructions.rump" name="rumps" class="form-control" required>
+					<option value="">-- Choose One --</option>
+					<option value="steaks">Steak</option>
+					<option value="roast">Roast</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="loin" class="col-sm-2 control-label">Loin Steaks</label>
+			<div class="col-sm-10">
+				<select ng-model="meatOrder.instructions.loin" name="loin" class="form-control" required>
+					<option value="">-- Choose One --</option>
+					<option value="t-bone steaks" selected>T-Bone Steaks</option>
+					<option value="fillet and sirloin steaks">Fillet and Sirloin Steaks</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="shoulders" class="col-sm-2 control-label">Shin</label>
+			<div class="col-sm-10">
+				<select ng-model="meatOrder.instructions.shin" name="shoulders" class="form-control" required>
+					<option value="">-- Choose One --</option>
+					<option value="mince" selected>Mince</option>
+					<option value="on bone">On Bone</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="blade" class="col-sm-2 control-label">Blade and Thick Flank</label>
+			<div class="col-sm-10">
+				<select ng-model="meatOrder.instructions.bladeAndFlank" name="blade" class="form-control" required>
+					<option value="">-- Choose One --</option>
+					<option value="bbq steaks" selected>BBQ Steaks</option>
+					<option value="stew">Stew Pieces</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="sausagePack" class="col-sm-2 control-label">Sausage Packing Sizes</label>
+			<div class="col-sm-10">
+				<select ng-model="meatOrder.instructions.sausagePackSize" name="sausagePack" class="form-control" required>
+					<option value="">-- Choose One --</option>
+					<option value="6" selected>6 Sausages per Package</option>
+					<option value="9" selected>9 Sausages per Package</option>
+					<option value="12" selected>12 Sausages per Package</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="packSize" class="col-sm-2 control-label">Servings Per Package</label>
+			<div class="col-sm-10">
+				<input ng-model="meatOrder.instructions.packSize" name="packSize" class="form-control" required min="1" max="10">
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="special" class="col-sm-2 control-label">Special Requests</label>
+			<div class="col-sm-10">
+				<textarea class="form-control" rows="4" ng-model="meatOrder.instructions.special" name="special" value="" placeholder="Any other special instructions, allergies, etc?"></textarea>
+			</div>
+		</div>
+
+		<div class="form-group">
+	    <div class="col-sm-offset-2 col-sm-10">
+	      <div class="checkbox">
+	        <label>
+	          <input type="checkbox" ng-model="meatOrder.instructions.bones"> Yes I'd like free soup and dog bones
+	        </label>
+	      </div>
+	    </div>
+	  </div>
+
+		<div class="form-group">
+			<div class="col-sm-10 col-sm-offset-2">
+				<button type="submit" class="btn" ng-class="{'btn-success':meatOrderForm.$valid, 'btn-warning':meatOrderForm.$invalid}">Place Order</button>
+			</div>
+		</div>
+		<br>
+	</form>
+
+	<div ng-show="success" class="jumbotron">
+		<h2 class="text-center">All ordered!</h2>
+		<p class="text-center">Thank you for your time and your order. We'll be in touch soon with your invoice when your order is finalized.</p>
+		<a href="/store" class="btn btn-primary">Keep Shopping</a>
+	</div>
+</div>
+
+<!-- {{meatOrderForm}} -->

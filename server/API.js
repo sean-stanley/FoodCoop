@@ -528,7 +528,7 @@ exports.configAPI = function configAPI(app) {
 
 	app.route('/api/meat-order', ctrl.auth.isLoggedIn)
 	.post(ctrl.meatOrder.create)
-	.put(ctrl.meatOrder.update)
+	//.put(ctrl.meatOrder.update) // deprecated so meat orders cannot be updated
 	.get(ctrl.meatOrder.me);
 
 	app.get('/api/meat-order/cart', ctrl.auth.isLoggedIn, ctrl.meatOrder.cart);

@@ -18,14 +18,6 @@ log = bunyan.createLogger({
 ObjectId = require('mongoose').Types.ObjectId,
 _ = require('lodash');
 
-//missing invoice
-
-// MeatOrder.findById("555d568b424e806d3ae2922d", function(err, order) {
-// 	if (err) log.warn(err);
-// 	invoiceCustomer(order);
-// 	invoiceProducer(order);
-// });
-
 
 exports.meatOrder = function(req, res, next, id) {
 	MeatOrder.findById(id, function(err, order) {
@@ -44,8 +36,11 @@ exports.create = function(req, res, next) {
 			return res.status(403).send(err.message);
 		}
 		log.info({success: true, order: order._id});
-		alertProducer(order);
-		emailCustomer(order);
+		// Deprecated
+		// alertProducer(order);
+		// emailCustomer(order);
+		invoiceCustomer(order);
+		invoiceProducer(order);
 		res.json(order);
 	});
 };
@@ -67,25 +62,25 @@ exports.cart = function(req, res, next) {
 };
 
 
-// send invoice if param invoice is truthy
-exports.update = function(req, res, next) {
-	MeatOrder.findById(req.body._id, function(err, order) {
-		order = _.merge(order, req.body);
-		//save product
-		order.save(function(err, order) {
-			if (err) return next(err);
-			if (req.query.invoice && order.weight > 0 && order.deliveryInstructions) {
-					invoiceCustomer(order);
-					invoiceProducer(order);
-					res.json(order);
-			} else if (req.query.invoice) {
-				order.invoice = false;
-				order.save();
-				res.status(403).send("Could not send invoice, weight or delivery instructions are missing");
-			} else res.json(order);
-		});
-	});
-};
+// deprecated. Orders cannot be edited
+// exports.update = function(req, res, next) {
+// 	MeatOrder.findById(req.body._id, function(err, order) {
+// 		order = _.merge(order, req.body);
+// 		//save product
+// 		order.save(function(err, order) {
+// 			if (err) return next(err);
+// 			if (req.query.invoice && order.weight > 0 && order.deliveryInstructions) {
+// 					invoiceCustomer(order);
+// 					invoiceProducer(order);
+// 					res.json(order);
+// 			} else if (req.query.invoice) {
+// 				order.invoice = false;
+// 				order.save();
+// 				res.status(403).send("Could not send invoice, weight or delivery instructions are missing");
+// 			} else res.json(order);
+// 		});
+// 	});
+// };
 
 exports.delete = function(req, res, next) {
 	var order = req.meatOrder;
@@ -101,64 +96,6 @@ exports.show = function(req, res) {
 	res.json(req.meatOrder);
 };
 
-function alertProducer(order) {
-	var mailOptions, mailData, update;
-	order.populate('supplier', 'name email producerData.companyName', function(err, order) {
-		if (err) {
-			order.remove();
-			log.err('Meat Order Supplier not found. Error.')
-			return
-		}
-		mailOptions = {
-			template:'butchery/new-meat-order',
-			subject: 'New order of ' + order.product.name + ' from the NNFC',
-			to: {
-				email: order.supplier.email,
-				name: order.supplier.name
-			}
-		};
-		mailData = {
-			datePlaced: moment(order.datePlaced).format('MMMM Do YYYY, h:mm:ss a'),
-			name: order.supplier.name,
-			customer: order.customer,
-			productName: order.product.name,
-			unitPrice: '$' + order.unitPrice.toFixed(2),
-			instructions: order.instructions
-		};
-		update = new Emailer(mailOptions, mailData);
-
-		update.send(function(err, result) {
-			if (err) log.warn(err);
-			log.info('message sent about new item to be %s', order.supplier.email);
-		});
-	});
-}
-
-function emailCustomer(order) {
-	var mailOptions, mailData, mail;
-	mailOptions = {
-		template: 'butchery/customer-meat-order',
-		subject: 'Bulk ' + order.product.name + ' order',
-		to: {
-			email: order.customer.email,
-			name: order.customer.name
-		}
-	};
-	mailData = {
-		datePlaced: moment(order.datePlaced).format('MMMM Do YYYY, h:mm:ss a'),
-		name: order.customer.name,
-		productName: order.product.name,
-		unitPrice: '$' + order.unitPriceWithMarkup.toFixed(2),
-		instructions: order.instructions
-	};
-	mail = new Emailer(mailOptions, mailData);
-
-	mail.send(function(err, result) {
-		if (err) log.warn(err);
-		log.info('message sent about bulk meat order to %s', order.customer.email);
-	});
-}
-
 function invoiceCustomer(order) {
 	async.waterfall([
 		function (done) {
@@ -166,19 +103,20 @@ function invoiceCustomer(order) {
 				dueDate: moment().add(7, 'd').format(),
 				meatOrder: order._id,
 				invoicee: order.customer.id,
-				title: order.product.name + ' order from the NNFC',
+				title: order.product.name + ' order through the NNFC',
 				items: [{
-					cost: order.totalWithMarkup,
-					name: order.product.name + ' @ $' + order.unitPriceWithMarkup.toFixed(2) + '/ kg (' + order.weight + ' kg)'
+					cost: order.priceWithMarkup,
+					name: order.product.name
 				}],
 			});
 
-			if (order.fixedPrice) {
-				invoice.items.push({
-					cost: order.fixedPrice,
-					name: 'Processing Fee',
-				});
-			}
+			// Deprecated
+			// if (order.fixedPrice) {
+			// 	invoice.items.push({
+			// 		cost: order.fixedPrice,
+			// 		name: 'Processing Fee',
+			// 	});
+			// }
 
 			invoice.save(function(err, invoice){
 				done(err, invoice);
@@ -200,9 +138,8 @@ function invoiceCustomer(order) {
 				dueDate: moment(invoice.dueDate).format('dddd DD MMMM YYYY'),
 				code: invoice._id,
 				product: order.product.name,
-				weight: order.weight,
 				items: invoice.items,
-				total: order.totalWithMarkup + (order.fixedPrice || 0),
+				total: order.priceWithMarkup,
 				account: invoice.bankAccount,
 				instructions: order.instructions,
 				deliveryInstructions: order.deliveryInstructions
@@ -234,25 +171,27 @@ function invoiceProducer(order) {
 			});
 		},
 		function (done) {
+			var produce
 			var invoice = new Invoice({
-				dueDate: moment().add(14, 'd').format(),
+				dueDate: moment().add(28, 'd').format(),
 				meatOrder: order._id,
 				toCoop: true,
 				invoicee: order.supplier,
 				title: order.product.name + ' order for ' + order.customer.name + ' at the NNFC',
 				items: [{
-					cost: order.total,
-					name: order.product.name + ' @ $' + order.unitPrice.toFixed(2) + '/ kg (' + order.weight + ' kg)'
+					cost: order.price,
+					name: order.product.name
 				}],
 				bankAccount: order.supplier.producerData.bankAccount
 			});
 
-			if (order.fixedPrice) {
-				invoice.items.push({
-					cost: order.fixedPrice,
-					name: 'Processing Fee',
-				});
-			}
+			// Not using Fixed Costs any more
+			// if (order.fixedPrice) {
+			// 	invoice.items.push({
+			// 		cost: order.fixedPrice,
+			// 		name: 'Processing Fee',
+			// 	});
+			// }
 
 			invoice.save(function(err, invoice){
 				done(err, invoice);
@@ -274,9 +213,8 @@ function invoiceProducer(order) {
 				dueDate: moment(invoice.dueDate).format('dddd DD MMMM YYYY'),
 				code: invoice._id,
 				product: order.product.name,
-				weight: order.weight,
 				items: invoice.items,
-				total: order.total + (order.fixedPrice || 0),
+				total: order.price,
 				instructions: order.instructions,
 				account: invoice.bankAccount,
 				deliveryInstructions: order.deliveryInstructions
@@ -286,14 +224,14 @@ function invoiceProducer(order) {
 
 
 			mail.send(function(err, result) {
-				if (err) done(err);
-				// a response is sent so the client request doesn't timeout and get an error.
+				if (err) log.error(err);
 				else {
-					done(null);
+					log.info(result);
 				}
 			});
+			done(); //send response right away instead of waiting for emails
 		}
 	], function(error) {
-		if (error) log.warn(error);
+		if (error) log.error(error);
 	});
 }
