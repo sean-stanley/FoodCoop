@@ -26,7 +26,7 @@ exports.discounts = ['WHOLEFOODHUB15', 'pechakucha', 'technical2015'];
 
 // set the co-op's markup as a whole number e.g. 20 for 20%
 exports.markup = 10;
-exports.meatMarkup = 5;
+exports.meatMarkup = 10;
 
 // set the co-op's milage rate (for later features). Units are dollars/km one way.
 exports.mileage = 0.8;

@@ -33,10 +33,7 @@ var bower_components = [
 ];
 
 var css_components = [
-	'app/lib/bower_components/bootstrap/dist/css/bootstrap.css',
-	'app/css/animations.css',
-	'app/css/banner.css',
-	'app/css/site.css',
+	'app/bootstrap-custom/dist/css/bootstrap.css',
 	'app/css/*.css',
 	'!app/css/compiled.min.css',
 	'app/lib/bower_components/textAngular/dist/textAngular.css',

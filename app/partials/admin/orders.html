@@ -34,14 +34,38 @@
 <p>Number of Customers: <span class="badge">{{customerCount}}</span><br>
   Number of Producers: <span class="badge">{{producerCount}}</span></p>
 
-<h2> Master List By Producer</h2>
+<div class="col-sm-6">
+  <h4 class="text-center">Customers</h4>
+  <div class="list-group">
+    <button type="button" class="list-group-item"
+    ng-click="$parent.search = customer"
+    ng-repeat="(customer,orderCount) in customers | orderBy:'customer' track by $index">
+      <span class="badge">{{orderCount}}</span>
+      {{customer}}
+    </button>
+  </div>
+</div>
+
+<div class="col-sm-6">
+  <h4 class="text-center">Producers</h4>
+  <div class="list-group">
+    <button type="button" class="list-group-item" ng-repeat="(producer,orderCount) in producers | orderBy:'producer' track by $index"
+    ng-click="$parent.search = producer">
+      <span class="badge">{{orderCount}}</span>
+      {{producer}}
+    </button>
+  </div>
+</div>
+
+<h2> Master List</h2>
 <input type="search" ng-model='search' placeholder="filter results" class='form-control'>
 
 			<table class="table">
 				<thead>
 					<tr>
-						<th>Arrived</th>
-						<th><a href="" ng-click="predicateP = 'supplier.producerData.companyName || supplier.name'; reverse=!reverse ">Producer</a></th>
+						<th>Sorted</th>
+            <th><a href="" ng-click="predicateP = 'customer.name'; reverse=!reverse ">customer</a></th>
+            <th><a href="" ng-click="predicateP = 'supplier.producerData.companyName || supplier.name'; reverse=!reverse ">Producer</a></th>
 						<th><a href="" ng-click="predicateP = 'product.productName'; reverse=!reverse ">Product</a></th>
 						<th><a href="" ng-click="predicateP = 'producerPrice'; reverse=!reverse ">Unit Price</a></th>
 						<th><a href="" ng-click="predicateP = 'orderPrice'; reverse=!reverse ">Price</a></th>
@@ -49,9 +73,12 @@
 				</thead>
 				<tbody>
 					<tr ng-repeat="i in orders | orderBy:predicateP:reverse | filter:search as filteredOrders " ng-class="{'text-disabled' : arrived}">
-				        <td data-title="'Date Placed'">
-							<button class="btn btn-primary" ng-click='arrived=!arrived'>Arrived</button>
+				    <td data-title="'Date Placed'">
+							<button class="btn btn-primary" ng-click='arrived=!arrived'>Sorted</button>
 						</td>
+            <td>
+              <a ng-href="/user/{{i.customer._id}}">{{i.customer.name}}</a>
+            </td>
 						<td data-title="'Producer'">
 							<a ng-href="/user/{{i.supplier._id}}">{{i.supplier.producerData.companyName || i.supplier.name}}</a>
 						</td>
@@ -62,7 +89,6 @@
 						<td data-title="'Price'">
 							{{i.unitPrice | currency}} / {{i.product.units}}
 						</td>
-
 						<td data-title="'times Ordered'">
 							{{i.orderPrice | currency}}
 						</td>
@@ -71,87 +97,9 @@
 				<tfoot>
 					<tr>
 						<td colspan="4"></td>
-						<td>Total: {{total(filteredOrders, 'orderPrice') | currency}}</td>
+						<td>Producer Total: {{total(filteredOrders, 'orderPrice') | currency}}</td>
+            <td>Customer Total: {{total(filteredOrders, 'orderPriceWithMarkup') | currency}}</td>
 					</tr>
 				</tfoot>
 			</table>
-<h2> Master List By Customer</h2>
-<input type="search" ng-model='search' placeholder="filter results" class='form-control'>
-			<table class="table">
-				<thead>
-					<tr>
-						<th>Sorted</th>
-						<th><a href="" ng-click="predicate = 'customer.name'; reverse=!reverse ">customer</a></th>
-						<th><a href="" ng-click="predicate = 'product.productName'; reverse=!reverse ">Product</a></th>
-						<th><a href="" ng-click="predicate = 'producerPrice'; reverse=!reverse ">Unit Price</a></th>
-						<th><a href="" ng-click="predicate = 'orderPriceWithMarkup'; reverse=!reverse ">Price w Markup</a></th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr ng-repeat="i in orders | orderBy:predicate:reverse | filter:search as filteredOrders " ng-class="{'text-disabled' : collected}">
-				        <td data-title="'Date Placed'">
-							<button class="btn btn-primary" ng-click='collected=!collected'>Sorted</button>
-						</td>
-						<td data-title="'Customer'">
-							<a ng-href="/user/{{i.customer._id}}">{{i.customer.name}}</a>
-						</td>
-						<td data-title="'Product'" >
-							x{{i.quantity}} <a ng-href="/product-upload/{{i.product._id}}">{{i.product.fullName}}</a>
-							<span ng-show="i.milk"> for {{i.deliveryDay | date:'d/M/yy'}}</span>
-						</td>
-						<td data-title="'Price'">
-							{{i.unitPriceWithMarkup | currency}} / {{i.product.units}}
-						</td>
-						<td data-title="'times Ordered'">
-							{{i.orderPriceWithMarkup | currency}}
-						</td>
-				    </tr>
-				</tbody>
-				<tfoot>
-					<tr>
-						<td colspan="4"></td>
-						<td>Total: {{total(filteredOrders, 'orderPriceWithMarkup') | currency}}</td>
-					</tr>
-				</tfoot>
-			</table>
-<h2> Refrigeration List </h2>
-<h3>Filter By: </h3>
-<ul class="nav nav-pills">
-	<li><a href="" ng-click="searchR.product.refrigeration = 'none'; ">None</a></li>
-	<li><a href="" ng-click="searchR.product.refrigeration = 'refrigeration' ">Refrigeration</a></li>
-	<li><a href="" ng-click="searchR.product.refrigeration = 'frozen' ">Frozen</a></li>
-</ul>
- 			<table class="table">
- 				<thead>
- 					<tr>
- 						<th><a href="" ng-click="predicateR = 'product.refrigeration'; reverse=!reverse ">Refrigeration</a></th>
- 						<th><a href="" >Product</a></th>
-						<th><a href="" >Customer</a></th>
- 						<th><a href="" >Producer</a></th>
-						<th><a href="" >Date</a></th>
- 					</tr>
- 				</thead>
- 				<tbody>
- 					<tr ng-repeat="i in orders | filter:searchR | orderBy:'product.refrigeration':reverse" ng-class="{'text-disabled' : stored}">
-						<td data-title="'Date Placed'">
- 							<button ng-show="i.product.refrigeration && i.product.refrigeration !== 'none' " class="btn btn-primary" ng-click='stored=!stored'>
-								{{i.product.refrigeration}}
-							</button>
-							<span ng-if="i.product.refrigeration === 'none'">{{i.product.refrigeration}}</span>
- 						</td>
- 						<td data-title="'Product'" >
-							x{{i.quantity}} <a ng-href="/product-upload/{{i.product._id}}">{{i.product.fullName}}</a>
-						</td>
- 						<td data-title="'Customer'">
- 							<a ng-href="/user/{{i.customer._id}}">{{i.customer.name}}</a>
- 						</td>
- 						<td data-title="'Producer'">
- 							<a ng-href="/user/{{i.supplier._id}}">{{i.supplier.producerData.companyName || i.supplier.name}}</a>
- 						</td>
-						<td data-title="'Date Placed'">
- 							{{i.datePlaced | shortDate}}
- 						</td>
-					</tr>
- 				</tbody>
- 			</table>
 </div>

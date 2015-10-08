@@ -871,7 +871,8 @@ exports.configAPI = function configAPI(app) {
 							USER_TYPE : user.user_type.name,
 							ADDRESS : user.address,
 							PHONE : user.phone
-						}
+						},
+						double_optin: false
 					};
 					//subscribe user to mailChimp
 					mc.lists.subscribe(params, function(result) {log.info(result);}, function(err) {

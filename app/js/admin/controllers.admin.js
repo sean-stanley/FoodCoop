@@ -288,16 +288,11 @@ angular.module('co-op.admin')
 
 	$scope.predicate = 'customer.name';
 
-	$scope.total = function(orders, property) {
-		var total = 0;
+	$scope.$watch('search', function() {
+		$scope.total($scope.orders);
+	});
 
-		if (_.isArray(orders)) {
-			for (var i=0; i < orders.length; i++) {
-				total += Number(orders[i][property]);
-			}
-			return total;
-		}
-	};
+	$scope.total = total;
 
 	function count(property) {
 		if ($scope.orders.length > 0) {
@@ -314,11 +309,28 @@ angular.module('co-op.admin')
 		producer = count('supplier') || [];
 		$scope.customerCount = customer.length;
 		$scope.producerCount = producer.length;
+
+		// get a list of customers and producers with a simple count of number of items ordered.
+		$scope.customers = _.countBy(result, function(order) {
+			return order.customer.name;
+		});
+		$scope.producers = _.countBy(result, function(order) {
+			return order.supplier.producerData.companyName || order.supplier.name;
+		});
 	}
 
-	$scope.$watch('search', function() {
-		$scope.total($scope.orders);
-	});
+	function total(orders, property) {
+		var result = 0;
+
+		if (_.isArray(orders)) {
+			for (var i=0; i < orders.length; i++) {
+				result += Number(orders[i][property]);
+			}
+			return result;
+		}
+	}
+
+
 }])
 .controller('productAdminCtrl', ['$scope', '$http', '$modal', '$window', 'categories', function($scope, $http, $modal, $window, categories) {
 	$scope.categories = categories.data;
