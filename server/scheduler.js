@@ -99,7 +99,7 @@ function checkConfig() {
 					recipients = {name: 'Sean Stanley', email: 'sean@maplekiwi.com'}
 				}
 				mandrill.send('delivery-day-template', recipients, {tags:["delivery day"]}, function(err, result) {
-					console.log(results)
+					console.log(result);
 				});
 			});
 
