@@ -246,64 +246,20 @@ exports.configAPI = function configAPI(app) {
 		if (product.cycle < scheduler.currentCycle._id) {
 			res.status(400).send('Products sold in the past can\'t be deleted');
 		}
-
-		if (product.cycle == scheduler.currentCycle._id) {
-
-			models.Order.find({cycle: scheduler.currentCycle._id, product: new ObjectId(product._id)})
-			.populate('customer', 'name email')
-			.populate('product', 'productName variety fullName')
-			.exec(function(e, orders){
-				if (e) return next(e);
-
-				function sendProductNotAvailableEmail(order) {
-					var mailOptions, mailData, update;
-					mailOptions = {
-						template: 'product-delete',
-						subject: product.productName + ' has been removed from the NNFC store',
-						to: {
-							email: order.customer.email,
-							name: order.customer.name
-						}
-					};
-					mailData = {
-						name: order.customer.name,
-						productName: order.product.fullName
-					};
-					update = new Emailer(mailOptions, mailData);
-
-					update.send(function(err, result) {
-						if (err) log.warn(err);
-						log.info('message sent about item deletion to %s', order.customer.email);
-					});
-				}
-
-				if (orders.length > 0) {
-					async.each(orders, function(order, done) {
-						sendProductNotAvailableEmail(order);
-						models.Order.findByIdAndRemove(order._id, function(err, order) {
-							if (err) return done(err);
-							done(null);
-						});
-					}, function(err) {
-						if (err) return next(err);
-						product.remove(function(err, product){
-							if (err) return next(err);
-							res.status(200).send('product deleted');
-						});
-					});
-				} else { // no orders for that product
-					product.remove(function(err, product){
-						if (err) return next(err);
-						else res.status(200).send('product deleted');
-					});
-				}
-			});
-		} else { // don't even bother looking for orders just delete the product
-			product.remove(function(err, product){
-				if (err) return next(err);
-				else res.status(200).send('product deleted');
-			});
-		}
+		models.Order.find({product: new ObjectId(product._id)})
+		.count(function(e, count){
+			if (e) return next(e);
+			
+			if (count > 0) {
+				return res.status(401).send('Products that have been ordered by customers cannot be deleted sorry');
+			} else { // no orders for that product
+				product.remove(function(err, product){
+					if (err) return next(err);
+					else res.status(200).send('product deleted');
+				});
+			}
+		});
+		
 	});
 	// return a compact list of all the current user's products.
 	app.get('/api/product-list', ctrl.auth.isLoggedIn, function(req, res, next) {
@@ -334,7 +290,7 @@ exports.configAPI = function configAPI(app) {
 		});
 	});
 
-	// return a compact list of all the current user's products for the current month.
+	// return a compact list of all the current user's products for the current cycle.
 	app.get('/api/product-list/current', ctrl.auth.isLoggedIn, function(req, res, next) {
 		models.Product.find().or([{
 			producer_ID : new ObjectId(req.user._id),
@@ -455,7 +411,7 @@ exports.configAPI = function configAPI(app) {
 						var minOrder = product.minOrder ? product.minOrder : 1;
 						if (!e) {
 							// make sure we are changing an order for the current cycle and a current product
-							if ( order.cycle === product.cycle && product.cycle === scheduler.currentCycle._id) {
+							if ( order.cycle >= product.cycle && product.cycle <= scheduler.currentCycle._id) {
 								if ( product.quantity >= (product.amountSold - oldQuantity + newQuantity) && newQuantity >= minOrder ) {
 									product.amountSold = product.amountSold - oldQuantity + newQuantity;
 									order.quantity = newQuantity;

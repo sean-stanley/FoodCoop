@@ -56,15 +56,15 @@
 			{{data.priceWithMarkup|currency}} / {{data.units}}
 		</h3>
 		<div class="well">
-			<button class="btn btn-danger btn-block" disabled ng-if="data.quantity === 0">
+			<button class="btn btn-danger btn-block" disabled ng-if="data.quantity - data.amountSold <= 0">
 				<span class="glyphicon glyphicon-exclamation-sign"></span> SOLD OUT
 			</button>
-			<button class="btn btn-primary btn-block" ng-click="addToCart(data)" ng-if="!data.AlreadyInCart" ng-hide="data.quantity <= 0 || data.permanent || !currentUser">
+			<button class="btn btn-primary btn-block" ng-click="addToCart(data)" ng-if="!data.AlreadyInCart" ng-hide="data.quantity - data.amountSold <= 0 || data.permanent || !currentUser">
 				<span class="glyphicon glyphicon-shopping-cart"></span> Add to Cart
 			</button>
 			<a class="btn btn-primary btn-block"
 			ng-href="{{data.butcheryForm}}/{{data._id}}"
-			ng-show="data.permanent">
+			ng-show="!!data.butcheryForm">
 				Order Now
 			</a>
 			<a class="btn btn-primary btn-block" href="/signup" ng-if="!currentUser">Become a member to Shop</a>

@@ -42,12 +42,14 @@
 	<h1 class="text-center">NNFC Catalogue</h1>
 	<table class="table table-hover" border="0" cellspacing="5" cellpadding="5">
 		<tr>
+			<th ng-if="currentUser.user_type.isAdmin || product.producer_ID === currentUser._id"><i class="fa fa-edit"></i></th>
 			<th><a href="" ng-click="sort = 'fullName' || 'productName'; reverse=!reverse">Product Name</a></th>
 			<th><a href="" ng-click="sort = 'producer_ID.producerData.companyName' || 'producer_ID.name'; reverse=!reverse">Producer</a></th>
 			<th><a href="" ng-click="sort = 'quantity'; reverse=!reverse">Amount Available</a></th>
 			<th colspan="2"><a href="" ng-click="sort = 'price'; reverse=!reverse">price</a></th>
 		</tr>
 		<tr ng-repeat="product in products | orderBy:sort:reverse | filter:search">
+			<td ng-if="currentUser.user_type.isAdmin || product.producer_ID === currentUser._id"><a ng-href="/product-upload/{{product._id}}"><i class="fa fa-pencil"></i></a></td>
 			<td><a ng-click="open(product)">{{product.fullName}}</a></td>
 			<td><a ng-href="/producer/{{product.producer_ID.producerData.companyName | forURL}}-{{product.producer_ID.name | forURL}}">
 					<span popover="id: {{product.producer_ID._id}}" popover-trigger="mouseenter"><span class="glyphicon glyphicon-user"></span> 

@@ -1,14 +1,15 @@
-var config = require('./coopConfig.js'),
-	cycle = config.cycle,
-	async = require('async'),
-	Emailer = require('./emailer.js'),
-	mongoose = require('mongoose'),
-	ObjectId = require('mongoose').Types.ObjectId,
-	models = require('./models.js'),
-	fs = require('fs'),
-	_ = require('lodash'),
-	schedule = require('node-schedule'),
-	mandrill = require('./mandrill.js');
+var config = require('./coopConfig.js')
+	, cycle = config.cycle
+	, async = require('async')
+	, Emailer = require('./emailer.js')
+	, mongoose = require('mongoose')
+	, ObjectId = require('mongoose').Types.ObjectId
+	, models = require('./models.js')
+	, fs = require('fs')
+	, _ = require('lodash')
+	, schedule = require('node-schedule')
+	, mandrill = require('./mandrill.js')
+	, moment = require('moment');
 
 	require('datejs');
 
@@ -76,6 +77,11 @@ function checkConfig() {
 		} else if (today.between( shoppingStart, shoppingStop) ) {
 			console.log('today is a shopping day');
 			exports.canShop = true;
+			
+			// if (moment(today).isSame(moment(shoppingStop).subtract(3, 'days'), 'day')) {
+// 				sendShoppingReminder()
+// 			}
+			
 		}
 
 		else if (today.equals(deliveryDay) ) {
@@ -95,7 +101,7 @@ function checkConfig() {
 	      recipients = _.merge(customers, suppliers);
 
 				console.log('sending delivery day message to: ', recipients.length)
-				if (process.env.NODE_ENVIRONMENT !== "Production") {
+				if (process.env.NODE_ENV !== "production") {
 					recipients = {name: 'Sean Stanley', email: 'sean@maplekiwi.com'}
 				}
 				mandrill.send('delivery-day-template', recipients, {tags:["delivery day"]}, function(err, result) {
@@ -329,6 +335,21 @@ function disableCycle() {
 // 		});
 // 	});
 // }
+
+
+function sendShoppingReminder() {
+	models.User.find({}, 'name email', function(err, recipients) {
+		if (err) return err;
+		console.log('sending shopping reminder to: %s members', recipients.length)
+		
+		if (process.env.NODE_ENV !== "production") {
+			recipients = {name: 'Sean Stanley', email: 'sean@maplekiwi.com'}
+		}
+		mandrill.send('shopping-ends-soon-template', recipients, {tags:["shopping reminder"]}, function(err, result) {
+			console.log(result);
+		});
+	});
+}
 
 //
 function consolidateAmountSold () {

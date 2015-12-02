@@ -315,7 +315,10 @@ angular.module('co-op.admin')
 			return order.customer.name;
 		});
 		$scope.producers = _.countBy(result, function(order) {
-			return order.supplier.producerData.companyName || order.supplier.name;
+			if (!!order.supplier.producerData && order.supplier.producerData.hasOwnProperty('companyName')) {
+				return order.supplier.producerData.companyName;
+			}
+			return order.supplier.name;
 		});
 	}
 
