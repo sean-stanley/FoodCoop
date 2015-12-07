@@ -19,7 +19,7 @@ var async = require('async')
 	var start = moment().startOf('year');
 	var dates = [];
 
-	for (var i = 0; i <= 118; i++) {
+	for (var i = 0; i <= 31; i++) {
 		dates.push(Date.parse('january 1st 2015').addDays(i));
 	}
 
@@ -55,28 +55,28 @@ var async = require('async')
 			})
 			
 		});
-		it('should be able to find a specific delivery day', function(done) {
-			expect(start.month()).toBe(0);
-			//done();
-			var date = Date.parse('Wednesday January 14 2015');
-			
-			scheduler.checkCycle(date, function(err, cycle) {
-				expect(err).toBe(null);
-				expect(cycle).not.toBeNull();
-				expect(cycle.deliveryDay).not.toBeUndefined();
-				expect(cycle.start).not.toBeUndefined();
-				
-				var d = Date.parse(cycle.deliveryDay)
-				
-				expect(date).toEqual(d);
-				
-				done();
-			});
-		});
+		// it('should be able to find a specific shopping day', function(done) {
+		// 	expect(start.month()).toBe(0);
+		// 	//done();
+		// 	var date = Date.parse('Wednesday January 14 2015');
+		//
+		// 	scheduler.checkCycle(date, function(err, cycle) {
+		// 		expect(err).toBe(null);
+		// 		expect(cycle).not.toBeNull();
+		// 		expect(cycle.deliveryDay).not.toBeUndefined();
+		// 		expect(cycle.start).not.toBeUndefined();
+		//
+		// 		var d = Date.parse(cycle.deliveryDay)
+		//
+		// 		expect(date).toEqual(d);
+		//
+		// 		done();
+		// 	});
+		// });
 		it('should be able to find a specific cycle start', function(done) {
 			expect(start.month()).toBe(0);
 			//done();
-			var date = Date.parse('Thursday January 15 2015');
+			var date = Date.parse('Monday January 12 2015');
 			
 			scheduler.checkCycle(date, function(err, cycle) {
 				expect(err).toBe(null);

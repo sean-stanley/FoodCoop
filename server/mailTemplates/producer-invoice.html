@@ -5,7 +5,14 @@
     <body>
         <p> Hi {{name}},</p>
 		<p>Thank you for selling with the Northland Natural Food Co-op. Local commerce reduces environmental impact and increases Northland's food security. Our customers thank you for sharing your fantastic products with them.</p>
-        <p> Below is a summary of the products you have sold this cycle, along with the amount your account has been credited. Please bring all the products which have been ordered from you to the Woods Centre on delivery day, which is <strong>{{deliveryDay}}</strong>. If you want to make other arrangements to drop off your goods please contact <a href="mailto:sean@foodcoop.nz">me</a></p>
+				<p>Please arrange to get your order to us by {{deliveryDay}}. You can drop it off between 1pm and 3pm at 1 Woods Rd (the warehouse behind Chipmunks) in Whangarei. If there are other NNFC producers near you, please consider carpooling your orders. If you are unable to get your order to us on {{deliveryDay}}, please contact <a href="mailto:sean@foodcoop.nz">us</a>. We may be able to arrange pick-up, or help you organise a courier.</p>
+		
+				<h2>Storing Product at our Sorting Hub</h2>
+				<p>If delivering is inconvenient for you, consider storing your products at our Sorting Hub. Keeping stock at our warehouse will allow you  to deliver less frequently. Products stored with us remain your property, and you will be paid for them as they sell, as usual.</p>
+				<p>Please note that we are only able to store shelf stable items at this point.</p>
+				
+				 <h2>Your Sales</h2>
+				 <p> Below is a summary of the products you have sold this cycle, along with the amount your account has been credited.</p>
 		
 				<table border="0" cellspacing="10" cellpadding="10">
 				 <thead>
@@ -14,7 +21,6 @@
 						 <th colspan="5"></td><strong>{{name}}'s Requested Products</strong></th>
 					 </tr>
 					 <tr>
-						 <th><strong>Refrigeration</strong></th>
 						 <th><strong>Product</strong></th>
 						 <th><strong>Customer</strong></th>
 						 <th><strong>Unit Price</strong></th>
@@ -26,7 +32,6 @@
                
 			  <% _.each(items, function(item) { %> 
                  <tr>
-                     <td>{{item.product.refrigeration || 'none'}}</td>
 					 <td>{{item.product.fullName}} </td>
 					 <td>{{item.customer.name}}</td>
 					 <td>${{item.product.price.toFixed(2)}} / {{item.product.units}}</td>
@@ -37,7 +42,7 @@
            </tbody>
            <tfoot>
 							 <tr>
-								 <td colspan="6"> Total: ${{total.toFixed(2)}}</td>
+								 <td colspan="5"> Total: ${{total.toFixed(2)}}</td>
 							 </tr>
 						 </tfoot>
 					 </table>
@@ -45,9 +50,9 @@
 	   <p>Assuming all your customers pay us promptly, your payment should arrive by <strong>{{dueDate}}</strong> You can expect payment to the account {{account}}. If this is incorrect, please contact us immediately and update your bank account details from the producer profile page on our website.</p>
        
 			
-		<h1>Product Labels</h1>
+		<!-- <h1>Product Labels</h1>
 		<p>These labels detail which customers purchased each of your products, along with the quantity they have ordered. Some producers like to attach these labels to their products. This is not a requirement but mearly a helpful aid for making sure all products are brought in the right quantites for each individual.</p>
-		  <% _.each(items, function(item) { %> 
+		  <% _.each(items, function(item) { %>
 			<table style="width: 500px; border: 1px dotted #333;">
                 <tr>
 					<td style="padding: 15px 10px 0 10px"><strong>{{item.product.fullName}}</strong> <br/>
@@ -61,10 +66,9 @@
 					<td style="padding: 0 10px 15px 10px">{{item.product.refrigeration}}</td>
 				</tr>
 			</table>
-		<% }); %>
+		<% }); %> -->
 		
-		<h2>Delivering your Order</h2>
-		<p>Please arrange with us to have your order by {{deliveryDay}}. You can drop it off between 1pm and 3pm at 1 Woods Rd (the warehouse behind Chipmunks) in Whangarei. Or you can arrange pick up with us a couple days beforehand if you won't be in Whangarei on Delivery Day and have no goods to pickup. If there are other NNFC producers near you, consider carpooling your orders together to save time and money. We can also help with courier of your goods if delivery is not efficient for you any other way.</p>
+		
         
         <p> We look forward to hearing from you and receiving your orders.</p>
         <p>Cheers, <br>

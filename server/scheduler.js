@@ -19,7 +19,7 @@ function checkCycle(date, done) {
 
 	models.Cycle.findOne({
 		start: {$lte: new Date(date).toISOString()},
-		deliveryDay: {$gte: new Date(date).toISOString()}
+		shoppingStop: {$gt: new Date(date).toISOString()}
 	})
 	.lean().exec(function(err, cycle) {
 
@@ -39,7 +39,6 @@ exports.checkCycle = checkCycle;
 var orderCycleChecker = schedule.scheduleJob({hour:1, minute: 0}, checkConfig);
 
 // schedule emails to send alerting members that it is delivery day.
-// To be executed at 9:15am Wednesday;
 function checkConfig() {
 	var today = new Date();
 	today.setHours(0, 0, 0, 0);
@@ -53,7 +52,6 @@ function checkConfig() {
 	// 	else console.log(result);
 	// });
 
-
 	checkCycle(today, function(err, cycle) {
 		if (err) {
 			console.log(err);
@@ -63,53 +61,57 @@ function checkConfig() {
 		var shoppingStop = Date.parse(cycle.shoppingStop);
 		var deliveryDay = Date.parse(cycle.deliveryDay);
 
-		exports.canShop = false;
+		exports.canShop = true;
 
 		if ( today.equals( shoppingStart ) ) {
-			console.log('today is a shopping day');
-			exports.canShop = true;
-		} else if (today.equals(cycle.shoppingStop) ) {
-			console.log('Today everyone is invoiced');
-			// checkout everyone's purchases
-			exports.checkout();
-			// send order requests to producers
-			exports.orderGoods();
+			console.log('today is a shopping day and start of a new cycle');
+					
 		} else if (today.between( shoppingStart, shoppingStop) ) {
 			console.log('today is a shopping day');
-			exports.canShop = true;
 			
-			// if (moment(today).isSame(moment(shoppingStop).subtract(3, 'days'), 'day')) {
-// 				sendShoppingReminder()
-// 			}
-			
+			if (moment(today).isSame(moment(shoppingStop).subtract(3, 'days'), 'day')) {
+				sendShoppingReminder()
+			}
 		}
 
-		else if (today.equals(deliveryDay) ) {
-			console.log('Today is Delivery Day!');
-			models.Order.find({cycle: exports.currentCycle}, 'supplier customer')
-			.populate('supplier', 'name email')
-			.populate('customer', 'name email')
-			.exec(function(err, orders) {
+		isShoppingStopDay (function(err, cycle) {
+			if (cycle) {
+				console.log('Today everyone is invoiced');
+				// checkout everyone's purchases
+				exports.checkout();
+				// send order requests to producers
+				exports.orderGoods();
+			}
+		});
+		
+			
+		isDeliveryDay(function(err, cycle) {
+			if (cycle) {
+				console.log('Today is Delivery Day!');
+				models.Order.find({cycle: exports.currentCycle}, 'supplier customer')
+				.populate('supplier', 'name email')
+				.populate('customer', 'name email')
+				.exec(function(err, orders) {
 
-				var customers, suppliers, recipients;
-				if (err) {
-					console.error(err);
-					return
-				}
-				customers = _.pluck(orders, 'customer');
-	      suppliers = _.pluck(orders, 'supplier');
-	      recipients = _.merge(customers, suppliers);
+					var customers, suppliers, recipients;
+					if (err) {
+						console.error(err);
+						return
+					}
+					customers = _.pluck(orders, 'customer');
+		      suppliers = _.pluck(orders, 'supplier');
+		      recipients = _.merge(customers, suppliers);
 
-				console.log('sending delivery day message to: ', recipients.length)
-				if (process.env.NODE_ENV !== "production") {
-					recipients = {name: 'Sean Stanley', email: 'sean@maplekiwi.com'}
-				}
-				mandrill.send('delivery-day-template', recipients, {tags:["delivery day"]}, function(err, result) {
-					console.log(result);
+					console.log('sending delivery day message to: ', recipients.length)
+					if (process.env.NODE_ENV !== "production") {
+						recipients = {name: 'Sean Stanley', email: 'sean@maplekiwi.com'}
+					}
+					mandrill.send('delivery-day-template', recipients, {tags:["delivery day"]}, function(err, result) {
+						console.log(result);
+					});
 				});
-			});
-
-		}
+			}
+		});
 
 	});
 }
@@ -335,7 +337,15 @@ function disableCycle() {
 // 		});
 // 	});
 // }
+function isDeliveryDay(cb) {
+	models.Cycle.findOne({deliveryDay: new Date( Date.today().toISOString() ) })
+	.lean().exec(cb)
+}
 
+function isShoppingStopDay(cb) {
+	models.Cycle.findOne({shoppingStop: new Date( Date.today().toISOString() ) })
+	.lean().exec(cb)
+}
 
 function sendShoppingReminder() {
 	models.User.find({}, 'name email', function(err, recipients) {
