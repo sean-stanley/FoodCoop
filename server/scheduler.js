@@ -78,9 +78,9 @@ function checkConfig() {
 			if (cycle) {
 				console.log('Today everyone is invoiced');
 				// checkout everyone's purchases
-				exports.checkout();
+				exports.checkout(cycle._id);
 				// send order requests to producers
-				exports.orderGoods();
+				exports.orderGoods(cycle._id);
 			}
 		});
 		
@@ -117,13 +117,13 @@ function checkConfig() {
 }
 exports.checkConfig = checkConfig;
 
-exports.checkout = function () {
+exports.checkout = function (cycleId) {	
 	async.waterfall([
 		function(done) {
 			console.log('beginning checkout process');
 			models.Order
 			.aggregate()
-			.match({cycle: exports.currentCycle._id})
+			.match({cycle: cycleId})
 			.group({ _id: '$customer', orders: { $push : {product: '$product', quantity: '$quantity'} }})
 			.exec(function(e, customers) {
 				// customers is a plain javascript object not a special mongoose document.
@@ -137,9 +137,10 @@ exports.checkout = function () {
 			});
 		}
 	],function(e, result){
+		this.cycleId = cycleId;
 		if (e) console.log(e);
 		else {
-			async.each(result, exports.invoiceCustomer, function(error) {
+			async.each(result, exports.invoiceCustomer.bind(this), function(error) {
 				if (error) console.log(error);
 			});
 		}
@@ -151,12 +152,13 @@ exports.checkout = function () {
 exports.invoiceCustomer = function(customer, callback) {
 	async.waterfall([
 		function (done) {
+			if (this.cycleId == undefined) throw new Error("cycleId is undefined")
 			var invoice = new models.Invoice({
 				dueDate: Date.parse(exports.currentCycle.shoppingStop).addDays(7).toString(),
 				invoicee: customer._id._id,
 				title: 'Shopping Order for ' + Date.today().toString('MMMM'),
 				items: customer.orders,
-				cycle: exports.currentCycle._id,
+				cycle: this.cycleId,
 				deliveryRoute: customer._id.routeTitle || 'Whangarei'
 			});
 
@@ -206,13 +208,14 @@ exports.invoiceCustomer = function(customer, callback) {
 	});
 };
 
-exports.orderGoods = function() {
+exports.orderGoods = function(cycleId) {
 	console.log('beginning ordering from producers');
+	
 	async.waterfall([
 		function(done) {
 			models.Order
 			.aggregate()
-			.match({cycle: exports.currentCycle._id})
+			.match({cycle: cycleId})
 			.group({ _id: '$supplier', orders: { $push : {product: '$product', customer: '$customer', quantity: '$quantity'} }})
 
 			.exec(function(e, producers) {
@@ -228,10 +231,22 @@ exports.orderGoods = function() {
 			});
 		}
 	],function(e, result){
+		this.cycleId = cycleId;
 		if (e) {
 			console.log(e);
 		} else {
-			async.each(result, exports.invoiceFromProducer, function(error) {
+			// exports.invoiceFromProducer.call( this,
+// 				{
+// 					_id: {
+// 						_id: ObjectId("535e107876dc96914a743e73"),
+// 						producerData: {bankAccount: ""}
+// 					},
+// 					orders: [
+// 						{}
+// 					],
+// 					test: true
+// 				}, _.noop);
+			async.each(result, exports.invoiceFromProducer.bind(this), function(error) {
 				if (error) console.log(error);
 			});
 		}
@@ -247,16 +262,20 @@ exports.invoiceFromProducer = function (producer, callback) {
 
 	async.waterfall([
 		function(done) {
+			if (this.cycleId == undefined) throw new Error("cycleId is undefined in async.waterfall")
+// 			console.log(this.cycleId)
 			var invoice = new models.Invoice({
 				dueDate: Date.parse(exports.currentCycle.deliveryDay).addDays(4).toString('ddd dd MMMM yyyy'),
 				invoicee: producer._id._id,
 				title: 'Products Requested for ' + Date.today().toString('MMMM'),
 				items: producer.orders,
-				cycle: exports.currentCycle._id,
+				cycle: this.cycleId,
 				toCoop: true,
 				bankAccount: producer._id.producerData.bankAccount || 'NO ACCOUNT ON RECORD'
 			});
-
+			
+			// if (producer.test) throw new Error("don't save the invoice it's a test!")
+				
 			invoice.populate('items.customer', 'name email routeTitle balance')
 			.populate('items.product', 'fullName variety productName price units refrigeration', function(e, invoice) {
 				if (e) return done(e);
