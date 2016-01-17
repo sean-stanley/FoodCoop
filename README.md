@@ -3,7 +3,7 @@
 
 Software for managing a local food co-op. This web app is built with MongoDB, Express, AngularJS and Node.js.
 
-A live site can be found [here](https://foodcoop.nz).
+A live site can be found [here](http://foodcoop.nz).
 
 
 # Included Features:
