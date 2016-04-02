@@ -1,0 +1,37 @@
+<div class="col-xs-12">
+<nav class="navbar navbar-default" role="navigation">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">NNFC Admin</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="/admin">Users</a></li>
+        <li><a href="/admin/invoices">Invoices</a></li>
+				<li><a href="/admin/orders">Orders</a></li>
+				<li><a href="/admin/cycles">Cycles</a></li>
+				<li><a href="/admin/routes">Routes</a></li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+<h1>Meat Orders</h1>
+
+<accordion>
+  <accordion-group heading="{{order.product.name}} for {{order.customer.name}} ordered {{order.datePlaced | calendar}}" ng-repeat="order in orders">
+    <h3>Butchery Instructions</h3>
+    <ul>
+      <li ng-repeat="(key, value) in order.instructions">{{key.toUpperCase()}} : {{value}}</li>
+    </ul>
+    <p>Customer Price: {{order.priceWithMarkup | currency}} Producer Price: {{order.price | currency}}
+  </accordion-group>
+</accordion>

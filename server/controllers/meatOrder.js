@@ -53,6 +53,14 @@ exports.me = function(req, res, next) {
 	});
 };
 
+exports.all = function(req, res, next) {
+	MeatOrder.find().sort({datePlaced: -1})
+	.exec(function(err, orders) {
+		if (err) return next(err);
+		res.json(orders);
+	});
+};
+
 exports.cart = function(req, res, next) {
 	MeatOrder.find({'customer.id': new ObjectId(req.user._id)})
 	.exec(function(err, orders) {

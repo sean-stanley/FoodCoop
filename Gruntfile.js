@@ -107,6 +107,24 @@ module.exports = function(grunt) {
 					stdout: true
 				}
 			},
+      mongodb: {
+        command: 'mongod',
+        options: {
+          async: true,
+          stdout:false,
+          stderr: true,
+          failOnError: true
+        }
+      },
+      redis: {
+        command: 'redis-server',
+        options: {
+          async:true,
+          stdout:false,
+          stderr: true,
+          failOnError: true
+        }
+      },
 			encryptConfig: {
 				command: 'openssl cast5-cbc -e -in config.js -out config.js.cast5',
 				options: {
@@ -345,10 +363,10 @@ module.exports = function(grunt) {
 	// grunt.loadNpmTasks('grunt-contrib-clean');
 
 	// Default task(s).
-	grunt.registerTask('dev', ['cssmin', 'coffee:compile', 'uglify:bowerDev', 'concurrent:dev']);
+	grunt.registerTask('dev', ['cssmin', 'coffee:compile', 'uglify:bowerDev', 'shell:mongodb', 'shell:redis', 'concurrent:dev']);
 	grunt.registerTask('build', ['cssmin', 'coffee:compile', 'concurrent:build', 'replace', 'clean:annotations', 'ngAnnotate', 'uglify:app', 'uglify:bowerServer']);
 	grunt.registerTask('serve-opt', ['build', 'nodemon:opt']);
-	grunt.registerTask('debug', ['cssmin', 'coffee:compile', 'concurrent:debug']);
+	grunt.registerTask('debug', ['cssmin', 'coffee:compile', 'shell:mongodb', 'shell:redis', 'concurrent:debug']);
 	grunt.registerTask('deploy-debug', ['rsync:linode', 'shell:updateServer']);
 	grunt.registerTask('deploy', ['build', 'rsync:linodeOpt', 'shell:updateServer']);
 	grunt.registerTask('decrypt-config', ['shell:decryptConfig']);

@@ -56,26 +56,22 @@
 	
 <hr>
 
-<div ng-controller="calendarCtrl" class="col-sm-4 col-md-3">
+<div ng-controller="calendarCtrl" class="col-sm-4">
 	<a href="/calendar"><i class="fa fa-calendar pull-left fa-4x"></i></a>
 	<p>
-		<i class="fa fa-shopping-cart fa-fw"></i> Shopping <strong>{{shoppingTime()}}</strong><br>
-		<i class="fa fa-gift fa-fw"></i> Delivery Day is <strong>{{deliveryDayFromNow}}</strong><br>
+		<i class="fa fa-shopping-cart fa-fw"></i> Shopping finishes each <strong>Friday</strong><br>
+		<i class="fa fa-gift fa-fw"></i> Delivery Day is the following <strong>Tuesday</strong><br>
 	</p>
-	<h2>Events for {{month}}</h2>
-	<table class="table col-lg-11" border="0" cellspacing="5" cellpadding="5">
-		<tr ng-repeat-start="cycle in calendar[month]">
-			<th><a href="/faq#shopping-start">Shopping</a></th>
-			<td>{{cycle.shoppingStart | longDate}} - {{cycle.shoppingStop | longDate}}</td>
-		</tr>
-		<tr ng-repeat-end>
-			<th><a href="/faq#delivery-day">Delivery Day</a></th>
-			<td>{{cycle.deliveryDay | longDate}}</td>
-		</tr>
-	</table>
+	<ul class="list-unstyled">
+		<li><span class="glyphicon glyphicon-earphone"></span> {{currentUser.phone}}</li>
+		<li><span class="glyphicon glyphicon-envelope"></span> {{currentUser.email}}</li>
+		<li><span class="glyphicon glyphicon-map-marker"></span> {{currentUser.address}}</li>
+		<li ng-show="producer.producerData.website"><img src="../img/glyphicons/Globe.png" width="18" alt="Globe"> <a href="http://{{producer.producerData.website}}" >{{currentUser.producerData.website}}</a></li>
+	</ul>
+	<a href="/edit-me" class="btn btn-block btn-default"><span class="glyphicon glyphicon-user"></span> Edit My Info</a>
 </div>
 
-<div class="col-sm-4 col-md-3" ng-if="currentUser.user_type.canSell" >
+<div class="col-sm-4" ng-if="currentUser.user_type.canSell" >
 	<h2>{{currentUser.producerData.companyName || currentUser.name}}</h2>
 	<article ta-bind ng-model="currentUser.producerData.description"></article>
 	
@@ -83,7 +79,7 @@
 	<br>
 </div>
 
-<div class="col-sm-4 col-md-3 well" ng-if="currentUser.user_type.canSell" >
+<div class="col-sm-4 well" ng-if="currentUser.user_type.canSell" >
 	<h2>Personal Bio</h2>
 	<article ta-bind ng-model="currentUser.producerData.personalBio"></article>
 	<a ng-show="currentUser.user_type.canSell" href="/edit-me" class="btn btn-block btn-default"><span class="glyphicon glyphicon-pencil"></span> Edit My Profile</a>
@@ -92,14 +88,7 @@
 
 
 <div class="col-sm-4 col-md-3">
-	<ul class="list-unstyled">
-		<li><span class="glyphicon glyphicon-earphone"></span> {{currentUser.phone}}</li>
-		<li><span class="glyphicon glyphicon-envelope"></span> {{currentUser.email}}</li>
-		<li><span class="glyphicon glyphicon-map-marker"></span> {{currentUser.address}}</li>
-		<li ng-show="producer.producerData.website"><img src="../img/glyphicons/Globe.png" width="18" alt="Globe"> <a href="http://{{producer.producerData.website}}" >{{currentUser.producerData.website}}</a></li>
-	</ul>
-	<a href="/edit-me" class="btn btn-block btn-default"><span class="glyphicon glyphicon-user"></span> Edit My Info</a>
-
+	
 </div>
 	
 

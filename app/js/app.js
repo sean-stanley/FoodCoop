@@ -33,6 +33,8 @@ angular.module('co-op', [
 		.when('/signup', {templateUrl: 'partials/signup/signup.html', controller: 'userCtrl', reloadOnSearch: false, title: 'Signup',
 		description: 'Signup to be a member of the NNFC. Northland\'s first food co-op.'
 		})
+    .when('/info/customer', {templateUrl: 'partials/signup/customer-info.html', reloadOnSearch: false, title: 'Customer Benefits'})
+    .when('/info/producer', {templateUrl: 'partials/signup/producer-info.html', reloadOnSearch: false, title: 'Producer Benefits'})
 		.when('/welcome', {templateUrl: 'partials/signup/welcome.html', loggedInOnly: true, reloadOnSearch: false, title: 'Welcome New Member'})
 		.when('/apply', {
 			templateUrl: 'partials/signup/producer-application.html',
@@ -189,6 +191,16 @@ angular.module('co-op', [
 			});
 
 	})
+  .run(function($rootScope, $http) {
+		$http.get('/api/calendar').success(function(result) {
+			
+      $rootScope.cycleObject = result.cycle;
+			$rootScope.cycle = result.cycle._id;
+			
+			$rootScope.$broadcast('CALENDAR-LOADED');
+			$rootScope.$broadcast('GET_CART');
+		});
+  })
 	.run(['$rootScope', '$route', '$location', 'LoginManager', 'flash', 'Session', 'Restangular', '$window', function($rootScope, $route, $location, LoginManager, flash, Session, Restangular, $window) {
 		$rootScope.slideInterval = 7000;
 		$rootScope.setInterval = function(interval) {

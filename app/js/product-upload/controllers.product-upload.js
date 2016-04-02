@@ -25,49 +25,49 @@ angular.module('co-op.product-upload')
 	function($scope, $rootScope, $sce, $location, $modal, ProductManager, Restangular, $http, product, flash) {
 		// init
 		$scope.productManager = ProductManager;
-		console.log($rootScope.cycle);
 
 		$scope.newProduct = {
 			refrigeration: 'none',
+			active: true,
 			img: null,
 			priceWithMarkup: this.price * 1.1,
 			price: undefined,
 			producer_ID: $rootScope.currentUser._id
 		};
-		$scope.newProduct.cycle = $rootScope.canShop ? $rootScope.cycle : !!$rootScope.cycle ? $rootScope.cycle + 1 : undefined;
+		// $scope.newProduct.cycle = $rootScope.canShop ? $rootScope.cycle : !!$rootScope.cycle ? $rootScope.cycle + 1 : undefined;
 
 		$scope.reset = reset;
 
 		$scope.productData = product || angular.copy($scope.newProduct);
 		$scope.selectedImg = $scope.productData.img || null;
 
-		var originalCycle = (!!product && product.hasOwnProperty('cycle') ) ? product.cycle : undefined;
+		// var originalCycle = (!!product && product.hasOwnProperty('cycle') ) ? product.cycle : undefined;
 
-		if ($rootScope.cycle) {
-			//true if calendar-loaded already fired
-			if ($scope.productData.cycle < $rootScope.cycle || $scope.productData.cycle === undefined) {
-				// old product from a past cycle or new product
-				$scope.productData.cycle = $rootScope.canShop ? $rootScope.cycle : $rootScope.cycle + 1;
-			}
-			// old product from distant future -- do nothing
-		}
+		// if ($rootScope.cycle) {
+// 			//true if calendar-loaded already fired
+// 			if ($scope.productData.cycle < $rootScope.cycle || $scope.productData.cycle === undefined) {
+// 				// old product from a past cycle or new product
+// 				$scope.productData.cycle = $rootScope.canShop ? $rootScope.cycle : $rootScope.cycle + 1;
+// 			}
+// 			// old product from distant future -- do nothing
+// 		}
 
-		$scope.$on('CALENDAR-LOADED', calendarLoaded);
+		// $scope.$on('CALENDAR-LOADED', calendarLoaded);
 
 		$scope.ingredients = false;
 
-		$scope.selectAllCycles = selectAllCycles;
+		// $scope.selectAllCycles = selectAllCycles;
 
-		$scope.$watch('multiCycle', productCycleReset);
+		// $scope.$watch('multiCycle', productCycleReset);
 
-    $scope.$watch('productData.permanent', function(nv){
-      if (nv === true) {
-        $scope.productData.cycle = undefined;
-      } else {
-        productCycleReset(false);
-      }
-
-    });
+    // $scope.$watch('productData.permanent', function(nv){
+//       if (nv === true) {
+//         $scope.productData.cycle = undefined;
+//       } else {
+//         productCycleReset(false);
+//       }
+//
+//     });
 
 		$scope.$watch('productData.price', function(newValue) {
 			$scope.productData.priceWithMarkup = newValue * 1.1;
@@ -83,13 +83,11 @@ angular.module('co-op.product-upload')
 
 		certifications.getList().then(getCertifications);
 
-		$scope.save = saveProduct;
-
-		$scope.update = updateProduct;
-
 		$scope.crop = crop;
-
+		$scope.save = saveProduct;
+		$scope.update = updateProduct;
 		$scope.preview = preview;
+		$scope.togglePublish = togglePublish;
 
     function reset() {
 			var path = $location.path();
@@ -98,30 +96,50 @@ angular.module('co-op.product-upload')
 				$location.path('product-upload');
 			}
 		}
+		
+		function togglePublish() {
+			var active;
+			active = $scope.productData.active;
+			
+			var modalInstance = $modal.open({
+				templateUrl: 'partials/loggedIn/product-upload/toggle-publish.html',
+				size: 'sm'
+			});
 
-    function selectAllCycles() {
-			$scope.productData.cycle = [];
-			for (var i = 0; i < ProductManager.cycles.length; i++) {
-				$scope.productData.cycle.push(ProductManager.cycles[i]._id);
-			}
+			modalInstance.result.then(function() {
+				console.log("save product");
+				updateProduct(true, false);
+
+			}, function() {
+				$scope.productData.active = !$scope.productData.active; // ng-changed won't be triggered here so no infinite loop
+				console.log('Modal dismissed at: ' + new Date());
+			});
+			
 		}
 
-    function productCycleReset(newValue) {
-      console.log(newValue);
-      if (newValue === false) {
-				if ($rootScope.canShop) {
-					$scope.productData.cycle = $scope.productData.hasOwnProperty('_id') && originalCycle ? originalCycle : $rootScope.cycle;
-				} else $scope.productData.cycle = $scope.productData.hasOwnProperty('_id') && originalCycle ? originalCycle : $rootScope.cycle + 1;
-			} else $scope.productData.cycle = [];
-		}
+    // function selectAllCycles() {
+// 			$scope.productData.cycle = [];
+// 			for (var i = 0; i < ProductManager.cycles.length; i++) {
+// 				$scope.productData.cycle.push(ProductManager.cycles[i]._id);
+// 			}
+// 		}
 
-    function calendarLoaded() {
-			if ($scope.productData.cycle < $rootScope.cycle || $scope.productData.cycle === undefined) {
-				// old product from a past cycle or new product
-				$scope.productData.cycle = $rootScope.canShop ? $rootScope.cycle : $rootScope.cycle + 1;
-				// old product from distant future -- do nothing
-			}
-		}
+    // function productCycleReset(newValue) {
+//       console.log(newValue);
+//       if (newValue === false) {
+// 				if ($rootScope.canShop) {
+// 					$scope.productData.cycle = $scope.productData.hasOwnProperty('_id') && originalCycle ? originalCycle : $rootScope.cycle;
+// 				} else $scope.productData.cycle = $scope.productData.hasOwnProperty('_id') && originalCycle ? originalCycle : $rootScope.cycle + 1;
+// 			} else $scope.productData.cycle = [];
+// 		}
+
+    // function calendarLoaded() {
+// 			if ($scope.productData.cycle < $rootScope.cycle || $scope.productData.cycle === undefined) {
+// 				// old product from a past cycle or new product
+// 				$scope.productData.cycle = $rootScope.canShop ? $rootScope.cycle : $rootScope.cycle + 1;
+// 				// old product from distant future -- do nothing
+// 			}
+// 		}
 
     function getCertifications(certification) {
 			for (var i = 0; i < certification.length; i++) {
@@ -140,12 +158,12 @@ angular.module('co-op.product-upload')
 				$scope.submitted = false;
 				flash.setMessage({type: 'warning', message: 'Beginning upload of '+ $scope.productData.productName});
 
-				if (_.isArray($scope.productData.cycle) ) {
-					$scope.productData.cycle = _.compact($scope.productData.cycle); // removes false, null, 0 and other falsey values
-					if ($scope.productData.cycle.length === 1) $scope.productData.cycle = $scope.productData.cycle[0];
-				} else if ($scope.productData.cycle <= $rootScope.cycle || !$scope.productData.cycle) {
-					$scope.productData.cycle = $rootScope.canShop ? $rootScope.cycle : $rootScope.cycle + 1; //next cycle;
-				}
+				// if (_.isArray($scope.productData.cycle) ) {
+// 					$scope.productData.cycle = _.compact($scope.productData.cycle); // removes false, null, 0 and other falsey values
+// 					if ($scope.productData.cycle.length === 1) $scope.productData.cycle = $scope.productData.cycle[0];
+// 				} else if ($scope.productData.cycle <= $rootScope.cycle || !$scope.productData.cycle) {
+// 					$scope.productData.cycle = $rootScope.canShop ? $rootScope.cycle : $rootScope.cycle + 1; //next cycle;
+// 				}
 
 				ProductManager.registerProduct($scope.productData, function(product) {
 					$scope.$broadcast('REFRESHCURRENT');
@@ -159,13 +177,13 @@ angular.module('co-op.product-upload')
 		}
 
     function updateProduct (isValid, categoryError) {
-			if( _.isArray($scope.productData.cycle) ) {
-				$scope.productData.cycle = _.compact($scope.productData.cycle);
-				if ($scope.productData.cycle.length === 1) $scope.productData.cycle = $scope.productData.cycle[0];
-				else flash.setMessage({type: 'danger', message: 'Sorry! Please select just one delivery date when trying to update a product. Use the "List across selected dates" button to upload a product for more than one date at a time.'});
-			}
+			// if( _.isArray($scope.productData.cycle) ) {
+// 				$scope.productData.cycle = _.compact($scope.productData.cycle);
+// 				if ($scope.productData.cycle.length === 1) $scope.productData.cycle = $scope.productData.cycle[0];
+// 				else return flash.setMessage({type: 'danger', message: 'Sorry! Please select just one delivery date when trying to update a product. Use the "List across selected dates" button to upload a product for more than one date at a time.'});
+// 			}
 
-			if (isValid && !categoryError && !_.isArray($scope.productData.cycle) ) {
+			if (isValid && !categoryError) {
 
 				$scope.submitted = false;
 				flash.setMessage({type: 'warning', message: 'Beginning update of '+ $scope.productData.productName});
@@ -225,6 +243,7 @@ angular.module('co-op.product-upload')
 
 		$scope.productData = {
 			permanent: true,
+			active: true,
 			price: 0,
 			units: 'Whole Beast',
 			refrigeration: 'frozen',

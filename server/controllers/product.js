@@ -73,15 +73,15 @@ exports.create = function(req, res) {
 	}
 };
 
-
-exports.changePrice = function(req, res, next) {
-	if (req.product.price !== req.body.price) {
-		if (scheduler.canBuy) {
-			req.body.price = req.product.price;
-		}
-	}
-	next();
-};
+// no longer needed
+// exports.changePrice = function(req, res, next) {
+// 	if (req.product.price !== req.body.price) {
+// 		if (scheduler.canBuy) {
+// 			req.body.price = req.product.price;
+// 		}
+// 	}
+// 	next();
+// };
 
 exports.updateValidator = function(req, res, next) {
 	if (_.isArray(req.body.cycle) ) {
@@ -92,7 +92,7 @@ exports.updateValidator = function(req, res, next) {
 };
 
 exports.update = function(req, res) {
-	product = _.merge(req.product, req.body);
+	var product = _.merge(req.product, req.body);
 
 	//save product
 	product.save(function(err) {
@@ -100,6 +100,15 @@ exports.update = function(req, res) {
 		res.json(product);
 	});
 };
+
+exports.publish = function(req, res) {
+  var product = req.product;
+  product.active = true;
+	product.save(function(err) {
+		if (err) return next(err);
+		res.json(product);
+	});
+}
 
 // exports.emailChange = function(req, res, next) {
 // 	req.orders = [];
@@ -137,43 +146,54 @@ exports.update = function(req, res) {
 // };
 
 exports.quantityChange = function(req, res, next) {
-	if (req.product.amountSold > req.body.quantity && req.orders.length > 0) {
-		var amountToRemove = req.product.amountSold - req.body.quantity;
-		req.product.amountSold -= amountToRemove;
+	var totalAmount, amountToRemove;
+	Order.find({cycle: scheduler.currentCycle._id, product: new ObjectId(req.product._id) })
+	.populate('customer', 'name email').sort('-datePlaced quantity')
+	.exec(function(err, orders){
+		
+		if (err) return next(err);
+		req.orders = orders;
+		// if the product quantity drops and there are orders for it, check if there is sufficient inventory to supply all orders
+		if (req.product.quantity > req.body.quantity && req.orders.length > 0) {
+			totalAmount = _.sum(_.pluck(req.orders, 'quantity'));
+			if (totalAmount <= req.body.quantity) return next();
+			else {
+				amountToRemove = totalAmount - req.body.quantity;
+				req.body.amountSold -= amountToRemove
+				
+				async.eachSeries(req.orders, function(order, done){
+					if (amountToRemove <= 0) done('complete');
+					
+					else if (amountToRemove > order.quantity) {
+						amountToRemove -= order.quantity;
+						sendProductNotAvailableEmail(order);
+						Order.findByIdAndRemove(order._id, function(err, result) {
+							if (err) return done(err);
+							log.info('deleted order of %s because of quantity change', product.fullName);
+							if (amountToRemove > 0) done();
+							else done('complete');
 
-		// when fewer products are available than the amount ordered, preference is
-		// given to customers by time not an even averaging of quantities per order.
-		async.eachSeries(req.orders, function(order, done) {
-			// if the amount to remove is greater than the quantity of an order, delete that order
-			if (amountToRemove === 0) done('complete');
+						});
+					} else if (amountToRemove < order.quantity) {
+						order.quantity -= amountToRemove;
+						log.info('changed quantity of %s\'s order to be %s', order.customer.name, order.quantity);
 
-			else if (amountToRemove > order.quantity) {
-				amountToRemove -= order.quantity;
-				sendProductNotAvailableEmail(order);
-				Order.findByIdAndRemove(order._id, function(err, result) {
-					if (err) return done(err);
-					log.info('deleted order of %s because of quantity change', product.fullName);
-					if (amountToRemove > 0) done();
-					else done('complete');
-
+						order.save(function(err, order) {
+							if (err) return done(err);
+							sendProductChangeAmountEmail(order);
+							if (amountToRemove > 0) done();
+							else done('complete');
+						});
+					}
+				},function(result) {
+					if (result !== 'complete') return next(result);
+					log.info('all orders have been adjusted for product quantity change');
 				});
-			} else if (amountToRemove < order.quantity) {
-				order.quantity -= amountToRemove;
-				log.info('changed quantity of %s\'s order to be %s', order.customer.name, order.quantity);
 
-				order.save(function(err, order) {
-					if (err) return done(err);
-					sendProductChangeAmountEmail(order);
-					if (amountToRemove > 0) done();
-					else done('complete');
-				});
 			}
-		}, function(result) {
-			if (result !== 'complete') return next(result);
-			log.info('all orders have been adjusted for product quantity change');
-		});
-
-	} next();
+		}
+		next();
+	});
 };
 
 function sendProductNotAvailableEmail(order) {

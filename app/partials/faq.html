@@ -19,11 +19,24 @@
 </div>
 
 <div class="col-sm-10 col-sm-offset-1">
-<accordion close-others="true">
+  <accordion close-others="true">
     <accordion-group heading="How do I join?">
-		<p>You can sign up as a Producer or Customer member <a href="/signup">here</a>. You will then be required to pay the invoiced amount.</p>
+    <p>You can sign up as a Producer or Customer member <a href="/signup">here</a>. Both customers and producers can shop but only an approved producer can sell. If you sign up with Facebook, you will not need a password on your account but we would appreciate you providing your phone number and address anyways. Your address is required for registering you as a shareholder (so you can earn dividends and vote).</p>
 
-		<p>Please note that if you want to become a Producer Member, you will need to fill out a specialised application form, which will be reviewed before your membership can be approved. However, anyone can sign up as a Customer member.</p>
+    <p>Please note that if you want to become a Producer Member, you will need to fill out a producer application form, which will be reviewed before your producer status is granted. You may shop in the store as normal while awaiting the approval of your application. Approval usually takes less than 24 hours.</p>
+    </accordion-group>
+    <accordion-group heading="Where do I collect my orders?" ng-click="hashFunction('delivery-day')" is-open="hash === 'delivery-day'">
+      <p>Member's orders are collected and sorted each Tuesday.</p>
+      
+      <p>If you live in Whangarei, or want to collect your food while you’re in town, you can pick up your order from The Woods (1 Woods Road), in central Whangarei. We are behind Chipmunks. Orders are avaible for collection from 3:00 p.m. onwards on Tuesday. Feel free to call ahead if you need to make other arrangements. Shipping is available for an extra charge.</p>
+
+      <p>If Whangarei is too far for you to travel, you can pick up your goods from a collection point closer to home. If you join a  <a href="/delivery">delivery route</a> you can pick up from a fellow co-op member closer to home. Your local Route Manager fascilitates these pickups. Contact details for our Route Managers in communities all over Northland can be found <a href="/delivery">here.</a></p>
+      <p>If there is no delivery route to your area, please feel free to shop anyway and the co-op can arrange your delivery with you.</p>
+      <br> 
+      <div class="btn-group">
+        <a  class="btn btn-default" href="https://www.google.com/maps/place/1+Woods+Rd,+Whangarei,+0110,+New+Zealand/"><span class="glyphicon glyphicon-map-marker"></span> See Map</a>
+        <a  class="btn btn-default" ng-if="currentUser" ng-href="https://www.google.com/maps/dir/{{currentUser.address}}/2+Woods+Rd,+Whangarei,+0110,+New+Zealand/"><span class="glyphicon glyphicon-question-sign"></span> Get Directions</a>
+      </div>
     </accordion-group>
 		
 	<accordion-group heading="Why does being a producer cost more?" ng-click="hashFunction('test')" is-open="hash === 'test'">
@@ -33,64 +46,44 @@
 		<p>Most producers recoup the cost of membership quickly by selling their products through the NNFC. However, should a producer wish to leave the co-op, the membership fee is completely refundable.</p>
 	</accordion-group>
 	
-	<accordion-group heading="How do I know when to upload my products?" ng-click="hashFunction('upload-products')" is-open="hash === 'upload-products'">
-		<p>You can upload products any time. When you upload a product you pick which Delivery Days to sell that product for. Then your product will appear in the store during the shopping time for that delivery day.</p>
-		<p>For example, if you regularly sell a product, you can upload it once and set it to sell repeatedly for the dates you choose. Alternatively if you expect your animals to be butchered and ready for sale by a certain date, you can upload them significantly in advance.</p>
-		<p>Should you need to make changes to your products, you can make changes on a cycle-per-cycle basis. For example if you regularly sell apples in autumn but then unexpectedly have less available midway through the season, you can edit the apples in the store to reduce the quantity available for each delivery day to represent your reduced crop.</p>
+	<accordion-group heading="How do I upload my products?" ng-click="hashFunction('upload-products')" is-open="hash === 'upload-products'">
+		<p>You can upload products any time. Simply submit the online product upload form found <a href="/product-upload">here.</a></p>
+		<p>Once a product is uploaded it will stay in the store until you hide it. You can quickly hide a product from the Sales Dashboard or when editing a product. Once hidden, you can re-publish a product from the product edit screen.</p> 
+		<p>Should you need to make changes to your products, simply select it in the store or from your sales dashboard and you can make any changes you need. Save your product with those new changes for them to instantly take effect. Please note that changing a product will not modify a product in someone's shopping cart or a record of your product in someone's past order.</p>
 	</accordion-group>
 
 	<accordion-group heading="What kind of food can I sell?">
 		<p>In most cases, if you grew it, made it, or raised it in Northland, you can sell it. However, there are a few exceptions. </p>
 
-		<p>We are proud to be GE free. Genetically engineered products will not be accepted for sale. This extends to goods that have GE ingredients, and animal products where the animal was fed genetically engineered material. If you'd like to transition your operation away from GE inputs, please contact us and we can give you free consulting. As a Natural Food Co-op, we also require that producers declare all chemicals used in their production process. You can still sell your goods through the NNFC, but all chemical agents must be declared.</p>
+    <p>We are proud to be GE free. Genetically engineered products will not be accepted for sale. This extends to goods that have GE ingredients, and animal products where the animal was fed genetically engineered material. If you'd like to transition your operation away from GE inputs, please contact us and we can give you free consulting. As a Natural Food Co-op, we also require that producers declare all chemicals used in their production process. You can still sell your goods through the NNFC, but all chemical agents must be declared.</p>
 
-		<p>Finally, for the sake of the animals, we do not accept goods derived from Confined Animal Feeding Operations (such as battery hens). Please keep your livestock free range. </p>
+    <p>Finally, for the sake of the animals, we do not accept goods derived from Confined Animal Feeding Operations (such as battery hens). Free range meat, milk and eggs only.</p>
 	</accordion-group>
 	<accordion-group heading="When can I shop?" ng-click="hashFunction('shopping-start')" is-open="hash === 'shopping-start'">
-		<p>Check the <a href="/calendar">calendar</a> on our website to find out what days you can shop. All memebers will receive emails notifying them that ordering is now open.</p>
-		<p>If you don't see many products in the store, check back later as producers may not have uploaded all they plan to sell yet.</p>
-		<h4>Why only have a set time?</h4>
-		<p>A set time for shopping is used because the co-op is technically not a store. We have no inventory and no way to ship orders on our own. We do show you what other producers are selling and facilitate a convenient and efficient distribution system via volunteer sorters and drivers.</p>
+		<p>You can shop any time: morning, evening or night. However, any items you add to your cart on a Friday will not be processed until a week from Tuesday. Our producers need time to gather and prepare your orders so they can be as fresh as possible. To achieve this we cut off orders for Tuesday's delivery day the previous Friday.</p>
 	</accordion-group>
 	<accordion-group heading="After shopping, how long do I have to pay?" ng-click="hashFunction('how-long-to-pay')" is-open="hash === 'how-long-to-pay'">
 		<p>Check the <a href="/calendar">calendar</a> on our website to find out when you must have paid your shopping invoice to us. Ideally we like to have received payment before delivery day so we can pay the producers after they've delivered member's orders.</p>
 		<p>
 	</accordion-group>
-	<accordion-group heading="How does buying raw milk work?" ng-click="hashFunction('raw-milk')" is-open="hash === 'raw-milk'">
-		<p>Raw Milk can be added to your cart just like any other product in the store. However, raw milk is delivered fresh to our sorting center (1 Woods Rd, Whangarei) every <strong>Tuesday</strong>.</p>
-		<p>You pay for your milk at the same time as any other products you've ordered as normal.</p>
-		<p>When you order Raw Milk in our store, you are ordering milk for two weeks. Your order is prepaid and the quantity you order is how much you will receive over two weeks.</p>
-		<p>Each week you will receive 1/2 the full amount paid for.</p>
-		<p>Pick up time for Raw Milk is 3-6pm every Tuesday.</p>
-	</accordion-group>
-
-	<accordion-group heading="Where do I collect my food once I’ve paid for it?" ng-click="hashFunction('delivery-day')" is-open="hash === 'delivery-day'">
-		<p>Member's orders are collected and sorted on <a href="/calendar">Delivery Day</a>. Delivery day is usually the second and last Tuesday's of each month.</p>
-		
-		<p>If you live in Whangarei, or want to collect your food while you’re in town, you can pick up your order from The Woods (1 Woods Road), in central Whangarei. We are behind Chipmunks. Orders are avaible for collection from 3:00 p.m. onwards on Delivery Day. You can find out when the next Delivery Day is by checking the <a href="/calendar">calendar </a>on our wesite.</p>
-
-		<p>If Whangarei is too far for you to travel, you can pick up your goods from a collection point closer to home. To find out times and places for community collection points, you’ll need to join a <a href="/delivery">delivery route</a>. Please also get in touch with your local Route Manager. Contact details for our Route Managers in communities all over Northland can be found <a href="/delivery">here.</a></p>
-		<p>If there is no delivery route to your area, please feel free to shop anyway and the co-op will arrange your delivery.</p>
-		<br> 
-		<div class="btn-group">
-			<a  class="btn btn-default" ng-href="https://www.google.com/maps/place/2+Woods+Rd,+Whangarei,+0110,+New+Zealand/"><span class="glyphicon glyphicon-map-marker"></span> See Map</a>
-			<a  class="btn btn-default" ng-if="currentUser" ng-href="https://www.google.com/maps/dir/{{currentUser.address}}/2+Woods+Rd,+Whangarei,+0110,+New+Zealand/"><span class="glyphicon glyphicon-question-sign"></span> Get Directions</a>
-		</div>
-	</accordion-group>
+	
 	<accordion-group heading="Where do I take the products I’ve sold?">
 
-		<p>Producers should bring the goods their customers have ordered to The Woods, our sorting facility in Central Whangarei. You should also make sure your products are labelled with those provided you so as to help us and our vounteers sort orders.</p>
+    <p>Producers should bring the goods their customers have ordered to The Woods, our sorting facility in Central Whangarei.</p>
 
-		<p>All goods need to be dropped off at The Woods by 3:00 p.m. on Delivery Day. You can find out when the next Delivery day is by checking the calendar on our wesite.</p>
-		<p>We are open to making other arrangements to deliver your goods. Feel free to <a href="/contact">contact us</a> and we'll help you organise delivery of your goods.</p>
+    <p>All goods need to be dropped off at The Woods by 3:00 p.m. on Tuesday.</p>
+    <h2>Don't want to deliver?</h2>
+    <p>If your goods have a stable shelf life, we can stock them for you. We have refrigeration and freezer space available as well. Goods stocked this way are generally sold on commission or by negotiation with the administrator.
+    </p>
+    
 	</accordion-group>
-	<accordion-group heading="What time can I collect my order?">
-		<p>Delivery Day Pick Up Times are <strong>3pm to 6pm</strong></p>
-	</accordion-group>
-	
-	<accordion-group heading="How can I get a refund on a faulty product?" ng-click="hashFunction('refund')" is-open="hash === 'refund'">
-		<p>If you are unsatisfied with the quality of a purchase please <a href="/contact?subject=problem%20with%20product">contact us</a> right away. We will contact the producer and negotiate a refund or similar satisfactory solution for you.</p>
-	</accordion-group>
+  <!-- <accordion-group heading="What time can I collect my order?">
+    <p>Delivery Day Pick Up Times are <strong>3pm to 6pm</strong></p>
+  </accordion-group>
+
+  <accordion-group heading="How can I get a refund on a faulty product?" ng-click="hashFunction('refund')" is-open="hash === 'refund'">
+    <p>If you are unsatisfied with the quality of a purchase please <a href="/contact?subject=problem%20with%20product">contact us</a> right away. We will contact the producer and negotiate a refund or similar satisfactory solution for you.</p>
+  </accordion-group> -->
 </accordion>
 <h3>Have a question not answered here? <a href="/contact">Contact Us</a></h3>
 </div>

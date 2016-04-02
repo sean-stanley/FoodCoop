@@ -49,17 +49,17 @@
 		<span ng-repeat="item in data.ingredients track by $index"><a ng-href="/store?search={{item}}">{{item}} </a> </span></p>
 		<p ng-if="data.certification.name !== 'none'"><strong>Certification:</strong> {{data.certification.name}}</p>
 
-		<h4 ng-hide="data.permanent"><strong>Quantity left:</strong> {{data.quantity - data.amountSold}}</h4>
+		<h4><strong>Quantity left:</strong> {{data.quantity}}</h4>
 		<h4 ng-show="data.minOrder"><strong>Minimum Order:</strong> {{data.minOrder}} x {{data.units}}</h4>
 		<br>
 		<h3 class="text-center">
 			{{data.priceWithMarkup|currency}} / {{data.units}}
 		</h3>
 		<div class="well">
-			<button class="btn btn-danger btn-block" disabled ng-if="data.quantity - data.amountSold <= 0">
+			<button class="btn btn-danger btn-block" disabled ng-if="data.quantity <= 0">
 				<span class="glyphicon glyphicon-exclamation-sign"></span> SOLD OUT
 			</button>
-			<button class="btn btn-primary btn-block" ng-click="addToCart(data)" ng-if="!data.AlreadyInCart" ng-hide="data.quantity - data.amountSold <= 0 || data.permanent || !currentUser">
+			<button class="btn btn-primary btn-block" ng-click="addToCart(data)" ng-if="!data.AlreadyInCart" ng-hide="data.quantity <= 0 || !currentUser">
 				<span class="glyphicon glyphicon-shopping-cart"></span> Add to Cart
 			</button>
 			<a class="btn btn-primary btn-block"

@@ -22,7 +22,7 @@ function checkCycle(date, done) {
 		shoppingStop: {$gt: new Date(date).toISOString()}
 	})
 	.lean().exec(function(err, cycle) {
-
+    console.log(cycle);
 		if (err) {
 			done(new Error('WARNING FAILED TO FIND CYCLE', err));
 			exports.currentCycle = -1;
@@ -43,88 +43,80 @@ function checkConfig() {
 	var today = new Date();
 	today.setHours(0, 0, 0, 0);
 
-	// mandrill.sendMessage('<h1>Hi!</h1><p>Just testing if I can send you an automated email from the NNFC.</p>',
-	// [
-	// 	{name: 'Sean Stanley', email: 'sean@maplekiwi.com'},
-	// 	{name:'Oxville Farms', email: 'leah@oxvillefarms.com'}
-	// ], 'TEST MESSAGE FROM NNFC', function(err, result) {
-	// 	if (err) console.log(err);
-	// 	else console.log(result);
-	// });
-
 	checkCycle(today, function(err, cycle) {
 		if (err) {
 			console.log(err);
 		}
 		console.log(Date() + '. Constructing cycle object from DB results');
-		var shoppingStart = Date.parse(cycle.shoppingStart);
 		var shoppingStop = Date.parse(cycle.shoppingStop);
 		var deliveryDay = Date.parse(cycle.deliveryDay);
 
 		exports.canShop = true;
-
-		if ( today.equals( shoppingStart ) ) {
-			console.log('today is a shopping day and start of a new cycle');
-					
-		} else if (today.between( shoppingStart, shoppingStop) ) {
-			console.log('today is a shopping day');
 			
-			if (moment(today).isSame(moment(shoppingStop).subtract(3, 'days'), 'day')) {
-				sendShoppingReminder()
-			}
-		}
+		if (moment(today).isSame(moment(shoppingStop).subtract(3, 'days'), 'day')) {
+      sendShoppingReminder()
+    }
 
 		isShoppingStopDay (function(err, cycle) {
 			if (cycle) {
 				console.log('Today everyone is invoiced');
 				// checkout everyone's purchases
-				exports.checkout(cycle._id);
+				exports.checkout(cycle);
 				// send order requests to producers
-				exports.orderGoods(cycle._id);
+				exports.orderGoods(cycle);
 			}
 		});
 		
 			
-		isDeliveryDay(function(err, cycle) {
-			if (cycle) {
-				console.log('Today is Delivery Day!');
-				models.Order.find({cycle: exports.currentCycle}, 'supplier customer')
-				.populate('supplier', 'name email')
-				.populate('customer', 'name email')
-				.exec(function(err, orders) {
+    isDeliveryDay(function(err, cycle) {
+      if (cycle) {
+        console.log('Today is Delivery Day!');
+        models.Order.find({cycle: exports.currentCycle}, 'supplier customer')
+        .populate('supplier', 'name email')
+        .populate('customer', 'name email')
+        .exec(function(err, orders) {
 
-					var customers, suppliers, recipients;
-					if (err) {
-						console.error(err);
-						return
-					}
-					customers = _.pluck(orders, 'customer');
-		      suppliers = _.pluck(orders, 'supplier');
-		      recipients = _.merge(customers, suppliers);
+          var customers, suppliers, recipients;
+          if (err) {
+            console.error(err);
+            return
+          }
+          customers = _.pluck(orders, 'customer');
+          suppliers = _.pluck(orders, 'supplier');
+          recipients = _.merge(customers, suppliers);
 
-					console.log('sending delivery day message to: ', recipients.length)
-					if (process.env.NODE_ENV !== "production") {
-						recipients = {name: 'Sean Stanley', email: 'sean@maplekiwi.com'}
-					}
-					mandrill.send('delivery-day-template', recipients, {tags:["delivery day"]}, function(err, result) {
-						console.log(result);
-					});
-				});
-			}
-		});
+          console.log('sending delivery day message to: ', recipients.length)
+          if (process.env.NODE_ENV !== "production") {
+            recipients = {name: 'Sean Stanley', email: 'sean@maplekiwi.com'}
+          }
+          mandrill.send('delivery-day-template', recipients, {tags:["delivery day"]}, function(err, result) {
+            if (err) {
+              console.error(err)
+            }
+            console.log(result);
+          });
+        });
+      }
+    });
 
 	});
 }
 exports.checkConfig = checkConfig;
 
-exports.checkout = function (cycleId) {	
+exports.checkout = function (cycle) {	
 	async.waterfall([
 		function(done) {
 			console.log('beginning checkout process');
 			models.Order
 			.aggregate()
-			.match({cycle: cycleId})
-			.group({ _id: '$customer', orders: { $push : {product: '$product', quantity: '$quantity'} }})
+			.match({cycle: cycle._id})
+			.group({ _id: '$customer', orders: { 
+				$push : {
+					product: '$product', 
+					quantity: '$quantity', 
+					cost: { $multiply: [ "$unitPrice", "$quantity", "$markup" ] }
+				} 
+			}})
 			.exec(function(e, customers) {
 				// customers is a plain javascript object not a special mongoose document.
 				done(e, customers);
@@ -137,7 +129,7 @@ exports.checkout = function (cycleId) {
 			});
 		}
 	],function(e, result){
-		this.cycleId = cycleId;
+		this.cycle = cycle;
 		if (e) console.log(e);
 		else {
 			async.each(result, exports.invoiceCustomer.bind(this), function(error) {
@@ -150,15 +142,16 @@ exports.checkout = function (cycleId) {
 // called by checkout() for each customer. Creates invoices for customers to pay
 // and emails them a copy
 exports.invoiceCustomer = function(customer, callback) {
+	console.log("invoicing customer")
 	async.waterfall([
 		function (done) {
-			if (this.cycleId == undefined) throw new Error("cycleId is undefined")
+			if (this.cycle.deliveryDay == undefined) throw new Error("cycle is undefined for customer invoice")
 			var invoice = new models.Invoice({
-				dueDate: Date.parse(exports.currentCycle.shoppingStop).addDays(7).toString(),
+				dueDate: Date.parse(this.cycle.shoppingStop).addDays(7).toString(),
 				invoicee: customer._id._id,
 				title: 'Shopping Order for ' + Date.today().toString('MMMM'),
 				items: customer.orders,
-				cycle: this.cycleId,
+				cycle: this.cycle._id,
 				deliveryRoute: customer._id.routeTitle || 'Whangarei'
 			});
 
@@ -172,6 +165,7 @@ exports.invoiceCustomer = function(customer, callback) {
 		},
 		function(invoice, done) {
 			var mailOptions, mailData, mail;
+			if (this.cycle == undefined) throw new Error("cycle is undefined for customer invoice email")
 			mailOptions = {
 				template: 'shopping-invoice',
 				subject: 'Thank you for shopping locally this ' + Date.today().toString('MMM'),
@@ -183,8 +177,8 @@ exports.invoiceCustomer = function(customer, callback) {
 
 			mailData = {
 				name: customer._id.name,
-				dueDate: Date.parse(exports.currentCycle.shoppingStop).addDays(5).toString('ddd dd MMMM yyyy'),
-				deliveryDay: Date.parse(exports.currentCycle.deliveryDay).toString('ddd dd MMMM yyyy'),
+				dueDate: Date.today().addDays(5).toString('ddd dd MMMM yyyy'),
+				deliveryDay: Date.parse(this.cycle.deliveryDay).toString('ddd dd MMMM yyyy'),
 				code: invoice._id,
 				items: invoice.items,
 				total: invoice.total,
@@ -208,16 +202,29 @@ exports.invoiceCustomer = function(customer, callback) {
 	});
 };
 
-exports.orderGoods = function(cycleId) {
+exports.orderGoods = function(cycle) {
 	console.log('beginning ordering from producers');
 	
 	async.waterfall([
 		function(done) {
 			models.Order
 			.aggregate()
-			.match({cycle: cycleId})
-			.group({ _id: '$supplier', orders: { $push : {product: '$product', customer: '$customer', quantity: '$quantity'} }})
-
+			.match({cycle: cycle._id})
+			.group({ 
+					_id: '$supplier', 
+					orders: { 
+					$push : {
+						product: '$product', 
+						customer: '$customer', 
+						quantity: '$quantity',
+						cost: {
+							$multiply: [
+								"$unitPrice", "$quantity"
+							]
+						}
+					}
+				}
+			})
 			.exec(function(e, producers) {
 				// producers is a plain javascript document not a special mongoose document.
 				done(e, producers);
@@ -231,21 +238,11 @@ exports.orderGoods = function(cycleId) {
 			});
 		}
 	],function(e, result){
-		this.cycleId = cycleId;
+		this.cycle = cycle;
 		if (e) {
 			console.log(e);
 		} else {
-			// exports.invoiceFromProducer.call( this,
-// 				{
-// 					_id: {
-// 						_id: ObjectId("535e107876dc96914a743e73"),
-// 						producerData: {bankAccount: ""}
-// 					},
-// 					orders: [
-// 						{}
-// 					],
-// 					test: true
-// 				}, _.noop);
+			
 			async.each(result, exports.invoiceFromProducer.bind(this), function(error) {
 				if (error) console.log(error);
 			});
@@ -262,14 +259,14 @@ exports.invoiceFromProducer = function (producer, callback) {
 
 	async.waterfall([
 		function(done) {
-			if (this.cycleId == undefined) throw new Error("cycleId is undefined in async.waterfall")
-// 			console.log(this.cycleId)
+			if (this.cycle == undefined) throw new Error("cycle is undefined in producer order")
+				console.log(this.cycle.deliveryDay);
 			var invoice = new models.Invoice({
-				dueDate: Date.parse(exports.currentCycle.deliveryDay).addDays(4).toString('ddd dd MMMM yyyy'),
+				dueDate: Date.parse(this.cycle.deliveryDay).addDays(4).toString('ddd dd MMMM yyyy'),
 				invoicee: producer._id._id,
 				title: 'Products Requested for ' + Date.today().toString('MMMM'),
 				items: producer.orders,
-				cycle: this.cycleId,
+				cycle: this.cycle._id,
 				toCoop: true,
 				bankAccount: producer._id.producerData.bankAccount || 'NO ACCOUNT ON RECORD'
 			});
@@ -286,6 +283,7 @@ exports.invoiceFromProducer = function (producer, callback) {
 		},
 		function(invoice, done) {
 			var mailOptions, mailData, mail;
+			if (this.cycle == undefined) throw new Error("cycle is undefined in producer order")
 			mailOptions = {
 				template: 'producer-invoice',
 				subject: Date.today().toString('MMMM') + ' Products Requested for ' + config.coopName,
@@ -297,10 +295,20 @@ exports.invoiceFromProducer = function (producer, callback) {
 
 			mailData = {
 				name: producer._id.name,
-				dueDate: Date.parse(exports.currentCycle.deliveryDay).addDays(4).toString('ddd dd MMMM yyyy'),
-				deliveryDay: Date.parse(exports.currentCycle.deliveryDay).toString('ddd dd MMMM yyyy'),
+				dueDate: Date.parse(this.cycle.deliveryDay).addDays(4).toString('ddd dd MMMM yyyy'),
+				deliveryDay: Date.parse(this.cycle.deliveryDay).toString('ddd dd MMMM yyyy'),
 				code: invoice._id,
-				items: invoice.items,
+				items: _.sortBy(invoice.items, function(i) {
+          return i.product.fullName;
+        }),
+        products: _.map(_.groupBy(invoice.items, function(i) {
+          return i.product.fullName;
+        }), function(array, name) {
+            return {
+              name: name,
+              count: _.sum(_.pluck(array, 'quantity'))
+            };
+          }),
 				total: invoice.total,
 				account: producer._id.producerData.bankAccount
 			};
@@ -418,6 +426,38 @@ function consolidateAmountSold () {
 	});
 }
 
+function consolidateOrderUnitPrice () {
+	models.Order.find({cycle: 32}).populate('product', 'price').exec(function(err, orders) {
+		async.each(orders, function(order, done) {
+			order.unitPrice = order.product.price;
+			order.save(function(err) {
+				if (err) return done(err)
+				
+				done();
+			});
+		}, function(err) {
+			if (err) return console.log(err)
+			console.log('orders unitPrice set for cycle 32')
+		})
+	})
+}
+
+function removeBase64ImagesInProducts() {
+  models.Product.find().exec(function(err, products) {
+    async.each(products, function(product, done) {
+      product.save(function(err) {
+        if (err) return console.log(err);
+        done();
+      });
+    }, function(err) {
+      if (err) return console.log(err);
+      console.log('base64 image removal complete');
+    });
+  });
+}
+
+// removeBase64ImagesInProducts();
+//consolidateOrderUnitPrice();
 checkConfig();
 //consolidateAmountSold();
 //disableCycle();

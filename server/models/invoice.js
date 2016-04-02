@@ -51,10 +51,10 @@ InvoiceSchema.virtual('subtotal').get(function () {
 		
 		else if (this.items[i].product) {
 			if (this.toCoop) {
-				total += this.items[i].product.price * this.items[i].quantity;
+				total += this.items[i].cost || this.items[i].product.price * this.items[i].quantity;
 			}
 			else {
-				total += this.items[i].product.priceWithMarkup * this.items[i].quantity;
+				total += this.items[i].cost || this.items[i].product.priceWithMarkup * this.items[i].quantity;
 			}
 		}
 	}

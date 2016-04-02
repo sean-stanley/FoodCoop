@@ -1,13 +1,13 @@
 <div ng-class="{'col-md-10':!meatHistory && !milkHistory, 'col-md-offset-1': !meatHistory && !milkHistory, 'col-xs-12': milkHistory || meatHistory}">
 	<div class="page-header text-center">
-		<h1> <i class="fa fa-shopping-cart"></i> My Cart <small>Live Updates</small></h1>
+		<h1> <i class="fa fa-shopping-cart"></i> My Cart</h1>
 	</div>
 
 	<div ng-class="{'col-sm-8':meatHistory || milkHistory }">
 
 		<p>Here is where you will see all your shopping orders. You will get an email of this list at the end of the ordering period. Records of your past shopping is here too.</p>
 
-		<h2>{{month}} Cart</h2>
+		<h2>Current Cart</h2>
 		<div id="table-div" class="table-responsive">
 		<table class="table">
 			<thead>
@@ -54,8 +54,8 @@
 		</table>
 		<h3 ng-show="cart.length > 0">That's it! You will be billed for items in your cart at the end of ordering week. Thanks for shopping local!</h3>
 		</div>
-		<accordion>
-			<accordion-group heading="Cart History" ng-controller="cartHistoryCtrl">
+		<accordion ng-controller="cartHistoryCtrl">
+			<accordion-group heading="Cart History">
 				<div ng-controller="cartHistoryCtrl" class="table-responsive">
 					[ <a href="" ng-click="predicate=''">unsorted</a> ]
 					<table class="table">

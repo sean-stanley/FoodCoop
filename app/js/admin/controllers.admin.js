@@ -242,14 +242,14 @@ angular.module('co-op.admin')
 			});
 		};
 
-		$scope.invoice = function() {
-			$http.post('api/admin/send-invoices', {}).success(function() {
-				flash.setMessage({type: 'success', message:'sending invoices manually'});
-			}).error(function(error) {
-				flash.setMessage({type: 'danger', message: 'Oh no! Something went wrong!'});
-				console.log(error);
-			});
-		};
+		// $scope.invoice = function() {
+// 			$http.post('api/admin/send-invoices', {}).success(function() {
+// 				flash.setMessage({type: 'success', message:'sending invoices manually'});
+// 			}).error(function(error) {
+// 				flash.setMessage({type: 'danger', message: 'Oh no! Something went wrong!'});
+// 				console.log(error);
+// 			});
+// 		};
 
 	}])
 
@@ -407,4 +407,13 @@ angular.module('co-op.admin')
 		}
 	};
 
-}]);
+}])
+.controller('meatOrderAdminCtrl', function($scope, $http) {
+  $http.get('/api/admin/meat-order').then(function(result) {
+    $scope.orders = result.data;
+  }, function(error) {
+    console.log(error);
+  });
+})
+
+;

@@ -1,5 +1,5 @@
 'use strict';
-/*global angular, _, Date, Session*/
+/*global angular, _, Date, Session, moment*/
 
 /* Services */
 
@@ -295,6 +295,15 @@ angular.module('co-op.services', [])
 					flash.setMessage({type: 'danger', message: 'Drat! Could not delete that product.'});
 				});
 			},
+      
+      publishProduct : function(id) {
+        Restangular.one('api/product/publish', id).put().then(function() {
+					flash.setMessage({type: 'success', message: 'Poof! Product successfully published'});
+				}, function(error) {
+					console.log(error);
+					flash.setMessage({type: 'danger', message: 'Drat! Could not publish that product.'});
+				});
+      },
 			
 			cycles: Restangular.all('api/admin/cycle/future').getList().$object,
 			
@@ -347,61 +356,18 @@ angular.module('co-op.services', [])
 	
 	// Client side date managment. This job is shared by the client and server.
 	.factory('Calendar', ['$rootScope', '$http', function($rootScope, $http) {
-		var monthStart, 
-		lastMonthStart, 
-		significantDays, 
-		nextMonth, 
-		twoMonth, 
-		daysBeforeOrderingStops,
-		daysBeforeDeliveryDay;
+    
+    function getDeliveryDay() {
+      var nearestDeliveryDay = moment().day(2).startOf('day');
+      var shoppingStopDay = moment().day(5).startOf('day');
+      if (moment().startOf('day').isAfter(shoppingStopDay) ) {
+        return nearestDeliveryDay.add(1, 'weeks').format();
+      } else return nearestDeliveryDay.format();
+    }
 		
-		$rootScope.canShop = true; //default shopping to true until Calendar API confirms this.
 		
-		// counts how many days until @date. Returns @INTEGER or NaN
-		// a negative result means that @date is in the past
-		function daysUntil (date) {				
-			var result, a, b;
-			a = new Date(date);
-			b = new Date();
-			result = Math.floor( 
-				(Date.UTC(a.getFullYear(), a.getMonth(), a.getDate()) -
-				Date.UTC(b.getFullYear(), b.getMonth(), b.getDate()) ) /
-				(1000 * 60 * 60 * 24) );
-			return result;
-		}
-		
-		$http.get('/api/calendar').success(function(result) {
-			module.cycle = result.currentCycle;
-			module.nextCycle = result.nextCycle;
-			//module.twoMonth = results.cycles[2];
-			$rootScope.cycleObject = result.currentCycle;
-			$rootScope.cycle = result.currentCycle._id;
-			$rootScope.deliveryDay = result.currentCycle.deliveryDay;
-			$rootScope.nextDeliveryDay = result.nextCycle.deliveryDay;
-			// $rootScope.canUpload = result[4];
-			$rootScope.canShop = result.canShop;
-			// $rootScope.canChange = result[6];
-			
-			module.daysBeforeOrderingStops = daysUntil(module.cycle.shoppingStop);
-			module.daysBeforeDeliveryDay = daysUntil(module.cycle.deliveryDay);
-			
-			module.calendar = _.groupBy(result.cycles, function(c) {
-				return Date.parse(c.deliveryDay).toString('MMMM'); 
-			});
-			
-			module.cycles = result.cycles;
-			
-			$rootScope.$broadcast('CALENDAR-LOADED');
-			$rootScope.$broadcast('GET_CART');
-		});
-		
-		monthStart = Date.today().moveToFirstDayOfMonth();
-		lastMonthStart = Date.today().addMonths(-1).moveToFirstDayOfMonth();
-						
 		var module = {
-			daysUntil : function(date) {				
-				return daysUntil(date);
-			},
+			getDeliveryDay : getDeliveryDay,
 			// This method filters an array to only contain stuff from the 
 			// current cycle. @group must be an array of objects with a property called
 			// cycle. used for orders mainly
@@ -493,13 +459,13 @@ angular.module('co-op.services', [])
 						type: 'success',
 						message: "You're cart was successfully updated"
 					});
-					cb(result);
+					cb(null, result);
 				}, function(error) {
 					flash.setMessage({
 						type: 'danger',
 						message: error.data
 					});
-					cb(error);
+					cb(error, null);
 				});
 			},
 			deleteItem : function(id) {
@@ -511,7 +477,7 @@ angular.module('co-op.services', [])
 					$rootScope.cartTally --;
 					flash.setMessage({
 						type: 'success',
-						message: "Successfully got rid of that cart item for you."
+						message: "Poof! Got rid of that cart item for you."
 					});
 				}, function(error) {
 					result.reject();

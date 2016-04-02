@@ -17,15 +17,13 @@
 			</span>
 		</a>
 </h3>
-<alert type="danger" ng-hide="canShop">Shopping is Now Closed for the Cycle ending {{deliveryDay | date:'EEEE dd/MM/yy'}}</alert>
 
 <table class="table">
 <thead>
 	<tr>
 		<th><a href="" ng-click="predicate = 'productName'; reverse=!reverse ">Product</a></th>
 		<th><a href="" ng-click="predicate = 'price'; reverse=!reverse ">Price</a></th>
-		<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Quantity</a></th>
-		<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Ordered Amount</a></th>
+		<th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Stock Level</a></th>
 	</tr>
 </thead>
 <tbody>
@@ -33,7 +31,7 @@
 		<td data-title="'Product'" >
 			<a ng-hide="i.permanent && i.category === '5421e9192ba620071b4cb2a9' " ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a>
 			<a ng-show="i.permanent && i.category === '5421e9192ba620071b4cb2a9' " ng-href="/meat-upload/{{i._id}}">{{i.fullName}}</a>
-			<button type="button" class="close" aria-hidden="true" ng-click="delete($index, i._id)" tooltip-placement="right" tooltip="Delete Item: Warning this will affect orders made of this item."><i class="fa fa-times"></i></button>
+			<button type="button" class="close" aria-hidden="true" ng-click="delete($index, i._id)" tooltip-placement="right" tooltip="Deactivate this product"><i class="fa fa-times"></i></button>
 		</td>
 
 		<td data-title="'Price'">
@@ -42,45 +40,39 @@
 		<td data-title="'Quantity'">
 			{{i.quantity}}
 		</td>
-		<td data-title="'times Ordered'">
-			{{i.amountSold || 0}}
-		</td>
     </tr>
 </tbody>
 </table>
 
 <accordion>
 	<accordion-group>
-		<accordion-heading>Past Products <span class="badge" style="margin-left: 10px">{{stats.pastAmount}}</span></accordion-heading>
+		<accordion-heading>Deactivated Products <span class="badge" style="margin-left: 10px">{{stats.pastAmount}}</span></accordion-heading>
 		[ <a href="" ng-click="predicate=''">unsorted</a> ]
 		<table class="table">
 			<thead>
 				<tr>
-					<th><a href="" ng-click="predicate = 'cycle.deliveryDay'; reverse=!reverse ">Sale Date</a></th>
 					<th><a href="" ng-click="predicate = 'fullName'; reverse=!reverse ">Product</a></th>
 					<th><a href="" ng-click="predicate = 'price'; reverse=!reverse ">Price</a></th>
-					<th><a href="" ng-click="predicate = 'amountSold'; reverse=!reverse ">Ordered Amount</a></th>
+          <th><a href="" ng-click="predicate = 'quantity'; reverse=!reverse ">Stock Level</a></th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr ng-repeat="i in pastProducts | orderBy:predicate:reverse " >
-			        <td data-title="'cycle'" >
-			            {{i.cycle.deliveryDay | shortDate}}
-			        </td>
 							<td data-title="'Product'" >
-			            <a ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a>
+			            <button type="button" class="close" aria-hidden="true" ng-click="publish($index, i._id)" tooltip-placement="right" tooltip="Publish this product"><i class="fa fa-check"></i></button>
+                  <a ng-href="/product-upload/{{i._id}}">{{i.fullName}}</a>
 			        </td>
 			        <td data-title="'Price'">
 			            {{i.price | currency}} / {{i.units}}
 			        </td>
-					<td data-title="'times Ordered'">
-						{{i.amountSold || 0}}
-					</td>
+          		<td data-title="'Quantity'">
+          			{{i.quantity}}
+          		</td>
 			    </tr>
 			</tbody>
 		</table>
 	</accordion-group>
-	<accordion-group>
+	<!-- <accordion-group>
 		<accordion-heading>Future Products <span class="badge" style="margin-left: 10px">{{stats.futureAmount}}</span></accordion-heading>
 		[ <a href="" ng-click="predicate=''">unsorted</a> ]
 		<table class="table">
@@ -110,8 +102,8 @@
 			    </tr>
 			</tbody>
 		</table>
-	</accordion-group>
-	<accordion-group heading="All Products">
+	</accordion-group> -->
+	<!-- <accordion-group heading="All Products">
 		[ <a href="" ng-click="predicate=''">unsorted</a> ]
 		<table class="table">
 			<thead>
@@ -139,7 +131,7 @@
 			    </tr>
 			</tbody>
 		</table>
-	</accordion-group>
+	</accordion-group> -->
 </accordion>
 </div>
 <div class="col-md-6">

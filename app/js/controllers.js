@@ -434,7 +434,17 @@ angular.module('co-op.controllers', [])
 			var itemToDelete = $scope.currentProducts[idx];
 			$scope.currentProducts.splice(idx, 1);
 			ProductManager.deleteProduct(id);
+      $scope.pastProducts.push(itemToDelete);
 		};
+    
+    $scope.publish = publish;
+    
+    function publish (idx, id) {
+      var itemToPublish = _.find($scope.pastProducts, {_id: id});
+      _.remove($scope.pastProducts, {_id: id});
+      ProductManager.publishProduct(id);
+      $scope.currentProducts.push(itemToPublish);
+    }
 
 		$scope.lastMonth = Date.today().add(-1).months().toString('MMMM');
 		$scope.predicate = 'product';
@@ -584,15 +594,6 @@ angular.module('co-op.controllers', [])
 			}, err);
 		};
 
-		// only for the store.html page use of this controller
-		function getIds() {
-			$scope.cart.forEach(function(item) {
-				$scope.cartProduct_ids.push(item.product._id);
-			});
-			$scope.cartProduct_ids = _.uniq($scope.cartProduct_ids, true);
-			$rootScope.$broadcast('CART_IDS', $scope.cartProduct_ids);
-		}
-
 		$scope.$on('GET_CART', function() {
 			Cart.getCurrentCart(function(cart) {
 				$scope.cart = cart;
@@ -622,7 +623,10 @@ angular.module('co-op.controllers', [])
 			$scope.cart[idx].quantity = quantity;
 		});
 
-		$scope.open = function(item) {
+		$scope.open = openProduct; 
+    
+    
+    function openProduct (item) {
 			var path = $location.path();
 			if (path === "/store") {
 				$rootScope.$broadcast('OPEN_PRODUCT', item);
@@ -630,7 +634,16 @@ angular.module('co-op.controllers', [])
 			else {
 				$location.path("/store");
 			}
-		};
+		}
+    
+		// only for the store.html page use of this controller
+		function getIds() {
+			$scope.cart.forEach(function(item) {
+				$scope.cartProduct_ids.push(item.product._id);
+			});
+			$scope.cartProduct_ids = _.uniq($scope.cartProduct_ids, true);
+			$rootScope.$broadcast('CART_IDS', $scope.cartProduct_ids);
+		}
 	}
 ])
 .controller('updateCartCtrl', ['$scope', '$rootScope', '$location', 'Cart', 'flash', function($scope, $rootScope, $location, Cart, flash) {
@@ -648,7 +661,8 @@ angular.module('co-op.controllers', [])
 		}
 
 		else {
-			Cart.updateItem(item, function(error) {
+			item.oldQty = $scope.lastQuantity;
+			Cart.updateItem(item, function(error, result) {
 				if (error) {
 					$scope.$emit('FAILED_CART_UPDATE', $scope.lastQuantity, item._id);
 					console.log($scope.lastQuantity);
@@ -721,11 +735,11 @@ angular.module('co-op.controllers', [])
 
 .controller('storeCtrl', ['$scope', '$rootScope', '$location', '$routeParams', '$modal', 'LoginManager', 'categories', 'flash', '$http', 'Cart',
 	function($scope, $rootScope, $location, $routeParams, $modal, LoginManager, categories, flash, $http, Cart) {
-		var category, sort, reverse, productURL;
+		var category, sort, reverse, productURL, cartProductIds;
 
-		console.log(Cart);
-
-		$rootScope.$broadcast('GET_CART');
+		productURL = 'api/product?';
+		loadProducts(productURL);
+		
 		$scope.isProducts = true;
 
 		$scope.categories = categories.data;
@@ -737,76 +751,11 @@ angular.module('co-op.controllers', [])
 		$scope.sort = $scope.searchObject.hasOwnProperty('sort') ? $scope.searchObject.sort : undefined;
 		$scope.reverse = $scope.searchObject.hasOwnProperty('reverse') ? $scope.searchObject.reverse : undefined;
 
-		function findCartItems() {
-			if ($scope.cartProduct_ids && $scope.products) {
-				$scope.products.forEach(function(product) {
-					if ( _.contains($scope.cartProduct_ids, product._id) ) {
-						product.AlreadyInCart = true;
-					}
-					else product.AlreadyInCart = 0;
-				});
-			}
-		}
-
 		// initiate the real-time message container
 		//$scope.message = {type: 'danger', closeMessage: function() {if (this.message) this.message = null;} };
 		$scope.products = [];
 
-
 		var productsStarted;
-
-		function loadProducts(productURL) {
-			oboe(productURL)
-				.path('!.*', function(product) {
-					if (product) $scope.isProducts = true;
-					else $scope.isProducts = false;
-				})
-				.node('!.*', function( product ){
-					// This callback will be called each time a new product is loaded
-					$scope.products.push(product);
-					console.log($scope.products.length);
-					$scope.$apply();
-					return oboe.drop;
-				})
-				.done(function() {
-					(function() {
-						var hashID, product, key, searchObject;
-						// if we need to open a product modal
-						if ($location.hash()) {
-							hashID = $location.hash().split('&id=');
-							hashID = hashID[1];
-							product = _.findWhere($scope.products, {_id: hashID});
-							$scope.open(product);
-						}
-					}());
-
-					// this will do nothing if the products are loaded before the cart is ready
-					// or no user is logged in
-					findCartItems();
-
-					$scope.predictiveSearch = _.map($scope.products, 'fullName');
-					$rootScope.$broadcast('PREDICTIVE_SEARCH', $scope.predictiveSearch);
-
-					return oboe.drop;
-				});
-		}
-
-		if ($rootScope.cycle) {
-			if (!$rootScope.canShop) {
-				productURL = 'api/product?cycle='+ ($rootScope.cycle + 1);
-			} else productURL = 'api/product?cycle='+$rootScope.cycle;
-			loadProducts(productURL);
-			productsStarted = true;
-		}
-
-		$rootScope.$watch('cycle', function(newValue){
-			if ($rootScope.cycle && !productsStarted) {
-				if (!$rootScope.canShop) {
-					productURL = 'api/product?cycle='+ ($rootScope.cycle + 1);
-				} else productURL = 'api/product?cycle='+$rootScope.cycle;
-				loadProducts(productURL);
-			}
-		});
 
 		$scope.searchFor = function(term) {
 			$location.search('search', term);
@@ -814,34 +763,6 @@ angular.module('co-op.controllers', [])
 
 		// open the modal
 		$scope.open = openProduct;
-
-		function openProduct(product) {
-			var template = 'partials/store/store-modal.html',
-			controller = 'modalInstanceCtrl';
-			if (product.fullName.match(/milk/i)) {
-				template = 'partials/store/milk.html';
-				controller = 'MilkFormCtrl';
-			}
-			var modalInstance = $modal.open({
-				templateUrl: 'partials/store/store-modal.html',
-				controller: 'modalInstanceCtrl',
-				size: 'lg',
-				resolve: {
-					data: function() {
-						return product;
-					}
-				}
-			});
-
-
-			modalInstance.result.then(function(product) {
-				$location.hash('');
-				$scope.addToCart(product);
-			}, function() {
-				$location.hash('');
-				console.log('Modal dismissed at: ' + new Date());
-			});
-		}
 
 		$scope.$on('OPEN_PRODUCT', function(event, item) {
 			if ($scope.products) {
@@ -851,82 +772,16 @@ angular.module('co-op.controllers', [])
 			else console.log("can't open product because it's undefined currently");
 		});
 
-		$scope.$on('NOT_IN_CART', function(event, id) {
-			if ($scope.products) {
-				findCartItems();
-			}
-		});
+		$scope.$on('NOT_IN_CART', findCartItems);
 
 		// if the user has items in their cart that are also in the store
 		// flag those items with the bool AlreadyInCart = true;
-		$scope.$on('CART_IDS', function(event, cartProduct_ids) {
-			$scope.cartProduct_ids = cartProduct_ids;
-			// this will do nothing if the cart is loaded before the products are ready
-			findCartItems();
-		});
+		$scope.$on('CART_IDS', findCartItems);
 
 		// A very important function :-)
 		$scope.addToCart = addToCart;
 
-		function addToCart(product) {
-			var order, modalInstance;
-			if ($rootScope.currentUser) {
-				//TODO:need a better matcher in future
-				if (product.fullName.match(/milk/i)) {
-					modalInstance = $modal.open({
-						templateUrl: 'partials/store/milk.html',
-						controller: 'MilkFormCtrl',
-						size: 'sm',
-						resolve: {
-							milk: function() {
-								return product;
-							}
-						}
-					});
-
-					modalInstance.result.then(function(orders) {
-						$location.hash('');
-						Cart.addToCart(orders, function(err, cartOrder) {
-							if (err) {
-								console.log(err);
-							} else {
-								$rootScope.$broadcast('UPDATE_CART', cartOrder);
-								LoginManager.getTally();
-							}
-						});
-					}, function() {
-						$location.hash('');
-						console.log('Modal dismissed at: ' + new Date());
-					});
-				} else {
-					order = {
-						product: product._id,
-						customer: $rootScope.currentUser._id,
-						supplier: product.producer_ID._id,
-						quantity: product.minOrder || 1
-					};
-
-					Cart.addToCart(order, function(err, cartOrder){
-						if (err) {
-							console.log(err);
-						} else {
-							LoginManager.getTally();
-							$rootScope.$broadcast('UPDATE_CART', cartOrder);
-						}
-					});
-				}
-				// This is where the magic really happens
-				// an error returns an empty callback
-			}
-			else {
-				modalInstance = $modal.open({
-					templateUrl: 'partials/store/not-a-member.html',
-					size : 'sm'
-				});
-			}
-		}
-
-		// route params
+		// route param $watches
 
 		$scope.$watch('category', function(newValue) {
 			$scope.filterCategory = _.result(_.find($scope.categories, {name: newValue}), '_id');
@@ -959,6 +814,109 @@ angular.module('co-op.controllers', [])
 		$scope.$watch('filterCategory', function(newValue) {
 			$scope.category = _.result(_.find($scope.categories, {_id: newValue}), 'name');
 		});
+    
+    // functions 
+    
+		function addToCart(product) {
+			var order, modalInstance;
+			if ($rootScope.currentUser) {
+				
+				order = {
+					unitPrice: product.price,
+					product: product._id,
+					customer: $rootScope.currentUser._id,
+					supplier: product.producer_ID._id,
+					quantity: product.minOrder || 1
+				};
+
+				Cart.addToCart(order, function(err, cartOrder){
+					if (err) {
+						console.log(err);
+					} else {
+						LoginManager.getTally();
+						$rootScope.$broadcast('UPDATE_CART', cartOrder);
+					}
+				});
+				// This is where the magic really happens
+				// an error returns an empty callback
+			}
+			else {
+				modalInstance = $modal.open({
+					templateUrl: 'partials/store/not-a-member.html',
+					size : 'sm'
+				});
+			}
+		}
+    
+		function findCartItems(event, cartProduct_ids) {
+			if (cartProduct_ids) cartProductIds = cartProduct_ids;
+			$scope.products.forEach(function(product) {
+				if ( _.contains(cartProductIds, product._id) ) {
+					product.AlreadyInCart = true;
+				}
+				else product.AlreadyInCart = 0;
+			});
+		}
+    
+		function loadProducts(productURL) {
+			oboe(productURL)
+				.path('!.*', function(product) {
+					if (product) $scope.isProducts = true;
+					else $scope.isProducts = false;
+				})
+				.node('!.*', function( product ){
+					// This callback will be called each time a new product is loaded
+					$scope.products.push(product);
+					console.log($scope.products.length);
+					$scope.$apply();
+					return oboe.drop;
+				})
+				.done(function() {
+					findCartItems();
+          (function() {
+						var hashID, product, key, searchObject;
+						// if we need to open a product modal
+						if ($location.hash()) {
+							hashID = $location.hash().split('&id=');
+							hashID = hashID[1];
+							product = _.findWhere($scope.products, {_id: hashID});
+							$scope.open(product);
+						}
+					}());
+
+					// this will do nothing if the products are loaded before the cart is ready
+					// or no user is logged in
+          // findCartItems();
+
+					$scope.predictiveSearch = _.map($scope.products, 'fullName');
+					$rootScope.$broadcast('PREDICTIVE_SEARCH', $scope.predictiveSearch);
+
+					return oboe.drop;
+				});
+		}
+    
+		function openProduct(product) {
+			var template = 'partials/store/store-modal.html',
+			controller = 'modalInstanceCtrl';
+			var modalInstance = $modal.open({
+				templateUrl: 'partials/store/store-modal.html',
+				controller: 'modalInstanceCtrl',
+				size: 'lg',
+				resolve: {
+					data: function() {
+						return product;
+					}
+				}
+			});
+
+			modalInstance.result.then(function(product) {
+				$location.hash('');
+				$scope.addToCart(product);
+			}, function() {
+				$location.hash('');
+				console.log('Modal dismissed at: ' + new Date());
+			});
+		}
 
 		// $rootScope.$watch('canShop', function() {
 // 			if ($rootScope.canShop === false) {
@@ -995,6 +953,8 @@ angular.module('co-op.controllers', [])
 		$scope.$on('CALENDAR-LOADED', function() {
 			console.log('Calendar loaded!');
 			// $scope.countDown = Calendar.countDown;
+			$scope.nextDeliveryDay = Calendar.getDeliveryDay();
+			
 			$scope.calendar = Calendar.calendar;
 
 			$scope.significantDays = Calendar.cycle;

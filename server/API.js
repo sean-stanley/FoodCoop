@@ -195,8 +195,8 @@ exports.configAPI = function configAPI(app) {
 	app.get('/api/product', function(req, res, next) {
 		//
 		models.Product.find()
-		.or([{permanent: true}, req.query])
-		.sort({_id: 1})
+		.and([{active: true}, req.query])
+		.sort({'productName': 1})
 		.populate('certification', 'name -_id img')
 		.populate('producer_ID', 'name producerData.companyName email')
 		//.stream({transform: JSON.stringify})
@@ -231,7 +231,9 @@ exports.configAPI = function configAPI(app) {
 
 	app.get('/api/product/:productId', ctrl.auth.isLoggedIn, ctrl.product.show);
 
-	app.put('/api/product/', ctrl.auth.canSell, ctrl.product.fromBody, ctrl.product.changePrice, ctrl.product.updateValidator, ctrl.product.quantityChange, ctrl.product.update);
+	app.put('/api/product/', ctrl.auth.canSell, ctrl.product.fromBody, ctrl.product.updateValidator, ctrl.product.quantityChange, ctrl.product.update);
+  
+  app.put('/api/product/publish/:productId', ctrl.auth.canSell, ctrl.product.publish);
 
 	// this creates a new product. It is
 	// only called from the product-upload page of the app.
@@ -240,25 +242,31 @@ exports.configAPI = function configAPI(app) {
 	// this request will delete a product from the database. First we find the
 	// requested product.
 	app.delete('/api/product/:productId', ctrl.auth.isLoggedIn, function(req, res, next) {
-		var mailData, mailOptions, deleteMail;
 		var product = req.product;
-
-		if (product.cycle < scheduler.currentCycle._id) {
-			res.status(400).send('Products sold in the past can\'t be deleted');
-		}
-		models.Order.find({product: new ObjectId(product._id)})
-		.count(function(e, count){
-			if (e) return next(e);
-			
-			if (count > 0) {
-				return res.status(401).send('Products that have been ordered by customers cannot be deleted sorry');
-			} else { // no orders for that product
-				product.remove(function(err, product){
-					if (err) return next(err);
-					else res.status(200).send('product deleted');
-				});
-			}
+		
+		product.update({active: false}, function(err, product) {
+			if (err) return next(err)
+			res.status(200).send('product deactivated');
 		});
+
+		// Deprecated
+
+		// if (product.cycle < scheduler.currentCycle._id) {
+// 			res.status(400).send('Products sold in the past can\'t be deleted');
+// 		}
+// 		models.Order.find({product: new ObjectId(product._id)})
+// 		.count(function(e, count){
+// 			if (e) return next(e);
+//
+// 			if (count > 0) {
+// 				return res.status(401).send('Products that have been ordered by customers cannot be deleted sorry');
+// 			} else { // no orders for that product
+// 				product.remove(function(err, product){
+// 					if (err) return next(err);
+// 					else res.status(200).send('product deleted');
+// 				});
+// 			}
+// 		});
 		
 	});
 	// return a compact list of all the current user's products.
@@ -277,12 +285,12 @@ exports.configAPI = function configAPI(app) {
 	});
 
 	app.get('/api/product-list/past', ctrl.auth.isLoggedIn, function(req, res, next) {
-		models.Product.find({cycle: {$lt: scheduler.currentCycle._id}})
+		models.Product.find({active: false})
 		.where('producer_ID').equals(new ObjectId(req.user._id))
 		.limit(100)
 		.select('productName variety price quantity amountSold units cycle')
-		.populate('cycle')
-		.sort('cycle.deliveryDay')
+		// .populate('cycle')
+		// .sort('cycle.deliveryDay')
 		.exec(function(e, products){
 			if (e) return next(e);
 			res.setHeader('Cache-Control', 'private, no-cache, no-store');
@@ -292,10 +300,10 @@ exports.configAPI = function configAPI(app) {
 
 	// return a compact list of all the current user's products for the current cycle.
 	app.get('/api/product-list/current', ctrl.auth.isLoggedIn, function(req, res, next) {
-		models.Product.find().or([{
+		models.Product.find({
 			producer_ID : new ObjectId(req.user._id),
-			cycle: scheduler.currentCycle._id
-		}, {permanent: true, producer_ID : new ObjectId(req.user._id)}]).select('permanent category productName variety dateUploaded price quantity amountSold units cycle').sort({dateUploaded: 1}).exec(function(e, products) {
+			active: true
+		}).select('permanent category productName variety dateUploaded price quantity amountSold units cycle').sort({dateUploaded: 1}).exec(function(e, products) {
 			if (e) return next(e);
 			res.setHeader('Cache-Control', 'private, no-cache, no-store');
 			res.json(products);
@@ -308,7 +316,7 @@ exports.configAPI = function configAPI(app) {
 
 		// finds all the orders requested by the query from the url query.
 		models.Order.find(req.query).sort({datePlaced: 1})
-		.populate('product', 'fullName price units producer_ID productName variety cycle refrigeration')
+		.populate('product', 'fullName units producer_ID productName variety cycle refrigeration')
 		.populate('customer', 'name')
 		.populate('supplier', 'name email producerData.companyName')
 		.exec( function(e, orders) {
@@ -324,7 +332,7 @@ exports.configAPI = function configAPI(app) {
 			// get all cart orders for the current user.
 			// optional query params will select a cycle to sort from
 			models.Order.find(req.query).find({supplier: req.user._id}).sort({datePlaced: 1})
-			.populate('product', 'fullName price productName variety units')
+			.populate('product', 'fullName productName variety units')
 			.populate('customer', 'name')
 			.populate('supplier', 'name email producerData.companyName')
 			.exec( function(e, orders) {
@@ -338,7 +346,7 @@ exports.configAPI = function configAPI(app) {
 				function(done) {
 					models.Order
 					.aggregate().match({cycle: scheduler.currentCycle._id, supplier: req.user._id})
-					.group({ _id: '$customer', orders: { $push : {product: '$product', quantity: '$quantity', milk: '$milk', deliveryDay:'$deliveryDay'} }})
+					.group({ _id: '$customer', orders: { $push : {product: '$product', quantity: '$quantity', milk: '$milk', unitPrice: '$unitPrice', deliveryDay:'$deliveryDay'} }})
 					.exec(function(e, customers) {
 						// customers is a plain javascript object not a special mongoose document.
 						done(e, customers);
@@ -382,7 +390,7 @@ exports.configAPI = function configAPI(app) {
 			// get the cart orders for the current user.
 			// req.query is used for finding orders from a specific cycle
 			models.Order.find(req.query).find({customer: req.user._id}).sort({datePlaced: 1})
-			.populate('product', 'fullName price productName variety')
+			.populate('product', 'fullName productName variety')
 			.populate('customer', 'name')
 			.populate('supplier', 'name email producerData.companyName')
 			.exec( function(e, cart) {
@@ -394,87 +402,148 @@ exports.configAPI = function configAPI(app) {
 	});
 	// update an order from a user's perspective. Only allowed to change quantity
 	app.post('/api/cart', ctrl.auth.isLoggedIn, function(req, res, next) {
-		if (scheduler.canShop) {
-			async.waterfall([
-				function(callback) {
-					models.Order.findById(req.body._id, 'quantity product cycle', function(e, order) {
-						if (!e) {
-							callback(null, order.quantity, req.body.quantity, order);
-						}
-						else {
-							callback(e);
-						}
-					});
-				},
-				function(oldQuantity, newQuantity, order, callback) {
-					models.Product.findById(order.product, 'quantity amountSold cycle minOrder', function(e, product) {
-						var minOrder = product.minOrder ? product.minOrder : 1;
-						if (!e) {
-							// make sure we are changing an order for the current cycle and a current product
-							if ( order.cycle >= product.cycle && product.cycle <= scheduler.currentCycle._id) {
-								if ( product.quantity >= (product.amountSold - oldQuantity + newQuantity) && newQuantity >= minOrder ) {
-									product.amountSold = product.amountSold - oldQuantity + newQuantity;
-									order.quantity = newQuantity;
-									product.save(function(err) {
-										if (err) log.info(err);
-										else order.save(function(err) {
-											if (err) log.info(err);
-											else res.status(200).end();
-										});
-									});
-								}
-
-								else if (newQuantity < minOrder) {
-									res.status(403).send('Sorry! You cannot order less than ' + minOrder + '. Because the producer set a minimum order amount of '+ minOrder + '.');
-								}
-
-								else {
-									res.status(403).send('Sorry! Insufficient inventory to add more than ' + (product.quantity - product.amountSold) + ' to your cart' );
-								}
-							} else {
-								res.status(403).send('Sorry! That product cannot be changed at this time.');
-							}
-						} else callback(e);
+		// order follows regular order schema but also contains field oldQty which must be removed at save time.
+		var order = req.body
+				, productId = order.product
+				, newQty = order.quantity
+				, oldQty = order.oldQty
+				, deltaQty = parseInt(newQty) - parseInt(oldQty);
+				
+		delete order.oldQty;
+				
+		models.Order.findByIdAndUpdate(order._id, {
+			$inc: {quantity: deltaQty}
+		}, function(err, order) {
+			if (err) {
+				console.error(err);
+				return res.status(403)
+				.send('Sorry! Your new ordered amount cannot be less than 0' );
+			}
+			
+			models.Product.findByIdAndUpdate(productId, {
+				$inc: {quantity: -deltaQty, amountSold: deltaQty}
+			}, {new: true}, function(err, product) {
+				if (err || product.quantity < 0) {
+					product.quantity += deltaQty;
+					product.amountSold -= deltaQty;
+					product.save();
+					return models.Order.findByIdAndUpdate(order._id, {
+						$inc: {quantity: -deltaQty}
+					}, function(error, order) {
+						if (error) return next(error)
+						return res.status(403).send("Sorry! Cart update failed.")
 					});
 				}
-				],
-				function(err) {
-					log.info(err);
-					next(err);
+				res.status(200).send("Poof! Cart Successfully Updated")
 			});
-		} else res.status(403).send('Sorry! It\'s not the right time of the month to add items to your cart.');
+		});
+		
+		//
+		//
+		// // deprecated
+		// if (scheduler.canShop) {
+		// 	async.waterfall([
+		// 		function(callback) {
+		// 			models.Order.findById(req.body._id, 'quantity product cycle', function(e, order) {
+		// 				if (!e) {
+		// 					oldQty = order.quantity;
+		// 					deltaQty = parseInt(newQty) - parseInt(oldQty);
+		// 					callback(null, order.quantity, req.body.quantity, order);
+		// 				}
+		// 				else {
+		// 					callback(e);
+		// 				}
+		// 			});
+		// 		},
+		// 		function(oldQuantity, newQuantity, order, callback) {
+		// 			models.Product.findById(order.product, 'quantity amountSold cycle minOrder', function(e, product) {
+		// 				var minOrder = product.minOrder ? product.minOrder : 1;
+		// 				var deltaQuantity = newQuantity-oldQuantity;
+		// 				if (!e) {
+		// 					if (product.quantity > deltaQuantity && newQuantity >= minOrder) {
+		// 						product.amountSold += deltaQuantity;
+		// 						order.quantity = newQuantity;
+		// 					}
+		//
+		// 					// deprecated
+		// 					// make sure we are changing an order for the current cycle and a current product
+		// 					if ( order.cycle >= product.cycle && product.cycle <= scheduler.currentCycle._id) {
+		// 						if ( product.quantity >= (product.amountSold - oldQuantity + newQuantity) && newQuantity >= minOrder ) {
+		// 							product.amountSold = product.amountSold - oldQuantity + newQuantity;
+		// 							order.quantity = newQuantity;
+		// 							product.save(function(err) {
+		// 								if (err) log.info(err);
+		// 								else order.save(function(err) {
+		// 									if (err) log.info(err);
+		// 									else res.status(200).end();
+		// 								});
+		// 							});
+		// 						}
+		//
+		// 						else if (newQuantity < minOrder) {
+		// 							res.status(403).send('Sorry! You cannot order less than ' + minOrder + '. Because the producer set a minimum order amount of '+ minOrder + '.');
+		// 						}
+		//
+		// 						else {
+		// 							res.status(403).send('Sorry! Insufficient inventory to add more than ' + (product.quantity - product.amountSold) + ' to your cart' );
+		// 						}
+		// 					} else {
+		// 						res.status(403).send('Sorry! That product cannot be changed at this time.');
+		// 					}
+		// 				} else callback(e);
+		// 			});
+		// 		}
+		// 		],
+		// 		function(err) {
+		// 			log.info(err);
+		// 			next(err);
+		// 	});
+		// } else res.status(403).send('Sorry! It\'s not the right time of the month to add items to your cart.');
 
 	});
 	// Deletes a specific item from a users own cart and increases the quantity
 	// available of that product again.
 	app.delete('/api/cart/:id', ctrl.auth.isLoggedIn, function(req, res, next) {
+		models.Order.findById(req.params.id, function(err, order) {
+			if (err) return next(err);
+			models.Product.findByIdAndUpdate(order.product, { $inc: {amountSold: -order.quantity, quantity: order.quantity} }, function(err, product) {
+				if (err) return next(err);
+				order.remove(function(err) {
+					if (err) console.log(err);
+				});
+				res.status(200).send('Product removed from cart');
+			});
+		});
+		
+		
+		//Deprecated
 		// Check if the current user is logged in and their ID in the params matches the
 		// id of their user data. If it does, delete that order from the database. Items
 		// entered after the end of ordering week can't be changed.
-		if (scheduler.canShop) {
-			models.Order.findById(req.params.id, function(e, order) {
-				if (!e) {
-					// make sure only recent orders are being deleted
-					if (order.cycle === scheduler.currentCycle._id) {
-						// adjust the inventory of the product available
-						models.Product.findByIdAndUpdate(order.product, { $inc: {amountSold : order.quantity * -1}}, function(e, product) {
-							if (!e) {
-								// delete the requested order
-								// respond with a basic HTML message
-								res.status(200).send('Product removed from cart');
-								order.remove(function(e) {
-									if (e) log.info(e);
-								});
-							}
-						});
-					}
-					else {
-						log.info('%s failed to delete an item from their cart because it\'s the wrong cycle', req.user.name);
-						res.status(403).send('Sorry you cannot delete orders from previous cycles');
-					}
-				}
-			});
-		} else res.status(403).send('Sorry! You can\'t make changes to your cart after Shopping Week Closes');
+		// if (scheduler.canShop) {
+// 			models.Order.findById(req.params.id, function(e, order) {
+// 				if (!e) {
+// 					// make sure only recent orders are being deleted
+// 					if (order.cycle === scheduler.currentCycle._id) {
+// 						// adjust the inventory of the product available
+// 						models.Product.findByIdAndUpdate(order.product, { $inc: {amountSold : order.quantity * -1}}, function(e, product) {
+// 							if (!e) {
+// 								// delete the requested order
+// 								// respond with a basic HTML message
+// 								res.status(200).send('Product removed from cart');
+// 								order.remove(function(e) {
+// 									if (e) log.info(e);
+// 								});
+// 							}
+// 						});
+// 					}
+// 					else {
+// 						log.info('%s failed to delete an item from their cart because it\'s the wrong cycle', req.user.name);
+// 						res.status(403).send('Sorry you cannot delete orders from previous cycles');
+// 					}
+// 				}
+// 			});
+// 		} else res.status(403).send('Sorry! You can\'t make changes to your cart after Shopping Week Closes');
 	});
 
 	// Creates a new order from the 'add to cart' buttons in the app. Returns the
@@ -486,6 +555,8 @@ exports.configAPI = function configAPI(app) {
 	.post(ctrl.meatOrder.create)
 	//.put(ctrl.meatOrder.update) // deprecated so meat orders cannot be updated
 	.get(ctrl.meatOrder.me);
+  
+  app.get('/api/admin/meat-order', ctrl.auth.isAdmin, ctrl.meatOrder.all)
 
 	app.get('/api/meat-order/cart', ctrl.auth.isLoggedIn, ctrl.meatOrder.cart);
 
@@ -1212,12 +1283,13 @@ exports.configAPI = function configAPI(app) {
 		else res.send('No session saved');
 	});
 
-	app.post('/api/admin/send-invoices', ctrl.auth.isAdmin, function(req, res) {
-		// to do: convert these controller functions to use route error handling.
-		scheduler.checkout();
-		scheduler.orderGoods();
-		res.status(200).end();
-	});
+	// deprecated since version 0.4
+	// app.post('/api/admin/send-invoices', ctrl.auth.isAdmin, function(req, res) {
+// 		// to do: convert these controller functions to use route error handling.
+// 		scheduler.checkout();
+// 		scheduler.orderGoods();
+// 		res.status(200).end();
+// 	});
 
 	// Sends an email for resetting a user's password. Token will expires in 1 hour.
 	app.post('/api/forgot', function(req, res) {
@@ -1257,7 +1329,7 @@ exports.configAPI = function configAPI(app) {
 					}
 				};
 
-				resetData = {host: req.headers.host, token: token };
+				resetData = {host: 'foodcoop.nz', token: token };
 
 				resetEmail = new Emailer(resetOption, resetData);
 
@@ -1397,28 +1469,30 @@ exports.configAPI = function configAPI(app) {
 
 	// get the calendar and current cycle for the app to use
 	app.get('/api/calendar', function(req, res, next) {
-		var calendar = {
-			currentCycle : scheduler.currentCycle,
-			canShop: scheduler.canShop
-		};
-		async.parallel([function(done) {
-			models.Cycle.findOne({deliveryDay: {$gt: new Date(scheduler.currentCycle.deliveryDay)}})
-			.lean().exec(function(err, cycle) {
-				if (err) return next(err);
-				calendar.nextCycle = cycle;
-				done();
-			});
-		}, function(done) {
-			models.Cycle.find({
-				deliveryDay: {$gte: Date.today().moveToFirstDayOfMonth().toString() }
-			}).sort('shoppingStart').lean().exec(function(err, cycles) {
-				if (err) return next(err);
-				calendar.cycles = cycles;
-				done();
-			});
-		}], function(err) {
-			res.json(calendar);
-		});
+		
+    res.json({cycle: scheduler.currentCycle})
+    // var calendar = {
+//       currentCycle : scheduler.currentCycle,
+//       canShop: scheduler.canShop
+//     };
+//     async.parallel([function(done) {
+//       models.Cycle.findOne({deliveryDay: {$gt: new Date(scheduler.currentCycle.deliveryDay)}})
+//       .lean().exec(function(err, cycle) {
+//         if (err) return next(err);
+//         calendar.nextCycle = cycle;
+//         done();
+//       });
+//     }, function(done) {
+//       models.Cycle.find({
+//         deliveryDay: {$gte: Date.today().moveToFirstDayOfMonth().toString() }
+//       }).sort('shoppingStart').lean().exec(function(err, cycles) {
+//         if (err) return next(err);
+//         calendar.cycles = cycles;
+//         done();
+//       });
+//     }], function(err) {
+//       res.json(calendar);
+//     });
 	});
 	// crop product image
 	app.post('/api/crop', ctrl.auth.isLoggedIn, ctrl.imgCrop.crop);

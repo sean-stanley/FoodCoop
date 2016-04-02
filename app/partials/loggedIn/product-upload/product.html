@@ -27,12 +27,17 @@
 <div class="col-xs-12">
 
 	<div id="product-upload-preview-column" class="col-sm-5 col-md-4" >
-		<div ng-controller="calendarCtrl" class="">
+		<div class="">
 			<a href="/calendar"><i class="fa fa-calendar pull-left fa-4x"></i></a>
 			<p>
-				<i class="fa fa-shopping-cart fa-fw"></i> Shopping <strong>{{shoppingTime()}}</strong><br>
-				<i class="fa fa-gift fa-fw"></i> Delivery Day is <strong>{{deliveryDayFromNow}}</strong><br>
+				<i class="fa fa-shopping-cart fa-fw"></i> Shopping finishes each <strong>Friday</strong><br>
+				<i class="fa fa-gift fa-fw"></i> Delivery Day is the following <strong>Tuesday</strong><br>
 			</p>
+		</div>
+		<div class="checkbox" ng-if="!!productData._id">
+		  <label>
+		    <input type="checkbox" ng-model="productData.active" ng-change="togglePublish()"> <span ng-show="productData.active"> Product is Published</span> <span ng-hide="productData.active"> Product is Hidden
+		  </label>
 		</div>
 		<section ng-show="productData.category || productData.img || productData.productName">
 			<h2>Preview <small>Live</small></h2>
@@ -94,7 +99,7 @@ min-width: inherit;">
 			<h4 class="text-center">Edit A Product in the Store</h4>
 			<accordion id="product-history-list" close-others="false">
 				<accordion-group>
-				<accordion-heading><span class="badge" style="margin-left: 10px">{{currentProducts.length}}</span> Products This Cycle</accordion-heading>
+				<accordion-heading><span class="badge" style="margin-left: 10px">{{currentProducts.length}}</span> Published Products</accordion-heading>
 
 					<ul class="list-unstyled fa-ul">
 						<li ng-repeat="i in currentProducts">
@@ -103,9 +108,8 @@ min-width: inherit;">
 						</li>
 					</ul>
 				</accordion-group>
-				<h4 class='text-center'>Re-list an Old Product</h4>
 				<accordion-group>
-					<accordion-heading><span class="badge" style="margin-left: 10px">{{pastProducts.length}}</span> Past Products </accordion-heading>
+					<accordion-heading><span class="badge" style="margin-left: 10px">{{pastProducts.length}}</span> Deactivated Products </accordion-heading>
 					<table class="table table-hover">
 						<thead>
 							<tr>
@@ -144,7 +148,6 @@ min-width: inherit;">
 	<div id="product-upload-form-container" class="col-sm-7 col-md-8" >
 		<form name="productUpload" autocomplete="off" novalidate>
 			<fieldset>
-				<h1>1. Enter Product Information</h1>
 				<div class="row">
 					<div class="form-group col-xs-12">
 						<label for="category">Product Category (select one)</label>
@@ -246,7 +249,6 @@ min-width: inherit;">
 					</select>
 				</div>
 
-				<h1>2. Set Sale Details</h1>
 				<div class="row form-group">
 					<div class="form-group col-md-12">
 						<div class="btn-group">
@@ -321,7 +323,7 @@ min-width: inherit;">
 				</div>
 
 
-				<div class="form-group col-md-12 well" ng-hide="productData.permanent">
+				<!-- <div class="form-group col-md-12 well" ng-hide="productData.permanent">
 
 					<h3>Select Sale Dates for Each Product <i class="fa fa-info-circle" tooltip="A copy of your product and sale options will be created for each delivery cycle selected. That way if you need to make changes later you can without affecting information in the past."></i></h3>
 
@@ -343,26 +345,33 @@ min-width: inherit;">
 							<button type="button" class="btn btn-default selector" ng-repeat="cycle in productManager.cycles" ng-model="productData.cycle[$index]" btn-checkbox btn-checkbox-true="cycle._id">{{cycle.deliveryDay | date:'EEE MMM dd yyyy'}}</button>
 						</div>
 					</div>
-				</div>
+				</div> -->
 
 
 				<div class="form-group">
 					<div class="btn-group">
-						<button type="submit" class="btn" ng-class="{'btn-success':productUpload.$valid, 'btn-warning':productUpload.$invalid}" ng-click="save(productUpload.$valid, categoryError);" analytics-on="click" analytics-event="Upload Product">
-							<span ng-show="!!productData._id && productData.cycle < cycle && canShop">Re-list For Current Cycle</span>
+						<button type="submit" ng-show="!productData._id" class="btn" ng-class="{'btn-success':productUpload.$valid, 'btn-warning':productUpload.$invalid}" ng-click="save(productUpload.$valid, categoryError);" analytics-on="click" analytics-event="Upload Product">
+							<!-- <span ng-show="!!productData._id && productData.cycle < cycle && canShop">Re-list For Current Cycle</span>
 							<span ng-show="!!productData._id && productData.cycle < cycle && !canShop">Re-list For Next Cycle</span>
 							<span ng-show="!!productData._id && productData.cycle === cycle && canShop">List in the Store</span>
 							<span ng-show="!!productData._id && productData.cycle === cycle && !canShop">Re-list for Next Cycle</span>
 							<span ng-show="!!productData._id && !!productData.cycle && productData.cycle > cycle">List for Future Cycle</span>
 							<span ng-show="!!productData._id && productData.cycle.length > 0">List Across Selected Date(s)</span>
 							<span ng-show="!productData._id && productData.cycle.length > 0">List Across Selected Date(s)</span>
-							<span ng-show="!!productData._id && productData.permanent === true && !productData.cycle">List in the Store</span>
-							<span ng-show="!productData._id">Save</span>
+							<span ng-show="!!productData._id && productData.permanent === true && !productData.cycle">List in the Store</span> -->
+							Upload Product to the Online Store
 						</button>
-						<button ng-if="productData._id" type="submit" class="btn" ng-class="{'btn-success': productUpload.$valid, 'btn-warning':productUpload.$invalid}" ng-click="update(productUpload.$valid, categoryError);" analytics-on="click" analytics-event="Update Product" ng-hide="!!productData._id && productData.cycle < cycle">Update Current Listing</button>
-						</div>
+						<button ng-if="productData._id" type="submit" class="btn" ng-class="{'btn-success': productUpload.$valid, 'btn-warning':productUpload.$invalid}" ng-click="update(productUpload.$valid, categoryError);" analytics-on="click" analytics-event="Update Product" ng-show="!!productData._id">Save Changes to Current Product</button>
 					</div>
-
+					<div class="btn-group pull-right">
+						<button type="button" class="btn btn-default selector" ng-model="productData.active" btn-radio="true">
+							Publish
+						</button>
+						<button type="button" class="btn btn-default selector" ng-model="productData.active" btn-radio="false">
+							Hidden
+						</button>
+					</div>
+				</div>
 			</fieldset>
 		</form>
 	</div>

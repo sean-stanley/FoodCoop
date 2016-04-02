@@ -1,7 +1,7 @@
 # Natural Food Co-op
+v 0.4.0
 
-
-Software for managing a local food co-op. This web app is built with MongoDB, Express, AngularJS and Node.js.
+Software for managing a local food co-op. This web app is built with MongoDB, Express, Node.js and AngularJS v1.
 
 A live site can be found [here](http://foodcoop.nz).
 
@@ -16,7 +16,7 @@ A potential member can join either as a producer member or customer member. The 
 
 ## Buying Products
 
-To ease transportation costs buying is done on a fixed and customizable schedule in our dynamic and powerful store with an intuitive shopping cart.
+To ease transportation costs ordering is done on a fixed and customizable schedule in our dynamic and powerful store with an intuitive shopping cart.
 
 ### Schedule
 The admin page lets an admin user create new ordering cycles by specifying a start date (and time though this is usually midnight local time), shopping start, shopping stop and delivery day.
@@ -30,7 +30,7 @@ Here is what each of those controls in the store:
 **Delivery Day** is when producers bring all their goods to a central location for sorting and packing and for customers to either pick up or be sent out to more remote customers.
 
 ### Store
-The store by default only shows products uploaded for sale for the current cycle. It contains an easy-to-use interface as well as various search and filtering controls.
+The store shows all published products. When a user wishes to withdraw a product from the store catalog, they simply de-select the  the check box at the top of the product edit page.
 
 ### Shopping Cart
 A one-click add-to-cart system is in place and there is no checkout necessary. Once an item is added to a user's cart they can change the quantity they wish to purchase, quick-link to reading more about the product again or delete the product entirely from their cart.
@@ -40,9 +40,12 @@ Cart's are only mutable between the shopping start and shopping stop dates as th
 ## Selling Products
 A producer is very flexible with the ability to sell products through the store. They set their own prices (the co-op adds a markup though that can be set in the server/coopConfig.js file), units and quantity available. They also have a [Textangular Wysywig Editor](https://github.com/fraywing/textAngular) for making a rich product description.
 
-A product image can be uploaded and cropped in the browser with Standup75's [Angular Cropme Directive](https://github.com/standup75/cropme).
+A product image can be uploaded.
 
-A producer chooses when to sell the product and a single product can be replicated across multiple cycles with a single click. Each product can be individually updated as well.
+The product is then available for sale until it either sells out or is unpublished from the store catalog.
+
+### Selling Whole Animals
+Whole animal sales are accompanied by a butchery form. When an order is placed, the producer instantly receives an email with the butchery instructions.
 
 ## Managing Products and Orders
 A producer can see details for each order made and products they've sold in the store and have some very useful statistics at their finger tips.
@@ -86,12 +89,9 @@ Admin tools exists for managing most co-op features.
 * Add more E2E tests for common user tasks
 * Add more unit tests for both client-side and server-side controllers
 * Add a way to manage mailchimp subscription right from our site.
-* (When more meat sellers join) when a member buys an animal that must be butchered, have the website provide a form for filling out butchery instructions.
 * have a live map showing markers where producers live on producer list page. Currently lat long data is already stored for users.
 * for Co-op presentations and promotional/educational events have a place for those to be promoted on the website
-* move the farmer's market map from the blog to the main website
 * list other sources for local food in Northland
-* (When more meat sellers join) make a note that whole beast sales are not handled on delivery day but upon arrangement with the producer.
 * Develop a list of regions that members can belong to and then filter shopping to their regions. This would allow multiple regions to buy at the same time or possibly on different schedules.
 * integrate a method of searching for producers near a member.
 

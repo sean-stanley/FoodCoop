@@ -41,6 +41,12 @@ angular.module('co-op.admin', ['ngRoute']).config(['$routeProvider', function($r
 			}
 		})
 		.when('/admin/routes', { controller: 'routeAdminCtrl', templateUrl: 'partials/admin/routes.html', adminOnly: true, reloadOnSearch: false, title: 'Route Master Page'})
+    .when('/admin/meat-orders', {
+      controller: 'meatOrderAdminCtrl',
+      templateUrl: 'partials/admin/meat-orders.html',
+      adminOnly: true,
+      reloadOnSearch: false
+    })
 		.when('/catalogue', {
 			controller: 'productAdminCtrl', 
 			templateUrl:'partials/store/catalogue.html', 

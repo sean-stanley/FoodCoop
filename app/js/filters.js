@@ -1,5 +1,5 @@
 'use strict';
-/*global angular, Date*/
+/*global angular, Date, moment*/
 
 /* Filters */
 
@@ -58,5 +58,18 @@ angular.module('co-op.filters', []).
 		  	return Date.parse(longDate).toString('ddd d MMM yyyy');
 		  }
 	  };
-  })
+  }).filter('calendar', calendar)
   ;
+	
+	function calendar () {
+	  return function (time) {
+	    if (!time) return;
+
+	    return moment(time).calendar(null, {
+	      lastDay : '[Yesterday]',
+	      sameDay : 'LT',
+	      lastWeek : 'dddd',
+	      sameElse : 'DD/MM/YY'
+	    });
+	  };
+	}

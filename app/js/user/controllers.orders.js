@@ -46,6 +46,7 @@ angular.module('co-op.orders', [])
 		for (var i = 0; i < n; i++) {
 			var deliveryDay = moment($rootScope.deliveryDay).add(i, 'w').format();
 			$scope.weeks.push({
+				unitPrice: $scope.milk.price,
 				product: $scope.milk._id,
 				customer: $rootScope.currentUser._id,
 				supplier: $scope.milk.producer_ID._id,

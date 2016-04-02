@@ -54,7 +54,7 @@ exports.create = function(req, res, next) {
 	models.Order.create(order, function(err, newOrder) {
 		if (err) return next(err);
 		models.Order.populate(newOrder, [
-			{path:'product', select: 'price units fullName productName variety'},
+			{path:'product', select: 'units fullName productName variety'},
 			{path: 'supplier', select: 'name email producerData.companyName'}
 		]
 		, function(e, result) {
@@ -68,25 +68,26 @@ function product(order, callback) {
 	models.Product.findByIdAndUpdate(order.product,
 		{
 			$inc: {
-			amountSold : order.quantity
+				amountSold : order.quantity,
+				quantity: -order.quantity
 			}
 		}
 	)
 	.select('amountSold quantity variety productName fullName')
 	.exec(function(e, product) {
 		if (e) return callback(e);
-		if (product.quantity >= product.amountSold) {
+		if (product.quantity >= 0) {
 			callback(null);
 		}
 		else {
 			product.amountSold -= order.quantity;
+			product.quantity += order.quantity;
 			product.save(function(err) {
 				if (err) log.info(err);
 				var error = new Error('you can\'t buy that many. Insufficient quantity available.');
 				callback(error);
 			});
 		}
-
 	});
 }
 

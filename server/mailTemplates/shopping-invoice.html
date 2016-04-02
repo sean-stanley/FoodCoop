@@ -14,7 +14,6 @@
 								<td colspan="5">{{name}}'s Shopping Bill</td>
 							</tr>
 							<tr>
-								<td><strong>Refrigeration</strong></td>
 				 			 <td><strong>Product</strong></td>
 							 <td><strong>Unit Price</strong></td>
 							 <td><strong>Quantity</strong></td>
@@ -25,11 +24,10 @@
 
 						 <% _.each(items, function(item) { %> 
 							 <tr>
-								 <td>{{item.product.refrigeration}}</td>
 								 <td>{{item.product.fullName}}</td>
-								 <td>${{item.product.priceWithMarkup.toFixed(2)}} / {{item.product.units}}</td>
+								 <td>${{ (item.cost/item.quantity).toFixed(2) }} / {{item.product.units}}</td>
 								 <td>{{item.quantity}}</td>
-								 <td>${{ (item.product.priceWithMarkup * item.quantity).toFixed(2)}}</td>
+								 <td>${{ item.cost.toFixed(2) }}</td>
 							 </tr>
 						<% }); %>
 					</tbody>

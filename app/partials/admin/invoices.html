@@ -131,9 +131,9 @@
 	<tbody>
 		<tr ng-repeat="item in invoice.items">
 			<td>{{item.product.fullName}}</td>
-			<td>{{item.product.priceWithMarkup | currency}} / {{item.product.units}}</td>
+			<td>{{ (item.cost/item.quantity) || item.product.priceWithMarkup | currency}} / {{item.product.units}}</td>
 			<td>{{item.quantity}}</td>
-			<td>{{item.product.priceWithMarkup * item.quantity | currency}}</td>
+			<td>{{ item.cost || item.product.priceWithMarkup * item.quantity | currency}}</td>
 		</tr>
 	</tbody>
 </table>
@@ -165,9 +165,9 @@
 		<tr ng-repeat="item in invoice.items">
 			<td>{{item.product.fullName}} </td>
 			<td><a href="" popover-placement="top" popover="P: {{item.customer.phone}} E: {{item.customer.email}} A: {{item.customer.address}}">{{item.customer.name}}</a></td>
-			<td>{{item.product.price | currency}} / {{item.product.units}}</td>
+			<td>{{item.cost || item.product.price | currency}} / {{item.product.units}}</td>
 			<td>{{item.quantity}}</td>
-			<td>{{item.product.price * item.quantity | currency}}</td>
+			<td>{{(item.cost || item.product.price) * item.quantity | currency}}</td>
 		</tr>
 	</tbody>
 	

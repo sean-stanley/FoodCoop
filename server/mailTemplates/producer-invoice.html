@@ -13,6 +13,12 @@
 				
 				 <h2>Your Sales</h2>
 				 <p> Below is a summary of the products you have sold this cycle, along with the amount your account has been credited.</p>
+         <table border="1" cellspacing="0" cellpadding="5" width="100%">
+           <tr><th>Product</th><th>Amount</th></tr>
+           <% _.each(products, function(item) { %> 
+             <tr><td class="text-align: center"><strong>{{item.name}}</strong></td><td class="text-align:right">{{item.count}}</td></tr>
+           <% }); %>
+         </table>
 		
 				<table border="0" cellspacing="10" cellpadding="10">
 				 <thead>
@@ -29,23 +35,23 @@
 					 </tr>
 				 </thead>
 				 <tbody>
-               
-			  <% _.each(items, function(item) { %> 
-                 <tr>
-					 <td>{{item.product.fullName}} </td>
-					 <td>{{item.customer.name}}</td>
-					 <td>${{item.product.price.toFixed(2)}} / {{item.product.units}}</td>
-					 <td>{{item.quantity}}</td>
-                     <td>${{ (item.product.price * item.quantity).toFixed(2)}}</td>
-                 </tr>
-			<% }); %>
-           </tbody>
-           <tfoot>
-							 <tr>
-								 <td colspan="5"> Total: ${{total.toFixed(2)}}</td>
-							 </tr>
-						 </tfoot>
-					 </table>
+
+					 <% _.each(items, function(item) { %> 
+						 <tr>
+							 <td>x <strong>{{item.quantity}}</strong> {{item.product.fullName}} </td>
+							 <td>{{item.customer.name}}</td>
+							 <td>${{(item.cost / item.quantity).toFixed(2)}} / {{item.product.units}}</td>
+							 <td><strong>{{item.quantity}}</strong></td>
+							 <td>${{ item.cost.toFixed(2)}}</td>
+				 			</tr>
+				 <% }); %>
+				 </tbody>
+				 <tfoot>
+						<tr>
+							<td colspan="5"> Total: ${{total.toFixed(2)}}</td>
+						</tr>
+				 </tfoot>
+			</table>
 	   
 	   <p>Assuming all your customers pay us promptly, your payment should arrive by <strong>{{dueDate}}</strong> You can expect payment to the account {{account}}. If this is incorrect, please contact us immediately and update your bank account details from the producer profile page on our website.</p>
        
