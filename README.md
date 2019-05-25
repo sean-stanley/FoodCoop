@@ -1,9 +1,12 @@
+### Deprecated
+This project is deprecated. A newer version built with MeteorJS and AngularJS v1 can be found [here](https://github.com/redhead-web/meteor-foodcoop).
+
 # Natural Food Co-op
 v 0.4.0
 
 Software for managing a local food co-op. This web app is built with MongoDB, Express, Node.js and AngularJS v1.
 
-A live site can be found [here](http://foodcoop.nz).
+A live site can be found [here](https://foodcoop.nz).
 
 
 # Included Features:
