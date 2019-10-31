@@ -68,7 +68,7 @@
     "grunt-nodemon": "^0.2.1",
     "grunt-rsync": "~0.6.2",
     "grunt-shell": "~1.1.1",
-    "lodash": "^3.10.1",
+    "lodash": "^4.17.15",
     "mailchimp-api": "^2.0.6",
     "mandrill-api": "^1.0.45",
     "method-override": "^2.2.0",
