@@ -73,7 +73,7 @@
     "mandrill-api": "^1.0.45",
     "method-override": "^2.2.0",
     "moment": "^2.10.0",
-    "mongodb": "^1.4.10",
+    "mongodb": "^3.6.1",
     "mongojs": "^0.12.1",
     "mongoose": "^4.x",
     "node-schedule": "^0.1.13",
